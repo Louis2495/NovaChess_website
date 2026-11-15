@@ -26,9 +26,11 @@ import {
 export default function Openings({
   mode,
   query = "",
+  selectedId,
 }: {
   mode: "train" | "lesson";
   query?: string;
+  selectedId?: string;
 }) {
   const { data: lessons, error } = useData<Opening[]>("lessons"),
     { data: all } = useData<Opening[]>("openings");
@@ -39,6 +41,7 @@ export default function Openings({
       all={all || lessons}
       mode={mode}
       query={query}
+      selectedId={selectedId}
     />
   );
 }
@@ -47,15 +50,19 @@ function OpeningLibrary({
   all,
   mode,
   query,
+  selectedId,
 }: {
   lessons: Opening[];
   all: Opening[];
   mode: "train" | "lesson";
   query: string;
+  selectedId?: string;
 }) {
   const { library, setLibrary, notify } = useApp();
   const [search, setSearch] = useState(query),
-    [selected, setSelected] = useState(lessons[0]),
+    [selected, setSelected] = useState(
+      lessons.find((l) => l.id === selectedId) || lessons[0],
+    ),
     [step, setStep] = useState(0),
     [practice, setPractice] = useState(mode === "train"),
     [side, setSide] = useState<"w" | "b">("w"),

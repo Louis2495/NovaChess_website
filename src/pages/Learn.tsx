@@ -50,6 +50,7 @@ export default function Learn() {
           <Openings
             mode={section === "train" ? "train" : "lesson"}
             query={section === "search" ? detail.slice(7) : ""}
+            selectedId={section === "lessons" ? detail.slice(8) : undefined}
           />
         )}
       </>

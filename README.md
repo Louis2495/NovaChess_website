@@ -1,6 +1,6 @@
 # NovaChess web workspace
 
-A dark, customizable chess workspace following the iPhone app’s **Home, Analysis, Play, Puzzles and Learn** structure. Clock and camera features are intentionally omitted.
+A dark, customizable chess workspace following the iPhone app’s **Home, Analysis, Play, Puzzles and Learn** structure, with a dedicated **Stats** page. Clock and camera features are intentionally omitted.
 
 ![Desktop workspace](docs/preview-desktop.jpg)
 
@@ -27,13 +27,13 @@ Set `CHROMIUM_PATH` to use another Chromium binary. The build creates static fil
 
 ## Features
 
-- **Home:** daily puzzle, resume game, actual progress and recent games.
+- **Home:** a dedicated New Game section, daily puzzle, suggested opening lessons and recent games.
 - **Analysis:** local Stockfish 19 Lite, one/three candidate lines, evaluation, material/check insights, legal moves, FEN/PGN import, position editing, branching, saved studies, FEN/link/PNG/GIF export.
 - **Play:** computer games, adaptive strength, Developer opening book, requested openings, all app variants, two-board Bughouse, drops, Duck placement, premoves, underpromotions, takebacks, draw offers and local history.
 - **Puzzles:** all 4,000 source puzzles; adaptive selection, automatic replies, hints, first-attempt grading, streaks and a deterministic daily puzzle.
 - **Learn:** all 111 curated lessons and 3,865 searchable opening lines, practice, repertoire editing/import/training with transpositions and spaced review, public-game research, 17 playable endgames, 56 facts and 22 historical milestones with championship/event-rating views.
 - **Library:** folders, imports, replay, persistent/resumable reviews, repertoire recall suggestions, engine alternatives and exports.
-- **Progress:** real training/game results, improvement patterns, 14 achievements and a zoomable country map.
+- **Stats:** dedicated navigation, result and activity charts, training/game totals, improvement patterns, 14 achievements and a zoomable country map.
 - **Players & sharing:** local profile/avatar/country, local friends, pass-and-play, portable correspondence files, position/game links and read-only shared replays.
 - **Appearance:** nine app themes, all 12 board palettes and six piece sets, 12 app background styles plus uploaded backgrounds, custom base/accent/button/text/panel/board colors, background blur/dimming, panel opacity, font/size, spacing, corners, board size, move display, audio, personal presets and settings import/export. Changes persist locally.
 

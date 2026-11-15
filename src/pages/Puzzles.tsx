@@ -8,7 +8,6 @@ import {
   Target,
   ExternalLink,
   Calendar,
-  ChevronRight,
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import { useData, today } from "../lib/store";
@@ -380,11 +379,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               </div>
             )}
           </Card>
-          <button className="card tool-card" onClick={() => navigate("stats")}>
-            <Flame size={20} />
-            <span>Progress & achievements</span>
-            <ChevronRight size={17} />
-          </button>
         </div>
       </div>
     </>

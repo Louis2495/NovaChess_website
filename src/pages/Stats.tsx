@@ -3,6 +3,8 @@ import { Chess } from "chess.js";
 import {
   Trophy,
   Flame,
+  Puzzle,
+  ArrowRight,
   BookOpen,
   Target,
   Plus,
@@ -13,13 +15,14 @@ import {
   Check,
   Flag,
 } from "lucide-react";
+import type { SavedGame } from "../lib/types";
 import { useApp } from "../lib/context";
 import { useData } from "../lib/store";
 import { PageTitle, Card, Button, IconButton } from "../components/UI";
 type Country = { code: string; polygons: number[][][] };
 export default function Stats() {
-  const { library, navigate } = useApp();
-  const [tab, setTab] = useState("Statistics");
+  const { library } = useApp();
+  const [tab, setTab] = useState("Overview");
   const games = library.games.filter((g) => g.result !== "*"),
     wins = games.filter(
       (g) => g.result === (g.human === "w" ? "1-0" : "0-1"),
@@ -81,9 +84,9 @@ export default function Stats() {
   ];
   return (
     <>
-      <PageTitle title="Progress" subtitle="Local games and training results" />
+      <PageTitle title="Stats" />
       <div className="segmented page-segments">
-        {["Statistics", "Achievements", "World map"].map((t) => (
+        {["Overview", "Achievements", "World map"].map((t) => (
           <button
             key={t}
             className={tab === t ? "active" : ""}
@@ -124,145 +127,224 @@ export default function Stats() {
       ) : tab === "World map" ? (
         <WorldMap visited={visited} />
       ) : (
-        <>
-          <div className="stats-strip">
-            {[
-              { icon: Trophy, label: "Games completed", value: games.length },
-              {
-                icon: Target,
-                label: "Win rate",
-                value: games.length
-                  ? `${Math.round((wins / games.length) * 100)}%`
-                  : "—",
-              },
-              {
-                icon: Flame,
-                label: "Puzzle streak",
-                value: library.progress.streak,
-              },
-              {
-                icon: BookOpen,
-                label: "Lessons completed",
-                value: library.progress.learned.length,
-              },
-            ].map(({ icon: Icon, label, value }) => (
-              <Card className="stat-tile" key={label}>
-                <Icon size={20} />
-                <span>
-                  <b>{value}</b>
-                  <small>{label}</small>
-                </span>
-              </Card>
-            ))}
-          </div>
-          <div className="stats-grid">
-            <Card>
-              <h2>Results</h2>
-              <Bar label="Wins" value={wins} total={games.length} />
-              <Bar label="Draws" value={draws} total={games.length} />
-              <Bar label="Losses" value={losses} total={games.length} />
-            </Card>
-            <Card>
-              <h2>Color</h2>
-              <Bar
-                label="White"
-                value={games.filter((g) => g.human === "w").length}
-                total={games.length}
-              />
-              <Bar
-                label="Black"
-                value={games.filter((g) => g.human === "b").length}
-                total={games.length}
-              />
-              <p className="caption">
-                Local rating estimate: {Math.round(library.localRating)}. Not an
-                official competitive rating.
-              </p>
-            </Card>
-            <Card>
-              <h2>Training</h2>
-              <Bar
-                label="Puzzles solved"
-                value={library.progress.solved}
-                total={Math.max(1, library.progress.attempts)}
-              />
-              <Bar
-                label="Lessons"
-                value={library.progress.learned.length}
-                total={111}
-              />
-              <Bar
-                label="Endgames"
-                value={library.progress.endgames.length}
-                total={17}
-              />
-              <p className="caption">
-                Puzzle estimate: {Math.round(library.progress.rating)}
-              </p>
-            </Card>
-            <Card>
-              <h2>Improvement areas</h2>
-              <p className="caption">From {reviewed} reviewed games.</p>
-              {concepts.size ? (
-                [...concepts]
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([concept, count]) => (
-                    <Bar
-                      key={concept}
-                      label={concept}
-                      value={count}
-                      total={Math.max(...concepts.values())}
-                    />
-                  ))
-              ) : (
-                <p className="muted">
-                  Review a saved game to identify recurring patterns.
-                </p>
-              )}
-              <Button
-                className="text-button"
-                onClick={() => navigate("library")}
-              >
-                Review games
-              </Button>
-            </Card>
-            <Card>
-              <h2>Variants</h2>
-              {variants.size ? (
-                [...variants].map((v) => (
-                  <Bar
-                    key={v}
-                    label={v}
-                    value={games.filter((g) => g.variant === v).length}
-                    total={games.length}
-                  />
-                ))
-              ) : (
-                <p className="muted">Completed variant games appear here.</p>
-              )}
-            </Card>
-            <Card>
-              <h2>Repertoire</h2>
-              <div className="large-metric">
-                {library.repertoire.length}
-                <span>Saved lines</span>
-              </div>
-              <p className="caption">
-                {library.repertoire.filter((r) => r.due <= Date.now()).length}{" "}
-                due · {library.repertoire.reduce((s, r) => s + r.trained, 0)}{" "}
-                reviews completed
-              </p>
-              <Button
-                className="secondary"
-                onClick={() => navigate("learn", "repertoire")}
-              >
-                Train repertoire
-              </Button>
-            </Card>
-          </div>
-        </>
+        <StatsOverview
+          games={games}
+          wins={wins}
+          draws={draws}
+          losses={losses}
+          concepts={concepts}
+          reviewed={reviewed}
+        />
       )}
     </>
+  );
+}
+function StatsOverview({
+  games,
+  wins,
+  draws,
+  losses,
+  concepts,
+  reviewed,
+}: {
+  games: SavedGame[];
+  wins: number;
+  draws: number;
+  losses: number;
+  concepts: Map<string, number>;
+  reviewed: number;
+}) {
+  const { library, navigate } = useApp();
+  const rate = games.length ? Math.round((wins / games.length) * 100) : null;
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - 6 + i);
+    const end = new Date(d);
+    end.setDate(end.getDate() + 1);
+    return {
+      label: d.toLocaleDateString(undefined, { weekday: "short" }),
+      count: games.filter(
+        (g) => g.created >= d.getTime() && g.created < end.getTime(),
+      ).length,
+    };
+  });
+  const max = Math.max(1, ...days.map((d) => d.count));
+  const winStop = games.length ? (wins / games.length) * 100 : 0,
+    drawStop = games.length ? ((wins + draws) / games.length) * 100 : 0;
+  return (
+    <div className="stats-overview">
+      <section className="stats-metrics" aria-label="Your statistics">
+        {[
+          { icon: Trophy, label: "Games played", value: games.length },
+          {
+            icon: Target,
+            label: "Local rating",
+            value: Math.round(library.localRating),
+          },
+          {
+            icon: Puzzle,
+            label: "Puzzles solved",
+            value: library.progress.solved,
+          },
+          {
+            icon: Flame,
+            label: "Puzzle streak",
+            value: library.progress.streak,
+          },
+        ].map(({ icon: Icon, label, value }) => (
+          <div key={label}>
+            <span className="stat-metric-label">
+              <Icon size={16} />
+              {label}
+            </span>
+            <b>{value}</b>
+          </div>
+        ))}
+      </section>
+      <div className="stats-visual-grid">
+        <Card className="results-card">
+          <h2>Results</h2>
+          <div className="results-content">
+            <div
+              className="results-ring"
+              role="img"
+              aria-label={`${wins} wins, ${draws} draws, ${losses} losses`}
+              style={{
+                background: games.length
+                  ? `conic-gradient(var(--accent) 0% ${winStop}%, #b2bec3 ${winStop}% ${drawStop}%, #d38b8d ${drawStop}% 100%)`
+                  : "var(--border)",
+              }}
+            >
+              <div>
+                <strong>{rate === null ? "—" : `${rate}%`}</strong>
+                <span>Win rate</span>
+              </div>
+            </div>
+            <div className="results-legend">
+              {[
+                ["Wins", wins, "var(--accent)"],
+                ["Draws", draws, "#b2bec3"],
+                ["Losses", losses, "#d38b8d"],
+              ].map(([label, value, color]) => (
+                <div key={label}>
+                  <i style={{ background: String(color) }} />
+                  <span>{label}</span>
+                  <b>{value}</b>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+        <Card className="activity-card">
+          <div className="card-heading">
+            <h2>Activity</h2>
+            <span className="caption">Last 7 days</span>
+          </div>
+          <div className="activity-chart">
+            {days.map((d, i) => (
+              <div className="activity-day" key={i}>
+                <div className="activity-track">
+                  <span
+                    role="img"
+                    aria-label={`${d.label}: ${d.count} completed games`}
+                    style={{ height: `${(d.count / max) * 100}%` }}
+                  >
+                    {d.count > 0 && <b>{d.count}</b>}
+                  </span>
+                </div>
+                <small>{d.label}</small>
+              </div>
+            ))}
+          </div>
+          {!days.some((d) => d.count) && (
+            <p className="activity-empty">No completed games this week.</p>
+          )}
+        </Card>
+      </div>
+      <div className="stats-detail-grid">
+        <Card>
+          <div className="card-heading">
+            <h2>Training</h2>
+            <BookOpen size={18} />
+          </div>
+          <Bar
+            label="Opening lessons"
+            value={library.progress.learned.length}
+            total={111}
+          />
+          <Bar
+            label="Endgames"
+            value={library.progress.endgames.length}
+            total={17}
+          />
+          <div className="stats-training-footer">
+            <span>{library.repertoire.length} repertoire lines</span>
+            <button
+              className="text-link"
+              onClick={() => navigate("learn", "repertoire")}
+            >
+              Train
+              <ArrowRight size={14} />
+            </button>
+          </div>
+        </Card>
+        <Card>
+          <h2>Playing color</h2>
+          <Bar
+            label="White"
+            value={games.filter((g) => g.human === "w").length}
+            total={games.length}
+          />
+          <Bar
+            label="Black"
+            value={games.filter((g) => g.human === "b").length}
+            total={games.length}
+          />
+          <p className="caption">Local ratings are training estimates.</p>
+        </Card>
+      </div>
+      <section className="improvement-section">
+        <div className="home-section-heading">
+          <h2>Improvement areas</h2>
+          <span className="caption">{reviewed} reviewed games</span>
+        </div>
+        {concepts.size ? (
+          <div className="improvement-bars">
+            {[...concepts]
+              .sort((a, b) => b[1] - a[1])
+              .map(([concept, count]) => (
+                <Bar
+                  key={concept}
+                  label={concept}
+                  value={count}
+                  total={Math.max(...concepts.values())}
+                />
+              ))}
+          </div>
+        ) : (
+          <p className="muted">
+            Review a game to identify patterns in your play.
+          </p>
+        )}
+        <button className="text-link" onClick={() => navigate("library")}>
+          Review games
+          <ArrowRight size={14} />
+        </button>
+        <details className="variant-breakdown">
+          <summary>Variant breakdown</summary>
+          {[...new Set(games.map((g) => g.variant))].map((v) => (
+            <Bar
+              key={v}
+              label={v}
+              value={games.filter((g) => g.variant === v).length}
+              total={games.length}
+            />
+          ))}
+          {!games.length && <p className="caption">No completed games.</p>}
+        </details>
+      </section>
+    </div>
   );
 }
 function Bar({

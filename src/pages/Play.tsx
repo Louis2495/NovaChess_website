@@ -576,20 +576,22 @@ export default function Play() {
         subtitle={
           playing
             ? `${variantInfo?.name || game?.variant} · ${game?.opponent || "Computer"}`
-            : "Computer games and local variants"
+            : undefined
         }
       >
-        <Button
-          className="secondary"
-          onClick={() => {
-            setPlaying(false);
-            setPaused(false);
-            setPremoves([]);
-          }}
-        >
-          <Plus size={16} />
-          New game
-        </Button>
+        {playing && (
+          <Button
+            className="secondary"
+            onClick={() => {
+              setPlaying(false);
+              setPaused(false);
+              setPremoves([]);
+            }}
+          >
+            <Plus size={16} />
+            New game
+          </Button>
+        )}
         {playing && (
           <Button
             className="secondary"
@@ -610,33 +612,55 @@ export default function Play() {
         </div>
       )}
       {!playing || !game || !valid ? (
-        <div className="new-game-layout">
-          <Card className="new-game-card">
-            <MonitorPlay size={38} className="accent" />
-            <h2>New game</h2>
-            <Button disabled={!ff} onClick={start}>
-              <PlayIcon size={17} />
-              Start game
-            </Button>
-            {game?.result === "*" && (
+        <div className="game-setup-page">
+          <section
+            className="play-feature setup-launch"
+            aria-labelledby="new-game-title"
+          >
+            <div className="play-feature-copy">
+              <span className="feature-overline">
+                {variantList.find((v) => v.id === variant)?.name}
+              </span>
+              <h2 id="new-game-title">New game</h2>
+              <p>
+                {human === "w" ? "White" : "Black"} · {choice}
+              </p>
               <Button
-                className="secondary"
-                onClick={() => {
-                  setPlaying(true);
-                  setFlipped(game.human === "b");
-                }}
+                className="new-game-primary"
+                disabled={!ff}
+                onClick={start}
               >
-                Resume {game.title}
-                <ArrowRight size={15} />
+                Start game
+                <ArrowRight size={24} />
               </Button>
-            )}
+              {game?.result === "*" && (
+                <button
+                  className="resume-link"
+                  onClick={() => {
+                    setPlaying(true);
+                    setFlipped(game.human === "b");
+                  }}
+                >
+                  <RotateCcw size={15} />
+                  Resume saved game
+                  <ChevronDown size={15} />
+                </button>
+              )}
+            </div>
+            <div className="play-feature-art" aria-hidden="true">
+              <div className="piece-halo" />
+              <div className="piece-floor" />
+              <Piece symbol="N" />
+            </div>
+          </section>
+          <Card className="game-settings-card">
             <button
               className="options-toggle"
               aria-expanded={options}
               onClick={() => setOptions(!options)}
             >
               Game options
-              <ChevronDown size={16} />
+              <ChevronDown size={17} />
             </button>
             {options && (
               <div className="game-options">
@@ -738,37 +762,6 @@ export default function Play() {
               </div>
             )}
           </Card>
-          <div className="side-panels">
-            <Card>
-              <h2>Variants</h2>
-              <div className="variant-grid">
-                {variantList.map((v) => (
-                  <button
-                    key={v.id}
-                    className={variant === v.id ? "active" : ""}
-                    onClick={() => {
-                      setVariant(v.id);
-                      setOptions(true);
-                    }}
-                  >
-                    <span>{v.name}</span>
-                    <small>{v.description}</small>
-                  </button>
-                ))}
-              </div>
-            </Card>
-            <div className="button-row">
-              <Button className="secondary" onClick={() => navigate("library")}>
-                Game history
-              </Button>
-              <Button
-                className="secondary"
-                onClick={() => navigate("community")}
-              >
-                Play with a friend
-              </Button>
-            </div>
-          </div>
         </div>
       ) : (
         <div

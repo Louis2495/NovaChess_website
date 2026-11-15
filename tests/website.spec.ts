@@ -38,7 +38,7 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
   ).toBeVisible();
   await expect(page.locator(".app")).toHaveCSS(
     "background-color",
-    "rgb(16, 22, 18)",
+    "rgb(16, 20, 24)",
   );
   await expect(
     page.getByRole("heading", { name: /Your next move|A little brighter/ }),
@@ -678,4 +678,121 @@ test("bughouse transfers ordinary pieces normally and reverts captured promotion
   await expect
     .poll(async () => (await stored(page)).activeGame.partner.positions.at(-1))
     .toContain("[p]");
+});
+
+test("simplified Home has one large New Game action and no repeated tool or stats grids", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const section = page.getByRole("region", { name: "Play chess", exact: true });
+  const action = section.getByRole("button", { name: "New game", exact: true });
+  await expect(action).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "New game", exact: true }),
+  ).toHaveCount(1);
+  expect((await action.boundingBox())!.height).toBeGreaterThanOrEqual(58);
+  await expect(
+    page.getByRole("button", { name: "Customize", exact: true }),
+  ).toHaveCount(1);
+  await expect(
+    page.locator(".tool-grid,.stats-strip,.home-bottom"),
+  ).toHaveCount(0);
+  await action.click();
+  const start = page.getByRole("button", { name: "Start game", exact: true });
+  await expect(start).toBeVisible();
+  expect((await start.boundingBox())!.height).toBeGreaterThanOrEqual(58);
+  await expect(page.locator(".variant-grid")).toHaveCount(0);
+  await page.getByRole("button", { name: "Game options", exact: true }).click();
+  await expect(page.getByLabel("Variant", { exact: true })).toHaveCount(1);
+});
+
+test("Home suggests distinct opening families and opens the selected lesson", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const rows = page.locator(".suggested-lessons>button");
+  await expect(rows).toHaveCount(3);
+  const titles = await rows.locator("b").allTextContents();
+  expect(new Set(titles).size).toBe(3);
+  await rows.nth(1).click();
+  const id = await page.evaluate(() =>
+    decodeURIComponent(
+      location.hash.slice(location.hash.indexOf("/") + 1),
+    ).slice(8),
+  );
+  const lessons = JSON.parse(
+    fs.readFileSync("public/data/lessons.json", "utf8"),
+  );
+  const expected = lessons.find((l: { id: string }) => l.id === id);
+  await expect(
+    page.getByRole("heading", { name: expected.name, exact: true }),
+  ).toBeVisible();
+});
+
+test("Stats has dedicated navigation and derives charts from completed local games only", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  const c = new Chess();
+  const move = c.move("e4");
+  const start = new Date();
+  start.setHours(12, 0, 0, 0);
+  const current = start.getTime(),
+    yesterday = new Date(start);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const fixtures = ["1-0", "0-1", "1/2-1/2", "*"].map((result, i) => ({
+    id: `stats-${i}`,
+    title: "Recorded game",
+    created: i === 2 ? yesterday.getTime() : current,
+    initial,
+    variant: "chess",
+    moves: ["e2e4"],
+    notation: ["e4"],
+    positions: [initial, move.after],
+    result,
+    human: "w",
+    folder: "Games",
+  }));
+  await page.evaluate(
+    ({ key, games }) => {
+      const data = JSON.parse(localStorage.getItem(key)!);
+      data.games = games;
+      data.localRating = 1250;
+      data.progress.solved = 9;
+      data.progress.streak = 2;
+      localStorage.setItem(key, JSON.stringify(data));
+    },
+    { key: BASE_KEY, games: fixtures },
+  );
+  await page.reload();
+  await page
+    .getByRole("navigation", {
+      name: testInfo.project.name === "mobile" ? "App tabs" : "Main navigation",
+      exact: true,
+    })
+    .getByRole("button", { name: "Stats", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Stats", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".stats-metrics")).toContainText("1250");
+  await expect(
+    page.getByRole("img", { name: "1 wins, 1 draws, 1 losses", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".results-ring strong")).toHaveText("33%");
+  await expect(
+    page.locator(".stats-metrics>div").first().locator("b"),
+  ).toHaveText("3");
+  const totals = await page
+    .locator(".activity-track>span")
+    .evaluateAll((nodes) =>
+      nodes.reduce(
+        (n, node) =>
+          n +
+          Number(node.getAttribute("aria-label")?.match(/: (\d+)/)?.[1] || 0),
+        0,
+      ),
+    );
+  expect(totals).toBe(3);
+  expect((await stored(page)).games).toHaveLength(4);
 });

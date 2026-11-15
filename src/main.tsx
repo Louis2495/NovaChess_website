@@ -12,12 +12,10 @@ import {
   Palette,
   Search,
   ChevronRight,
-  Github,
   X,
   Command,
   ShieldCheck,
   Menu,
-  Download,
 } from "lucide-react";
 import "@fontsource/dm-sans/latin-400.css";
 import "@fontsource/dm-sans/latin-500.css";
@@ -33,13 +31,13 @@ import {
   base,
   APP_SOURCE,
   contrast,
-  download,
 } from "./lib/store";
 import type { Appearance as AppearanceType, Library, Tab } from "./lib/types";
 import { Button, IconButton, Modal, Loading, External } from "./components/UI";
 import Appearance from "./components/Appearance";
 import HomePage from "./pages/Home";
 import "./styles.css";
+import "./redesign.css";
 const Analysis = lazy(() => import("./pages/Analysis")),
   Play = lazy(() => import("./pages/Play")),
   Puzzles = lazy(() => import("./pages/Puzzles")),
@@ -53,10 +51,10 @@ const mainNav = [
   { id: "play", label: "Play", icon: MonitorPlay },
   { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
+  { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
 ] as const;
 const secondaryNav = [
   { id: "library", label: "Saved games", icon: FolderOpen },
-  { id: "stats", label: "Progress", icon: ChartNoAxesCombined },
   { id: "community", label: "Players & sharing", icon: Users },
 ] as const;
 const validTabs = new Set([...mainNav, ...secondaryNav].map((v) => v.id));
@@ -194,6 +192,22 @@ function App() {
     };
   }, [appearance.sound, appearance.volume]);
   useEffect(() => {
+    setAppearance((a) =>
+      a.backgroundColor === "#101612" &&
+      a.panelColor === "#1c271f" &&
+      a.textColor === "#eef4ed" &&
+      a.mutedColor === "#abb8aa"
+        ? {
+            ...a,
+            backgroundColor: defaults.backgroundColor,
+            panelColor: defaults.panelColor,
+            textColor: defaults.textColor,
+            mutedColor: defaults.mutedColor,
+          }
+        : a,
+    );
+  }, []);
+  useEffect(() => {
     document.documentElement.style.fontSize = `${appearance.fontSize}px`;
   }, [appearance.fontSize]);
   useEffect(() => {
@@ -293,7 +307,7 @@ function App() {
             <img src={`${base}app-icon.webp`} alt="" />
             <span>NovaChess</span>
           </button>
-          <div className="sidebar-label">WORKSPACE</div>
+
           <nav aria-label="Main navigation">
             {mainNav.map(({ id, label, icon: Icon }) => (
               <button
@@ -308,7 +322,7 @@ function App() {
               </button>
             ))}
           </nav>
-          <div className="sidebar-label">YOUR LIBRARY</div>
+          <div className="sidebar-label">LIBRARY</div>
           <nav aria-label="Library navigation">
             {secondaryNav.map(({ id, label, icon: Icon }) => (
               <button
@@ -322,20 +336,7 @@ function App() {
             ))}
           </nav>
           <div className="sidebar-bottom">
-            <button
-              className="appearance-sidebar"
-              onClick={() => setShowAppearance(true)}
-            >
-              <Palette size={19} />
-              <div>
-                Appearance<small>{appearance.theme} · Customizable</small>
-              </div>
-              <ChevronRight size={15} />
-            </button>
-            <button
-              className="sidebar-profile"
-              onClick={() => navigate("community")}
-            >
+            <div className="account-stamp">
               <span className="avatar">
                 {library.profile.avatar ? (
                   <img src={library.profile.avatar} alt="" />
@@ -343,12 +344,8 @@ function App() {
                   library.profile.name.slice(0, 1).toUpperCase()
                 )}
               </span>
-              <span>
-                {library.profile.name}
-                <small>Local profile</small>
-              </span>
-              <ChevronRight size={15} />
-            </button>
+              <span>{library.profile.name}</span>
+            </div>
             <div className="sidebar-footer">
               <button onClick={() => setInfo(true)}>
                 <ShieldCheck size={13} /> Privacy & source
@@ -373,29 +370,19 @@ function App() {
             >
               <Menu size={21} />
             </IconButton>
-            <div className="breadcrumb">
-              Workspace
-              <ChevronRight size={13} />
-              <span>
-                {[...mainNav, ...secondaryNav].find((v) => v.id === tab)?.label}
-              </span>
-            </div>
+            <span className="mobile-wordmark">NovaChess</span>
             <button
               className="global-search"
               aria-label="Search tools and openings"
               onClick={() => setCommand(true)}
             >
               <Search size={16} />
-              <span>Search tools & openings</span>
+              <span>Search</span>
               <kbd>
                 <Command size={10} /> K
               </kbd>
             </button>
             <div className="topbar-right">
-              <span className="local-badge">
-                <span />
-                On-device
-              </span>
               <Button
                 className="secondary appearance-trigger"
                 aria-label="Customize"
@@ -411,33 +398,6 @@ function App() {
               <div key={`${tab}:${detail}`}>{page}</div>
             </Suspense>
           </main>
-          <footer className="workspace-footer">
-            <span>Saved in this browser</span>
-            <button
-              onClick={() =>
-                download(
-                  "novachess-backup.json",
-                  JSON.stringify(
-                    {
-                      type: "novachess-library",
-                      version: 2,
-                      library,
-                      appearance,
-                    },
-                    null,
-                    2,
-                  ),
-                )
-              }
-            >
-              <Download size={12} />
-              Export backup
-            </button>
-            <a href={APP_SOURCE} target="_blank" rel="noreferrer">
-              iPhone source
-              <Github size={12} />
-            </a>
-          </footer>
         </div>
         <nav className="mobile-tabs" aria-label="App tabs">
           {mainNav.map(({ id, label, icon: Icon }) => (
