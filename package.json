@@ -5,17 +5,21 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/offline.mjs",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "playwright test"
+    "test": "playwright test",
+    "postinstall": "node scripts/prepare-assets.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",
     "@fontsource/manrope": "^5.3.0",
     "chess.js": "^1.4.0",
+    "ffish-es6": "^0.7.10",
+    "gifenc": "^1.0.3",
     "lucide-react": "^0.468.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "stockfish": "^19.0.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

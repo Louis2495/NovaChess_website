@@ -1,0 +1,237 @@
+{
+  "coverage_through": 2024,
+  "policy": "Original concise summaries of historical facts. No third-party prose, images or application code copied. Pre-rating-era champion values are omitted rather than reconstructed. Ratings are dated event snapshots, not peaks or USCF conversions.",
+  "snapshots": [
+    {
+      "champion": "spassky",
+      "rating": 2660,
+      "year": 1972,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp1972.pgn",
+      "source_sha256": "2e328e7305609ed01821f6f40cf6da4e3b6bea7e93c10de9cb0c8b5b2d65f875",
+      "example_game": {
+        "Date": "1972.??.??",
+        "Round": "1",
+        "White": "Spassky, Boris V",
+        "WhiteElo": "2660",
+        "Black": "Fischer, Robert James",
+        "BlackElo": "2785"
+      },
+      "context": "Archived PGN event metadata during the title reign; not a peak or live rating."
+    },
+    {
+      "champion": "fischer",
+      "rating": 2785,
+      "year": 1972,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp1972.pgn",
+      "source_sha256": "2e328e7305609ed01821f6f40cf6da4e3b6bea7e93c10de9cb0c8b5b2d65f875",
+      "example_game": {
+        "Date": "1972.??.??",
+        "Round": "21",
+        "White": "Spassky, Boris V",
+        "WhiteElo": "2660",
+        "Black": "Fischer, Robert James",
+        "BlackElo": "2785"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "karpov",
+      "rating": 2725,
+      "year": 1978,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp1978.pgn",
+      "source_sha256": "be2d4d4b424d19ba4d03e6cffdd981b720cadd16b6d804d670717d3fbc0b0305",
+      "example_game": {
+        "Date": "1978.??.??",
+        "Round": "32",
+        "White": "Karpov, Anatoly",
+        "WhiteElo": "2725",
+        "Black": "Kortschnoj, Viktor",
+        "BlackElo": "2665"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "kasparov",
+      "rating": 2700,
+      "year": 1985,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp1985.pgn",
+      "source_sha256": "ed6e04af408f69b9c7a27c6544ad8df545ad653510e4813c3ffb32328dc7b254",
+      "example_game": {
+        "Date": "1985.??.??",
+        "Round": "24",
+        "White": "Karpov, Anatoly",
+        "WhiteElo": "2720",
+        "Black": "Kasparov, Gary",
+        "BlackElo": "2700"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "kramnik",
+      "rating": 2770,
+      "year": 2000,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp2000.pgn",
+      "source_sha256": "1dcf3d75cdfadb0e859d9efd0e70d2800420666aeda663e644443a6d46a6c403",
+      "example_game": {
+        "Date": "2000.11.02",
+        "Round": "15",
+        "White": "Kasparov,G",
+        "WhiteElo": "2849",
+        "Black": "Kramnik,V",
+        "BlackElo": "2770"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "anand",
+      "rating": 2792,
+      "year": 2007,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp2007.pgn",
+      "source_sha256": "790f559d68765b1c309cc593eaaf40cb2b6f9a37932e986f74b7b977097bceeb",
+      "example_game": {
+        "Date": "2007.09.29",
+        "Round": "14",
+        "White": "Anand,V",
+        "WhiteElo": "2792",
+        "Black": "Leko,P",
+        "BlackElo": "2751"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "carlsen",
+      "rating": 2855,
+      "year": 2021,
+      "source": "https://github.com/jimhcyang/ChessAnalytics_wcc_2021_2023/blob/12465f014bb9df49aa3afd8c23500ab2c8d4376c/WCC2021.pgn",
+      "source_sha256": "0e27befff49a3b26bc8cf309d9148852cad0b8bfd26bc1b5987ed26d3714ad63",
+      "example_game": {
+        "Date": "2021.12.10",
+        "Round": "11",
+        "White": "Ian Nepomniachtchi",
+        "WhiteElo": "2782",
+        "Black": "Magnus Carlsen",
+        "BlackElo": "2855"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "ding",
+      "rating": 2788,
+      "year": 2023,
+      "source": "https://github.com/jimhcyang/ChessAnalytics_wcc_2021_2023/blob/12465f014bb9df49aa3afd8c23500ab2c8d4376c/WCC2023.pgn",
+      "source_sha256": "c6d6d278b96ebf4a3141eb893236cf4ffee4041943790d0a3885b6175f0781aa",
+      "example_game": {
+        "Date": "2023.04.29",
+        "Round": "14",
+        "White": "Liren, Ding",
+        "WhiteElo": "2788",
+        "Black": "Nepomniachtchi, Ian",
+        "BlackElo": "2795"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "gukesh",
+      "rating": 2783,
+      "year": 2024,
+      "source": "https://ratings.fide.com/profile/46616543/calculations",
+      "context": "November 2024 standard FIDE rating; historical reference, not fetched live under cloud network policy."
+    },
+    {
+      "champion": "fide-karpov",
+      "rating": 2760,
+      "year": 1993,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp1993.pgn",
+      "source_sha256": "b9ccb84b1a444a4f1c5193ace1d50fcf7843c5080ade0abe05f81febf7e4c8fb",
+      "example_game": {
+        "Date": "1993.??.??",
+        "Round": "21",
+        "White": "Timman, Jan H",
+        "WhiteElo": "2620",
+        "Black": "Karpov, Anatoly",
+        "BlackElo": "2760"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "fide-khalifman",
+      "rating": 2628,
+      "year": 1999,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp1999.pgn",
+      "source_sha256": "1b71caf433166f1b51ca0fe958a515d18c83f6802ef14f2d5ee6f3405a8ce7f9",
+      "example_game": {
+        "Date": "1999.08.28",
+        "Round": "7.6",
+        "White": "Khalifman, Alexander",
+        "WhiteElo": "2628",
+        "Black": "Akopian, Vladimir",
+        "BlackElo": "2646"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "fide-anand",
+      "rating": 2762,
+      "year": 2000,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp2000.pgn",
+      "source_sha256": "903eb79596b79eff384ae10e8c80c73ea1dd269589f38cd8369ad962c09b8720",
+      "example_game": {
+        "Date": "2000.12.24",
+        "Round": "7.4",
+        "White": "Anand,V",
+        "WhiteElo": "2762",
+        "Black": "Shirov,A",
+        "BlackElo": "2746"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "fide-ponomariov",
+      "rating": 2727,
+      "year": 2002,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp2002.pgn",
+      "source_sha256": "baa19169ce1dd56026b2bb121612ef458f7e15be1b20cc9361a850e75c4bfe82",
+      "example_game": {
+        "Date": "2002.01.23",
+        "Round": "7.7",
+        "White": "Ponomariov,R",
+        "WhiteElo": "2727",
+        "Black": "Ivanchuk,V",
+        "BlackElo": "2717"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "fide-kasimdzhanov",
+      "rating": 2652,
+      "year": 2004,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp2004.pgn",
+      "source_sha256": "707387017b494eba94c39c09cffa1089b4b9aebd51fbdfd90d56822a0756009a",
+      "example_game": {
+        "Date": "2004.07.13",
+        "Round": "7.8",
+        "White": "Kasimdzhanov,R",
+        "WhiteElo": "2652",
+        "Black": "Adams,Mi",
+        "BlackElo": "2731"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    },
+    {
+      "champion": "fide-topalov",
+      "rating": 2788,
+      "year": 2005,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp2005.pgn",
+      "source_sha256": "4e62a694275906acd10ee4b10d62c75bd373133a762912e32122321f6b74b1b6",
+      "example_game": {
+        "Date": "2005.10.14",
+        "Round": "14",
+        "White": "Svidler,P",
+        "WhiteElo": "2738",
+        "Black": "Anand,V",
+        "BlackElo": "2788"
+      },
+      "context": "Archived PGN event metadata; not a peak rating or a live rating."
+    }
+  ]
+}

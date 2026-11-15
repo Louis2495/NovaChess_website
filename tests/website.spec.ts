@@ -1,29 +1,53 @@
 import { test, expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { Chess } from "chess.js";
+import fs from "node:fs";
+import load from "ffish-es6";
+import type { FairyStockfish } from "ffish-es6";
+const BASE_KEY = "novachess-library-v2";
+const initial = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+async function stored(page: Page) {
+  return page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key) || "{}"),
+    BASE_KEY,
+  );
+}
+async function square(page: Page, sq: string, index = 0) {
+  await page
+    .getByRole("group", { name: "Chessboard", exact: true })
+    .nth(index)
+    .getByRole("button", { name: new RegExp(`^${sq},`) })
+    .click();
+}
+async function uiMove(page: Page, move: string) {
+  await square(page, move.slice(0, 2));
+  await square(page, move.slice(2, 4));
+}
 
-test("home loads without runtime errors, missing assets, or horizontal overflow", async ({
+test("dark Home provides tools, has no clock/camera/slogans, and fits responsive widths", async ({
   page,
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  const failures: string[] = [];
-  page.on("response", (r) => {
-    if (r.status() >= 400) failures.push(r.url());
-  });
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Your next move.",
+  await expect(
+    page.getByRole("heading", { name: "Home", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Solve puzzle", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".app")).toHaveCSS(
+    "background-color",
+    "rgb(16, 22, 18)",
   );
-  await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator("img").first()).toBeVisible();
-  expect(
-    await page
-      .locator("img")
-      .evaluateAll((imgs) =>
-        imgs.every((img) => img.complete && img.naturalWidth > 0),
-      ),
-  ).toBeTruthy();
+  await expect(
+    page.getByRole("heading", { name: /Your next move|A little brighter/ }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /Clock|Camera|Photos/ }),
+  ).toHaveCount(0);
   for (const width of [360, 390, 768, 1024, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
+    await page.setViewportSize({ width, height: 950 });
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -32,190 +56,388 @@ test("home loads without runtime errors, missing assets, or horizontal overflow"
     ).toBeTruthy();
   }
   expect(errors).toEqual([]);
-  expect(failures).toEqual([]);
-});
-test("prelaunch dialog is honest, dismisses with Escape, and restores focus", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const trigger = page
-    .getByRole("button", { name: "Follow the launch" })
-    .first();
-  await trigger.click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText("still in development");
-  await dialog.getByText("Want to try the source build?").click();
-  await expect(
-    dialog.getByText("You’ll need a Mac", { exact: false }),
-  ).toBeVisible();
-  await expect(
-    dialog.getByRole("link", { name: "Follow the project" }),
-  ).toHaveAttribute("href", "https://github.com/Louis2495/ChessVision");
-  await page.keyboard.press("Escape");
-  await expect(dialog).not.toBeVisible();
-  await expect(trigger).toBeFocused();
-});
-test("puzzles reject errors, provide hints, solve legally, persist and reset progress", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await page.getByRole("tab", { name: "Puzzles", exact: true }).click();
-  let panel = page.getByRole("tabpanel");
-  await panel.getByRole("button", { name: /^d1, white queen/ }).click();
-  await panel.getByRole("button", { name: /^d2,/ }).click();
-  await expect(panel.getByRole("status")).toContainText("Not quite");
-  await panel.getByRole("button", { name: "Hint", exact: true }).click();
-  await expect(panel.getByRole("status")).toContainText("Hint");
-  await panel.getByRole("button", { name: /^d8,/ }).click();
-  await expect(panel.getByRole("status")).toContainText("checkmate");
-  await expect(panel).toContainText("1 / 3 solved");
-  await panel.getByRole("button", { name: "Next puzzle" }).click();
-  await panel.getByRole("button", { name: /^c3, white queen/ }).click();
-  await panel.getByRole("button", { name: /^h8,/ }).click();
-  await expect(panel.getByRole("status")).toContainText("checkmate");
-  await panel.getByRole("button", { name: "Next puzzle" }).click();
-  await panel.getByRole("button", { name: /^b7, white rook/ }).click();
-  await panel.getByRole("button", { name: /^f7,/ }).click();
-  await expect(panel.getByRole("status")).toContainText("checkmate");
-  await expect(panel).toContainText("3 / 3 solved");
-  await page.reload();
-  await page.getByRole("tab", { name: "Puzzles", exact: true }).click();
-  panel = page.getByRole("tabpanel");
-  await expect(panel).toContainText("3 / 3 solved");
-  await panel.getByRole("button", { name: "Reset progress" }).click();
-  await expect(panel).toContainText("0 / 3 solved");
-});
-test("puzzle supports typed moves and reports illegal input", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await page.getByRole("tab", { name: "Puzzles", exact: true }).click();
-  const panel = page.getByRole("tabpanel");
-  await panel.getByText("Prefer to type your move?").click();
-  await panel.getByRole("textbox").fill("a1a8");
-  await panel.getByRole("button", { name: "Play", exact: true }).click();
-  await expect(panel.getByRole("status")).toContainText("Use a legal move");
-  await panel.getByRole("textbox").fill("Qd8");
-  await panel.getByRole("button", { name: "Play", exact: true }).click();
-  await expect(panel.getByRole("status")).toContainText("checkmate");
-});
-test("analysis sandbox moves, undoes and resets", async ({ page }) => {
-  await page.goto("/");
-  const panel = page.getByRole("tabpanel");
-  await expect(panel.getByRole("button", { name: "Take back" })).toBeDisabled();
-  await panel.getByRole("button", { name: /^f1, white rook/ }).click();
-  await panel.getByRole("button", { name: /^e1,/ }).click();
-  await expect(panel.getByRole("status")).toContainText("Black to move");
-  await expect(panel.getByLabel("Your played moves")).toContainText("Re1");
-  await panel.getByRole("button", { name: "Take back" }).click();
-  await expect(
-    panel.getByRole("button", { name: /^f1, white rook/ }),
-  ).toBeVisible();
-  await panel.getByRole("button", { name: "Reset board" }).click();
-  await expect(panel.getByRole("status")).toContainText("White to move");
-});
-test("every opening walkthrough plays and restarts", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("tab", { name: "Learn", exact: true }).click();
-  const panel = page.getByRole("tabpanel");
-  for (const [i, length] of [
-    [0, 12],
-    [1, 10],
-    [2, 10],
-  ]) {
-    await panel.getByRole("combobox").selectOption(String(i));
-    await expect(
-      panel.getByRole("button", { name: "Back", exact: true }),
-    ).toBeDisabled();
-    for (let n = 0; n < length; n++)
-      await panel
-        .getByRole("button", { name: "Next move", exact: true })
-        .click();
-    await expect(
-      panel.getByRole("button", { name: "Play again", exact: true }),
-    ).toBeVisible();
-    await expect(panel.getByRole("status")).toContainText(
-      `${length} / ${length}`,
-    );
-    await panel.getByRole("button", { name: "Play again" }).click();
-    await expect(panel.getByRole("status")).toContainText(
-      "The starting position",
-    );
-  }
-});
-test("theme picker and variant previews update visually", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("button", { name: "Ocean palette" }).click();
-  await expect(
-    page.getByRole("button", { name: "Ocean palette" }),
-  ).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(".style-caption")).toHaveText(
-    "Ocean board palette",
-  );
-  expect(
-    await page.locator(".style-board .chessboard").getAttribute("style"),
-  ).toContain("#376e99");
-  await page.getByRole("button", { name: /Duck chess/ }).click();
-  await expect(
-    page.getByAltText("NovaChess mallard duck chess piece"),
-  ).toBeVisible();
-  await expect(page.locator(".variant-caption h3")).toHaveText("Duck chess");
-  await page.getByRole("button", { name: /Blindfold/ }).click();
-  await expect(page.getByText("See it in your mind.")).toBeVisible();
-});
-test("FAQ, privacy, credits and mobile navigation work", async ({
-  page,
-}, testInfo) => {
-  await page.goto("/");
-  if (testInfo.project.name === "mobile") {
-    await page.getByRole("button", { name: "Open menu" }).click();
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "FAQ", exact: true })
-      .click();
-    await expect(
-      page.getByRole("button", { name: "Open menu" }),
-    ).toHaveAttribute("aria-expanded", "false");
-  }
-  await page
-    .getByText("When can I download NovaChess?", { exact: true })
-    .click();
-  await expect(
-    page.getByText(
-      "NovaChess is in development and isn’t on the App Store yet.",
-      { exact: false },
-    ),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Privacy", exact: true }).click();
-  await expect(page.getByRole("dialog")).toContainText(
-    "automatically publishes game boards",
-  );
-  await page.getByRole("button", { name: "Close dialog" }).click();
-  await page.getByRole("button", { name: "Credits & licenses" }).click();
-  await expect(page.getByRole("dialog")).toContainText("Colin M. L. Burnett");
-  await page.keyboard.press("Escape");
-  await page.screenshot({
-    path: `test-results/${testInfo.project.name}-full.png`,
-    fullPage: true,
-  });
 });
 
-test("tabs support arrow-key navigation and accessible structure in each interactive state", async ({
+test("appearance themes, custom colors, board/pieces/layout persist and presets export", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Customize", exact: true })
+    .first()
+    .click();
+  const d = page.getByRole("dialog", { name: "Appearance" });
+  await d.getByRole("button", { name: "Pink", exact: true }).click();
+  await expect(page.locator(".app")).toHaveCSS("--accent", "#ef7eb6");
+  await d
+    .locator(".color-field")
+    .filter({ hasText: "Buttons" })
+    .locator("input")
+    .fill("#9068df");
+  await d.getByRole("tab", { name: "Board", exact: true }).click();
+  await d.getByLabel("Board palette", { exact: true }).selectOption("Ocean");
+  await d.getByRole("button", { name: "Celtic", exact: true }).click();
+  await d.getByRole("tab", { name: "Layout", exact: true }).click();
+  await d.getByLabel("Font", { exact: true }).selectOption("Georgia");
+  await d.getByLabel("Corner radius", { exact: false }).fill("25");
+  await d.getByLabel("Text size", { exact: false }).fill("18");
+  await expect(page.locator("html")).toHaveCSS("font-size", "18px");
+  await d.getByRole("tab", { name: "Background", exact: true }).click();
+  await d.getByLabel("Background", { exact: true }).selectOption("Aurora");
+  await d.getByLabel("Preset name").fill("My setup");
+  await d.getByRole("button", { name: "Save", exact: true }).click();
+  const dl = page.waitForEvent("download");
+  await d.getByRole("button", { name: "Export", exact: true }).click();
+  expect((await dl).suggestedFilename()).toBe("novachess-appearance.json");
+  await d.getByRole("button", { name: "Close", exact: true }).click();
+  await page.reload();
+  const saved = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("novachess-appearance-v2")!),
+  );
+  expect(saved).toMatchObject({
+    theme: "Pink",
+    buttonColor: "#9068df",
+    board: "Ocean",
+    pieceStyle: "Celtic",
+    font: "Georgia",
+    radius: 25,
+    fontSize: 18,
+    background: "Aurora",
+  });
+  await page
+    .getByRole("button", { name: "Customize", exact: true })
+    .first()
+    .click();
+  await page
+    .getByRole("dialog", { name: "Appearance" })
+    .getByRole("button", { name: "Reset appearance", exact: true })
+    .click();
+  await expect(page.locator(".app")).toHaveCSS("--accent", "#78b58a");
+});
+
+test("uploaded backgrounds stay local and can be removed", async ({ page }) => {
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Customize", exact: true })
+    .first()
+    .click();
+  const d = page.getByRole("dialog");
+  await d.getByRole("tab", { name: "Background", exact: true }).click();
+  await d.locator(".upload-tile input").setInputFiles({
+    name: "background.png",
+    mimeType: "image/png",
+    buffer: fs.readFileSync("public/favicon.png"),
+  });
+  await expect(d.getByAltText("Your background")).toBeVisible();
+  await expect(page.locator(".app")).toHaveClass(/bg-custom/);
+  await d.getByRole("button", { name: "Remove image" }).click();
+  await expect(d.getByAltText("Your background")).toHaveCount(0);
+});
+
+test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image/GIF exports", async ({
+  page,
+}) => {
+  await page.goto("/#analysis");
+  await expect(page.locator(".engine-lines button").first()).toBeVisible({
+    timeout: 20000,
+  });
+  await expect(page.getByText(/Depth \d+/)).toBeVisible();
+  await uiMove(page, "e2e4");
+  await expect(page.locator(".notation-table")).toContainText("e4");
+  await page
+    .getByRole("button", { name: "Previous position", exact: true })
+    .click();
+  await uiMove(page, "d2d4");
+  await expect(page.locator(".branch-list")).toContainText("Branch 1");
+  await page.getByRole("button", { name: "Save study", exact: true }).click();
+  expect((await stored(page)).games).toHaveLength(1);
+  const pgn = page.waitForEvent("download");
+  await page.getByRole("button", { name: "PGN", exact: true }).click();
+  expect((await pgn).suggestedFilename()).toMatch(/\.pgn$/);
+  await page
+    .getByRole("button", { name: "Share position", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog");
+  const png = page.waitForEvent("download");
+  await dialog
+    .getByRole("button", { name: "Board image", exact: true })
+    .click();
+  expect((await png).suggestedFilename()).toMatch(/\.png$/);
+  const gif = page.waitForEvent("download");
+  await dialog.getByRole("button", { name: "Game GIF", exact: true }).click();
+  expect((await gif).suggestedFilename()).toMatch(/\.gif$/);
+  await dialog.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "FEN / PGN", exact: true }).click();
+  await page.getByLabel("FEN input").fill("invalid");
+  await page.getByRole("button", { name: "Import FEN", exact: true }).click();
+  await expect(page.getByRole("alert")).toBeVisible();
+  await page.getByLabel("FEN input").fill(initial);
+  await page.getByRole("button", { name: "Import FEN", exact: true }).click();
+  await expect(page.locator(".notation-table")).toContainText("Play a move");
+});
+
+test("position editor validates kings, applies a position and underpromotion is available", async ({
+  page,
+}) => {
+  await page.goto("/#analysis");
+  await page
+    .getByRole("button", { name: "Edit position", exact: true })
+    .click();
+  const d = page.getByRole("dialog");
+  await d.getByRole("button", { name: "Clear", exact: true }).click();
+  await d.getByRole("button", { name: "Use position", exact: true }).click();
+  await expect(d.getByRole("alert")).toBeVisible();
+  await d.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "FEN / PGN", exact: true }).click();
+  await page.getByLabel("FEN input").fill("7k/P7/8/8/8/8/8/7K w - - 0 1");
+  await page.getByRole("button", { name: "Import FEN", exact: true }).click();
+  await uiMove(page, "a7a8");
+  await page
+    .getByRole("button", { name: "Promote to knight", exact: true })
+    .click();
+  await expect(page.locator(".notation-table")).toContainText("a8=N");
+});
+
+test("all 4,000 puzzles load; adaptive solution, grading, hints and daily replay persist", async ({
+  page,
+}) => {
+  await page.goto("/#puzzles");
+  await expect(
+    page.getByRole("heading", { name: "Puzzles", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("group", { name: "Chessboard", exact: true }),
+  ).toBeVisible();
+  const list = JSON.parse(fs.readFileSync("public/data/puzzles.json", "utf8"));
+  const progress = (await stored(page)).progress;
+  const p = [...list].sort(
+    (a, b) =>
+      Math.abs(a.sourceRating - progress.rating) -
+        Math.abs(b.sourceRating - progress.rating) || a.id.localeCompare(b.id),
+  )[0];
+  for (let i = 1; i < p.moves.length; i += 2) {
+    const m = p.moves[i];
+    await uiMove(page, m);
+    if (m.length === 5)
+      await page
+        .getByRole("button", {
+          name: `Promote to ${{ q: "queen", r: "rook", b: "bishop", n: "knight" }[m[4]]}`,
+          exact: true,
+        })
+        .click();
+    if (i + 2 < p.moves.length) await page.waitForTimeout(550);
+  }
+  await expect(
+    page.getByRole("status").filter({ hasText: "Solved." }),
+  ).toBeVisible();
+  expect((await stored(page)).progress.solved).toBe(1);
+  await page.getByRole("button", { name: "Next puzzle", exact: true }).click();
+  await page.getByRole("button", { name: "Hint", exact: true }).click();
+  expect((await stored(page)).progress.streak).toBe(0);
+  await page.goto("/#puzzles/daily");
+  await expect(
+    page.getByRole("button", { name: "Replay", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Hint", exact: true }).click();
+  const attempts = (await stored(page)).progress.attempts;
+  await page.getByRole("button", { name: "Replay", exact: true }).click();
+  await page.getByRole("button", { name: "Hint", exact: true }).click();
+  expect((await stored(page)).progress.attempts).toBe(attempts);
+});
+
+test("curated opening lesson and searchable full opening library work", async ({
+  page,
+}) => {
+  await page.goto("/#learn/lessons");
+  await expect(page.locator(".list-summary")).toHaveText("111 curated lessons");
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(page.locator(".lesson-controls")).toContainText("1 /");
+  await page.getByLabel("Search openings", { exact: true }).fill("Najdorf");
+  await expect(page.locator(".opening-row").first()).toContainText("Najdorf");
+  await page.locator(".opening-row").first().click();
+  await page
+    .getByRole("button", { name: "Save to repertoire", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Save line", exact: true }).click();
+  expect((await stored(page)).repertoire).toHaveLength(1);
+});
+
+test("repertoire building, saving, training and spaced review work", async ({
+  page,
+}) => {
+  await page.goto("/#learn/repertoire");
+  await page.getByRole("button", { name: "Add line", exact: true }).click();
+  const d = page.getByRole("dialog");
+  await d.getByLabel("Line name").fill("King pawn");
+  await uiMove(page, "e2e4");
+  await page.getByRole("button", { name: "Save line", exact: true }).click();
+  await page.getByRole("button", { name: "Train", exact: true }).click();
+  await uiMove(page, "e2e4");
+  await expect(page.locator(".feedback")).toContainText("Line completed");
+  const saved = (await stored(page)).repertoire[0];
+  expect(saved.successes).toBe(1);
+  expect(saved.due).toBeGreaterThan(Date.now());
+});
+
+test("endgame trainer uses legal goals and saves completion", async ({
+  page,
+}) => {
+  await page.goto("/#learn/endgames");
+  await expect(
+    page.getByRole("heading", { name: "Queen: finish the net", exact: true }),
+  ).toBeVisible();
+  await uiMove(page, "f7g7");
+  await expect(
+    page.getByRole("heading", { name: "Completed", exact: true }),
+  ).toBeVisible();
+  expect((await stored(page)).progress.endgames).toContain("queen-finish");
+});
+
+test("research imports PGN and calculates real opening frequencies", async ({
+  page,
+}) => {
+  await page.goto("/#learn/research");
+  await page.locator(".file-button input").setInputFiles({
+    name: "games.pgn",
+    mimeType: "text/plain",
+    buffer: Buffer.from(
+      '[Event "One"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 Nc6 1-0\n\n[Event "Two"]\n[Result "0-1"]\n\n1. e4 c5 0-1',
+    ),
+  });
+  await expect(page.getByRole("status")).toContainText("2 games imported");
+  await expect(page.locator(".research-branches")).toContainText(
+    "2 games · 100%",
+  );
+  await page.locator(".research-branches>button").first().click();
+  await expect(page.locator(".research-branches")).toContainText("e5");
+  await expect(page.locator(".research-branches")).toContainText("c5");
+});
+
+test("facts, history, dated ratings and map controls provide real content", async ({
+  page,
+}) => {
+  await page.goto("/#learn/facts");
+  await expect(page.locator(".facts-grid .card")).toHaveCount(56);
+  await page.getByLabel("Search facts").fill("knight");
+  await expect(page.locator(".facts-grid .card").first()).toBeVisible();
+  await page.goto("/#learn/history");
+  await expect(page.locator(".history-timeline .card")).toHaveCount(22);
+  await page.getByRole("button", { name: "Ratings", exact: true }).click();
+  await expect(page.locator(".champions-grid .card").first()).toBeVisible();
+  await page.getByLabel("Championship lineage").selectOption("fide");
+  expect(await page.locator(".champions-grid .card").count()).toBeGreaterThan(
+    0,
+  );
+  await page.goto("/#stats");
+  await page.getByRole("button", { name: "Achievements", exact: true }).click();
+  await expect(page.locator(".achievement")).toHaveCount(14);
+  await page.getByRole("button", { name: "World map", exact: true }).click();
+  await expect(page.locator(".world-map path").first()).toBeVisible();
+  await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await expect(page.locator(".map-controls")).toContainText("1.5×");
+  const map = page.locator(".world-map");
+  await map.scrollIntoViewIfNeeded();
+  const box = (await map.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.4, box.y + box.height * 0.5);
+  await page.mouse.down();
+  await page.mouse.move(
+    box.x + box.width * 0.4 + 60,
+    box.y + box.height * 0.5,
+    { steps: 3 },
+  );
+  await page.mouse.up();
+  await page.getByRole("button", { name: "Zoom out", exact: true }).click();
+  await expect(page.locator(".world-map > g")).toHaveAttribute(
+    "transform",
+    "translate(360 180) scale(1) translate(-360 -180)",
+  );
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await expect(page.locator(".map-controls")).toContainText("1.0×");
+});
+
+test("local profile, friends and shared games work without invented online services", async ({
+  page,
+}) => {
+  await page.goto("/#community");
+  await page.getByLabel("Display name").fill("Alex");
+  await page.getByLabel("Country (optional)").selectOption("US");
+  await page.getByRole("button", { name: "Save profile", exact: true }).click();
+  await page.getByRole("button", { name: "Friends", exact: true }).click();
+  await page.getByRole("button", { name: "Add friend", exact: true }).click();
+  const d = page.getByRole("dialog");
+  await d.getByLabel("Name", { exact: true }).fill("Sam");
+  await d.getByLabel("Country", { exact: true }).selectOption("CA");
+  await d.getByRole("button", { name: "Save contact", exact: true }).click();
+  await page
+    .locator(".friends-grid")
+    .getByRole("button", { name: "Play", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "New shared game", exact: true })
+    .click();
+  await uiMove(page, "e2e4");
+  await expect(page.locator(".move-chips")).toContainText("e4");
+  await page
+    .getByRole("button", { name: "Copy game link", exact: true })
+    .click();
+  await expect(page.getByLabel("Game link")).toHaveValue(/#community\/invite/);
+  const link = await page.getByLabel("Game link").inputValue();
+  await page.goto(link);
+  await expect(page.locator(".incoming-game")).toContainText("Alex – Sam");
+  await page.getByRole("button", { name: "Open game", exact: true }).click();
+  await uiMove(page, "e7e5");
+  expect((await stored(page)).games[0].moves).toEqual(["e2e4", "e7e5"]);
+  await page.getByRole("button", { name: "Data", exact: true }).click();
+  const dl = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "Export backup", exact: true })
+    .first()
+    .click();
+  expect((await dl).suggestedFilename()).toBe("novachess-backup.json");
+});
+
+test("saved games replay and engine review persist real results", async ({
+  page,
+}) => {
+  await page.goto("/#library");
+  await page.getByRole("button", { name: "Import PGN", exact: true }).click();
+  await page
+    .getByLabel("PGN games")
+    .fill('[Event "Review test"]\n\n1. e4 e5 2. Nf3 Nc6');
+  await page.getByRole("button", { name: "Import", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Replay & review", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Next move", exact: true }).click();
+  await expect(
+    page.getByRole("slider", { name: "Replay position" }),
+  ).toHaveValue("1");
+  await page.getByLabel("Time per position").selectOption("300");
+  await page.getByRole("button", { name: "Review game", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Review complete." }),
+  ).toBeVisible({ timeout: 45000 });
+  expect((await stored(page)).games[0].review.length).toBe(4);
+});
+
+test("default dark views and customization dialog pass automated WCAG checks", async ({
   page,
 }) => {
   const { default: AxeBuilder } = await import("@axe-core/playwright");
-  await page.goto("/");
-  await page.getByRole("tab", { name: "Analysis", exact: true }).focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(
-    page.getByRole("tab", { name: "Puzzles", exact: true }),
-  ).toBeFocused();
-  await expect(
-    page.getByRole("tab", { name: "Puzzles", exact: true }),
-  ).toHaveAttribute("aria-selected", "true");
-  for (const mode of ["Analysis", "Puzzles", "Learn"]) {
-    await page.getByRole("tab", { name: mode, exact: true }).click();
+  for (const route of [
+    "/",
+    "/#analysis",
+    "/#puzzles",
+    "/#learn",
+    "/#community",
+    "/#stats",
+  ]) {
+    await page.goto(route);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    if (route.includes("puzzles"))
+      await expect(
+        page.getByRole("group", { name: "Chessboard", exact: true }),
+      ).toBeVisible();
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();
@@ -226,8 +448,11 @@ test("tabs support arrow-key navigation and accessible structure in each interac
       })),
     ).toEqual([]);
   }
-  await page.getByRole("button", { name: "Follow the launch" }).first().click();
-  let results = await new AxeBuilder({ page })
+  await page
+    .getByRole("button", { name: "Customize", exact: true })
+    .first()
+    .click();
+  const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
     .analyze();
   expect(
@@ -236,15 +461,221 @@ test("tabs support arrow-key navigation and accessible structure in each interac
       nodes: v.nodes.map((n) => n.target),
     })),
   ).toEqual([]);
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Privacy", exact: true }).click();
-  results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-    .analyze();
-  expect(
-    results.violations.map((v) => ({
-      id: v.id,
-      nodes: v.nodes.map((n) => n.target),
-    })),
-  ).toEqual([]);
+});
+
+let ff: FairyStockfish;
+test.beforeAll(async () => {
+  ff = await load({
+    wasmBinary: fs.readFileSync("node_modules/ffish-es6/ffish.wasm"),
+  } as Parameters<typeof load>[0]);
+  ff.loadVariantConfig(
+    "[cvfog:chess]\nking = -\ncommoner = k\ncastlingKingPiece = k\nextinctionValue = loss\nextinctionPieceTypes = k\nstalemateValue = draw\n[cvpawns:chess]\nstartFen = 4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1\ncastling = false\n[cvpawnrace:chess]\nking = -\nstartFen = 8/pppppppp/8/8/8/8/PPPPPPPP/8 w - - 0 1\ncastling = false\npromotionPieceTypes = -\nmandatoryPawnPromotion = false\nflagPiece = p\nflagRegionWhite = *8\nflagRegionBlack = *1\nextinctionValue = loss\nextinctionPieceTypes = *\nstalemateValue = loss",
+  );
+});
+for (const variant of [
+  "chess",
+  "blind",
+  "blindtext",
+  "crazyhouse",
+  "duck",
+  "atomic",
+  "cvfog",
+  "3check",
+  "kingofthehill",
+  "horde",
+  "antichess",
+  "cvpawns",
+  "cvpawnrace",
+  "chess960",
+  "bughouse",
+])
+  test(`legal human move and actual local opponent reply in ${variant}`, async ({
+    page,
+  }) => {
+    test.setTimeout(45000);
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    await page.goto("/#play");
+    await page
+      .getByRole("button", { name: "Game options", exact: true })
+      .click();
+    await page.getByLabel("Variant", { exact: true }).selectOption(variant);
+    await page.getByRole("button", { name: "Start game", exact: true }).click();
+    await expect(page.getByLabel("Game move", { exact: true })).toBeVisible();
+    const g = (await stored(page)).activeGame;
+    const b = new ff.Board(
+      ["blind", "blindtext", "chess960"].includes(variant) ? "chess" : variant,
+      g.initial,
+      variant === "chess960",
+    );
+    const move = b.legalMoves().split(" ")[0];
+    if (variant === "blindtext") {
+      await page.getByLabel("Game move", { exact: true }).fill(move);
+      await page
+        .locator(".inline-form")
+        .getByRole("button", { name: "Play", exact: true })
+        .click();
+    } else {
+      await uiMove(page, move);
+      if (variant === "duck") await square(page, move.slice(-2));
+    }
+    await expect
+      .poll(async () => (await stored(page)).activeGame?.moves.length || 0, {
+        timeout: 20000,
+      })
+      .toBeGreaterThanOrEqual(2);
+    const saved = (await stored(page)).activeGame;
+    for (const m of saved.moves)
+      expect(b.push(m), `illegal ${m} in ${variant}`).toBeTruthy();
+    b.delete();
+    expect(errors).toEqual([]);
+  });
+
+async function seedGame(
+  page: Page,
+  variant: string,
+  fen: string,
+  moves: string[] = [],
+  partner = false,
+) {
+  await page.goto("/");
+  const b = new ff.Board(variant, fen);
+  const positions = [fen],
+    notation: string[] = [];
+  for (const m of moves) {
+    notation.push(b.sanMove(m));
+    b.push(m);
+    positions.push(b.fen());
+  }
+  b.delete();
+  await page.evaluate(
+    ({ key, variant, fen, moves, positions, notation, partner }) => {
+      const l = JSON.parse(localStorage.getItem(key)!);
+      l.activeGame = {
+        id: "fixture",
+        title: "Rule check",
+        created: Date.now(),
+        initial: fen,
+        variant,
+        moves,
+        notation,
+        positions,
+        result: "*",
+        human: "w",
+        folder: "Games",
+        botRating: 1000,
+        ...(partner
+          ? {
+              partner: {
+                initial:
+                  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[] w KQkq - 0 1",
+                positions: [
+                  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[] w KQkq - 0 1",
+                ],
+                moves: [],
+                notation: [],
+                result: "*",
+              },
+            }
+          : {}),
+      };
+      localStorage.setItem(key, JSON.stringify(l));
+    },
+    { key: BASE_KEY, variant, fen, moves, positions, notation, partner },
+  );
+  await page.goto("/#play/resume");
+  await page.reload();
+  await expect(page.getByLabel("Game move", { exact: true })).toBeVisible();
+}
+test("crazyhouse drops and bughouse pocket transfers use real variant rules", async ({
+  page,
+}) => {
+  await seedGame(page, "crazyhouse", "7k/p7/8/8/8/8/8/7K[N] w - - 0 1");
+  await page.getByRole("button", { name: "Drop N", exact: true }).click();
+  await square(page, "e4");
+  await expect
+    .poll(async () => (await stored(page)).activeGame.moves[0])
+    .toBe("N@e4");
+  await seedGame(
+    page,
+    "bughouse",
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[] w KQkq - 0 1",
+    ["e2e4", "d7d5"],
+    true,
+  );
+  await uiMove(page, "e4d5");
+  await expect
+    .poll(async () => (await stored(page)).activeGame.partner.positions.at(-1))
+    .toContain("[p]");
+});
+test("king of the hill, third check and antichess use variant victory conditions", async ({
+  page,
+}) => {
+  await seedGame(page, "kingofthehill", "7k/8/8/8/8/3K4/8/8 w - - 0 1");
+  await uiMove(page, "d3d4");
+  await expect
+    .poll(async () => (await stored(page)).activeGame.result)
+    .toBe("1-0");
+  await seedGame(page, "3check", "7k/8/8/8/8/8/R7/K7 w - - 1+3 0 1");
+  await uiMove(page, "a2a8");
+  await expect
+    .poll(async () => (await stored(page)).activeGame.result)
+    .toBe("1-0");
+  await seedGame(page, "antichess", "8/8/8/8/8/1p6/P7/7K w - - 0 1");
+  await uiMove(page, "a2b3");
+  await expect
+    .poll(async () => (await stored(page)).activeGame.result)
+    .toBe("0-1");
+});
+test("mobile navigation and search lead to working app tools", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  if (testInfo.project.name === "mobile") {
+    await page
+      .getByRole("button", { name: "Open navigation", exact: true })
+      .click();
+    await page
+      .getByRole("navigation", { name: "Library navigation", exact: true })
+      .getByRole("button", { name: "Saved games", exact: true })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Saved games", exact: true }),
+    ).toBeVisible();
+  }
+  await page
+    .getByRole("button", { name: "Search tools and openings", exact: true })
+    .click();
+  await page.getByLabel("Search tools and openings").last().fill("Sicilian");
+  await page
+    .getByRole("button", { name: "Search opening library", exact: true })
+    .click();
+  await expect(page.locator(".opening-row").first()).toContainText("Sicilian");
+});
+
+test("bughouse transfers ordinary pieces normally and reverts captured promotions only", async ({
+  page,
+}) => {
+  await seedGame(
+    page,
+    "bughouse",
+    "7k/8/q~7/8/8/1q6/P7/7K[] w - - 0 1",
+    [],
+    true,
+  );
+  await uiMove(page, "a2b3");
+  await expect
+    .poll(async () => (await stored(page)).activeGame.partner.positions.at(-1))
+    .toContain("[q]");
+  await seedGame(
+    page,
+    "bughouse",
+    "7k/8/8/8/8/1q~6/P7/7K[] w - - 0 1",
+    [],
+    true,
+  );
+  await uiMove(page, "a2b3");
+  await expect
+    .poll(async () => (await stored(page)).activeGame.partner.positions.at(-1))
+    .toContain("[p]");
 });

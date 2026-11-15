@@ -1,0 +1,33 @@
+import { readdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+async function files(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const out = [];
+  for (const e of entries) {
+    const p = dir + "/" + e.name;
+    if (e.isDirectory()) out.push(...(await files(p)));
+    else out.push(p);
+  }
+  return out;
+}
+const all = (await files("dist"))
+  .filter(
+    (p) =>
+      !p.endsWith("/sw.js") &&
+      !p.endsWith(".mp3") &&
+      !p.endsWith(".woff") &&
+      !p.includes("/licenses/"),
+  )
+  .sort();
+const hash = createHash("sha256");
+for (const f of all) {
+  hash.update(f);
+  hash.update(await readFile(f));
+}
+const version = hash.digest("hex").slice(0, 12);
+const urls = all.map((p) => "./" + p.slice(5));
+const sw = `const prefix='novachess-'+self.registration.scope+'-';const CACHE=prefix+${JSON.stringify(version)};const FILES=${JSON.stringify(urls)};self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()))});self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(prefix)&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});self.addEventListener('fetch',event=>{const request=event.request,url=new URL(request.url);if(request.method!=='GET'||url.origin!==self.location.origin||!url.href.startsWith(self.registration.scope))return;if(request.mode==='navigate'){event.respondWith(fetch(request).catch(()=>caches.match(new URL('./index.html',self.registration.scope))));return}event.respondWith(caches.match(request).then(cached=>cached||fetch(request).then(response=>{if(response.ok&&response.status===200){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(request,copy)))}return response})))})`;
+await writeFile("dist/sw.js", sw);
+console.log(
+  `Offline cache: ${urls.length} local assets. Music caches after first use.`,
+);

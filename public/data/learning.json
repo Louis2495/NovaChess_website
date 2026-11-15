@@ -1,0 +1,1043 @@
+{
+  "coverageThrough": 2024,
+  "ratingNote": "Recorded event Elo with its year—not peak ratings. — means no contemporaneous event rating supplied. Early titles predate published FIDE lists.",
+  "facts": [
+    {
+      "id": "squares",
+      "title": "A small board, huge possibilities",
+      "detail": "An 8×8 board has 64 squares, split evenly between light and dark.",
+      "category": "Numbers",
+      "metric": "64",
+      "symbol": "square.grid.3x3.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "pieces",
+      "title": "Two tiny armies",
+      "detail": "Each side starts with 16 pieces: eight pawns and eight other pieces.",
+      "category": "Pieces",
+      "metric": "32",
+      "symbol": "person.2.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "first-moves",
+      "title": "Twenty ways to begin",
+      "detail": "White has 16 pawn moves and four knight moves in the starting position.",
+      "category": "Numbers",
+      "metric": "20",
+      "symbol": "arrow.triangle.branch",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "first-pair",
+      "title": "One move each",
+      "detail": "After White and Black have each moved once, 400 distinct positions are possible.",
+      "category": "Numbers",
+      "metric": "400",
+      "symbol": "square.grid.3x3.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "shannon",
+      "title": "More than a lifetime of games",
+      "detail": "Shannon’s famous rough game-tree estimate is about 10¹²⁰. It is an estimate, not an exact count.",
+      "category": "Numbers",
+      "metric": "≈10¹²⁰",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Shannon_number",
+      "diagram": null
+    },
+    {
+      "id": "knight-reach",
+      "title": "The knight’s eight exits",
+      "detail": "From a central square on an empty board, a knight can reach eight squares.",
+      "category": "Pieces",
+      "metric": "8",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": "n"
+    },
+    {
+      "id": "rook-reach",
+      "title": "Straight-line specialist",
+      "detail": "On an empty board, a rook has 14 destinations from any square.",
+      "category": "Pieces",
+      "metric": "14",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": "r"
+    },
+    {
+      "id": "bishop-reach",
+      "title": "Diagonal specialist",
+      "detail": "A centrally placed bishop can reach 13 squares on an empty board.",
+      "category": "Pieces",
+      "metric": "13",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": "b"
+    },
+    {
+      "id": "queen-reach",
+      "title": "Maximum mobility",
+      "detail": "A central queen can reach 27 squares on an otherwise empty board.",
+      "category": "Pieces",
+      "metric": "27",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": "q"
+    },
+    {
+      "id": "king-reach",
+      "title": "One step, every direction",
+      "detail": "A central king has eight neighboring squares, though attacks can make them illegal.",
+      "category": "Pieces",
+      "metric": "8",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": "k"
+    },
+    {
+      "id": "bishop-color",
+      "title": "A lifetime on one color",
+      "detail": "A bishop stays on its starting square color for the whole game.",
+      "category": "Pieces",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": "b"
+    },
+    {
+      "id": "knight-color",
+      "title": "Always changing color",
+      "detail": "Every knight move lands on the opposite square color.",
+      "category": "Pieces",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": "n"
+    },
+    {
+      "id": "promotion",
+      "title": "A pawn chooses its future",
+      "detail": "Promotion may produce a queen, rook, bishop or knight—even if none has been captured.",
+      "category": "Rules",
+      "metric": "4",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "underpromotion",
+      "title": "Sometimes a queen is too much",
+      "detail": "Underpromotion can avoid stalemate or deliver a knight fork.",
+      "category": "Rules",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "nine-queens",
+      "title": "A theoretical royal crowd",
+      "detail": "One side can theoretically have nine queens: the original plus eight promoted pawns.",
+      "category": "Numbers",
+      "metric": "9",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "en-passant",
+      "title": "A one-move window",
+      "detail": "En passant is available only immediately after the opponent’s qualifying two-square pawn advance.",
+      "category": "Rules",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "castle-check",
+      "title": "The king’s safe passage",
+      "detail": "You cannot castle out of, through, or into check.",
+      "category": "Rules",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "castle-rook",
+      "title": "An attacked rook can still castle",
+      "detail": "A rook being attacked does not by itself prevent castling.",
+      "category": "Rules",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "stalemate",
+      "title": "No move, no check",
+      "detail": "In standard chess, no legal move without being in check is stalemate: a draw.",
+      "category": "Rules",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "threefold",
+      "title": "Three appearances, one claim",
+      "detail": "Threefold repetition can be claimed; the repeated positions need not be consecutive.",
+      "category": "Rules",
+      "metric": "3",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "fivefold",
+      "title": "Five means automatic",
+      "detail": "Fivefold repetition ends a standard game automatically under FIDE rules.",
+      "category": "Rules",
+      "metric": "5",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "fifty",
+      "title": "A claim, not always an ending",
+      "detail": "The 50-move rule can be claimed after 50 moves by each side without a pawn move or capture.",
+      "category": "Rules",
+      "metric": "50",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "seventy-five",
+      "title": "The automatic move limit",
+      "detail": "After 75 such moves by each side, the game is drawn; checkmate on the last move takes priority.",
+      "category": "Rules",
+      "metric": "75",
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "same-position",
+      "title": "Same pieces is not enough",
+      "detail": "Repetition also depends on whose turn it is and the available castling and en-passant rights.",
+      "category": "Rules",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "checkmate-first",
+      "title": "The board decides first",
+      "detail": "A legal move delivering checkmate ends the game immediately.",
+      "category": "Rules",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://handbook.fide.com/chapter/E012023",
+      "diagram": null
+    },
+    {
+      "id": "chess960",
+      "title": "A different first position",
+      "detail": "Chess960 has 960 starts; bishops begin on opposite colors, with the king between the rooks.",
+      "category": "Numbers",
+      "metric": "960",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Fischer_random_chess",
+      "diagram": null
+    },
+    {
+      "id": "two-knights",
+      "title": "Mate possible, force impossible",
+      "detail": "Two knights cannot force checkmate against a bare king with best defense.",
+      "category": "Pieces",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Two_knights_endgame",
+      "diagram": null
+    },
+    {
+      "id": "bishop-knight",
+      "title": "The right corner matters",
+      "detail": "Bishop-and-knight mate drives the king toward a corner matching the bishop’s color.",
+      "category": "Pieces",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Bishop_and_knight_checkmate",
+      "diagram": null
+    },
+    {
+      "id": "wrong-bishop",
+      "title": "One pawn can change everything",
+      "detail": "A rook pawn and the wrong-colored bishop can fail to beat a lone king.",
+      "category": "Pieces",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Wrong_bishop",
+      "diagram": null
+    },
+    {
+      "id": "opposition",
+      "title": "Kings fight without touching",
+      "detail": "Endgame opposition can force the other king to yield ground.",
+      "category": "Pieces",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Opposition_(chess)",
+      "diagram": null
+    },
+    {
+      "id": "zugzwang",
+      "title": "The trouble with having a turn",
+      "detail": "In zugzwang, being required to move makes your position worse.",
+      "category": "Pieces",
+      "metric": null,
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Zugzwang",
+      "diagram": null
+    },
+    {
+      "id": "chaturanga",
+      "title": "An ancient ancestor",
+      "detail": "Chess traces its roots to chaturanga in India, around the sixth century.",
+      "category": "Origins",
+      "metric": "≈600",
+      "symbol": "globe.asia.australia.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess",
+      "diagram": null
+    },
+    {
+      "id": "shatranj",
+      "title": "A game crossing borders",
+      "detail": "Shatranj carried an early form of chess through Persia and the Islamic world.",
+      "category": "Origins",
+      "metric": null,
+      "symbol": "globe.asia.australia.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess",
+      "diagram": null
+    },
+    {
+      "id": "queen-evolves",
+      "title": "The queen gained her power",
+      "detail": "The modern queen’s long-range movement emerged in Europe in the late fifteenth century.",
+      "category": "Origins",
+      "metric": "≈1500",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess",
+      "diagram": null
+    },
+    {
+      "id": "lucena",
+      "title": "A very old chess book",
+      "detail": "Lucena’s 1497 book is an early printed source for modern chess rules and positions.",
+      "category": "Origins",
+      "metric": "1497",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Luis_Ram%C3%ADrez_de_Lucena",
+      "diagram": null
+    },
+    {
+      "id": "staunton",
+      "title": "The familiar silhouette",
+      "detail": "The Staunton piece design was introduced in 1849 and named after Howard Staunton.",
+      "category": "Origins",
+      "metric": "1849",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Staunton_chess_set",
+      "diagram": null
+    },
+    {
+      "id": "london1851",
+      "title": "A new tournament era",
+      "detail": "Adolf Anderssen won London 1851, a landmark international chess tournament.",
+      "category": "Origins",
+      "metric": "1851",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/London_1851_chess_tournament",
+      "diagram": null
+    },
+    {
+      "id": "morphy",
+      "title": "A champion before the official title",
+      "detail": "Paul Morphy dominated his 1858 European tour before an official world championship existed.",
+      "category": "People",
+      "metric": "1858",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Paul_Morphy",
+      "diagram": null
+    },
+    {
+      "id": "steinitz",
+      "title": "The first official world champion",
+      "detail": "Steinitz defeated Zukertort in the 1886 title match.",
+      "category": "People",
+      "metric": "1886",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "diagram": null
+    },
+    {
+      "id": "lasker",
+      "title": "Twenty-seven years at the top",
+      "detail": "Emanuel Lasker held the world title from 1894 to 1921.",
+      "category": "People",
+      "metric": "27",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "diagram": null
+    },
+    {
+      "id": "capablanca",
+      "title": "The chess machine",
+      "detail": "Capablanca became world champion in 1921, celebrated for clarity and endgame skill.",
+      "category": "People",
+      "metric": "1921",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "diagram": null
+    },
+    {
+      "id": "menchik",
+      "title": "A women’s championship pioneer",
+      "detail": "Vera Menchik won the first Women’s World Championship in 1927.",
+      "category": "People",
+      "metric": "1927",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/Vera_Menchik",
+      "diagram": null
+    },
+    {
+      "id": "fide",
+      "title": "A federation born in Paris",
+      "detail": "FIDE was founded in Paris in 1924.",
+      "category": "Origins",
+      "metric": "1924",
+      "symbol": "globe.europe.africa.fill",
+      "source": "https://en.wikipedia.org/wiki/FIDE",
+      "diagram": null
+    },
+    {
+      "id": "first-gms",
+      "title": "The first official grandmasters",
+      "detail": "FIDE awarded its first 27 grandmaster titles in 1950.",
+      "category": "People",
+      "metric": "27",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Grandmaster_(chess)",
+      "diagram": null
+    },
+    {
+      "id": "nona",
+      "title": "A grandmaster milestone",
+      "detail": "Nona Gaprindashvili became the first woman awarded the open GM title in 1978.",
+      "category": "People",
+      "metric": "1978",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Nona_Gaprindashvili",
+      "diagram": null
+    },
+    {
+      "id": "polgar",
+      "title": "Breaking into the top ten",
+      "detail": "Judit Polgár reached the world top ten in the open rating list.",
+      "category": "People",
+      "metric": "Top 10",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/Judit_Polg%C3%A1r",
+      "diagram": null
+    },
+    {
+      "id": "reykjavik",
+      "title": "A match on the world stage",
+      "detail": "Fischer and Spassky’s 1972 title match took place in Reykjavík, Iceland.",
+      "category": "People",
+      "metric": "1972",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "diagram": null
+    },
+    {
+      "id": "marathon-match",
+      "title": "Forty-eight games, no winner",
+      "detail": "The 1984–85 Karpov–Kasparov title match was stopped after 48 games without a champion being decided.",
+      "category": "People",
+      "metric": "48",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "diagram": null
+    },
+    {
+      "id": "longest-game",
+      "title": "A very long draw",
+      "detail": "Nikolić–Arsović, Belgrade 1989, lasted 269 moves.",
+      "category": "Numbers",
+      "metric": "269",
+      "symbol": "lightbulb.fill",
+      "source": "https://en.wikipedia.org/wiki/List_of_world_records_in_chess",
+      "diagram": null
+    },
+    {
+      "id": "deep-blue",
+      "title": "A computer wins a match",
+      "detail": "In 1997, Deep Blue defeated reigning champion Kasparov in a six-game classical match.",
+      "category": "Technology",
+      "metric": "1997",
+      "symbol": "desktopcomputer",
+      "source": "https://en.wikipedia.org/wiki/Deep_Blue_versus_Garry_Kasparov",
+      "diagram": null
+    },
+    {
+      "id": "engines",
+      "title": "Searching is not seeing everything",
+      "detail": "Chess engines search selected continuations; extra time can change the best move.",
+      "category": "Technology",
+      "metric": null,
+      "symbol": "cpu",
+      "source": "https://en.wikipedia.org/wiki/Computer_chess",
+      "diagram": null
+    },
+    {
+      "id": "tablebases",
+      "title": "Perfect knowledge, limited pieces",
+      "detail": "An endgame tablebase can give exact results for positions within its piece limit.",
+      "category": "Technology",
+      "metric": null,
+      "symbol": "externaldrive.fill",
+      "source": "https://en.wikipedia.org/wiki/Endgame_tablebase",
+      "diagram": null
+    },
+    {
+      "id": "elo",
+      "title": "A rating is relative",
+      "detail": "Elo measures results within a player pool; different pools are not automatically equivalent.",
+      "category": "Numbers",
+      "metric": null,
+      "symbol": "chart.bar.fill",
+      "source": "https://en.wikipedia.org/wiki/Elo_rating_system",
+      "diagram": null
+    },
+    {
+      "id": "fide-lists",
+      "title": "Ratings arrived much later",
+      "detail": "Published FIDE Elo lists began long after the first world championship. Early champions have no title-era FIDE rating.",
+      "category": "Technology",
+      "metric": "1971",
+      "symbol": "chart.bar.fill",
+      "source": "https://en.wikipedia.org/wiki/FIDE_world_rankings",
+      "diagram": null
+    },
+    {
+      "id": "reunification",
+      "title": "One title again",
+      "detail": "Kramnik’s 2006 victory over Topalov reunited the split world championship.",
+      "category": "People",
+      "metric": "2006",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "diagram": null
+    },
+    {
+      "id": "gukesh",
+      "title": "A teenage undisputed champion",
+      "detail": "Gukesh won the undisputed world title in 2024 at age 18.",
+      "category": "People",
+      "metric": "18",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "diagram": null
+    }
+  ],
+  "milestones": [
+    {
+      "id": "event-600",
+      "year": 600,
+      "title": "An Indian beginning",
+      "detail": "Chaturanga emerges: an ancestor of modern chess.",
+      "symbol": "globe.asia.australia.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+    },
+    {
+      "id": "event-900",
+      "year": 900,
+      "title": "A game travels",
+      "detail": "Shatranj spreads across cultures and into Europe.",
+      "symbol": "globe.europe.africa.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+    },
+    {
+      "id": "event-1497",
+      "year": 1497,
+      "title": "The powerful queen era",
+      "detail": "Lucena’s printed book records an early form of modern chess.",
+      "symbol": "book.closed.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+    },
+    {
+      "id": "event-1769",
+      "year": 1769,
+      "title": "The Mechanical Turk",
+      "detail": "A famous apparent chess automaton was secretly operated by a human.",
+      "symbol": "gearshape.fill",
+      "source": "https://en.wikipedia.org/wiki/Mechanical_Turk"
+    },
+    {
+      "id": "event-1849",
+      "year": 1849,
+      "title": "The Staunton shape",
+      "detail": "The familiar tournament-piece design is introduced.",
+      "symbol": "square.grid.3x3.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+    },
+    {
+      "id": "event-1851",
+      "year": 1851,
+      "title": "London gathers the masters",
+      "detail": "Anderssen wins a landmark international tournament.",
+      "symbol": "person.3.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+    },
+    {
+      "id": "event-1858",
+      "year": 1858,
+      "title": "Morphy’s European tour",
+      "detail": "A brilliant attacking player dominates before the official world title.",
+      "symbol": "bolt.fill",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+    },
+    {
+      "id": "event-1886",
+      "year": 1886,
+      "title": "The world title begins",
+      "detail": "Steinitz defeats Zukertort in the first official championship match.",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    },
+    {
+      "id": "event-1924",
+      "year": 1924,
+      "title": "FIDE is founded",
+      "detail": "A world federation is established in Paris.",
+      "symbol": "globe.europe.africa.fill",
+      "source": "https://en.wikipedia.org/wiki/FIDE"
+    },
+    {
+      "id": "event-1927",
+      "year": 1927,
+      "title": "A women’s world title",
+      "detail": "Vera Menchik wins the inaugural championship.",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/Women%27s_World_Chess_Championship"
+    },
+    {
+      "id": "event-1948",
+      "year": 1948,
+      "title": "A title decided by tournament",
+      "detail": "Botvinnik wins the five-player championship after Alekhine’s death.",
+      "symbol": "person.3.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    },
+    {
+      "id": "event-1950",
+      "year": 1950,
+      "title": "Official GM titles",
+      "detail": "FIDE awards the first 27 grandmaster titles.",
+      "symbol": "star.fill",
+      "source": "https://en.wikipedia.org/wiki/Grandmaster_(chess)"
+    },
+    {
+      "id": "event-1971",
+      "year": 1971,
+      "title": "Published Elo lists",
+      "detail": "FIDE’s published Elo lists establish a new way to compare results.",
+      "symbol": "chart.bar.fill",
+      "source": "https://en.wikipedia.org/wiki/FIDE_world_rankings"
+    },
+    {
+      "id": "event-1972",
+      "year": 1972,
+      "title": "Reykjavík captures attention",
+      "detail": "Fischer defeats Spassky in a globally watched match.",
+      "symbol": "globe.europe.africa.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    },
+    {
+      "id": "event-1978",
+      "year": 1978,
+      "title": "A milestone for women",
+      "detail": "Gaprindashvili receives the open grandmaster title.",
+      "symbol": "star.fill",
+      "source": "https://en.wikipedia.org/wiki/Nona_Gaprindashvili"
+    },
+    {
+      "id": "event-1985",
+      "year": 1985,
+      "title": "Kasparov takes the crown",
+      "detail": "The 22-year-old begins a fifteen-year title reign.",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    },
+    {
+      "id": "event-1993",
+      "year": 1993,
+      "title": "Two championship branches",
+      "detail": "The classical and FIDE titles split.",
+      "symbol": "arrow.triangle.branch",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    },
+    {
+      "id": "event-1997",
+      "year": 1997,
+      "title": "Deep Blue’s breakthrough",
+      "detail": "A computer defeats the reigning champion in a classical match.",
+      "symbol": "desktopcomputer",
+      "source": "https://en.wikipedia.org/wiki/Deep_Blue_versus_Garry_Kasparov"
+    },
+    {
+      "id": "event-2006",
+      "year": 2006,
+      "title": "Reunification",
+      "detail": "Kramnik defeats Topalov; the world title is reunited.",
+      "symbol": "arrow.triangle.merge",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    },
+    {
+      "id": "event-2013",
+      "year": 2013,
+      "title": "The Carlsen era",
+      "detail": "Carlsen defeats Anand in Chennai.",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    },
+    {
+      "id": "event-2023",
+      "year": 2023,
+      "title": "Ding wins the tiebreak",
+      "detail": "Ding Liren becomes champion after a tied classical match.",
+      "symbol": "clock.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    },
+    {
+      "id": "event-2024",
+      "year": 2024,
+      "title": "A teenage champion",
+      "detail": "Gukesh defeats Ding Liren in Singapore.",
+      "symbol": "crown.fill",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+    }
+  ],
+  "champions": [
+    {
+      "id": "steinitz",
+      "name": "Wilhelm Steinitz",
+      "start": 1886,
+      "end": 1894,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "The first official champion"
+    },
+    {
+      "id": "lasker",
+      "name": "Emanuel Lasker",
+      "start": 1894,
+      "end": 1921,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "A 27-year reign"
+    },
+    {
+      "id": "capablanca",
+      "name": "José Raúl Capablanca",
+      "start": 1921,
+      "end": 1927,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "Renowned for endgame clarity"
+    },
+    {
+      "id": "alekhine-first",
+      "name": "Alexander Alekhine",
+      "start": 1927,
+      "end": 1935,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "Takes the title from Capablanca"
+    },
+    {
+      "id": "euwe",
+      "name": "Max Euwe",
+      "start": 1935,
+      "end": 1937,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "The Dutch mathematician wins"
+    },
+    {
+      "id": "alekhine-second",
+      "name": "Alexander Alekhine",
+      "start": 1937,
+      "end": 1946,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "Regains the title"
+    },
+    {
+      "id": "botvinnik-first",
+      "name": "Mikhail Botvinnik",
+      "start": 1948,
+      "end": 1957,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "Wins the 1948 championship tournament"
+    },
+    {
+      "id": "smyslov",
+      "name": "Vasily Smyslov",
+      "start": 1957,
+      "end": 1958,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "Harmony and endgame mastery"
+    },
+    {
+      "id": "botvinnik-second",
+      "name": "Mikhail Botvinnik",
+      "start": 1958,
+      "end": 1960,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "Wins the return match"
+    },
+    {
+      "id": "tal",
+      "name": "Mikhail Tal",
+      "start": 1960,
+      "end": 1961,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "The Wizard of Riga"
+    },
+    {
+      "id": "botvinnik-third",
+      "name": "Mikhail Botvinnik",
+      "start": 1961,
+      "end": 1963,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "A third title reign"
+    },
+    {
+      "id": "petrosian",
+      "name": "Tigran Petrosian",
+      "start": 1963,
+      "end": 1969,
+      "track": "main",
+      "elo": null,
+      "ratingYear": null,
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship",
+      "highlight": "Famous for resilient defense"
+    },
+    {
+      "id": "spassky",
+      "name": "Boris Spassky",
+      "start": 1969,
+      "end": 1972,
+      "track": "main",
+      "elo": 2660,
+      "ratingYear": 1972,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp1972.pgn",
+      "highlight": "An exceptionally versatile player"
+    },
+    {
+      "id": "fischer",
+      "name": "Bobby Fischer",
+      "start": 1972,
+      "end": 1975,
+      "track": "main",
+      "elo": 2785,
+      "ratingYear": 1972,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp1972.pgn",
+      "highlight": "Wins in Reykjavík"
+    },
+    {
+      "id": "karpov",
+      "name": "Anatoly Karpov",
+      "start": 1975,
+      "end": 1985,
+      "track": "main",
+      "elo": 2725,
+      "ratingYear": 1978,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp1978.pgn",
+      "highlight": "Awarded the title; defends it in 1978"
+    },
+    {
+      "id": "kasparov",
+      "name": "Garry Kasparov",
+      "start": 1985,
+      "end": 2000,
+      "track": "main",
+      "elo": 2700,
+      "ratingYear": 1985,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp1985.pgn",
+      "highlight": "Classical title branch after 1993"
+    },
+    {
+      "id": "kramnik",
+      "name": "Vladimir Kramnik",
+      "start": 2000,
+      "end": 2007,
+      "track": "main",
+      "elo": 2770,
+      "ratingYear": 2000,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp2000.pgn",
+      "highlight": "Reunites the title in 2006"
+    },
+    {
+      "id": "anand",
+      "name": "Viswanathan Anand",
+      "start": 2007,
+      "end": 2013,
+      "track": "main",
+      "elo": 2792,
+      "ratingYear": 2007,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/WorldChamp2007.pgn",
+      "highlight": "Wins the unified title tournament"
+    },
+    {
+      "id": "carlsen",
+      "name": "Magnus Carlsen",
+      "start": 2013,
+      "end": 2023,
+      "track": "main",
+      "elo": 2855,
+      "ratingYear": 2021,
+      "source": "https://github.com/jimhcyang/ChessAnalytics_wcc_2021_2023/blob/12465f014bb9df49aa3afd8c23500ab2c8d4376c/WCC2021.pgn",
+      "highlight": "Five successful title matches"
+    },
+    {
+      "id": "ding",
+      "name": "Ding Liren",
+      "start": 2023,
+      "end": 2024,
+      "track": "main",
+      "elo": 2788,
+      "ratingYear": 2023,
+      "source": "https://github.com/jimhcyang/ChessAnalytics_wcc_2021_2023/blob/12465f014bb9df49aa3afd8c23500ab2c8d4376c/WCC2023.pgn",
+      "highlight": "Wins in rapid tiebreaks"
+    },
+    {
+      "id": "gukesh",
+      "name": "Gukesh D",
+      "start": 2024,
+      "end": null,
+      "track": "main",
+      "elo": 2783,
+      "ratingYear": 2024,
+      "source": "https://ratings.fide.com/profile/46616543/calculations",
+      "highlight": "Wins the title at 18"
+    },
+    {
+      "id": "fide-karpov",
+      "name": "Anatoly Karpov",
+      "start": 1993,
+      "end": 1999,
+      "track": "split",
+      "elo": 2760,
+      "ratingYear": 1993,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp1993.pgn",
+      "highlight": "FIDE title during the split"
+    },
+    {
+      "id": "fide-khalifman",
+      "name": "Alexander Khalifman",
+      "start": 1999,
+      "end": 2000,
+      "track": "split",
+      "elo": 2628,
+      "ratingYear": 1999,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp1999.pgn",
+      "highlight": "FIDE title during the split"
+    },
+    {
+      "id": "fide-anand",
+      "name": "Viswanathan Anand",
+      "start": 2000,
+      "end": 2002,
+      "track": "split",
+      "elo": 2762,
+      "ratingYear": 2000,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp2000.pgn",
+      "highlight": "FIDE title during the split"
+    },
+    {
+      "id": "fide-ponomariov",
+      "name": "Ruslan Ponomariov",
+      "start": 2002,
+      "end": 2004,
+      "track": "split",
+      "elo": 2727,
+      "ratingYear": 2002,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp2002.pgn",
+      "highlight": "FIDE title during the split"
+    },
+    {
+      "id": "fide-kasimdzhanov",
+      "name": "Rustam Kasimdzhanov",
+      "start": 2004,
+      "end": 2005,
+      "track": "split",
+      "elo": 2652,
+      "ratingYear": 2004,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp2004.pgn",
+      "highlight": "FIDE title during the split"
+    },
+    {
+      "id": "fide-topalov",
+      "name": "Veselin Topalov",
+      "start": 2005,
+      "end": 2006,
+      "track": "split",
+      "elo": 2788,
+      "ratingYear": 2005,
+      "source": "https://github.com/mainali123/Chess-Dataset/blob/5721c8a71a0f9850d54fe6d5b2d8060abcab1357/World_Chess_Champoinship/FideChamp2005.pgn",
+      "highlight": "FIDE title during the split"
+    }
+  ]
+}

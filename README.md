@@ -1,58 +1,60 @@
-# NovaChess website
+# NovaChess web workspace
 
-A visual, responsive prelaunch website for [NovaChess for iPhone](https://github.com/Louis2495/ChessVision). Built with React, TypeScript and Vite. All fonts and artwork are served locally; no account, backend, API keys or analytics are required.
+A dark, customizable chess workspace following the iPhone app’s **Home, Analysis, Play, Puzzles and Learn** structure. Clock and camera features are intentionally omitted.
 
-![NovaChess desktop preview](docs/preview-desktop.jpg)
+![Desktop workspace](docs/preview-desktop.jpg)
 
-## Run
+## Use
 
-Use Node.js 22.12+ (Node 24 is verified).
+Node.js 22.12+; Node 24 is verified.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-## Verify
+`postinstall` prepares the local Stockfish worker and WASM from the locked npm package. No credentials, account or backend are required.
 
 ```sh
 npm run build
-# Uses /usr/bin/chromium when available. Otherwise install Playwright's browser:
+npm run preview
+# Uses /usr/bin/chromium when present; otherwise install Playwright Chromium:
 npx playwright install chromium
 npm test
-npm run preview
 ```
 
-Validation in the cloud environment: production build passed; all 18 desktop/mobile browser tests passed, including axe WCAG A/AA checks of the demos and dialogs. The production output was also tested under `/NovaChess_website/`, including a solved puzzle and all local assets. This does not claim native iPhone execution or hosted deployment.
+Set `CHROMIUM_PATH` to use another Chromium binary. The build creates static files in `dist/`, including an offline service worker. Core tools and bundled data are cached after the first successful online load. Piano loads only when enabled and is then cached; public game imports need internet access.
 
-Set `CHROMIUM_PATH` to use another installed Chromium executable. Tests cover desktop and iPhone-sized Chromium, legal/illegal puzzle moves, hints, local progress, every opening walkthrough, sandbox undo/reset, palette/variant previews, dialogs, navigation, assets and overflow.
+## Features
 
-## What’s included
+- **Home:** daily puzzle, resume game, actual progress and recent games.
+- **Analysis:** local Stockfish 19 Lite, one/three candidate lines, evaluation, material/check insights, legal moves, FEN/PGN import, position editing, branching, saved studies, FEN/link/PNG/GIF export.
+- **Play:** computer games, adaptive strength, Developer opening book, requested openings, all app variants, two-board Bughouse, drops, Duck placement, premoves, underpromotions, takebacks, draw offers and local history.
+- **Puzzles:** all 4,000 source puzzles; adaptive selection, automatic replies, hints, first-attempt grading, streaks and a deterministic daily puzzle.
+- **Learn:** all 111 curated lessons and 3,865 searchable opening lines, practice, repertoire editing/import/training with transpositions and spaced review, public-game research, 17 playable endgames, 56 facts and 22 historical milestones with championship/event-rating views.
+- **Library:** folders, imports, replay, persistent/resumable reviews, repertoire recall suggestions, engine alternatives and exports.
+- **Progress:** real training/game results, improvement patterns, 14 achievements and a zoomable country map.
+- **Players & sharing:** local profile/avatar/country, local friends, pass-and-play, portable correspondence files, position/game links and read-only shared replays.
+- **Appearance:** nine app themes, all 12 board palettes and six piece sets, 12 app background styles plus uploaded backgrounds, custom base/accent/button/text/panel/board colors, background blur/dimming, panel opacity, font/size, spacing, corners, board size, move display, audio, personal presets and settings import/export. Changes persist locally.
 
-- Illustrated iPhone preview and feature cards using the app’s actual icon, duck and piece artwork.
-- Legal-move analysis sandbox (not a browser chess engine).
-- Three checkmate puzzles from the app's Lichess dataset, with hints, keyboard notation and browser-local completion.
-- Three opening walkthroughs, five variant previews and five live board palettes.
-- Accessible native dialogs, responsive navigation, reduced-motion support, privacy information and credits.
-- Honest prelaunch calls to action. No fake App Store links, testimonials, ratings, email subscriptions or live online services.
+## Browser differences
 
-See [the app review](docs/APP_REVIEW.md) for source references, feature coverage and limitations.
+This is a working web adaptation, not a wrapper around SwiftUI. Standard analysis/play uses **Stockfish 19 Lite** with a smaller network than the native app. Variant legality uses **Fairy-Stockfish via ffish-es6**; variant opponents and variant review use lighter local searches/material heuristics. Their strength is not a calibrated human rating.
+
+Apple CloudKit and Game Center are not browser services. The website uses local profiles/contacts and game files/snapshot links instead; it does not invent a live player directory, automatic public broadcasts, matchmaking or cloud synchronization. Saved games and progress belong to this browser. Export backups to keep copies.
+
+Opening research calls the selected service only after a user requests it. Browser CORS, site availability and rate limits apply. PGN-file research works independently of those services. Live Chess.com/Lichess access could not be verified in this cloud instance because its outbound proxy blocked both destinations; representative PGN imports and opening-tree results were validated.
+
+See [feature mapping](docs/APP_REVIEW.md) for source references and differences.
 
 ## Deploy
 
-The production output is `dist/`. It can be hosted on any static host. Relative asset paths support a GitHub Pages repository subpath.
+Host `dist/` on a static host. Relative asset paths and hash routes support the GitHub Pages repository path. Workers/WASM are included locally and need no cross-origin-isolation headers.
 
-For GitHub Pages:
+For GitHub Pages, select **Settings → Pages → Source → GitHub Actions**, then run **Actions → Deploy website → Run workflow** on `main`. The CI workflow builds and runs browser tests on pushes and pull requests. Source pushes alone do not publish the website.
 
-1. In the repository, choose **Settings → Pages → Source → GitHub Actions**.
-2. Open **Actions → Deploy website → Run workflow**, selecting `main`.
+## Privacy and licenses
 
-The manual deployment workflow builds and publishes the site. The separate CI workflow builds and runs browser tests on pushes and pull requests. Pushing source alone does not enable Pages or publish the website.
+There are no analytics, ads, advertising cookies or sign-ups. Games, profiles, contacts, backgrounds, presets and progress use browser storage. Service-worker caches hold static application assets; they do not upload personal data. Shared files/links contain the game/profile information the user explicitly exports. Static hosts may retain request logs.
 
-When a release exists, replace the prelaunch dialog's `APP_SOURCE` destination/wording in `src/main.tsx` with the official App Store or TestFlight link. The current site intentionally describes NovaChess as in development.
-
-## Privacy & attribution
-
-The website saves only completed demo puzzle IDs in `localStorage` under `novachess-web-puzzles-v1`. **Reset progress** clears it. It collects no email or analytics; static hosts may retain standard request logs. Optional online behavior of the iPhone app is explained separately in the privacy dialog.
-
-Chess pieces are Colin M. L. Burnett’s CBurnett set, used under GPL-3.0-or-later. Their complete license is in `public/licenses/`. Puzzle facts are from the Lichess CC0 dataset; original games are linked in the preview. App artwork is from NovaChess. Font licenses, data provenance and other notices are in [THIRD_PARTY.md](THIRD_PARTY.md). This website is AGPL-3.0-or-later; see [LICENSE](LICENSE).
+[THIRD_PARTY.md](THIRD_PARTY.md) records artwork, data, fonts, engine source references and music attribution. The source is AGPL-3.0-or-later; see [LICENSE](LICENSE). Piano has its separate CC BY-SA 4.0 license. Full third-party license texts are under `public/licenses/`.

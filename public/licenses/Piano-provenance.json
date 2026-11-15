@@ -1,0 +1,37 @@
+{
+  "upstream": "https://github.com/MutopiaProject/MutopiaProject",
+  "commit": "2144afd6f52d56c5b6995b8b589ef1268b3139f0",
+  "recording_license": "CC-BY-SA-4.0",
+  "pieces": [
+    {
+      "file": "FieldNocturne5.ly",
+      "composer": "John Field",
+      "title": "Nocturne No. 5 in B-flat major, H.37",
+      "quarter_bpm": 78,
+      "upstream_path": "ftp/FieldJ/H37/Field_Nocturne_5/Field_Nocturne_5.ly",
+      "edition_credit": "Alex Schreiber, Mutopia-2016/10/06-2137",
+      "edition_license": "CC-BY-SA-4.0",
+      "sha256": "cafed360d2efe4c0bd5a8f6890c041b41d5421161c3b94c9ed0fa30c6c9e8bc6"
+    },
+    {
+      "file": "Consolation.ly",
+      "composer": "Friedrich Burgm\u00fcller",
+      "title": "Consolation, Op.100 No.13",
+      "quarter_bpm": 100,
+      "upstream_path": "ftp/BurgmullerJFF/O100/25EF-13/25EF-13.ly",
+      "edition_credit": "Bas Wassink, Mutopia-2013/01/12-224",
+      "edition_license": "Public Domain",
+      "sha256": "54f46cb419baa9a7b11faa1bc271450fa811474c883a77ef315aa9792e124066"
+    },
+    {
+      "file": "DoucePlainte.ly",
+      "composer": "Friedrich Burgm\u00fcller",
+      "title": "Douce plainte, Op.100 No.16",
+      "quarter_bpm": 90,
+      "upstream_path": "ftp/BurgmullerJFF/O100/25EF-16/25EF-16.ly",
+      "edition_credit": "Bas Wassink, Mutopia-2013/01/12-228",
+      "edition_license": "Public Domain",
+      "sha256": "a1d4901914dbcc31ef2e2251b816933edaf5018a0d3ced225496633e2ad8a37c"
+    }
+  ]
+}

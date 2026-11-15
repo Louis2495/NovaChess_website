@@ -1,0 +1,392 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Chess } from "chess.js";
+import {
+  Flame,
+  Lightbulb,
+  ArrowRight,
+  RotateCcw,
+  Target,
+  ExternalLink,
+  Calendar,
+  ChevronRight,
+} from "lucide-react";
+import { useApp } from "../lib/context";
+import { useData, today } from "../lib/store";
+import type { PuzzleData } from "../lib/types";
+import { dailyPuzzle } from "./Home";
+import { Board } from "../components/Board";
+import { PageTitle, Card, Button, Loading, Field } from "../components/UI";
+export default function Puzzles() {
+  const { data, error } = useData<PuzzleData[]>("puzzles");
+  if (!data) return <Loading error={error} />;
+  return <PuzzleTrainer puzzles={data} />;
+}
+function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
+  const { library, setLibrary, detail, notify, navigate } = useApp();
+  const daily = detail === "daily";
+  const [theme, setTheme] = useState("All themes");
+  const pool = useMemo(
+    () =>
+      theme === "All themes"
+        ? puzzles
+        : puzzles.filter((p) => p.themes.includes(theme)),
+    [puzzles, theme],
+  );
+  function choose(exclude?: string) {
+    if (daily) {
+      const saved = library.progress.daily[today()];
+      return puzzles.find((p) => p.id === saved?.id) || dailyPuzzle(puzzles);
+    }
+    const unseen = pool.filter(
+      (p) => p.id !== exclude && !library.progress.completed.includes(p.id),
+    );
+    const choices = unseen.length
+      ? unseen
+      : pool.filter((p) => p.id !== exclude);
+    return (
+      [...choices].sort(
+        (a, b) =>
+          Math.abs(a.sourceRating - library.progress.rating) -
+            Math.abs(b.sourceRating - library.progress.rating) ||
+          a.id.localeCompare(b.id),
+      )[0] || pool[0]
+    );
+  }
+  const [puzzle, setPuzzle] = useState(() => choose()),
+    [cursor, setCursor] = useState(1),
+    [fen, setFen] = useState(() => {
+      const c = new Chess(puzzle.fen);
+      c.move(puzzle.moves[0]);
+      return c.fen();
+    }),
+    [message, setMessage] = useState(""),
+    [done, setDone] = useState(false),
+    [hint, setHint] = useState(""),
+    [wrong, setWrong] = useState(false),
+    [played, setPlayed] = useState<string[]>([]),
+    [moveInput, setMoveInput] = useState("");
+  const graded = useRef(daily && !!library.progress.daily[today()]);
+  const learner = useMemo(() => {
+    const c = new Chess(puzzle.fen);
+    c.move(puzzle.moves[0]);
+    return c.turn();
+  }, [puzzle]);
+  const c = new Chess(fen);
+  function grade(correct: boolean) {
+    if (graded.current) return;
+    graded.current = true;
+    setLibrary((l) => {
+      if (daily && l.progress.daily[today()]) return l;
+      const p = l.progress;
+      const expected = 1 / (1 + 10 ** ((puzzle.sourceRating - p.rating) / 400));
+      const k = p.attempts < 10 ? 400 : p.attempts < 25 ? 120 : 40;
+      return {
+        ...l,
+        progress: {
+          ...p,
+          rating: Math.max(
+            200,
+            Math.min(3500, p.rating + k * ((correct ? 1 : 0) - expected)),
+          ),
+          attempts: p.attempts + 1,
+          solved: p.solved + (correct ? 1 : 0),
+          streak: correct ? p.streak + 1 : 0,
+          completed: [...new Set([...p.completed, puzzle.id])],
+          daily: daily
+            ? {
+                ...p.daily,
+                [today()]: { id: puzzle.id, correct, completed: correct },
+              }
+            : p.daily,
+        },
+      };
+    });
+  }
+  function complete() {
+    const assisted = graded.current;
+    grade(true);
+    setDone(true);
+    setMessage(
+      daily && library.progress.daily[today()]
+        ? "Daily puzzle replayed. No rating change."
+        : assisted
+          ? "Completed. Earlier hints or mistakes remain recorded."
+          : "Solved.",
+    );
+    if (daily)
+      setLibrary((l) => ({
+        ...l,
+        progress: {
+          ...l.progress,
+          daily: {
+            ...l.progress.daily,
+            [today()]: {
+              ...(l.progress.daily[today()] || {
+                id: puzzle.id,
+                correct: !assisted,
+              }),
+              completed: true,
+            },
+          },
+        },
+      }));
+  }
+  function load(p: PuzzleData) {
+    const c = new Chess(p.fen);
+    c.move(p.moves[0]);
+    setPuzzle(p);
+    setFen(c.fen());
+    setCursor(1);
+    setDone(false);
+    setMessage("");
+    setHint("");
+    setWrong(false);
+    setPlayed([]);
+    graded.current = daily && !!library.progress.daily[today()];
+    setMoveInput("");
+  }
+  function attempt(from: string, to: string, promotion?: string) {
+    if (done || c.turn() !== learner) return;
+    try {
+      const ch = new Chess(fen),
+        m = ch.move({ from, to, promotion: promotion || "q" }),
+        uci = m.from + m.to + (m.promotion || "");
+      if (uci !== puzzle.moves[cursor] && !ch.isCheckmate()) {
+        grade(false);
+        setWrong(true);
+        setMessage("Try another move.");
+        return;
+      }
+      setFen(ch.fen());
+      setPlayed((p) => [...p, m.san]);
+      setCursor(cursor + 1);
+      setWrong(false);
+      setHint("");
+      setMessage("Correct.");
+      if (cursor + 1 >= puzzle.moves.length || ch.isCheckmate()) complete();
+    } catch {
+      notify("That move is not legal.");
+    }
+  }
+  useEffect(() => {
+    if (done || c.turn() === learner || cursor >= puzzle.moves.length) return;
+    const timer = setTimeout(() => {
+      try {
+        const ch = new Chess(fen),
+          m = ch.move(puzzle.moves[cursor]);
+        setFen(ch.fen());
+        setPlayed((p) => [...p, m.san]);
+        setCursor(cursor + 1);
+      } catch {
+        setMessage(
+          "The puzzle reply could not be played. Skip to the next puzzle.",
+        );
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [fen, cursor, puzzle, done]);
+  const themes = useMemo(
+    () => [...new Set(puzzles.flatMap((p) => p.themes))].sort(),
+    [puzzles],
+  );
+  return (
+    <>
+      <PageTitle
+        title={daily ? "Daily puzzle" : "Puzzles"}
+        subtitle={
+          daily
+            ? new Date().toLocaleDateString()
+            : "Adaptive training · 4,000 offline positions"
+        }
+      >
+        <Button
+          className="secondary"
+          onClick={() => navigate("puzzles", daily ? "" : "daily")}
+        >
+          <Calendar size={16} />
+          {daily ? "Adaptive practice" : "Daily puzzle"}
+        </Button>
+      </PageTitle>
+      <div className="chess-layout">
+        <div className="board-column">
+          <div className="board-topline">
+            <span className="turn-indicator">
+              <i className={learner === "w" ? "white-piece" : "black-piece"} />
+              {done
+                ? "Completed"
+                : c.turn() !== learner
+                  ? "Playing reply…"
+                  : `${learner === "w" ? "White" : "Black"} to move`}
+            </span>
+            <span className="muted">{played.length} half-moves</span>
+          </div>
+          <div
+            className={`puzzle-board ${wrong ? "wrong" : ""} ${done ? "solved" : ""}`}
+          >
+            <Board
+              fen={fen}
+              onMove={attempt}
+              disabled={done || c.turn() !== learner}
+              flipped={learner === "b"}
+              hint={hint}
+            />
+          </div>
+          <div className="puzzle-feedback" role="status">
+            {message || "Find the best continuation."}
+          </div>
+          <div className="button-row equal-buttons">
+            <Button
+              className="hint-button"
+              disabled={done || c.turn() !== learner}
+              onClick={() => {
+                grade(false);
+                const m = new Chess(fen).move(puzzle.moves[cursor]);
+                setHint(m.from);
+                setMessage(`Try ${m.san}.`);
+              }}
+            >
+              <Lightbulb size={17} />
+              Hint
+            </Button>
+            <Button
+              onClick={() => {
+                if (daily) {
+                  load(puzzle);
+                } else {
+                  if (!done) grade(false);
+                  load(choose(puzzle.id));
+                }
+              }}
+            >
+              {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
+              {daily ? "Replay" : done ? "Next puzzle" : "Skip"}
+            </Button>
+          </div>
+          <form
+            className="inline-form move-entry"
+            onSubmit={(e) => {
+              e.preventDefault();
+              try {
+                const m = new Chess(fen).move(moveInput);
+                attempt(m.from, m.to, m.promotion);
+                setMoveInput("");
+              } catch {
+                notify("Enter a legal move.");
+              }
+            }}
+          >
+            <input
+              aria-label="Puzzle move"
+              value={moveInput}
+              onChange={(e) => setMoveInput(e.target.value)}
+              placeholder="Enter move"
+              disabled={done || c.turn() !== learner}
+            />
+            <Button className="secondary" disabled={!moveInput || done}>
+              Play
+            </Button>
+          </form>
+        </div>
+        <div className="side-panels">
+          <Card>
+            <div className="card-heading">
+              <h2>Your training</h2>
+              <Target size={19} />
+            </div>
+            <div className="large-metric">
+              {Math.round(library.progress.rating)}
+              <span>Puzzle estimate</span>
+            </div>
+            <div className="metric-pair">
+              <div>
+                <b>{library.progress.solved}</b>
+                <span>Solved</span>
+              </div>
+              <div>
+                <b>
+                  <Flame size={19} />
+                  {library.progress.streak}
+                </b>
+                <span>Streak</span>
+              </div>
+            </div>
+            <p className="caption">
+              Local training estimate on the Lichess puzzle scale. Hints,
+              mistakes and skips affect it.
+            </p>
+          </Card>
+          {!daily && (
+            <Card>
+              <h2>Practice</h2>
+              <Field label="Theme">
+                <select
+                  value={theme}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setTheme(value);
+                    const choices =
+                      value === "All themes"
+                        ? puzzles
+                        : puzzles.filter((p) => p.themes.includes(value));
+                    if (!done) grade(false);
+                    load(
+                      [...choices].sort(
+                        (a, b) =>
+                          Math.abs(a.sourceRating - library.progress.rating) -
+                          Math.abs(b.sourceRating - library.progress.rating),
+                      )[0],
+                    );
+                  }}
+                >
+                  <option>All themes</option>
+                  {themes.map((t) => (
+                    <option key={t}>{t}</option>
+                  ))}
+                </select>
+              </Field>
+              <p className="caption">
+                Difficulty follows your results and favors unseen positions.
+              </p>
+            </Card>
+          )}
+          <Card>
+            <div className="card-heading">
+              <h2>Moves</h2>
+              <span className="pill">{done ? "Complete" : "In progress"}</span>
+            </div>
+            <div className="move-chips">
+              {played.length ? (
+                played.map((m, i) => <span key={i}>{m}</span>)
+              ) : (
+                <p className="muted">Your solution appears here.</p>
+              )}
+            </div>
+            <a
+              className="external"
+              href={puzzle.gameURL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Original game
+              <ExternalLink size={14} />
+            </a>
+            {done && (
+              <div className="puzzle-themes">
+                {puzzle.themes.map((t) => (
+                  <span className="pill" key={t}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
+          </Card>
+          <button className="card tool-card" onClick={() => navigate("stats")}>
+            <Flame size={20} />
+            <span>Progress & achievements</span>
+            <ChevronRight size={17} />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
