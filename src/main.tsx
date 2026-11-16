@@ -259,26 +259,52 @@ function App() {
   }, [appearance.sound, appearance.volume]);
   useEffect(() => {
     setAppearance((a) =>
-      a.backgroundColor === "#80350d"
-        ? { ...a, backgroundColor: defaults.backgroundColor }
-        : ["#101418", "#101612", "#19262e"].includes(a.backgroundColor) &&
-            ["#1b2126", "#1c271f", "#263840"].includes(a.panelColor) &&
-            ["#f0f3f1", "#eef4ed", "#f4f8f5"].includes(a.textColor) &&
-            ["#a6b0aa", "#abb8aa", "#b5c8c5"].includes(a.mutedColor)
-          ? {
-              ...a,
-              backgroundColor: defaults.backgroundColor,
-              panelColor: defaults.panelColor,
-              textColor: defaults.textColor,
-              mutedColor: defaults.mutedColor,
-              accent: a.accent === "#78b58a" ? defaults.accent : a.accent,
-              buttonColor:
-                a.buttonColor === "#78b58a"
-                  ? defaults.buttonColor
-                  : a.buttonColor,
-              font: a.font === "DM Sans" ? defaults.font : a.font,
-            }
-          : a,
+      a.background === "Default" &&
+      a.backgroundColor === "#20313b" &&
+      a.panelColor === "#304651" &&
+      a.textColor === "#f4f8f5" &&
+      a.mutedColor === "#b5c8c5"
+        ? {
+            ...a,
+            backgroundColor: defaults.backgroundColor,
+            panelColor: defaults.panelColor,
+            textColor: defaults.textColor,
+            mutedColor: defaults.mutedColor,
+            theme:
+              a.theme === "Forest" && a.accent === "#96d9b8"
+                ? defaults.theme
+                : a.theme,
+            accent:
+              a.theme === "Forest" && a.accent === "#96d9b8"
+                ? defaults.accent
+                : a.accent,
+            buttonColor:
+              a.theme === "Forest" &&
+              a.accent === "#96d9b8" &&
+              a.buttonColor === "#96d9b8"
+                ? defaults.buttonColor
+                : a.buttonColor,
+          }
+        : a.backgroundColor === "#80350d"
+          ? { ...a, backgroundColor: defaults.backgroundColor }
+          : ["#101418", "#101612", "#19262e"].includes(a.backgroundColor) &&
+              ["#1b2126", "#1c271f", "#263840"].includes(a.panelColor) &&
+              ["#f0f3f1", "#eef4ed", "#f4f8f5"].includes(a.textColor) &&
+              ["#a6b0aa", "#abb8aa", "#b5c8c5"].includes(a.mutedColor)
+            ? {
+                ...a,
+                backgroundColor: defaults.backgroundColor,
+                panelColor: defaults.panelColor,
+                textColor: defaults.textColor,
+                mutedColor: defaults.mutedColor,
+                accent: a.accent === "#78b58a" ? defaults.accent : a.accent,
+                buttonColor:
+                  a.buttonColor === "#78b58a"
+                    ? defaults.buttonColor
+                    : a.buttonColor,
+                font: a.font === "DM Sans" ? defaults.font : a.font,
+              }
+            : a,
     );
   }, []);
   useEffect(() => {

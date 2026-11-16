@@ -5,6 +5,7 @@ export const base = import.meta.env.BASE_URL;
 export const initialFen =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 export const themes: Record<string, string> = {
+  Periwinkle: "#c7c1ff",
   Forest: "#96d9b8",
   Pink: "#ef7eb6",
   Ocean: "#72b2ff",
@@ -54,14 +55,14 @@ export const backgrounds = [
   "Flag",
 ];
 export const defaults: Appearance = {
-  theme: "Forest",
+  theme: "Periwinkle",
   background: "Default",
-  backgroundColor: "#20313b",
-  accent: "#96d9b8",
-  buttonColor: "#96d9b8",
-  textColor: "#f4f8f5",
-  mutedColor: "#b5c8c5",
-  panelColor: "#304651",
+  backgroundColor: "#292d43",
+  accent: "#c7c1ff",
+  buttonColor: "#f1bb98",
+  textColor: "#fbf8ff",
+  mutedColor: "#c6c7dc",
+  panelColor: "#3b425d",
   board: "Classic",
   light: boards.Classic[0],
   dark: boards.Classic[1],

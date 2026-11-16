@@ -36,7 +36,7 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
   await expect(page.getByRole("link", { name: /Daily puzzle/ })).toBeVisible();
   await expect(page.locator(".app")).toHaveCSS(
     "background-color",
-    "rgb(32, 49, 59)",
+    "rgb(41, 45, 67)",
   );
   await expect(
     page.getByRole("heading", { name: /Your next move|A little brighter/ }),
@@ -110,7 +110,7 @@ test("appearance themes, custom colors, board/pieces/layout persist and presets 
     .getByRole("dialog", { name: "Appearance" })
     .getByRole("button", { name: "Reset appearance", exact: true })
     .click();
-  await expect(page.locator(".app")).toHaveCSS("--accent", "#96d9b8");
+  await expect(page.locator(".app")).toHaveCSS("--accent", "#c7c1ff");
 });
 
 test("uploaded backgrounds stay local and can be removed", async ({ page }) => {

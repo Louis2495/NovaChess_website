@@ -1,5 +1,6 @@
 # Validation
 
+- Theme refresh: 12 targeted desktop/mobile checks passed, including returning-user palette migration, preserved custom colors/backgrounds, reset behavior and accessibility. Production Home, Play, Analysis, Puzzles, Learn, Stats and Profile also passed desktop/mobile accessibility and overflow checks.
 - TypeScript and Vite production build: passed. The offline cache contains 430 local assets.
 - Full desktop/mobile Chromium suite: 143 scenarios passed in one run; one desktop-only layout check is intentionally skipped on mobile.
 - Node rules/content/database/federation suite: all 34 tests passed.

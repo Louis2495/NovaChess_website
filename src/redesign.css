@@ -3882,3 +3882,14 @@ select.theme-select {
 .quiz-result .quiz-picture-result {
   align-self: center;
 }
+
+/* Gentle color across the default workspace, using the user's palette. */
+.bg-default .site-background {
+  background:
+    radial-gradient(ellipse at 85% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+    radial-gradient(ellipse at 5% 85%, color-mix(in srgb, var(--button) 9%, transparent), transparent 58%),
+    var(--base);
+}
+.bg-default .topbar {
+  background: transparent;
+}
