@@ -36,7 +36,7 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
   await expect(page.getByRole("link", { name: /Daily puzzle/ })).toBeVisible();
   await expect(page.locator(".app")).toHaveCSS(
     "background-color",
-    "rgb(128, 53, 13)",
+    "rgb(32, 49, 59)",
   );
   await expect(
     page.getByRole("heading", { name: /Your next move|A little brighter/ }),

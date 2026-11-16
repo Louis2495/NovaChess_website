@@ -56,7 +56,7 @@ export const backgrounds = [
 export const defaults: Appearance = {
   theme: "Forest",
   background: "Default",
-  backgroundColor: "#80350d",
+  backgroundColor: "#20313b",
   accent: "#96d9b8",
   buttonColor: "#96d9b8",
   textColor: "#f4f8f5",

@@ -3543,3 +3543,19 @@ select.theme-select {
 .trap-list > button.active small {
   color: var(--text);
 }
+.daily-meme-image {
+  display: block;
+  width: min(100%, 560px);
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-solid);
+}
+.profile-avatar:has(.default-avatar),
+.avatar:has(.default-avatar) {
+  background: radial-gradient(circle at 35% 25%, #96d9b836, #263840);
+}
+.profile-avatar .default-avatar,
+.avatar .default-avatar {
+  filter: drop-shadow(0 2px 2px #0004);
+}

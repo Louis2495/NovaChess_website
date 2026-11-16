@@ -254,7 +254,7 @@ function App() {
   }, [appearance.sound, appearance.volume]);
   useEffect(() => {
     setAppearance((a) =>
-      a.backgroundColor === "#20313b"
+      a.backgroundColor === "#80350d"
         ? { ...a, backgroundColor: defaults.backgroundColor }
         : ["#101418", "#101612", "#19262e"].includes(a.backgroundColor) &&
             ["#1b2126", "#1c271f", "#263840"].includes(a.panelColor) &&
@@ -437,7 +437,7 @@ function App() {
                   <img src={library.profile.avatar} alt="" />
                 ) : (
                   <img
-                    src={pieceUrl("wP", "Merida")}
+                    src={pieceUrl("wP", "Chessnut")}
                     className="default-avatar"
                     alt=""
                   />

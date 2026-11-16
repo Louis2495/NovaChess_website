@@ -80,7 +80,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
                   <img src={avatar} alt="Your profile picture" />
                 ) : (
                   <img
-                    src={pieceUrl("wP", "Merida")}
+                    src={pieceUrl("wP", "Chessnut")}
                     className="default-avatar"
                     alt="Default pawn avatar"
                   />

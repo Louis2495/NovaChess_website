@@ -1,3 +1,4 @@
+import DailyMeme from "../components/DailyMeme";
 import { useMemo } from "react";
 import { ArrowRight, Check, ChevronRight, RotateCcw } from "lucide-react";
 import { useApp } from "../lib/context";
@@ -134,6 +135,7 @@ export default function HomePage() {
           </div>
         </section>
       </div>
+      <DailyMeme />
       {library.games.length > 0 && (
         <section className="home-recent">
           <div className="home-section-heading">

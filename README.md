@@ -27,7 +27,7 @@ Set `CHROMIUM_PATH` to use another Chromium binary. The build creates static fil
 
 ## Features
 
-- **Home:** one large New Game action, a fully clickable daily puzzle, opening suggestions and recent games. Meme candidates live in [a separate review folder](content/memes/README.md); none are published yet.
+- **Home:** one large New Game action, a fully clickable daily puzzle, opening suggestions and recent games. A daily meme rotates through [public/memes](public/memes/README.md), where images and captions can be reviewed manually.
 - **Boards:** forgiving piece-centered dragging, positive material surplus on the leading side, cursor-positioned promotion, configurable right-click marks/arrows, and keyboard controls (`f` flips; `z` enters board-only focus mode). Consecutive premoves preview future piece positions and are checked for legality before execution.
 - **Play:** all 15 original app modes plus Dropping Squares, Chaos chess and Random. Illustrated variant cards lead to a prominent Start game button. Games include persistent state, legal moves, local opponents and a large result banner.
 - **Puzzles:** 4,000 adaptive positions and Guess the Eval, a five-round game scored against an actual local Stockfish search.
@@ -36,7 +36,7 @@ Set `CHROMIUM_PATH` to use another Chromium binary. The build creates static fil
 - **Famous games:** 12 complete annotated master games, key-moment jumps, move-by-move replay, adjustable autoplay, analysis links, saving and full-game GIF export. Saved games also export GIFs.
 - **Analysis / Research:** browser Stockfish, branches, studies, position editor, exports, a dedicated public-game research tab with frequency-weighted arrows. Loading continues when you switch sections; progress and results remain intact.
 - **Profile / Controls:** username, bio, default pawn or uploaded avatar, country, personal settings, configurable shortcuts and annotation colors. Auto-queen defaults off; premoves default on. Profile opens from the bottom account button; Controls and Customize are inside it.
-- **Appearance:** nine themes, 12 palettes, six piece sets, custom colors/background images, bundled country flags, typography, layout, audio and personal presets. Defaults use a burnt-orange background, dark panels and mint accents.
+- **Appearance:** nine themes, 12 palettes, six piece sets, custom colors/background images, bundled country flags, typography, layout, audio and personal presets. Defaults use a dark blue-gray background, dark panels and mint accents.
 - **Stats:** results, activity, training, 18 harder achievements, a country map and improvement patterns. Endgame Lessons use the same name throughout the site.
 - **Online, when connected:** Supabase accounts, persistent Throne queues, one-day Vote Chess, team rooms versus friends/bots, shared annotations, global chat, and real global/country rankings and percentiles.
 
