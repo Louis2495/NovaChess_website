@@ -13,7 +13,7 @@ import {
   Save,
   RotateCcw,
   Play,
-  Pause,
+  Square,
 } from "lucide-react";
 import { useApp } from "../../lib/context";
 import { useData, initialFen, uid } from "../../lib/store";
@@ -259,9 +259,7 @@ function LessonWorkspace({
         return;
       }
       show(step + 1);
-    } catch {
-      notify("Illegal move.");
-    }
+    } catch {}
   }
   const premove = usePremoves({
     fen,
@@ -322,10 +320,10 @@ function LessonWorkspace({
       )}
       {!practice && (
         <IconButton
-          label={autoplay ? "Pause lesson" : "Play lesson"}
+          label={autoplay ? "Stop lesson" : "Play lesson"}
           onClick={() => setAutoplay((v) => !v)}
         >
-          {autoplay ? <Pause size={16} /> : <Play size={16} />}
+          {autoplay ? <Square size={16} /> : <Play size={16} />}
         </IconButton>
       )}
     </div>

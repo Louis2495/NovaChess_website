@@ -63,3 +63,5 @@ There are no analytics, ads or advertising cookies. Local games, profiles, backg
 USCF lookup requires the free read-only federation function. Follow the [browser-only setup](docs/ONLINE_SETUP.md#set-up-uscf-lookup-without-installing-anything); it works independently of account sign-in and needs no private keys in the website.
 
 Library separates training studies (including saved branches), recorded games, and NovaChess game history. Studies can be practiced as either color. Library is a main tab below Stats; Multiplayer navigation is temporarily hidden.
+
+Game play emphasizes a large board with draw, takeback and resign above a narrow notation rail. Analysis starts with collapsed notation and three adjustable engine lines; study names are entered when saving. Repertoire management remains in Learn. A separate global chat panel supports account-based Realtime messages, reporting and server-enforced moderator actions after the [Supabase setup](docs/ONLINE_SETUP.md#global-chat-moderation). Without that connection it is explicitly draft-only.

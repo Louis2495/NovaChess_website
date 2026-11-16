@@ -284,7 +284,7 @@ test("famous games replay, autoplay speeds and complete GIF export work", async 
       page.getByRole("slider", { name: "Replay position" }).inputValue(),
     )
     .not.toBe("0");
-  await page.getByRole("button", { name: "Pause replay", exact: true }).click();
+  await page.getByRole("button", { name: "Stop replay", exact: true }).click();
   await page.getByRole("button", { name: "Last move", exact: true }).click();
   await expect(
     page.getByRole("slider", { name: "Replay position" }),
@@ -401,7 +401,7 @@ for (const variant of ["dropping", "chaos", "random"])
       )
       .toEqual([]);
     if (variant === "dropping") {
-      await page.getByRole("button", { name: "Games", exact: true }).click();
+      await page.getByRole("button", { name: "New game", exact: true }).click();
       await page
         .getByRole("button", { name: "Game options", exact: true })
         .click();

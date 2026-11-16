@@ -1,12 +1,8 @@
 import { previewPremoves } from "../lib/premoves";
 import { usePremoves } from "../lib/usePremoves";
-import { matchTypedMove } from "../lib/moves";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FairyStockfish } from "ffish-es6";
 import {
-  Play as PlayIcon,
-  Pause,
-  Plus,
   RotateCcw,
   Flag,
   Handshake,
@@ -14,7 +10,6 @@ import {
   ArrowRight,
   MonitorPlay,
   Trash2,
-  Save,
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import {
@@ -28,11 +23,10 @@ import {
   fog,
 } from "../lib/variants";
 import { search } from "../lib/engine";
-import { uid, useData } from "../lib/store";
+import { uid, useData, pieceUrl } from "../lib/store";
 import type { Opening, SavedGame } from "../lib/types";
 import { Board, Piece } from "../components/Board";
 import {
-  PageTitle,
   Card,
   Button,
   Field,
@@ -130,7 +124,7 @@ export default function Play() {
     [rated, setRated] = useState(true),
     [openingId, setOpeningId] = useState(""),
     [options, setOptions] = useState(false),
-    [paused, setPaused] = useState(false),
+    [drawPending, setDrawPending] = useState(false),
     [flipped, setFlipped] = useState(false),
     [duck, setDuck] = useState<{
       fen: string;
@@ -138,7 +132,6 @@ export default function Play() {
       queued?: boolean;
     } | null>(null),
     [pocket, setPocket] = useState(""),
-    [text, setText] = useState(""),
     [confirm, setConfirm] = useState(false),
     [busy, setBusy] = useState(false);
   const { data: openings } = useData<Opening[]>("openings");
@@ -166,9 +159,6 @@ export default function Play() {
     }
   }, [ff, game]);
   const valid = snap && !("error" in snap) ? snap : null;
-  const variantInfo = variantList.find(
-    (v) => v.id === (game?.variant || variant),
-  );
   function archive(l: typeof library, g: SavedGame) {
     const existing = l.games.some((v) => v.id === g.id);
     return {
@@ -292,7 +282,6 @@ export default function Play() {
       activeGame: g,
     }));
     setPlaying(true);
-    setPaused(false);
     setFlipped(human === "b");
     setPremoves([]);
     setDuck(null);
@@ -386,7 +375,7 @@ export default function Play() {
     if (appearance.sound) window.dispatchEvent(new Event("chess-move"));
   }
   function play(from: string, to: string, promotion?: string) {
-    if (!game || !valid || paused || game.result !== "*") return;
+    if (!game || !valid || game.result !== "*") return;
     const prefix = from + to + (promotion || "");
     if (valid.turn !== game.human) {
       if (appearance.premoves) {
@@ -433,7 +422,6 @@ export default function Play() {
         (!promotion && m.split(",")[0] === from + to),
     );
     if (!candidates.length) {
-      notify("Illegal move.");
       return;
     }
     if (game.variant === "duck") {
@@ -473,7 +461,6 @@ export default function Play() {
       !game ||
       !valid ||
       !playing ||
-      paused ||
       game.result !== "*" ||
       valid.turn === game.human
     )
@@ -524,10 +511,9 @@ export default function Play() {
       controller.abort();
       setBusy(false);
     };
-  }, [ff, game?.id, game?.moves.length, playing, paused, openings]);
+  }, [ff, game?.id, game?.moves.length, playing, openings]);
   useEffect(() => {
-    if (!ff || !game?.partner || !playing || paused || game.result !== "*")
-      return;
+    if (!ff || !game?.partner || !playing || game.result !== "*") return;
     const controller = new AbortController();
     const id = game.id,
       partnerPly = game.partner.moves.length;
@@ -554,12 +540,12 @@ export default function Play() {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [ff, game?.partner?.positions, playing, paused, game?.result]);
+  }, [ff, game?.partner?.positions, playing, game?.result]);
   const premove = usePremoves({
     fen: valid?.fen || "8/8/8/8/8/8/8/8 w - - 0 1",
     side: game?.human || "w",
     legal: valid?.legal || [],
-    active: !!game && playing && !paused && game.result === "*",
+    active: !!game && playing && game.result === "*",
     identity: game?.id,
     execute: (move) => apply(move),
   });
@@ -580,45 +566,17 @@ export default function Play() {
         variant={special}
         human={game?.special ? game.human : human}
         dropCount={game?.special?.dropCount || dropCount}
-        onBack={() => setSpecial(null)}
+        onBack={() => {
+          setVariant(special);
+          setSpecial(null);
+          setPlaying(false);
+          setOptions(false);
+        }}
       />
     );
   return (
     <>
-      {playing ? (
-        <PageTitle
-          title={variantInfo?.name || game?.variant || "Game"}
-          subtitle={game?.opponent || "Computer"}
-        >
-          {playing && game?.result === "*" && (
-            <Button
-              className="secondary"
-              onClick={() => {
-                setPlaying(false);
-                setPaused(false);
-                setPremoves([]);
-              }}
-            >
-              <Plus size={16} />
-              New game
-            </Button>
-          )}
-          {playing && game?.result === "*" && (
-            <Button
-              className="secondary"
-              onClick={() => {
-                setPaused(!paused);
-                setPremoves([]);
-              }}
-            >
-              {paused ? <PlayIcon size={16} /> : <Pause size={16} />}{" "}
-              {paused ? "Resume" : "Pause"}
-            </Button>
-          )}
-        </PageTitle>
-      ) : (
-        <h1 className="sr-only">New game</h1>
-      )}
+      <h1 className="sr-only">{playing ? "Chess game" : "New game"}</h1>
       {error && (
         <div className="error-banner" role="alert">
           {error}
@@ -814,7 +772,9 @@ export default function Play() {
       ) : (
         <div
           className={
-            game.variant === "bughouse" ? "bughouse-layout" : "chess-layout"
+            game.variant === "bughouse"
+              ? "chess-layout play-match bughouse-match"
+              : "chess-layout play-match"
           }
         >
           <div className="board-column">
@@ -827,181 +787,123 @@ export default function Play() {
               </span>
               <div>
                 <b>{game.opponent}</b>
-                <small>{game.botRating} requested · approximate</small>
+                <small>{game.botRating}</small>
               </div>
             </div>
-            {game.variant === "blindtext" ? (
-              <Card className="blind-text">
-                <h2>
-                  {valid.turn === game.human ? "Your move" : "Opponent to move"}
-                </h2>
-                <p>{game.notation.at(-1) || "Enter a move below."}</p>
-              </Card>
-            ) : (
-              <>
-                <Pocket
-                  value={
-                    valid.turn === game.human
-                      ? game.human === "w"
-                        ? valid.blackPocket
-                        : valid.whitePocket
-                      : game.human === "w"
-                        ? valid.blackPocket
-                        : valid.whitePocket
-                  }
-                  enabled={false}
-                  onSelect={() => {}}
-                />
-                <Board
-                  fen={duck?.fen || premove.preview}
-                  materialFen={valid.fen}
-                  onCancelPremoves={premove.cancelOnRightClick}
-                  onMove={play}
-                  legalMoves={premoveLegal}
-                  onSquare={
-                    duck
-                      ? (square) => {
-                          const move = duck.options.find(
-                            (m) => m.slice(-2) === square,
+            <>
+              <Pocket
+                value={
+                  valid.turn === game.human
+                    ? game.human === "w"
+                      ? valid.blackPocket
+                      : valid.whitePocket
+                    : game.human === "w"
+                      ? valid.blackPocket
+                      : valid.whitePocket
+                }
+                enabled={false}
+                onSelect={() => {}}
+              />
+              <Board
+                fen={duck?.fen || premove.preview}
+                materialFen={valid.fen}
+                onCancelPremoves={premove.cancelOnRightClick}
+                onMove={play}
+                legalMoves={premoveLegal}
+                onSquare={
+                  duck
+                    ? (square) => {
+                        const move = duck.options.find(
+                          (m) => m.slice(-2) === square,
+                        );
+                        if (move) {
+                          if (duck.queued) premove.enqueue(move);
+                          else apply(move);
+                          setDuck(null);
+                        } else
+                          notify(
+                            "Place the duck on an available empty square.",
                           );
-                          if (move) {
-                            if (duck.queued) premove.enqueue(move);
-                            else apply(move);
-                            setDuck(null);
-                          } else
-                            notify(
-                              "Place the duck on an available empty square.",
-                            );
+                      }
+                    : pocket
+                      ? (square) => {
+                          const move = `${pocket.toUpperCase()}@${square}`;
+                          if (
+                            valid.turn !== game.human &&
+                            appearance.premoves &&
+                            !squares(premove.preview)[square]
+                          )
+                            premove.enqueue(move);
+                          else if (valid.legal.includes(move)) apply(move);
+
+                          setPocket("");
                         }
-                      : pocket
-                        ? (square) => {
-                            const move = `${pocket.toUpperCase()}@${square}`;
-                            if (
-                              valid.turn !== game.human &&
-                              appearance.premoves &&
-                              !squares(premove.preview)[square]
-                            )
-                              premove.enqueue(move);
-                            else if (valid.legal.includes(move)) apply(move);
-                            else notify("That drop is not legal.");
-                            setPocket("");
-                          }
-                        : undefined
-                  }
-                  flipped={flipped}
-                  onFlip={() => setFlipped((v) => !v)}
-                  disabled={
-                    paused ||
-                    game.result !== "*" ||
-                    (valid.turn !== game.human && !appearance.premoves)
-                  }
-                  hidden={game.variant === "blind"}
-                  visible={
-                    game.variant === "cvfog"
-                      ? fog(valid.fen, game.human)
                       : undefined
-                  }
-                  highlights={
-                    game.moves.length
-                      ? [
-                          game.moves.at(-1)!.slice(0, 2),
-                          game.moves.at(-1)!.slice(2, 4),
-                        ]
-                      : []
-                  }
-                />
-                <Pocket
-                  value={
-                    game.human === "w" ? valid.whitePocket : valid.blackPocket
-                  }
-                  enabled={
-                    (valid.turn === game.human || appearance.premoves) &&
-                    !paused &&
-                    game.result === "*"
-                  }
-                  selected={pocket}
-                  onSelect={setPocket}
-                />
-              </>
-            )}
+                }
+                flipped={flipped}
+                onFlip={() => setFlipped((v) => !v)}
+                disabled={
+                  game.result !== "*" ||
+                  (valid.turn !== game.human && !appearance.premoves)
+                }
+                hidden={["blind", "blindtext"].includes(game.variant)}
+                visible={
+                  game.variant === "cvfog"
+                    ? fog(valid.fen, game.human)
+                    : undefined
+                }
+                highlights={
+                  game.moves.length
+                    ? [
+                        game.moves.at(-1)!.slice(0, 2),
+                        game.moves.at(-1)!.slice(2, 4),
+                      ]
+                    : []
+                }
+              />
+              <Pocket
+                value={
+                  game.human === "w" ? valid.whitePocket : valid.blackPocket
+                }
+                enabled={
+                  (valid.turn === game.human || appearance.premoves) &&
+                  game.result === "*"
+                }
+                selected={pocket}
+                onSelect={setPocket}
+              />
+            </>
             <div
               className={`player-strip ${valid.turn === game.human ? "to-move" : ""}`}
             >
-              <span className="avatar">{library.profile.name[0]}</span>
+              <span className="avatar">
+                <img
+                  src={library.profile.avatar || pieceUrl("wP", "Chessnut")}
+                  alt=""
+                />
+              </span>
               <div>
                 <b>{library.profile.name}</b>
-                <small>{Math.round(library.localRating)} local estimate</small>
+                <small>{Math.round(library.localRating)}</small>
               </div>
             </div>
             <div className="game-message" role="status">
-              {game.result !== "*"
-                ? `Game over · ${game.result}`
-                : paused
-                  ? "Paused"
-                  : duck
-                    ? "Place the duck."
-                    : pocket
-                      ? `Drop ${pocket.toUpperCase()}.`
-                      : busy
-                        ? "Opponent is thinking…"
-                        : valid.check
-                          ? "Check."
-                          : `${valid.turn === "w" ? "White" : "Black"} to move`}
+              {duck ? (
+                "Place the duck."
+              ) : pocket ? (
+                `Drop ${pocket.toUpperCase()}.`
+              ) : busy ? (
+                "Opponent is thinking…"
+              ) : valid.check ? (
+                "Check."
+              ) : (
+                <span
+                  role="img"
+                  aria-label={valid.turn === "w" ? "White turn" : "Black turn"}
+                  className={`analysis-turn-dot ${valid.turn === "w" ? "white-turn" : "black-turn"}`}
+                />
+              )}
             </div>
-            <form
-              className="inline-form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (valid.turn !== game.human && appearance.premoves) {
-                  if (/^[a-h][1-8][a-h][1-8][qrbn]?$/i.test(text.trim())) {
-                    setPremoves((p) => [...p, text.trim().toLowerCase()]);
-                    setText("");
-                    notify("Premove queued.");
-                  } else notify("Use coordinate notation for premoves.");
-                  return;
-                }
-                try {
-                  const b = makeBoard(
-                    ff!,
-                    game.variant,
-                    game.variant === "bughouse" ? valid.fen : game.initial,
-                    game.variant === "bughouse" ? [] : game.moves,
-                  );
-                  const move = matchTypedMove(
-                    text,
-                    valid.legal.map((uci) => ({ uci, san: b.sanMove(uci) })),
-                  );
-                  b.delete();
-                  if (move && valid.turn === game.human) {
-                    apply(move);
-                    setText("");
-                  } else notify("Enter a legal SAN or UCI move.");
-                } catch {
-                  notify("Move could not be played.");
-                }
-              }}
-            >
-              <input
-                aria-label="Game move"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder={
-                  game.variant === "duck"
-                    ? "UCI compound move or use board"
-                    : "Move · e.g. Nf3 or g1f3"
-                }
-                disabled={paused || game.result !== "*"}
-              />
-              <Button
-                disabled={
-                  !text.trim() ||
-                  (!appearance.premoves && valid.turn !== game.human) ||
-                  paused
-                }
-              >
-                Play
-              </Button>
-            </form>
             {premoves.length > 0 && (
               <div className="premove-queue">
                 <span>Premoves: {premoves.join(" → ")}</span>
@@ -1019,12 +921,32 @@ export default function Play() {
                 </IconButton>
               </div>
             )}
+          </div>
+          <div className="side-panels match-sidebar">
+            {game.variant === "bughouse" && game.partner && (
+              <Card className="partner-board">
+                <h2>Partner board</h2>
+                <p className="caption">
+                  Three local opponents · captures transfer between boards
+                </p>
+                <Board
+                  fen={game.partner.positions.at(-1)!}
+                  disabled
+                  flipped={game.human === "w"}
+                  compact
+                />
+                <p className="caption">
+                  {game.partner.notation.slice(-6).join(" ") || "Ready"}
+                </p>
+              </Card>
+            )}
             {game.result === "*" ? (
               <div className="game-actions">
                 <Button
                   className="draw-button"
+                  disabled={drawPending}
                   onClick={() => {
-                    setPaused(true);
+                    setDrawPending(true);
                     notify(
                       "Draw offered. The computer accepts if the local evaluation is close.",
                     );
@@ -1039,7 +961,12 @@ export default function Play() {
                           )
                     )
                       .then((accepted) => {
-                        if (live.current?.id !== game.id) return;
+                        if (
+                          live.current?.id !== game.id ||
+                          live.current.result !== "*" ||
+                          live.current.moves.length !== game.moves.length
+                        )
+                          return;
                         if (accepted) {
                           const next = { ...game, result: "1/2-1/2" };
                           setLibrary((l) =>
@@ -1049,12 +976,9 @@ export default function Play() {
                           );
                           notify("Draw accepted.");
                         } else notify("Draw declined.");
-                        setPaused(false);
                       })
-                      .catch((e) => {
-                        setPaused(false);
-                        notify(e.message);
-                      });
+                      .catch((e) => notify(e.message))
+                      .finally(() => setDrawPending(false));
                   }}
                 >
                   <Handshake size={15} />
@@ -1102,92 +1026,45 @@ export default function Play() {
                   Review game
                   <ArrowRight size={15} />
                 </Button>
-                <Button className="secondary" onClick={() => setPlaying(false)}>
+                <Button
+                  className="secondary"
+                  onClick={() => {
+                    setPlaying(false);
+                    setOptions(false);
+                  }}
+                >
                   New game
                 </Button>
               </div>
             )}
-          </div>
-          {game.variant === "bughouse" && game.partner ? (
-            <Card className="partner-board">
-              <h2>Partner board</h2>
-              <p className="caption">
-                Three local opponents · captures transfer between boards
-              </p>
-              <Board
-                fen={game.partner.positions.at(-1)!}
-                disabled
-                flipped={game.human === "w"}
-                compact
-              />
-              <p className="caption">
-                {game.partner.notation.slice(-6).join(" ") || "Ready"}
-              </p>
-            </Card>
-          ) : (
-            <div className="side-panels">
+            {!["blind", "blindtext", "cvfog"].includes(game.variant) && (
               <Card>
                 <div className="card-heading">
-                  <h2>Game</h2>
-                  <span className="pill variant-summary">
-                    <VariantIcon id={game.variant} />
-                    {variantInfo?.name}
+                  <h2>Moves</h2>
+                  <span className="pill">
+                    {Math.ceil(game.moves.length / 2)}
                   </span>
                 </div>
-                {variantInfo?.description && (
-                  <p className="caption">{variantInfo.description}</p>
-                )}
-                <p className="caption">
-                  {game.rated ? "Rated" : "Unrated"} · {game.opponentChoice}
-                </p>
-                {game.requestedOpening && (
-                  <p className="caption">
-                    {
-                      openings?.find((o) => o.id === game.requestedOpening)
-                        ?.name
-                    }
-                  </p>
-                )}
-                <Button
-                  className="text-button"
-                  onClick={() => {
-                    const study = {
-                      ...game,
-                      id: uid(),
-                      title: game.title + " · saved position",
-                      kind: "game" as const,
-                      origin: "archive" as const,
-                    };
-                    setLibrary((l) => ({ ...l, games: [study, ...l.games] }));
-                    notify("Game saved.");
-                  }}
-                >
-                  <Save size={14} />
-                  Save current game
-                </Button>
+                <div className="match-notation">
+                  <div className="notation-row notation-head">
+                    <span>White</span>
+                    <span>Black</span>
+                  </div>
+                  {Array.from(
+                    { length: Math.ceil(game.notation.length / 2) },
+                    (_, i) => (
+                      <div className="notation-row" key={i}>
+                        <span>
+                          <small>{i + 1}.</small> {game.notation[i * 2]}
+                        </span>
+                        <span>{game.notation[i * 2 + 1] || ""}</span>
+                      </div>
+                    ),
+                  )}
+                </div>
               </Card>
-              {!["blind", "blindtext", "cvfog"].includes(game.variant) && (
-                <Card>
-                  <div className="card-heading">
-                    <h2>Moves</h2>
-                    <span className="pill">
-                      {Math.ceil(game.moves.length / 2)}
-                    </span>
-                  </div>
-                  <div className="move-chips">
-                    {game.notation.map((m, i) => (
-                      <span key={i}>
-                        {i % 2 === 0 && (
-                          <small>{Math.floor(i / 2) + 1}. </small>
-                        )}
-                        {m}
-                      </span>
-                    ))}
-                  </div>
-                </Card>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
       {confirm && (

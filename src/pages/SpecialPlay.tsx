@@ -2,7 +2,6 @@ import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
 import { useEffect, useState } from "react";
 import {
-  ArrowLeft,
   Flag,
   Handshake,
   RotateCcw,
@@ -10,7 +9,7 @@ import {
   ArrowLeftRight,
 } from "lucide-react";
 import { useApp } from "../lib/context";
-import { usePersistent, uid } from "../lib/store";
+import { usePersistent, uid, pieceUrl } from "../lib/store";
 import {
   newSpecial,
   specialApply,
@@ -22,7 +21,7 @@ import {
   type SpecialState,
 } from "../lib/specialRules";
 import { Board } from "../components/Board";
-import { Button, Card, PageTitle } from "../components/UI";
+import { Button, Card } from "../components/UI";
 import GameResult from "../components/GameResult";
 import GameGIFButton from "../components/GameGIFButton";
 export default function SpecialPlay({
@@ -41,6 +40,7 @@ export default function SpecialPlay({
     id: string;
     state: SpecialState;
     human: "w" | "b";
+    history?: SpecialState[];
   }>("novachess-special-" + variant, {
     id: uid(),
     state: newSpecial(variant, dropCount),
@@ -59,7 +59,11 @@ export default function SpecialPlay({
   function apply(action: Parameters<typeof specialApply>[1]) {
     try {
       const next = specialApply(state, action);
-      setSaved((s) => ({ ...s, state: next }));
+      setSaved((s) => ({
+        ...s,
+        history: [...(s.history || []), s.state],
+        state: next,
+      }));
       setArmed("");
       setFirst("");
     } catch (e) {
@@ -122,6 +126,7 @@ export default function SpecialPlay({
         if (move)
           setSaved((s) => ({
             ...s,
+            history: [...(s.history || []), s.state],
             state: specialApply(next, { type: "move", move }),
           }));
       } catch (e) {
@@ -153,15 +158,13 @@ export default function SpecialPlay({
   });
   return (
     <>
-      <PageTitle title={names[variant]}>
-        <Button className="secondary" onClick={onBack}>
-          <ArrowLeft size={16} />
-          Games
-        </Button>
-      </PageTitle>
-      <div className="chess-layout">
+      <h1 className="sr-only">{names[variant]}</h1>
+      <div className="chess-layout play-match special-match">
         <div className="board-column">
           <GameResult result={state.result} />
+          <div className="player-strip">
+            <b>Computer</b>
+          </div>
           <Board
             fen={premove.preview}
             materialFen={state.fen}
@@ -188,11 +191,22 @@ export default function SpecialPlay({
                 : undefined
             }
           />
+          <div className="player-strip">
+            <span className="avatar">
+              <img
+                src={library.profile.avatar || pieceUrl("wP", "Chessnut")}
+                alt=""
+              />
+            </span>
+            <b>{library.profile.name}</b>
+          </div>
           <PremoveQueue
             moves={premove.queue}
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
             clear={premove.clear}
           />
+        </div>
+        <div className="side-panels match-sidebar">
           <div className="button-row">
             {variant === "chaos" && state.result === "*" && (
               <>
@@ -250,78 +264,85 @@ export default function SpecialPlay({
               <Handshake size={16} />
               Draw
             </Button>
+            <Button
+              className="takeback-button"
+              disabled={state.result !== "*" || !saved.history?.length}
+              onClick={() => {
+                const history = [...(saved.history || [])];
+                let previous = history.pop();
+                while (
+                  previous &&
+                  specialTurn(previous) !== side &&
+                  history.length
+                )
+                  previous = history.pop();
+                while (
+                  previous &&
+                  history.length &&
+                  history[history.length - 1].ply === previous.ply
+                )
+                  previous = history.pop();
+                if (previous)
+                  setSaved((s) => ({ ...s, state: previous!, history }));
+                setArmed("");
+                setFirst("");
+                premove.clear();
+              }}
+            >
+              {" "}
+              <RotateCcw size={16} />
+              Take back
+            </Button>
             <GameGIFButton
               positions={state.positions}
               flipped={side === "b"}
               blocked={state.blocked}
             />
           </div>
-        </div>
-        <div className="side-panels">
+
+          {armed && (
+            <p role="status">
+              {armed === "freeze"
+                ? "Choose an opponent piece."
+                : first
+                  ? "Choose your second piece."
+                  : "Choose your first piece."}
+            </p>
+          )}
+          {state.frozen && (
+            <p className="pill">Frozen: {state.frozen.square}</p>
+          )}
+          <span
+            role="img"
+            aria-label={turn === "w" ? "White turn" : "Black turn"}
+            className={`analysis-turn-dot ${turn === "w" ? "white-turn" : "black-turn"}`}
+          />
           <Card>
-            <h2>
-              {state.result === "*"
-                ? busy
-                  ? "Computer thinking…"
-                  : turn === "w"
-                    ? "White to move"
-                    : "Black to move"
-                : "Game finished"}
-            </h2>
-            {variant === "dropping" && (
-              <p className="caption">
-                One empty square drops every five full moves.{" "}
-                {state.blocked.length} / {state.dropCount} dropped.
-              </p>
-            )}
-            {variant === "chaos" && (
-              <p className="caption">
-                Pawns can move one or two clear squares. Freeze once without
-                using your turn; switch two pieces once as your move.
-              </p>
-            )}
-            {variant === "random" && (
-              <p className="caption">
-                Move the selected piece: {state.randomFrom}. Each turn selects a
-                piece with legal moves.
-              </p>
-            )}
-            {armed && (
-              <p role="status">
-                {armed === "freeze"
-                  ? "Choose an opponent piece."
-                  : first
-                    ? "Choose your second piece."
-                    : "Choose your first piece."}
-              </p>
-            )}
-            {state.frozen && (
-              <p className="pill">Frozen: {state.frozen.square}</p>
-            )}
-          </Card>
-          <Card>
-            <div className="move-chips">
-              {state.notation.map((m, i) => (
-                <span key={i}>
-                  {i % 2 === 0 ? `${Math.floor(i / 2) + 1}. ` : ""}
-                  {m}
-                </span>
-              ))}
+            <h2>Moves</h2>
+            <div className="match-notation">
+              <div className="notation-row notation-head">
+                <span>White</span>
+                <span>Black</span>
+              </div>
+              {Array.from(
+                { length: Math.ceil(state.notation.length / 2) },
+                (_, i) => (
+                  <div className="notation-row" key={i}>
+                    <span>
+                      <small>{i + 1}.</small> {state.notation[i * 2]}
+                    </span>
+                    <span>{state.notation[i * 2 + 1] || ""}</span>
+                  </div>
+                ),
+              )}
             </div>
           </Card>
-          <Button
-            onClick={() => {
-              setSaved({
-                id: uid(),
-                state: newSpecial(variant, dropCount),
-                human,
-              });
-              setArmed("");
-            }}
-          >
-            <RotateCcw size={17} />
-            New game
-          </Button>
+          {state.result !== "*" && (
+            <Button onClick={onBack}>
+              <RotateCcw size={17} />
+              New game
+            </Button>
+          )}
         </div>
       </div>
     </>

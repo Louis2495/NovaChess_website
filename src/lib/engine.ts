@@ -104,13 +104,13 @@ export function search(
 }
 export function useEngine(fen: string, enabled: boolean, multiPV = 1) {
   const [lines, setLines] = useState<EngineLine[]>([]),
-    [status, setStatus] = useState("Paused"),
+    [status, setStatus] = useState("Idle"),
     [error, setError] = useState("");
   useEffect(() => {
     setLines([]);
     setError("");
     if (!enabled) {
-      setStatus("Paused");
+      setStatus("Idle");
       return;
     }
     const c = new AbortController();

@@ -179,9 +179,7 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
                 promotion: promotion || "q",
               });
               playMove(m.from + m.to + (m.promotion || ""));
-            } catch {
-              notify("Illegal move.");
-            }
+            } catch {}
           }}
         />
         <PremoveQueue

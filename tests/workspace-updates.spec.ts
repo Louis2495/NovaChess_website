@@ -32,6 +32,7 @@ test("notation follows the current move, respects manual scrolling, and can resu
     { key: libraryKey, game },
   );
   await page.goto("/#analysis");
+  await page.getByRole("button", { name: "Notation", exact: true }).click();
   const list = page.getByLabel("Game notation", { exact: true });
   await expect.poll(() => list.evaluate((e) => e.scrollTop)).toBeGreaterThan(0);
   await page
@@ -71,7 +72,9 @@ test("analysis explains positions, has a separate large evaluation and a compact
   ).toBeGreaterThan(25);
   const study = page
     .locator(".side-panels>.card")
-    .filter({ has: page.getByRole("heading", { name: "Study", exact: true }) });
+    .filter({
+      has: page.getByRole("heading", { name: "Top lines", exact: true }),
+    });
   await expect(study.locator(".card-heading svg")).toHaveCount(0);
   await expect(
     study.getByRole("button", { name: "Set up a position", exact: true }),
@@ -86,7 +89,7 @@ test("analysis explains positions, has a separate large evaluation and a compact
   const black = c.fen().replace(" w ", " b ");
   await page.goto("/#analysis/" + encodeURIComponent("fen:" + black));
   await expect(
-    page.getByRole("img", { name: "Black to move", exact: true }),
+    page.getByRole("img", { name: "Black turn", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("Black to move", { exact: true })).toHaveCount(0);
 });

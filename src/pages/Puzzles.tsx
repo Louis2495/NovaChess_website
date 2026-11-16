@@ -35,7 +35,7 @@ function ClassicPuzzles() {
   return <PuzzleTrainer puzzles={data} />;
 }
 function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
-  const { library, setLibrary, detail, notify, navigate, appearance } =
+  const { library, setLibrary, detail, navigate, appearance } =
     useApp();
   const daily = detail === "daily";
   const [theme, setTheme] = useState("All themes");
@@ -200,9 +200,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
       setHint("");
       setMessage("Correct.");
       if (cursor + 1 >= puzzle.moves.length || ch.isCheckmate()) complete();
-    } catch {
-      notify("That move is not legal.");
-    }
+    } catch {}
   }
   useEffect(() => {
     if (done || c.turn() === learner || cursor >= puzzle.moves.length) return;
@@ -330,7 +328,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
                 attempt(m.from, m.to, m.promotion);
                 setMoveInput("");
               } catch {
-                notify("Enter a legal move.");
               } finally {
                 moveInputRef.current?.focus();
               }

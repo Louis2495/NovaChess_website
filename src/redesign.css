@@ -3963,3 +3963,162 @@ select.theme-select {
   color: var(--text);
   font-size: 1.4rem;
 }
+.analysis-navigation {
+  width: calc(100% - 29px);
+  margin-left: 29px;
+}
+.notation-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 1;
+  text-align: left;
+}
+.notation-toggle[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+.analysis-notation .notation-table[hidden] {
+  display: none;
+}
+.analysis-notation:has(.notation-toggle[aria-expanded="false"]) .card-heading {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.engine-top-lines select {
+  width: 66px;
+  padding: 6px 10px;
+}
+.engine-lines {
+  display: grid;
+  gap: 12px;
+}
+.engine-line {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  font-size: .8rem;
+}
+.engine-line > strong {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.engine-line > span {
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.analysis-layout .board-with-eval .board {
+  width: 100%;
+}
+/* Put the game itself first; keep the notation rail narrow. */
+.workspace:has(.play-match) {
+  max-width: none;
+  padding: 6px 24px 20px;
+}
+.workspace-shell:has(.play-match) > .topbar {
+  height: 24px;
+}
+.play-match.chess-layout {
+  grid-template-columns: minmax(0, min(calc(100dvh - 150px), calc(100% - 240px))) 220px;
+  gap: 20px;
+  justify-content: center;
+}
+.play-match > .board-column {
+  max-width: none;
+}
+.play-match .player-strip {
+  padding: 4px 8px;
+  min-height: 32px;
+  margin: 4px 0;
+  gap: 8px;
+}
+.play-match .player-strip .avatar {
+  width: 28px;
+  height: 28px;
+}
+.play-match .player-strip b { font-size: .8rem; }
+.play-match .player-strip small { font-size: .7rem; }
+.play-match .game-message {
+  min-height: 18px;
+  margin: 4px 0;
+  padding: 0;
+  font-size: .75rem;
+}
+.play-match .match-sidebar { gap: 12px; }
+.match-sidebar > .card { padding: 14px; }
+.match-sidebar .game-actions,
+.match-sidebar > .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+}
+.match-sidebar .btn {
+  min-height: 34px;
+  padding: 8px;
+  gap: 4px;
+  font-size: .7rem;
+}
+.match-sidebar .game-actions > .btn { flex: 1; }
+.match-sidebar h2 { font-size: .9rem; }
+.match-notation { max-height: calc(100dvh - 180px); overflow: auto; margin-top: 12px; }
+.match-notation .notation-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap: 8px;
+  padding: 7px 2px;
+  font-size: .8rem;
+}
+.match-notation .notation-row:nth-child(even) { background: var(--accent-soft); border-radius: 5px; }
+.match-notation .notation-head { color: var(--muted); font-size: .7rem; border-bottom: 1px solid var(--border); }
+.match-notation small { color: var(--muted); font-size: .68rem; }
+@media (min-width: 1001px) {
+  .analysis-layout.chess-layout {
+    grid-template-columns: minmax(0,1fr) minmax(240px,260px);
+    max-width: calc(var(--board-max) * 1.5 + 287px);
+  }
+}
+@media (max-width: 1000px) {
+  .play-match.chess-layout { grid-template-columns: minmax(0,1fr); }
+  .play-match > .board-column { width: 100%; max-width: min(100%, calc(100dvh - 155px)); justify-self: center; }
+  .play-match .match-sidebar { width: 100%; max-width: 600px; justify-self: center; }
+  .play-match .match-sidebar .game-actions > .btn { font-size: .8rem; }
+  .workspace-shell:has(.play-match) > .topbar { height: 44px; }
+}
+@media (max-width: 600px) {
+  .workspace:has(.play-match) { padding: 4px 10px 85px; }
+}
+.analysis-layout .board-with-eval > .eval-meter { margin-bottom: 0; }
+.analysis-layout .board-with-eval:has(.board-frame > .board + .material-imbalance) > .eval-meter { margin-bottom: 29px; }
+.analysis-layout .board-with-eval:has(.board-frame > .material-imbalance + .board) > .eval-meter { margin-top: 29px; }
+.chat-launcher {
+  position: fixed; right: 20px; bottom: 20px; z-index: 35;
+  width: 42px; height: 42px; display: grid; place-items: center;
+  border-radius: 50%; background: var(--button); color: var(--button-text);
+  box-shadow: 0 4px 20px #0004;
+}
+.global-chat-panel {
+  position: fixed; right: 20px; bottom: 72px; z-index: 36;
+  width: min(370px,calc(100vw - 24px)); max-height: min(550px,calc(100dvh - 150px));
+  display: flex; flex-direction: column; gap: 12px; padding: 18px;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--panel-solid); box-shadow: 0 12px 60px #0006;
+}
+.chat-dock-heading,.chat-compose,.chat-entry-meta {display:flex;align-items:center;gap:10px;justify-content:space-between;}
+.chat-dock-heading h2 {font-size:1rem;}
+.chat-dock-messages {min-height:100px;overflow:auto;display:grid;gap:14px;}
+.chat-entry {display:grid;grid-template-columns:28px minmax(0,1fr);gap:9px;}
+.chat-avatar {width:28px;height:28px;border-radius:50%;object-fit:cover;}
+.chat-entry-meta {font-size:.75rem;}
+.chat-entry-meta time {font-size:.65rem;color:var(--muted);}
+.chat-entry p {white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8rem;line-height:1.5;margin:4px 0;}
+.chat-message-actions {display:flex;gap:5px;}
+.chat-message-actions .icon-btn {min-height:24px;height:24px;padding:4px;}
+.chat-compose input {flex:1;min-width:0;font-size:.8rem;}
+.focus-mode .chat-launcher,.focus-mode .global-chat-panel {display:none;}
+@media(max-width:600px){.chat-launcher{right:12px;bottom:76px;}.global-chat-panel{right:12px;bottom:125px;}}
+.match-sidebar .game-actions { flex-wrap: nowrap; }
+.match-sidebar .game-actions > .btn { min-width: 0; padding: 7px 4px; font-size: .66rem; gap: 3px; }
+.match-sidebar .game-actions > .btn > svg { width: 13px; height: 13px; }

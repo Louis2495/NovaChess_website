@@ -142,6 +142,12 @@ before(async () => {
       "",
     );
   await pg.exec(migration);
+  await pg.exec(
+    readFileSync(
+      "supabase/migrations/202611160002_chat_moderation.sql",
+      "utf8",
+    ),
+  );
   for (const uid of users)
     await pg.query("insert into auth.users(id)values($1)", [uid]);
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
@@ -354,6 +360,64 @@ test("global chat stores plain text, applies rate limits, and allows only the au
         ])
       ).rows.length,
       4,
+    );
+  } finally {
+    await pg.exec("reset role");
+  }
+});
+
+test("chat moderation is server-enforced, audited, and cannot be granted by a regular member", async () => {
+  await pg.exec("update profiles set banned=false");
+  await pg.exec(
+    `set role authenticated;set request.jwt.claim.sub='${users[1]}';`,
+  );
+  let id;
+  try {
+    assert.equal(
+      (await pg.query("select is_chat_moderator() as allowed")).rows[0].allowed,
+      false,
+    );
+    await assert.rejects(() =>
+      pg.query("insert into chat_moderators(user_id)values($1)", [users[1]]),
+    );
+    await pg.query("select post_message('A message for moderation')");
+    id = (
+      await pg.query(
+        "select id from messages where body='A message for moderation'",
+      )
+    ).rows[0].id;
+    await assert.rejects(() => pg.query("select moderate_chat($1,true)", [id]));
+    await assert.rejects(() =>
+      pg.query("select post_message('A message for moderation')"),
+    );
+  } finally {
+    await pg.exec("reset role");
+  }
+  await pg.query("insert into chat_moderators(user_id)values($1)", [users[2]]);
+  await pg.exec(
+    `set role authenticated;set request.jwt.claim.sub='${users[2]}';`,
+  );
+  try {
+    await pg.query("select moderate_chat($1,true)", [id]);
+    assert.equal(
+      (
+        await pg.query("select count(*)::int as n from messages where id=$1", [
+          id,
+        ])
+      ).rows[0].n,
+      0,
+    );
+    assert.equal(
+      (
+        await pg.query(
+          "select count(*)::int as n from chat_moderation_log where action='ban'",
+        )
+      ).rows[0].n,
+      1,
+    );
+    await pg.exec(`set request.jwt.claim.sub='${users[1]}';`);
+    await assert.rejects(() =>
+      pg.query("select post_message('Trying after a ban')"),
     );
   } finally {
     await pg.exec("reset role");

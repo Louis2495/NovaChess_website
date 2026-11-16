@@ -81,7 +81,7 @@ export function Board({
   materialFen?: string;
   guides?: BoardMark[];
 }) {
-  const { appearance, notify } = useApp();
+  const { appearance } = useApp();
   const boardRef = useRef<HTMLDivElement>(null),
     pointer = useRef({ x: 0, y: 0 });
   const [selected, setSelected] = useState<string | null>(null),
@@ -112,7 +112,8 @@ export function Board({
       moving: boolean;
       pointerId: number;
     } | null>(null),
-    suppressClick = useRef(false);
+    suppressClick = useRef(false),
+    canceledRight = useRef(false);
   const [startingFlip] = useState(() => fen.split(" ")[1] === "b");
   const initialFlip =
     preferredFlip ?? (disabled ? fen.split(" ")[1] === "b" : startingFlip);
@@ -166,6 +167,40 @@ export function Board({
       ...(exists ? [] : [{ from, to, color }]),
     ]);
   }
+  function cancelDrag() {
+    const g = gesture.current;
+    if (!g || g.right) return false;
+    gesture.current = null;
+    setDrag(null);
+    setSelected(null);
+    suppressClick.current = true;
+    canceledRight.current = true;
+    boardRef.current
+      ?.querySelectorAll<HTMLElement>(".board-square")
+      .forEach((el) => {
+        if (el.hasPointerCapture(g.pointerId))
+          el.releasePointerCapture(g.pointerId);
+      });
+    return true;
+  }
+  useEffect(() => {
+    const mouseDown = (event: MouseEvent) => {
+      if (event.button === 2 && cancelDrag()) event.preventDefault();
+    };
+    const contextMenu = (event: MouseEvent) => {
+      if (canceledRight.current) {
+        event.preventDefault();
+        event.stopPropagation();
+        canceledRight.current = false;
+      }
+    };
+    window.addEventListener("mousedown", mouseDown, true);
+    window.addEventListener("contextmenu", contextMenu, true);
+    return () => {
+      window.removeEventListener("mousedown", mouseDown, true);
+      window.removeEventListener("contextmenu", contextMenu, true);
+    };
+  }, []);
   function squareAt(x: number, y: number) {
     const box = boardRef.current!.getBoundingClientRect(),
       size = box.width / 8;
@@ -184,7 +219,7 @@ export function Board({
     const options = moves!.filter((m) => m.startsWith(from + to));
     if (!options.length) {
       setSelected(null);
-      notify("Illegal move.");
+
       return;
     }
     const choices = [
@@ -280,6 +315,10 @@ export function Board({
         }
         onContextMenu={(e) => {
           e.preventDefault();
+          if (cancelDrag() || canceledRight.current) {
+            canceledRight.current = false;
+            return;
+          }
           if (onCancelPremoves?.()) return;
           onCancel?.();
         }}
@@ -340,6 +379,7 @@ export function Board({
                   pointer.current = { x: e.clientX, y: e.clientY };
                   if (e.button === 2) {
                     e.preventDefault();
+                    if (cancelDrag() || canceledRight.current) return;
                     if (onCancelPremoves?.()) {
                       gesture.current = null;
                       return;
@@ -389,6 +429,7 @@ export function Board({
                     blocked.includes(square)
                   )
                     return;
+                  suppressClick.current = false;
                   gesture.current = {
                     from: square,
                     startX: e.clientX,
@@ -457,21 +498,40 @@ export function Board({
                   opacity=".45"
                 />
               );
-            const angle = Math.atan2(b.y - a.y, b.x - a.x),
+            const dx = Math.abs(b.x - a.x),
+              dy = Math.abs(b.y - a.y);
+            const knight =
+              (dx === 25 && dy === 12.5) || (dy === 25 && dx === 12.5);
+            const elbow = knight
+              ? dx > dy
+                ? { x: b.x, y: a.y }
+                : { x: a.x, y: b.y }
+              : a;
+            const angle = Math.atan2(b.y - elbow.y, b.x - elbow.x),
               end = {
                 x: b.x - Math.cos(angle) * 3,
                 y: b.y - Math.sin(angle) * 3,
               };
             return (
               <g key={i} stroke={m.color} fill={m.color} opacity=".85">
-                <line
-                  x1={a.x}
-                  y1={a.y}
-                  x2={end.x}
-                  y2={end.y}
-                  strokeWidth={Math.max(0.7, Math.min(4, m.weight || 2.3))}
-                  strokeLinecap="round"
-                />
+                {knight ? (
+                  <polyline
+                    points={`${a.x},${a.y} ${elbow.x},${elbow.y} ${end.x},${end.y}`}
+                    fill="none"
+                    strokeWidth={Math.max(0.7, Math.min(4, m.weight || 2.3))}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                ) : (
+                  <line
+                    x1={a.x}
+                    y1={a.y}
+                    x2={end.x}
+                    y2={end.y}
+                    strokeWidth={Math.max(0.7, Math.min(4, m.weight || 2.3))}
+                    strokeLinecap="round"
+                  />
+                )}
                 <path
                   d={`M ${b.x} ${b.y} L ${b.x - Math.cos(angle - 0.55) * 5} ${b.y - Math.sin(angle - 0.55) * 5} L ${b.x - Math.cos(angle + 0.55) * 5} ${b.y - Math.sin(angle + 0.55) * 5} Z`}
                 />

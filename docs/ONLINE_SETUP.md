@@ -7,7 +7,7 @@ The site is fully usable for local chess, bots, lessons and puzzles without this
 ## One-time setup
 
 1. Create a Free project at [Supabase](https://supabase.com/dashboard). Save the project reference, project URL and **anon/publishable** key from the project’s API settings.
-2. In **SQL Editor**, run [the migration](../supabase/migrations/202611160001_online.sql). It creates the database, row-level security, Realtime publication, chat rate limits and server-only game/rating functions.
+2. In **SQL Editor**, run [the migration](../supabase/migrations/202611160001_online.sql). It creates the database, row-level security, Realtime publication, chat rate limits and server-only game/rating functions. Then run [chat moderation](../supabase/migrations/202611160002_chat_moderation.sql).
 3. In **Database → Extensions**, enable **pg_cron**. Then run:
 
    ```sql
@@ -94,3 +94,17 @@ npx supabase functions deploy federation-records --project-ref YOUR_PROJECT_REF 
 ```
 
 The function caches records for six hours. Rebuild the standalone editor file after changing the parser or handler with `npm run prepare:federations`. The public record's live availability still depends on US Chess; the parser must be checked against a live member after deployment. Manual entry remains available during outages.
+
+## Global chat moderation
+
+Global chat is a separate panel available throughout the site. It uses the existing public project URL/key and authenticated Realtime messages. Without a connection it allows drafting but does not pretend to publish a message.
+
+After applying both SQL migrations, create your account and save your username in Profile. From the SQL editor, assign a moderator:
+
+```sql
+insert into public.chat_moderators(user_id)
+select id from public.profiles where username = 'YOUR_USERNAME'
+on conflict do nothing;
+```
+
+Members can report messages and delete their own. Moderators can see reported messages, delete posts, and ban senders; every moderation action is recorded in the protected audit table. Users cannot grant themselves moderator access. Posting enforces length limits, repeat-message rejection, link-spam limits, per-user rate limits and bans on the server. No automated classifier or round-the-clock human moderation is claimed.

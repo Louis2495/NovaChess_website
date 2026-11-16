@@ -154,6 +154,10 @@ test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image
   await uiMove(page, "d2d4");
   await expect(page.locator(".branch-list")).toContainText("Branch 1");
   await page.getByRole("button", { name: "Save study", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Save study" })
+    .getByRole("button", { name: "Save", exact: true })
+    .click();
   expect((await stored(page)).games).toHaveLength(1);
   await expect(
     page.getByRole("button", { name: "Download PGN", exact: true }),
@@ -553,7 +557,9 @@ for (const variant of [
       .click();
     await page.getByLabel("Variant", { exact: true }).selectOption(variant);
     await page.getByRole("button", { name: "Start game", exact: true }).click();
-    await expect(page.getByLabel("Game move", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("group", { name: "Chessboard", exact: true }).first(),
+    ).toBeVisible();
     const g = (await stored(page)).activeGame;
     const b = new ff.Board(
       ["blind", "blindtext", "chess960"].includes(variant) ? "chess" : variant,
@@ -561,16 +567,8 @@ for (const variant of [
       variant === "chess960",
     );
     const move = b.legalMoves().split(" ")[0];
-    if (variant === "blindtext") {
-      await page.getByLabel("Game move", { exact: true }).fill(move);
-      await page
-        .locator(".inline-form")
-        .getByRole("button", { name: "Play", exact: true })
-        .click();
-    } else {
-      await uiMove(page, move);
-      if (variant === "duck") await square(page, move.slice(-2));
-    }
+    await uiMove(page, move);
+    if (variant === "duck") await square(page, move.slice(-2));
     await expect
       .poll(async () => (await stored(page)).activeGame?.moves.length || 0, {
         timeout: 20000,
@@ -637,7 +635,9 @@ async function seedGame(
   );
   await page.goto("/#play/resume");
   await page.reload();
-  await expect(page.getByLabel("Game move", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("group", { name: "Chessboard", exact: true }).first(),
+  ).toBeVisible();
 }
 test("crazyhouse drops and bughouse pocket transfers use real variant rules", async ({
   page,

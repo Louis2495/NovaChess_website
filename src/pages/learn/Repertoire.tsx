@@ -173,9 +173,7 @@ export default function Repertoire() {
                       ...v,
                       move.from + move.to + (move.promotion || ""),
                     ]);
-                  } catch {
-                    notify("Illegal move.");
-                  }
+                  } catch {}
                 }}
               />
               <div className="move-chips">

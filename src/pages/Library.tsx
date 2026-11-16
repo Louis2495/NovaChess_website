@@ -1,5 +1,5 @@
 import { isStudy, libraryKind } from "../lib/library";
-import Repertoire, { RepertoireTrainer } from "./learn/Repertoire";
+import { RepertoireTrainer } from "./learn/Repertoire";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -12,7 +12,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Play,
-  Pause,
+  Square,
   ScanLine,
   Star,
   ChartNoAxesCombined,
@@ -230,13 +230,6 @@ export default function LibraryPage() {
             description="Save an analysis study or finish a game."
           />
         </Card>
-      )}
-      {(category === "Studies" ||
-        (category === "All" && library.repertoire.length > 0)) && (
-        <section className="library-repertoire">
-          <h2>Opening repertoire</h2>
-          <Repertoire />
-        </section>
       )}
       {newFolder && (
         <Modal title="New folder" onClose={() => setNewFolder(false)}>
@@ -548,11 +541,11 @@ function GameViewer({
           ),
         }));
       }
-      setStatus(ctrl.signal.aborted ? "Review paused." : "Review complete.");
+      setStatus(ctrl.signal.aborted ? "Review stopped." : "Review complete.");
     } catch (e) {
-      if ((e as Error).name === "AbortError") setStatus("Review paused.");
+      if ((e as Error).name === "AbortError") setStatus("Review stopped.");
       else {
-        setStatus("Review paused.");
+        setStatus("Review stopped.");
         notify((e as Error).message);
       }
     } finally {
@@ -660,10 +653,10 @@ function GameViewer({
               <ChevronLeft size={18} />
             </IconButton>
             <IconButton
-              label={playing ? "Pause replay" : "Play replay"}
+              label={playing ? "Stop replay" : "Play replay"}
               onClick={() => setPlaying(!playing)}
             >
-              {playing ? <Pause size={17} /> : <Play size={17} />}
+              {playing ? <Square size={17} /> : <Play size={17} />}
             </IconButton>
             <IconButton
               label="Next move"
@@ -813,9 +806,9 @@ function GameViewer({
                   reviewing ? controller.current?.abort() : void review()
                 }
               >
-                {reviewing ? <Pause size={15} /> : <Play size={15} />}{" "}
+                {reviewing ? <Square size={15} /> : <Play size={15} />}{" "}
                 {reviewing
-                  ? "Pause"
+                  ? "Stop"
                   : rows.length
                     ? "Resume review"
                     : "Review game"}

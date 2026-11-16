@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Search,
   Play,
-  Pause,
+  Square,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -238,13 +238,13 @@ function Archive({ games }: { games: FamousGame[] }) {
             <ChevronLeft size={18} />
           </IconButton>
           <IconButton
-            label={playing ? "Pause replay" : "Play replay"}
+            label={playing ? "Stop replay" : "Play replay"}
             onClick={() => {
               if (cursor === game.moves.length) setCursor(0);
               setPlaying(!playing);
             }}
           >
-            {playing ? <Pause size={18} /> : <Play size={18} />}
+            {playing ? <Square size={18} /> : <Play size={18} />}
           </IconButton>
           <IconButton
             label="Next move"

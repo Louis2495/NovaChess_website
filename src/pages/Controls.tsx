@@ -14,7 +14,7 @@ const labels: Record<string, string> = {
   next: "Next move",
   first: "First move",
   last: "Last move",
-  autoplay: "Play / pause",
+  autoplay: "Play / stop",
   clearMarks: "Clear annotations / cancel",
 };
 export default function Controls({ embedded = false }: { embedded?: boolean }) {

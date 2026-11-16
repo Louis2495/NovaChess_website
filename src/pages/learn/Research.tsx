@@ -42,7 +42,7 @@ function parsePGN(text: string, username = ""): PublicGame | null {
   }
 }
 export default function Research() {
-  const { notify, appearance } = useApp();
+  const { appearance } = useApp();
   const [site, setSite] = useState("Chess.com"),
     [username, setUsername] = useState(""),
     [identity, setIdentity] = useState(""),
@@ -272,9 +272,7 @@ export default function Research() {
                   promotion: promotion || "q",
                 });
                 setPath((v) => [...v, m.from + m.to + (m.promotion || "")]);
-              } catch {
-                notify("Illegal move.");
-              }
+              } catch {}
             }}
           />
           <div className="board-navigation">

@@ -1,3 +1,4 @@
+import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -151,7 +152,10 @@ function App() {
   const audio = useRef<HTMLAudioElement | null>(null);
   const musicReady = useRef<Promise<void> | null>(null);
   const { tab, detail } = locationState;
-  const notify = (text: string) => setMessage(text);
+  const notify = (text: string) => {
+    if (!/illegal move|move is not legal|drop is not legal|premove is unavailable/i.test(text))
+      setMessage(text);
+  };
   function navigate(tab: Tab, detail = "") {
     location.hash = tab + (detail ? "/" + encodeURIComponent(detail) : "");
     setLocation({ tab, detail });
@@ -414,6 +418,7 @@ function App() {
           </button>
         )}
         <div className="site-background" aria-hidden="true" />
+        <GlobalChat />
         <a className="skip-link" href="#workspace">
           Skip to workspace
         </a>

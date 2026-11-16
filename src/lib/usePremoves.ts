@@ -54,7 +54,6 @@ export function usePremoves({
     if (!move) {
       setQueue([]);
       setSent(null);
-      notify("Premove is no longer legal. Queue cleared.");
       return;
     }
     last.current = fen;
