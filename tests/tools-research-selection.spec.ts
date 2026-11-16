@@ -6,22 +6,10 @@ const square = (p: any, s: string) =>
     .getByRole("group", { name: "Chessboard", exact: true })
     .first()
     .getByRole("button", { name: new RegExp("^" + s + ",") });
-test("analysis exposes its four tools through one compact menu", async ({
+test("analysis keeps all four tools visible in one menu", async ({
   page,
 }) => {
   await page.goto("/#analysis");
-  await expect(
-    page.getByRole("button", { name: "Save study", exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Edit position", exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Reset", exact: true }),
-  ).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "Analysis tools", exact: true })
-    .click();
   const menu = page.getByRole("group", {
     name: "Analysis actions",
     exact: true,
@@ -39,9 +27,6 @@ test("analysis exposes its four tools through one compact menu", async ({
     .click();
   await square(page, "e2").click();
   await square(page, "e4").click();
-  await page
-    .getByRole("button", { name: "Analysis tools", exact: true })
-    .click();
   await page.getByRole("button", { name: "Reset", exact: true }).click();
   await expect(square(page, "e2")).toHaveAttribute(
     "aria-label",
@@ -49,7 +34,7 @@ test("analysis exposes its four tools through one compact menu", async ({
   );
   await expect(
     page.getByRole("group", { name: "Analysis actions", exact: true }),
-  ).toHaveCount(0);
+  ).toBeVisible();
 });
 test("Research source/color toggles align with username and NovaChess explores real local games", async ({
   page,

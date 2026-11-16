@@ -304,6 +304,8 @@ export function Board({
     const measure = () => {
       const rect = el.getBoundingClientRect();
       setMeasuredSize(Math.round(rect.width));
+      el.closest<HTMLElement>(".analysis-layout > .board-column")
+        ?.style.setProperty("--actual-board-width", `${rect.width}px`);
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
       const top = rect.top + window.scrollY;

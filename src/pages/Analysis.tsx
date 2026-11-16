@@ -18,7 +18,6 @@ import {
   Lightbulb,
   LocateFixed,
   Save,
-  Ellipsis,
   RotateCcw,
 } from "lucide-react";
 import { useApp } from "../lib/context";
@@ -88,19 +87,9 @@ export default function Analysis() {
     [name, setName] = useState(source?.title || "Analysis"),
     [sharing, setSharing] = useState(false),
     [saving, setSaving] = useState(false),
-    [toolsOpen, setToolsOpen] = useState(false),
     [notationOpen, setNotationOpen] = useState(false),
     [lineCount, setLineCount] = useState(3),
     [exporting, setExporting] = useState(false);
-  const toolsRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!toolsOpen) return;
-    const close = (e: PointerEvent) => {
-      if (!toolsRef.current?.contains(e.target as Node)) setToolsOpen(false);
-    };
-    window.addEventListener("pointerdown", close);
-    return () => window.removeEventListener("pointerdown", close);
-  }, [toolsOpen]);
   const notationRef = useRef<HTMLDivElement>(null);
   const [followNotation, setFollowNotation] = useState(true);
   useLayoutEffect(() => {
@@ -218,74 +207,11 @@ export default function Analysis() {
         title="Analysis"
         subtitle={`Stockfish 19 Lite · Depth ${engine.lines[0]?.depth ?? 0}`}
       >
-        <div
-          className="analysis-tools"
-          ref={toolsRef}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              setToolsOpen(false);
-              e.stopPropagation();
-              toolsRef.current
-                ?.querySelector<HTMLButtonElement>("button")
-                ?.focus();
-            }
-          }}
-        >
-          <IconButton
-            label="Analysis tools"
-            aria-expanded={toolsOpen}
-            aria-controls="analysis-tools-menu"
-            onClick={() => setToolsOpen((v) => !v)}
-          >
-            <Ellipsis size={22} />
-          </IconButton>
-          {toolsOpen && (
-            <div
-              id="analysis-tools-menu"
-              className="analysis-tools-menu"
-              role="group"
-              aria-label="Analysis actions"
-            >
-              <button
-                onClick={() => {
-                  setToolsOpen(false);
-                  setSaving(true);
-                }}
-              >
-                <Save size={16} />
-                Save study
-              </button>
-              <button
-                aria-label="Edit position"
-                onClick={() => {
-                  setToolsOpen(false);
-                  setEditing(true);
-                }}
-              >
-                <SlidersHorizontal size={16} />
-                Set up position
-              </button>
-              <button
-                aria-label="Share position"
-                onClick={() => {
-                  setToolsOpen(false);
-                  setSharing(true);
-                }}
-              >
-                <Share2 size={16} />
-                Share
-              </button>
-              <button
-                onClick={() => {
-                  setToolsOpen(false);
-                  reset(initialFen);
-                }}
-              >
-                <RotateCcw size={16} />
-                Reset
-              </button>
-            </div>
-          )}
+        <div className="analysis-tools-menu" role="group" aria-label="Analysis actions">
+          <button onClick={() => setSaving(true)}><Save size={16} />Save study</button>
+          <button aria-label="Edit position" onClick={() => setEditing(true)}><SlidersHorizontal size={16} />Set up position</button>
+          <button aria-label="Share position" onClick={() => setSharing(true)}><Share2 size={16} />Share</button>
+          <button onClick={() => reset(initialFen)}><RotateCcw size={16} />Reset</button>
         </div>
       </PageTitle>
       {engine.error && (
@@ -293,24 +219,24 @@ export default function Analysis() {
           {engine.error}
         </p>
       )}
+      <div className="board-topline">
+        <div className="analysis-position-meta">
+          <span
+            className="evaluation-readout"
+            aria-label={`Evaluation ${scoreLabel(engine.lines[0])}`}
+          >
+            {scoreLabel(engine.lines[0])}
+          </span>
+          <span
+            className={`analysis-turn-dot ${c.turn() === "w" ? "white-turn" : "black-turn"}`}
+            role="img"
+            aria-label={`${c.turn() === "w" ? "White" : "Black"} turn`}
+            title={`${c.turn() === "w" ? "White" : "Black"} turn`}
+          />
+        </div>
+      </div>
       <div className="chess-layout analysis-layout">
         <div className="board-column">
-          <div className="board-topline">
-            <div className="analysis-position-meta">
-              <span
-                className="evaluation-readout"
-                aria-label={`Evaluation ${scoreLabel(engine.lines[0])}`}
-              >
-                {scoreLabel(engine.lines[0])}
-              </span>
-              <span
-                className={`analysis-turn-dot ${c.turn() === "w" ? "white-turn" : "black-turn"}`}
-                role="img"
-                aria-label={`${c.turn() === "w" ? "White" : "Black"} turn`}
-                title={`${c.turn() === "w" ? "White" : "Black"} turn`}
-              />
-            </div>
-          </div>
           <div className="board-with-eval">
             <div
               className="eval-meter"
@@ -480,7 +406,7 @@ export default function Analysis() {
                 value={lineCount}
                 onChange={(e) => setLineCount(+e.target.value)}
               >
-                {[1, 2, 3, 4, 5].map((n) => (
+                {[1, 2, 3].map((n) => (
                   <option key={n} value={n}>
                     {n}
                   </option>

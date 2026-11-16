@@ -3964,7 +3964,7 @@ select.theme-select {
   font-size: 1.4rem;
 }
 .analysis-navigation {
-  width: calc(100% - 29px);
+  width: var(--actual-board-width, calc(100% - 29px));
   margin-left: 29px;
 }
 .notation-toggle {
@@ -4156,10 +4156,16 @@ select.theme-select {
 .manual-boards .lesson-board-area { max-width:min(100%,var(--board-max)); }
 .manual-boards .lesson-workspace { max-height:none; }
 .board-resize-handle:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
-.analysis-tools { position:relative; }
-.analysis-tools-menu { position:absolute; right:0; top:calc(100% + 8px); z-index:25; width:185px; padding:6px; border:1px solid var(--border); border-radius:12px; background:var(--panel-solid); box-shadow:0 8px 28px #0005; }
-.analysis-tools-menu > button { display:flex; align-items:center; gap:10px; width:100%; padding:11px 10px; border-radius:7px; font-size:.8rem; text-align:left; }
+.analysis-tools-menu { display:flex; flex-wrap:wrap; gap:4px; padding:5px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+.analysis-tools-menu > button { display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; border-radius:7px; font-size:.8rem; }
 .analysis-tools-menu > button:hover { background:var(--accent-soft); }
+.engine-lines { gap:18px; align-items:start; }
+.engine-line { padding:12px; border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border)); border-radius:10px; background:color-mix(in srgb,var(--base) 45%,transparent); }
+.engine-line .pv-heading { padding-bottom:9px; margin-bottom:6px; border-bottom:1px solid var(--border); }
+.engine-top-lines .choice-select { min-width:126px; }
+@media(min-width:1001px) { .analysis-layout:has(.material-top) > .side-panels { padding-top:29px; } }
+@media(max-width:600px) { .analysis-tools-menu { width:100%; } .analysis-tools-menu > button { flex:1 1 40%; } }
+
 .puzzle-rating { display:flex; justify-content:center; align-items:center; width:100%; margin:0; text-align:center; }
 .segmented-control { display:flex; gap:3px; padding:4px; border:1px solid var(--border); border-radius:10px; min-height:43px; background:var(--input); }
 .segmented-control > button { flex:1; min-width:0; padding:7px 11px; border-radius:6px; font-size:.8rem; white-space:nowrap; }

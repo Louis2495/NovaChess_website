@@ -153,9 +153,6 @@ test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image
     .click();
   await uiMove(page, "d2d4");
   await expect(page.locator(".branch-list")).toContainText("Branch 1");
-  await page
-    .getByRole("button", { name: "Analysis tools", exact: true })
-    .click();
   await page.getByRole("button", { name: "Save study", exact: true }).click();
   await page
     .getByRole("dialog", { name: "Save study" })
@@ -165,9 +162,6 @@ test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image
   await expect(
     page.getByRole("button", { name: "Download PGN", exact: true }),
   ).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "Analysis tools", exact: true })
-    .click();
   await page
     .getByRole("button", { name: "Share position", exact: true })
     .click();
@@ -195,9 +189,6 @@ test("position editor validates kings, applies a position and underpromotion is 
   page,
 }) => {
   await page.goto("/#analysis");
-  await page
-    .getByRole("button", { name: "Analysis tools", exact: true })
-    .click();
   await page
     .getByRole("button", { name: "Edit position", exact: true })
     .click();

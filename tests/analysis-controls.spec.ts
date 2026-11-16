@@ -13,9 +13,9 @@ test("analysis starts with closed notation and three adjustable engine lines, na
   ).toHaveAttribute("aria-expanded", "false");
   await expect(page.getByLabel("Game notation", { exact: true })).toBeHidden();
   await expect(page.getByLabel("Study name", { exact: true })).toHaveCount(0);
-  await expect(page.getByLabel("Number of engine lines")).toHaveValue("3");
+  await expect(page.getByRole("group", { name: "Number of engine lines" }).getByRole("button", {name:"3", exact:true})).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".engine-line")).toHaveCount(3);
-  await page.getByLabel("Number of engine lines").selectOption("2");
+  await page.getByRole("group", { name: "Number of engine lines" }).getByRole("button", {name:"2", exact:true}).click();
   await expect(page.locator(".engine-line")).toHaveCount(2);
   const board = (await page.locator(".analysis-layout .board").boundingBox())!,
     bar = (await page.locator(".analysis-navigation").boundingBox())!;
@@ -28,9 +28,6 @@ test("analysis starts with closed notation and three adjustable engine lines, na
   await expect(page.getByLabel("Game notation", { exact: true })).toContainText(
     "e4",
   );
-  await page
-    .getByRole("button", { name: "Analysis tools", exact: true })
-    .click();
   await page.getByRole("button", { name: "Save study", exact: true }).click();
   await page.getByLabel("Study name", { exact: true }).fill("My study");
   await page
