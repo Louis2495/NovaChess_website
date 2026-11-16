@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { isStudy, libraryKind } from "../lib/library";
+import Repertoire, { RepertoireTrainer } from "./learn/Repertoire";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
   FolderOpen,
@@ -19,9 +21,13 @@ import {
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import { uid, download, dateLabel } from "../lib/store";
-import { search } from "../lib/engine";
+import { search, useEngine, scoreLabel } from "../lib/engine";
 import { fairy, legal, squares } from "../lib/variants";
-import type { SavedGame, ReviewRow } from "../lib/types";
+import type {
+  SavedGame,
+  ReviewRow,
+  Repertoire as RepertoireLine,
+} from "../lib/types";
 import GameGIFButton from "../components/GameGIFButton";
 import { useControl } from "../lib/controls";
 import { Board } from "../components/Board";
@@ -67,46 +73,85 @@ export function parseGame(text: string): SavedGame {
     result: h.Result || "*",
     human: "w",
     folder: "Games",
+    kind: "game",
+    origin: "archive",
   };
 }
 export default function LibraryPage() {
-  const { library, setLibrary, detail, notify } = useApp();
-  const [folder, setFolder] = useState("All"),
+  const { library, setLibrary, detail, notify, navigate } = useApp();
+  const [category, setCategory] = useState("All"),
+    [trainingStudy, setTrainingStudy] = useState<SavedGame | null>(null),
+    [folder, setFolder] = useState("All"),
     [query, setQuery] = useState(""),
     [newFolder, setNewFolder] = useState(false),
     [name, setName] = useState(""),
     [selected, setSelected] = useState(detail || "");
-  const games = library.games.filter(
+  const records =
+    library.activeGame?.moves.length &&
+    !library.games.some((g) => g.id === library.activeGame?.id)
+      ? [library.activeGame, ...library.games]
+      : library.games;
+  const games = records.filter(
     (g) =>
+      (category === "All" || libraryKind(g) === category) &&
       (folder === "All" || g.folder === folder) &&
       g.title.toLowerCase().includes(query.toLowerCase()),
   );
-  const g = library.games.find((v) => v.id === selected);
+  const g = records.find((v) => v.id === selected);
+  if (trainingStudy)
+    return (
+      <StudyTraining
+        study={trainingStudy}
+        onClose={() => setTrainingStudy(null)}
+      />
+    );
   if (g) return <GameViewer game={g} onClose={() => setSelected("")} />;
   return (
     <>
-      <PageTitle
-        title="Saved games"
-        subtitle={`${library.games.length} games and studies`}
-      >
+      <PageTitle title="Library">
         <Button className="secondary" onClick={() => setNewFolder(true)}>
           <Plus size={16} />
           Folder
         </Button>
       </PageTitle>
+      <div
+        className="library-categories"
+        role="group"
+        aria-label="Library sections"
+      >
+        {["All", "Studies", "Games", "NovaChess games"].map((value) => (
+          <button
+            key={value}
+            aria-pressed={category === value}
+            onClick={() => {
+              setCategory(value);
+              setFolder("All");
+            }}
+          >
+            {value}
+          </button>
+        ))}
+      </div>
       <div className="section-toolbar">
-        <div className="folder-tabs">
-          {["All", ...library.folders].map((f) => (
-            <button
-              key={f}
-              className={folder === f ? "active" : ""}
-              onClick={() => setFolder(f)}
-            >
-              <FolderOpen size={15} />
-              {f}
-            </button>
-          ))}
-        </div>
+        {library.folders.some((f) => !["Games", "Studies"].includes(f)) && (
+          <div className="folder-tabs">
+            {[
+              "All",
+              ...library.folders.filter(
+                (f) => !["Games", "Studies"].includes(f),
+              ),
+            ].map((f) => (
+              <button
+                key={f}
+                className={folder === f ? "active" : ""}
+                onClick={() => setFolder(f)}
+              >
+                <FolderOpen size={15} />
+                {f === "All" ? "All folders" : f}
+              </button>
+            ))}
+          </div>
+        )}
         <input
           aria-label="Search saved games"
           value={query}
@@ -127,18 +172,40 @@ export default function LibraryPage() {
               <div className="card-heading">
                 <h3>{g.title}</h3>
                 <span className="pill">
-                  {g.result === "*" ? "Study" : g.result}
+                  {isStudy(g)
+                    ? "Study"
+                    : g.result === "*"
+                      ? "Unfinished"
+                      : g.result}
                 </span>
               </div>
               <p className="caption">
-                {g.variant} · {Math.ceil(g.moves.length / 2)} moves ·{" "}
-                {dateLabel(g.created)}
+                {isStudy(g)
+                  ? `${1 + (g.branches?.length || 0)} lines`
+                  : libraryKind(g)}{" "}
+                · {Math.ceil(g.moves.length / 2)} moves · {dateLabel(g.created)}
               </p>
               <div className="button-row">
-                <Button className="secondary" onClick={() => setSelected(g.id)}>
-                  Replay & review
-                  <ChevronRight size={15} />
-                </Button>
+                {isStudy(g) ? (
+                  <>
+                    <Button onClick={() => setTrainingStudy(g)}>
+                      Train lines
+                    </Button>
+                    <Button
+                      className="secondary"
+                      onClick={() => navigate("analysis", "game:" + g.id)}
+                    >
+                      Open study
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    className="secondary"
+                    onClick={() => setSelected(g.id)}
+                  >
+                    Replay & review <ChevronRight size={15} />
+                  </Button>
+                )}
                 <IconButton
                   label={`Delete ${g.title}`}
                   onClick={() => {
@@ -164,6 +231,13 @@ export default function LibraryPage() {
           />
         </Card>
       )}
+      {(category === "Studies" ||
+        (category === "All" && library.repertoire.length > 0)) && (
+        <section className="library-repertoire">
+          <h2>Opening repertoire</h2>
+          <Repertoire />
+        </section>
+      )}
       {newFolder && (
         <Modal title="New folder" onClose={() => setNewFolder(false)}>
           <Field label="Folder name">
@@ -188,6 +262,79 @@ export default function LibraryPage() {
           </Button>
         </Modal>
       )}
+    </>
+  );
+}
+function StudyTraining({
+  study,
+  onClose,
+}: {
+  study: SavedGame;
+  onClose: () => void;
+}) {
+  const [index, setIndex] = useState(0),
+    [side, setSide] = useState<"w" | "b">(
+      study.initial.split(" ")[1] === "b" ? "b" : "w",
+    );
+  const lines = useMemo<RepertoireLine[]>(
+    () =>
+      [
+        { name: "Main line", initial: study.initial, moves: study.moves },
+        ...(study.branches || []),
+      ]
+        .filter((line) => line.moves.length > 0)
+        .map((line, i) => ({
+          id: `${study.id}-${i}`,
+          name: line.name,
+          side,
+          initial: line.initial,
+          moves: line.moves,
+          due: 0,
+          trained: 0,
+          successes: 0,
+        })),
+    [study, side],
+  );
+  if (!lines.length)
+    return (
+      <Card>
+        <p>No saved moves.</p>
+        <Button onClick={onClose}>Back to Library</Button>
+      </Card>
+    );
+  return (
+    <>
+      <PageTitle title={study.title}>
+        <Button className="secondary" onClick={onClose}>
+          Back to Library
+        </Button>
+      </PageTitle>
+      <div className="section-toolbar">
+        <Field label="Study line">
+          <select value={index} onChange={(e) => setIndex(+e.target.value)}>
+            {lines.map((line, i) => (
+              <option key={line.id} value={i}>
+                {line.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Practice as">
+          <select
+            value={side}
+            onChange={(e) => setSide(e.target.value as "w" | "b")}
+          >
+            <option value="w">White</option>
+            <option value="b">Black</option>
+          </select>
+        </Field>
+      </div>
+      <RepertoireTrainer
+        key={`${index}-${side}`}
+        line={lines[index]}
+        lines={lines}
+        onClose={onClose}
+      />
     </>
   );
 }
@@ -253,6 +400,10 @@ function GameViewer({
   const controller = useRef<AbortController | null>(null);
   const standard = ["chess", "blind", "blindtext"].includes(game.variant),
     rows = game.review || [];
+  const liveEngine = useEngine(
+    game.positions[cursor] || game.initial,
+    standard,
+  );
   useEffect(() => () => controller.current?.abort(), []);
   useEffect(() => {
     if (!playing) return;
@@ -438,7 +589,7 @@ function GameViewer({
         subtitle={`${game.variant} · ${game.result}`}
       >
         <Button className="secondary" onClick={onClose}>
-          Back to games
+          Back to Library
         </Button>
         <Button
           className="secondary"
@@ -463,6 +614,19 @@ function GameViewer({
       </PageTitle>
       <div className="chess-layout">
         <div className="board-column">
+          {standard && (
+            <div className="live-game-evaluation">
+              <span>
+                Stockfish 19 Lite · Depth {liveEngine.lines[0]?.depth ?? 0}
+              </span>
+              <strong>{scoreLabel(liveEngine.lines[0])}</strong>
+            </div>
+          )}
+          {liveEngine.error && (
+            <p role="alert" className="error">
+              {liveEngine.error}
+            </p>
+          )}
           <Board
             fen={game.positions[cursor] || game.initial}
             blocked={
@@ -720,10 +884,10 @@ function GameViewer({
               })}
             </div>
           </Card>
-          {game.branches?.length && (
+          {isStudy(game) && !!game.branches?.length && (
             <Card>
               <h2>Saved branches</h2>
-              {game.branches.map((b, i) => (
+              {game.branches!.map((b, i) => (
                 <Button
                   key={i}
                   className="text-button"

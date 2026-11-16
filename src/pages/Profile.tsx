@@ -88,9 +88,11 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
                 )}
               </div>
               <div className="button-row">
-                <label className="btn secondary file-button">
+                <label
+                  className="profile-photo-upload file-button"
+                  title="Upload profile picture"
+                >
                   <Upload size={16} />
-                  Upload photo
                   <input
                     aria-label="Upload profile picture"
                     type="file"

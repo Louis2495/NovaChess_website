@@ -1,3 +1,4 @@
+import { isStudy } from "../lib/library";
 import Rankings from "./Rankings";
 import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
@@ -27,7 +28,11 @@ export default function Stats() {
     detail === "rankings" ? "Rankings" : "Overview",
   );
   const games = library.games.filter(
-      (g) => g.result !== "*" && g.folder !== "Studies",
+      (g) =>
+        g.result !== "*" &&
+        g.folder !== "Studies" &&
+        !isStudy(g) &&
+        g.origin !== "archive",
     ),
     wins = games.filter(
       (g) => g.result === (g.human === "w" ? "1-0" : "0-1"),

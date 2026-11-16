@@ -82,6 +82,8 @@ export default function SpecialPlay({
       result: state.result,
       human: side,
       folder: "Games",
+      kind: "game" as const,
+      origin: "novachess" as const,
       special: state,
     };
     setLibrary((l) => ({

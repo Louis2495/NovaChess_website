@@ -423,9 +423,38 @@ test("Profile saves username, bio and avatar; defaults are auto-queen off and pr
 test("saved games replay and engine review persist real results", async ({
   page,
 }) => {
-  await page.goto("/#analysis");
-  for (const m of ["e2e4", "e7e5", "g1f3", "b8c6"]) await uiMove(page, m);
-  await page.getByRole("button", { name: "Save study", exact: true }).click();
+  const c = new Chess(),
+    positions = [c.fen()],
+    moves: string[] = [],
+    notation: string[] = [];
+  for (const uci of ["e2e4", "e7e5", "g1f3", "b8c6"]) {
+    const m = c.move(uci);
+    moves.push(uci);
+    notation.push(m.san);
+    positions.push(c.fen());
+  }
+  await page.addInitScript(
+    (game) =>
+      localStorage.setItem(
+        "novachess-library-v2",
+        JSON.stringify({ games: [game] }),
+      ),
+    {
+      id: "recorded",
+      title: "Recorded game",
+      created: Date.now(),
+      initial: positions[0],
+      positions,
+      moves,
+      notation,
+      kind: "game",
+      origin: "archive",
+      variant: "chess",
+      human: "w",
+      result: "*",
+      folder: "Games",
+    },
+  );
   await page.goto("/#library");
   await page
     .getByRole("button", { name: "Replay & review", exact: true })
@@ -659,11 +688,11 @@ test("mobile navigation and search lead to working app tools", async ({
       .getByRole("button", { name: "Open navigation", exact: true })
       .click();
     await page
-      .getByRole("navigation", { name: "Library navigation", exact: true })
-      .getByRole("button", { name: "Saved games", exact: true })
+      .getByRole("navigation", { name: "Main navigation", exact: true })
+      .getByRole("button", { name: "Library", exact: true })
       .click();
     await expect(
-      page.getByRole("heading", { name: "Saved games", exact: true }),
+      page.getByRole("heading", { name: "Library", exact: true }),
     ).toBeVisible();
   }
   await page.keyboard.press("/");

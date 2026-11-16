@@ -59,7 +59,7 @@ export const defaults: Appearance = {
   background: "Default",
   backgroundColor: "#292d43",
   accent: "#c7c1ff",
-  buttonColor: "#f1bb98",
+  buttonColor: "#b7c7ed",
   textColor: "#fbf8ff",
   mutedColor: "#c6c7dc",
   panelColor: "#3b425d",

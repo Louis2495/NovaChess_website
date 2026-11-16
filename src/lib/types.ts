@@ -74,6 +74,8 @@ export type Appearance = {
   boardSize: number;
 };
 export type SavedGame = {
+  kind?: "study" | "game";
+  origin?: "novachess" | "archive";
   special?: import("./specialRules").SpecialState;
   id: string;
   title: string;

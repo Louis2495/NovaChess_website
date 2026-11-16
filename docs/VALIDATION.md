@@ -1,10 +1,11 @@
 # Validation
 
+- Library/profile/analysis update: branching study training accepts saved alternatives; recorded games replay their actual line, and NovaChess history is classified separately. Navigation and compact profile upload passed desktop/mobile checks. Continuous engine search survives a simulated minute beyond its startup watchdog, emits deeper analysis and terminates on navigation. Production screens passed accessibility/overflow checks.
 - Theme refresh: 12 targeted desktop/mobile checks passed, including returning-user palette migration, preserved custom colors/backgrounds, reset behavior and accessibility. Production Home, Play, Analysis, Puzzles, Learn, Stats and Profile also passed desktop/mobile accessibility and overflow checks.
-- TypeScript and Vite production build: passed. The offline cache contains 431 local assets.
-- Full desktop/mobile Chromium suite: 143 scenarios passed in one run; one desktop-only layout check is intentionally skipped on mobile.
-- Federation connection repair: six desktop/mobile browser checks passed for server-first USCF requests without an online account, saved profile/rating updates, clear unconfigured-server errors and retained direct FIDE lookup. The standalone dashboard deployment file is exercised by the 34-test suite and checked against the source parser/handler. No live Supabase deployment is claimed.
-- Node rules/content/database/federation suite: all 34 tests passed.
+- TypeScript and Vite production build: passed. The offline cache contains 433 local assets.
+- Full desktop/mobile Chromium suite: 157 scenarios passed in one run; one desktop-only layout check is intentionally skipped on mobile.
+- Federation connection repair: six desktop/mobile browser checks passed for server-first USCF requests without an online account, saved profile/rating updates, clear unconfigured-server errors and retained direct FIDE lookup. The standalone dashboard deployment file is exercised by the unit suite and checked against the source parser/handler. No live Supabase deployment is claimed.
+- Node rules/content/database/federation suite: all 35 tests passed.
 - Puzzle/quiz refinements check hidden empty move history, removed turn/status text, narrower aligned panels, side-to-move orientation across every quiz scenario plus Analysis, Guess the Eval and saved-game previews, and bundled introduction/result illustrations. Production desktop/mobile puzzle, quiz selection and quiz result screens passed accessibility checks without horizontal overflow.
 - Setup refinements check immediate center-grab dragging and edge drops, centered purple resume actions, compact strength choices, rated defaults, opening search, equal-height homepage cards and the larger Analysis board.
 - New coverage checks notation following/manual override, large evaluation and turn dots, concise position-specific insights, the homepage meme placement, retained puzzle input focus, rating-card alignment, configurable Stats periods, nested Rankings and federation profile input/lookup.

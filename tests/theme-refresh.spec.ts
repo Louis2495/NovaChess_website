@@ -23,7 +23,7 @@ test("returning users receive the refreshed default palette while keeping board 
   await page.goto("/");
   await expect(page.locator(".app")).toHaveCSS("--base", "#292d43");
   await expect(page.locator(".app")).toHaveCSS("--accent", "#c7c1ff");
-  await expect(page.locator(".app")).toHaveCSS("--button", "#f1bb98");
+  await expect(page.locator(".app")).toHaveCSS("--button", "#b7c7ed");
   await expect
     .poll(() =>
       page.evaluate(

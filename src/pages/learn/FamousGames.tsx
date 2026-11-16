@@ -118,7 +118,9 @@ function Archive({ games }: { games: FamousGame[] }) {
       result: game.result,
       variant: "chess",
       human: "w",
-      folder: "Studies",
+      folder: "Games",
+      kind: "game",
+      origin: "archive",
       opponent: game.black,
     };
     setLibrary((l) => ({

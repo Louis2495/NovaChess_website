@@ -12,12 +12,14 @@ export function search(
   fen: string,
   {
     time = 1200,
+    infinite = false,
     multiPV = 1,
     elo = 3190,
     signal,
     onInfo,
   }: {
     time?: number;
+    infinite?: boolean;
     multiPV?: number;
     elo?: number;
     signal?: AbortSignal;
@@ -73,7 +75,8 @@ export function search(
         worker.postMessage("isready");
       } else if (text === "readyok") {
         worker.postMessage(`position fen ${fen}`);
-        worker.postMessage(`go movetime ${time}`);
+        if (infinite) clearTimeout(timeout);
+        worker.postMessage(infinite ? "go infinite" : `go movetime ${time}`);
       } else if (text.startsWith("info ") && text.includes(" pv ")) {
         const depth = Number(text.match(/depth (\d+)/)?.[1] || 0),
           rank = Number(text.match(/multipv (\d+)/)?.[1] || 1);
@@ -99,12 +102,7 @@ export function search(
     worker.postMessage("uci");
   });
 }
-export function useEngine(
-  fen: string,
-  enabled: boolean,
-  time = 1200,
-  multiPV = 1,
-) {
+export function useEngine(fen: string, enabled: boolean, multiPV = 1) {
   const [lines, setLines] = useState<EngineLine[]>([]),
     [status, setStatus] = useState("Paused"),
     [error, setError] = useState("");
@@ -118,7 +116,7 @@ export function useEngine(
     const c = new AbortController();
     setStatus("Analyzing");
     search(fen, {
-      time,
+      infinite: true,
       multiPV,
       signal: c.signal,
       onInfo: (line) => {
@@ -140,7 +138,7 @@ export function useEngine(
         }
       });
     return () => c.abort();
-  }, [fen, enabled, time, multiPV]);
+  }, [fen, enabled, multiPV]);
   return { lines, status, error };
 }
 export function sanLine(fen: string, moves: string[]) {

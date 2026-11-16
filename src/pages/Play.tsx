@@ -228,6 +228,8 @@ export default function Play() {
           result: "*",
           human,
           folder: "Games",
+          kind: "game",
+          origin: "novachess",
           special: state,
         },
       }));
@@ -259,6 +261,8 @@ export default function Play() {
       result: "*",
       human,
       folder: "Games",
+      kind: "game",
+      origin: "novachess",
       opponent: "Computer",
       opponentChoice: choice,
       botRating: choice === "Current rating" ? library.localRating : rating,
@@ -1151,7 +1155,8 @@ export default function Play() {
                       ...game,
                       id: uid(),
                       title: game.title + " · saved position",
-                      result: "*",
+                      kind: "game" as const,
+                      origin: "archive" as const,
                     };
                     setLibrary((l) => ({ ...l, games: [study, ...l.games] }));
                     notify("Game saved.");

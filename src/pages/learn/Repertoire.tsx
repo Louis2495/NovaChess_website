@@ -232,12 +232,14 @@ export default function Repertoire() {
     </>
   );
 }
-function RepertoireTrainer({
+export function RepertoireTrainer({
   line,
   onClose,
+  lines,
 }: {
   line: Line;
   onClose: () => void;
+  lines?: Line[];
 }) {
   const { library, setLibrary, appearance } = useApp();
   const [fen, setFen] = useState(line.initial),
@@ -250,7 +252,9 @@ function RepertoireTrainer({
   const c = new Chess(fen);
   const choices = useMemo(() => {
     const result: { line: Line; index: number; move: string }[] = [];
-    for (const l of library.repertoire.filter((v) => v.side === line.side)) {
+    for (const l of (lines || library.repertoire).filter(
+      (v) => v.side === line.side,
+    )) {
       const b = new Chess(l.initial);
       for (let i = 0; i < l.moves.length; i++) {
         if (key(b) === key(c))
@@ -259,7 +263,7 @@ function RepertoireTrainer({
       }
     }
     return result;
-  }, [fen, library.repertoire]);
+  }, [fen, library.repertoire, lines]);
   function finish(helped: boolean) {
     if (done) return;
     setDone(true);

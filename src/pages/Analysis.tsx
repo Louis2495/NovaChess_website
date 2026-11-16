@@ -44,7 +44,8 @@ type Line = {
 export default function Analysis() {
   const { appearance, library, setLibrary, notify, detail } = useApp();
   const source = detail.startsWith("game:")
-    ? library.games.find((g) => g.id === detail.slice(5))
+    ? library.games.find((g) => g.id === detail.slice(5)) ||
+      (library.activeGame?.id === detail.slice(5) ? library.activeGame : null)
     : library.analysis;
   let defaultFen = initialFen;
   if (detail.startsWith("fen:")) {
@@ -102,7 +103,7 @@ export default function Analysis() {
         row.top - box.top - list.clientHeight / 2 + row.height / 2;
   }, [cursor, notation.length, followNotation]);
   const fen = positions[cursor] || initial,
-    engine = useEngine(fen, true, appearance.searchTime, appearance.multiPV);
+    engine = useEngine(fen, true, appearance.multiPV);
   const c = new Chess(fen);
   useEffect(() => {
     setLibrary((l) => ({
@@ -119,6 +120,7 @@ export default function Analysis() {
         result: "*",
         human: "w",
         folder: "Studies",
+        kind: "study",
         branches,
       },
     }));
@@ -187,6 +189,7 @@ export default function Analysis() {
       result: "*",
       human: "w",
       folder: "Studies",
+      kind: "study",
       branches,
     };
     setLibrary((l) => ({ ...l, games: [g, ...l.games] }));

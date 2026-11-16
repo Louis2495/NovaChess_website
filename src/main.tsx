@@ -8,7 +8,6 @@ import {
   BookOpen,
   FolderOpen,
   ChartNoAxesCombined,
-  Users,
   Search,
   ChevronRight,
   X,
@@ -57,16 +56,14 @@ const mainNav = [
   { id: "learn", label: "Learn", icon: BookOpen },
   { id: "research", label: "Research", icon: Search },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
-] as const;
-const secondaryNav = [
-  { id: "library", label: "Saved games", icon: FolderOpen },
-  { id: "community", label: "Multiplayer", icon: Users },
+  { id: "library", label: "Library", icon: FolderOpen },
 ] as const;
 const validTabs = new Set<string>([
   "profile",
   "controls",
   "rankings",
-  ...[...mainNav, ...secondaryNav].map((v) => v.id),
+  "community",
+  ...mainNav.map((v) => v.id),
 ]);
 function route() {
   const [tab, ...rest] = location.hash.slice(1).split("/");
@@ -259,52 +256,54 @@ function App() {
   }, [appearance.sound, appearance.volume]);
   useEffect(() => {
     setAppearance((a) =>
-      a.background === "Default" &&
-      a.backgroundColor === "#20313b" &&
-      a.panelColor === "#304651" &&
-      a.textColor === "#f4f8f5" &&
-      a.mutedColor === "#b5c8c5"
-        ? {
-            ...a,
-            backgroundColor: defaults.backgroundColor,
-            panelColor: defaults.panelColor,
-            textColor: defaults.textColor,
-            mutedColor: defaults.mutedColor,
-            theme:
-              a.theme === "Forest" && a.accent === "#96d9b8"
-                ? defaults.theme
-                : a.theme,
-            accent:
-              a.theme === "Forest" && a.accent === "#96d9b8"
-                ? defaults.accent
-                : a.accent,
-            buttonColor:
-              a.theme === "Forest" &&
-              a.accent === "#96d9b8" &&
-              a.buttonColor === "#96d9b8"
-                ? defaults.buttonColor
-                : a.buttonColor,
-          }
-        : a.backgroundColor === "#80350d"
-          ? { ...a, backgroundColor: defaults.backgroundColor }
-          : ["#101418", "#101612", "#19262e"].includes(a.backgroundColor) &&
-              ["#1b2126", "#1c271f", "#263840"].includes(a.panelColor) &&
-              ["#f0f3f1", "#eef4ed", "#f4f8f5"].includes(a.textColor) &&
-              ["#a6b0aa", "#abb8aa", "#b5c8c5"].includes(a.mutedColor)
-            ? {
-                ...a,
-                backgroundColor: defaults.backgroundColor,
-                panelColor: defaults.panelColor,
-                textColor: defaults.textColor,
-                mutedColor: defaults.mutedColor,
-                accent: a.accent === "#78b58a" ? defaults.accent : a.accent,
-                buttonColor:
-                  a.buttonColor === "#78b58a"
-                    ? defaults.buttonColor
-                    : a.buttonColor,
-                font: a.font === "DM Sans" ? defaults.font : a.font,
-              }
-            : a,
+      a.buttonColor === "#f1bb98"
+        ? { ...a, buttonColor: defaults.buttonColor }
+        : a.background === "Default" &&
+            a.backgroundColor === "#20313b" &&
+            a.panelColor === "#304651" &&
+            a.textColor === "#f4f8f5" &&
+            a.mutedColor === "#b5c8c5"
+          ? {
+              ...a,
+              backgroundColor: defaults.backgroundColor,
+              panelColor: defaults.panelColor,
+              textColor: defaults.textColor,
+              mutedColor: defaults.mutedColor,
+              theme:
+                a.theme === "Forest" && a.accent === "#96d9b8"
+                  ? defaults.theme
+                  : a.theme,
+              accent:
+                a.theme === "Forest" && a.accent === "#96d9b8"
+                  ? defaults.accent
+                  : a.accent,
+              buttonColor:
+                a.theme === "Forest" &&
+                a.accent === "#96d9b8" &&
+                a.buttonColor === "#96d9b8"
+                  ? defaults.buttonColor
+                  : a.buttonColor,
+            }
+          : a.backgroundColor === "#80350d"
+            ? { ...a, backgroundColor: defaults.backgroundColor }
+            : ["#101418", "#101612", "#19262e"].includes(a.backgroundColor) &&
+                ["#1b2126", "#1c271f", "#263840"].includes(a.panelColor) &&
+                ["#f0f3f1", "#eef4ed", "#f4f8f5"].includes(a.textColor) &&
+                ["#a6b0aa", "#abb8aa", "#b5c8c5"].includes(a.mutedColor)
+              ? {
+                  ...a,
+                  backgroundColor: defaults.backgroundColor,
+                  panelColor: defaults.panelColor,
+                  textColor: defaults.textColor,
+                  mutedColor: defaults.mutedColor,
+                  accent: a.accent === "#78b58a" ? defaults.accent : a.accent,
+                  buttonColor:
+                    a.buttonColor === "#78b58a"
+                      ? defaults.buttonColor
+                      : a.buttonColor,
+                  font: a.font === "DM Sans" ? defaults.font : a.font,
+                }
+              : a,
     );
   }, []);
   useEffect(() => {
@@ -323,7 +322,7 @@ function App() {
     }
   }, []);
   useEffect(() => {
-    document.title = `${[...mainNav, ...secondaryNav].find((v) => v.id === tab)?.label || "Home"} · NovaChess`;
+    document.title = `${mainNav.find((v) => v.id === tab)?.label || "Home"} · NovaChess`;
   }, [tab]);
 
   const panelHex = appearance.panelColor.replace("#", "");
@@ -442,19 +441,6 @@ function App() {
               </button>
             ))}
           </nav>
-          <div className="sidebar-label">LIBRARY</div>
-          <nav aria-label="Library navigation">
-            {secondaryNav.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                className={tab === id ? "active" : ""}
-                onClick={() => navigate(id)}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </button>
-            ))}
-          </nav>
           <div className="sidebar-bottom">
             <button
               className="account-stamp"
@@ -550,7 +536,7 @@ function App() {
               onChange={(e) => setQuery(e.target.value)}
             />
             <div className="command-results">
-              {[...mainNav, ...secondaryNav]
+              {mainNav
                 .filter((n) =>
                   n.label.toLowerCase().includes(query.toLowerCase()),
                 )
