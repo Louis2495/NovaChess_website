@@ -12,6 +12,10 @@ test("illustrated modes put Standard first and show distinct artwork for all 18 
   page,
 }) => {
   await page.goto("/#play");
+  await expect(
+    page.getByRole("heading", { name: "Play", exact: true }),
+  ).toHaveCount(0);
+  await expect(page.locator(".page-title")).toHaveCount(0);
   const cards = page.locator(".variant-gallery>button");
   await expect(cards).toHaveCount(18);
   await expect(cards.first()).toHaveText("Standard");

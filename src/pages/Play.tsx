@@ -634,40 +634,40 @@ export default function Play() {
     );
   return (
     <>
-      <PageTitle
-        title="Play"
-        subtitle={
-          playing
-            ? `${variantInfo?.name || game?.variant} · ${game?.opponent || "Computer"}`
-            : undefined
-        }
-      >
-        {playing && game?.result === "*" && (
-          <Button
-            className="secondary"
-            onClick={() => {
-              setPlaying(false);
-              setPaused(false);
-              setPremoves([]);
-            }}
-          >
-            <Plus size={16} />
-            New game
-          </Button>
-        )}
-        {playing && game?.result === "*" && (
-          <Button
-            className="secondary"
-            onClick={() => {
-              setPaused(!paused);
-              setPremoves([]);
-            }}
-          >
-            {paused ? <PlayIcon size={16} /> : <Pause size={16} />}{" "}
-            {paused ? "Resume" : "Pause"}
-          </Button>
-        )}
-      </PageTitle>
+      {playing ? (
+        <PageTitle
+          title={variantInfo?.name || game?.variant || "Game"}
+          subtitle={game?.opponent || "Computer"}
+        >
+          {playing && game?.result === "*" && (
+            <Button
+              className="secondary"
+              onClick={() => {
+                setPlaying(false);
+                setPaused(false);
+                setPremoves([]);
+              }}
+            >
+              <Plus size={16} />
+              New game
+            </Button>
+          )}
+          {playing && game?.result === "*" && (
+            <Button
+              className="secondary"
+              onClick={() => {
+                setPaused(!paused);
+                setPremoves([]);
+              }}
+            >
+              {paused ? <PlayIcon size={16} /> : <Pause size={16} />}{" "}
+              {paused ? "Resume" : "Pause"}
+            </Button>
+          )}
+        </PageTitle>
+      ) : (
+        <h1 className="sr-only">New game</h1>
+      )}
       {error && (
         <div className="error-banner" role="alert">
           {error}
