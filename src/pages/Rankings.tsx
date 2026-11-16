@@ -1,3 +1,4 @@
+import { FederationCards } from "../components/FederationProfiles";
 import { useEffect, useState } from "react";
 import { Trophy, ArrowUpRight } from "lucide-react";
 import { online, useOnlineSession } from "../lib/online";
@@ -16,7 +17,7 @@ type Ranking = {
   global_percentile: number;
   country_percentile: number;
 };
-export default function Rankings() {
+export default function Rankings({ embedded = false }: { embedded?: boolean }) {
   const { session } = useOnlineSession();
   const [country, setCountry] = useState(""),
     [rankings, setRankings] = useState<Ranking[]>([]),
@@ -59,7 +60,8 @@ export default function Rankings() {
         encodeURIComponent(memberId);
   return (
     <>
-      <PageTitle title="Rankings" />
+      {!embedded && <PageTitle title="Rankings" />}
+      <FederationCards />
       <div className="rank-summary">
         {mine ? (
           <>

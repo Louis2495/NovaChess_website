@@ -1,3 +1,4 @@
+import { FederationProfiles } from "../components/FederationProfiles";
 import { useEffect, useState } from "react";
 import { Save, Upload, Trash2, SlidersHorizontal } from "lucide-react";
 import Controls from "./Controls";
@@ -222,6 +223,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
               </Button>
             </Card>
           </div>
+          <FederationProfiles />
         </div>
       )}
     </>

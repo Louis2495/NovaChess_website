@@ -14,7 +14,6 @@ import {
   X,
   ShieldCheck,
   Menu,
-  Trophy,
 } from "lucide-react";
 import "@fontsource/dm-sans/latin-400.css";
 import "@fontsource/dm-sans/latin-500.css";
@@ -45,7 +44,6 @@ const Analysis = lazy(() => import("./pages/Analysis")),
   Play = lazy(() => import("./pages/Play")),
   Puzzles = lazy(() => import("./pages/Puzzles")),
   Research = lazy(() => import("./pages/Research")),
-  Rankings = lazy(() => import("./pages/Rankings")),
   ProfilePage = lazy(() => import("./pages/Profile")),
   Learn = lazy(() => import("./pages/Learn")),
   LibraryPage = lazy(() => import("./pages/Library")),
@@ -61,13 +59,13 @@ const mainNav = [
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
 ] as const;
 const secondaryNav = [
-  { id: "rankings", label: "Rankings", icon: Trophy },
   { id: "library", label: "Saved games", icon: FolderOpen },
   { id: "community", label: "Multiplayer", icon: Users },
 ] as const;
 const validTabs = new Set<string>([
   "profile",
   "controls",
+  "rankings",
   ...[...mainNav, ...secondaryNav].map((v) => v.id),
 ]);
 function route() {
@@ -78,12 +76,19 @@ function route() {
   } catch {}
   return {
     tab:
-      tab === "controls"
-        ? ("profile" as Tab)
-        : validTabs.has(tab)
-          ? (tab as Tab)
-          : ("home" as Tab),
-    detail: tab === "controls" ? "controls" : detail,
+      tab === "rankings"
+        ? ("stats" as Tab)
+        : tab === "controls"
+          ? ("profile" as Tab)
+          : validTabs.has(tab)
+            ? (tab as Tab)
+            : ("home" as Tab),
+    detail:
+      tab === "rankings"
+        ? "rankings"
+        : tab === "controls"
+          ? "controls"
+          : detail,
   };
 }
 function App() {
@@ -340,9 +345,7 @@ function App() {
       <Puzzles />
     ) : tab === "learn" ? (
       <Learn />
-    ) : tab === "research" ? null : tab === "rankings" ? (
-      <Rankings />
-    ) : tab === "profile" ? (
+    ) : tab === "research" ? null : tab === "profile" ? (
       <ProfilePage />
     ) : tab === "library" ? (
       <LibraryPage />

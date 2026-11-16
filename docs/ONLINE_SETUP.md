@@ -71,7 +71,15 @@ select cron.schedule('novachess-chat-retention', '30 3 * * *',
 
 ## Federation records
 
-FIDE and US Chess do not provide a supported free public member-stat API integrated here. **Rankings → Federation ratings** accepts an ID and opens the official record. It does not pretend NovaChess’s rating is a federation rating or scrape unverified statistics into the profile. An official licensed API can be connected later if one becomes available.
+Attach official profile URLs or IDs in **Profile → Federation profiles**. The records and any manually entered ratings are saved with the browser profile and shown in **Stats → Rankings**. Manually entered values are labelled separately from fetched records.
+
+FIDE lookup uses the documented public [Lichess FIDE API](https://lichess.org/api#tag/FIDE/operation/fidePlayerGet), which mirrors FIDE’s public data. US Chess’s public record can be read directly when its browser-access policy permits it. For browsers blocked by federation CORS policies, deploy the optional read-only proxy into the same Supabase project:
+
+```sh
+npx supabase functions deploy federation-records --no-verify-jwt
+```
+
+The function needs no database migration or service-role secret. It accepts only validated federation IDs and fixed public upstreams, caches records for six hours, and makes no changes to federation accounts. USCF parsing rejects unreadable rating responses; manual entry remains available if the source changes or is unavailable. Lookup cannot run through this proxy until the function and public Vite Supabase configuration are deployed.
 
 ## Validation scope
 

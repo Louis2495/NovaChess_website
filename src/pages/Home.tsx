@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { ArrowRight, Check, ChevronRight, RotateCcw } from "lucide-react";
 import { useApp } from "../lib/context";
 import { useData, today, dateLabel } from "../lib/store";
-import type { Opening, PuzzleData } from "../lib/types";
+import type { PuzzleData } from "../lib/types";
 import { Chess } from "chess.js";
 import { Board, Piece } from "../components/Board";
 import { Button, PageTitle } from "../components/UI";
@@ -19,21 +19,7 @@ export function dailyPuzzle(puzzles: PuzzleData[]) {
 export default function HomePage() {
   const { library, navigate } = useApp();
   const { data } = useData<PuzzleData[]>("puzzles");
-  const { data: lessons } = useData<Opening[]>("lessons");
   const puzzle = useMemo(() => (data ? dailyPuzzle(data) : null), [data]);
-  const suggestions = useMemo(
-    () =>
-      lessons
-        ?.filter((l) => !library.progress.learned.includes(l.id))
-        .filter(
-          (l, index, all) =>
-            all.findIndex(
-              (v) => v.name.split(":")[0] === l.name.split(":")[0],
-            ) === index,
-        )
-        .slice(0, 3) || [],
-    [lessons, library.progress.learned],
-  );
   let fen = "";
   if (puzzle) {
     const c = new Chess(puzzle.fen);
@@ -98,44 +84,8 @@ export default function HomePage() {
             )}
           </div>
         </section>
-        <section className="home-lessons" aria-labelledby="lessons-title">
-          <div className="home-section-heading">
-            <h2 id="lessons-title">Opening lessons</h2>
-            <button
-              className="text-link"
-              onClick={() => navigate("learn", "lessons")}
-            >
-              View all
-              <ArrowRight size={14} />
-            </button>
-          </div>
-          <div className="suggested-lessons">
-            {suggestions.map((lesson, i) => (
-              <button
-                key={lesson.id}
-                aria-label={`Open lesson: ${lesson.name}`}
-                onClick={() => navigate("learn", `lessons:${lesson.id}`)}
-              >
-                <span className="lesson-piece">
-                  <Piece symbol={["N", "B", "R"][i]} />
-                </span>
-                <span>
-                  <b>{lesson.name.split(":")[0]}</b>
-                  <small>
-                    {lesson.eco} · {Math.ceil(lesson.moves.length / 2)} moves
-                  </small>
-                </span>
-                <ChevronRight size={17} />
-              </button>
-            ))}
-            {lessons && !suggestions.length && (
-              <p className="muted">All curated lessons completed.</p>
-            )}
-            {!lessons && <p className="muted">Loading lessons…</p>}
-          </div>
-        </section>
+        <DailyMeme />
       </div>
-      <DailyMeme />
       {library.games.length > 0 && (
         <section className="home-recent">
           <div className="home-section-heading">

@@ -691,7 +691,7 @@ export default function Play() {
               </Button>
               {game?.result === "*" && (
                 <button
-                  className="resume-link"
+                  className="resume-link resume-game-button"
                   onClick={() => {
                     if (game.special) {
                       setSpecial(game.variant as SpecialVariant);

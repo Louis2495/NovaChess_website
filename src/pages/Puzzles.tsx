@@ -1,7 +1,7 @@
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
 import { parseTypedMove, humanTheme } from "../lib/moves";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { Lightbulb, ArrowRight, RotateCcw, Calendar } from "lucide-react";
 import { useApp } from "../lib/context";
@@ -79,6 +79,28 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     [wrong, setWrong] = useState(false),
     [played, setPlayed] = useState<string[]>([]),
     [moveInput, setMoveInput] = useState("");
+  const moveInputRef = useRef<HTMLInputElement>(null);
+  const layoutRef = useRef<HTMLDivElement>(null),
+    puzzleBoardRef = useRef<HTMLDivElement>(null);
+  const [ratingOffset, setRatingOffset] = useState(47);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const board = puzzleBoardRef.current?.querySelector(".board");
+      if (board && layoutRef.current)
+        setRatingOffset(
+          board.getBoundingClientRect().top -
+            layoutRef.current.getBoundingClientRect().top,
+        );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (puzzleBoardRef.current) observer.observe(puzzleBoardRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [fen]);
   const graded = useRef(daily && !!library.progress.daily[today()]);
   const learner = useMemo(() => {
     const c = new Chess(puzzle.fen);
@@ -233,7 +255,15 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           Guess the eval
         </Button>
       </PageTitle>
-      <div className="chess-layout">
+      <div
+        className="chess-layout puzzle-layout"
+        ref={layoutRef}
+        style={
+          {
+            "--puzzle-rating-offset": `${ratingOffset}px`,
+          } as React.CSSProperties
+        }
+      >
         <div className="board-column">
           <div className="board-topline">
             <span className="turn-indicator">
@@ -244,9 +274,9 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
                   ? "Playing reply…"
                   : `${learner === "w" ? "White" : "Black"} to move`}
             </span>
-            <span className="muted">{Math.ceil(played.length / 2)} moves</span>
           </div>
           <div
+            ref={puzzleBoardRef}
             className={`puzzle-board ${wrong ? "wrong" : ""} ${done ? "solved" : ""}`}
           >
             <Board
@@ -270,7 +300,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             clear={premove.clear}
           />
           <div className="puzzle-feedback" role="status">
-            {message || "Find the best continuation."}
+            {message}
           </div>
           <div className="button-row equal-buttons">
             <Button
@@ -304,21 +334,26 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             className="inline-form move-entry"
             onSubmit={(e) => {
               e.preventDefault();
+              if (done || c.turn() !== learner) return;
               try {
                 const m = parseTypedMove(new Chess(fen), moveInput);
                 attempt(m.from, m.to, m.promotion);
                 setMoveInput("");
               } catch {
                 notify("Enter a legal move.");
+              } finally {
+                moveInputRef.current?.focus();
               }
             }}
           >
             <input
               aria-label="Puzzle move"
+              ref={moveInputRef}
               value={moveInput}
               onChange={(e) => setMoveInput(e.target.value)}
               placeholder="Enter move"
-              disabled={done || c.turn() !== learner}
+              readOnly={done}
+              aria-disabled={done}
             />
             <Button className="secondary" disabled={!moveInput || done}>
               Play
@@ -363,9 +398,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
                   ))}
                 </select>
               </Field>
-              <p className="caption">
-                Difficulty follows your results and favors unseen positions.
-              </p>
             </Card>
           )}
           <Card>

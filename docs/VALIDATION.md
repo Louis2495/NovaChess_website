@@ -1,8 +1,10 @@
 # Validation
 
-- TypeScript and Vite production build: passed. The offline cache contains 426 local assets.
-- Full desktop/mobile Chromium suite: all 114 existing scenarios passed in one run; eight additional desktop/mobile checks passed for variant art, Standard-first ordering, removed bindings, Up/Down navigation, positive-only material and right-click premove cancellation. All 42 focused desktop/mobile checks also passed after the final annotation/contrast fixes.
-- Node rules/content/database suite: all 26 tests passed.
+- TypeScript and Vite production build: passed. The offline cache contains 427 local assets.
+- Full desktop/mobile Chromium suite: all 132 scenarios passed in one run.
+- Node rules/content/database/federation suite: all 34 tests passed.
+- New coverage checks notation following/manual override, large evaluation and turn dots, concise position-specific insights, the homepage meme placement, retained puzzle input focus, rating-card alignment, configurable Stats periods, nested Rankings and federation profile input/lookup.
+- Positional explanations were checked against legal positions with real pins, passed pawns, open files, supported outposts, mating nets and engine-line pawn-structure changes. Federation parsing and the actual read-only Edge handler were checked with documented/representative responses, cache reuse and rejected arbitrary/private URLs.
 - New rules: ordinary positions were cross-checked against chess.js; dropped-square timing/caps/path blocking, extended pawn moves, freeze expiration, swap king safety, Random selection, castling, en passant, underpromotion and actual bot replies were checked.
 - Online logic: the actual Edge Function handler and SQL migration were exercised against embedded PostgreSQL (PGlite). Authentication rejection, legal/out-of-turn moves, Throne queue transitions, atomic winner replacement, balanced Vote Chess teams, one-day deadlines, first-vote tie breaking, team actions, shared annotations, bot replies, bot-only draw actions, rating idempotency, percentiles, row-level permissions and chat rate limits/deletion passed.
 - Content: all 129 curated opening lines, all 84 guide branches and all 12 master-game scores replay legally. Stored master-game SAN/positions and PGNs agree; GIF exports include every frame. All 32 middlegame workbooks, 176 annotations and 20 trap/refutation pairs replay legally; decision alternatives are legal. Twelve daily meme images are available in `public/memes` for manual vetting; previous candidates are archived. Quiz moves are legal; all trivia prompts are questions and answer sets are distinct.
@@ -13,8 +15,8 @@
 - Production `/NovaChess_website/` subpath: passed. Final offline checks passed for Stockfish analysis and the master archive; lesson and encyclopedia offline navigation also passed. Country-flag assets are bundled locally.
 - Updated desktop/mobile previews were captured from the production build.
 
-Live Supabase credentials were not supplied, so no live project, email delivery, deployed Realtime connection or public deployment is claimed. The remaining owner setup and smoke test are in [ONLINE_SETUP.md](ONLINE_SETUP.md).
+Live Supabase credentials were not supplied, so no live Supabase project, email delivery or deployed Realtime connection is claimed. The remaining owner setup and smoke test are in [ONLINE_SETUP.md](ONLINE_SETUP.md).
 
-Public Chess.com/Lichess access is subject to the source’s CORS/rate limits and this environment’s outbound proxy. Research parsing and frequency calculations were tested using representative API-response fixtures. Federation lookup links to official records; it does not claim to ingest verified FIDE/US Chess statistics. Arbitrary user-selected appearance colors remain under the user’s control.
+Public Chess.com/Lichess access is subject to the source’s CORS/rate limits and this environment’s outbound proxy. Research parsing and frequency calculations were tested using representative API-response fixtures. FIDE lookup follows the documented Lichess FIDE response schema; USCF parsing and the optional federation proxy were tested with fixtures because this environment could not reach the live upstreams. The proxy still requires owner deployment, and manually entered ratings are explicitly labelled. Arbitrary user-selected appearance colors remain under the user’s control.
 
 CI crash regression: custom variants skip Fairy-Stockfish snapshots. The native board factory rejects unregistered variants before calling WASM. Desktop/mobile custom-game tests instrument the native constructor to catch accidental engine calls safely, and check start, computer reply, resume and resignation. GitHub Actions now annotates individual test failures.

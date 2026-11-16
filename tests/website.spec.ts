@@ -727,27 +727,20 @@ test("simplified Home has one large New Game action and no repeated tool or stat
   await expect(page.getByLabel("Variant", { exact: true })).toHaveCount(1);
 });
 
-test("Home suggests distinct opening families and opens the selected lesson", async ({
+test("Home keeps the unlabelled meme beside the puzzle and opening lessons remain in Learn", async ({
   page,
 }) => {
   await page.goto("/");
-  const rows = page.locator(".suggested-lessons>button");
-  await expect(rows).toHaveCount(3);
-  const titles = await rows.locator("b").allTextContents();
-  expect(new Set(titles).size).toBe(3);
-  await rows.nth(1).click();
-  const id = await page.evaluate(() =>
-    decodeURIComponent(
-      location.hash.slice(location.hash.indexOf("/") + 1),
-    ).slice(8),
-  );
-  const lessons = JSON.parse(
-    fs.readFileSync("public/data/lessons.json", "utf8"),
-  );
-  const expected = lessons.find((l: { id: string }) => l.id === id);
   await expect(
-    page.getByRole("heading", { name: expected.name, exact: true }),
+    page.locator(".home-practice-grid .daily-meme-image"),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Daily meme", exact: true }),
+  ).toHaveCount(0);
+  await expect(page.locator(".home-lessons,.suggested-lessons")).toHaveCount(0);
+  await page.goto("/#learn");
+  await page.getByRole("button", { name: /Opening lessons/ }).click();
+  await expect(page.locator(".list-summary")).toHaveText("129 lessons");
 });
 
 test("Stats has dedicated navigation and derives charts from completed local games only", async ({

@@ -78,7 +78,10 @@ export function Field({
       {isValidElement(children) &&
       ["input", "select", "textarea"].includes(String(children.type))
         ? cloneElement(children as ReactElement<Record<string, unknown>>, {
-            "aria-label": label,
+            "aria-label":
+              (children as ReactElement<Record<string, unknown>>).props[
+                "aria-label"
+              ] ?? label,
           })
         : children}
     </label>

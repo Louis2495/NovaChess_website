@@ -129,6 +129,12 @@ export type Repertoire = {
   successes: number;
 };
 export type Profile = {
+  federations?: Partial<
+    Record<
+      import("./federations").Federation,
+      import("./federations").FederationProfile
+    >
+  >;
   bio?: string;
   name: string;
   country: string;

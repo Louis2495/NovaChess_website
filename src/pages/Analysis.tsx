@@ -1,5 +1,6 @@
+import { positionInsights } from "../lib/positionInsights";
 import { parseTypedMove } from "../lib/moves";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
   ChevronLeft,
@@ -13,8 +14,8 @@ import {
   Image,
   GitBranch,
   Trash2,
-  SquarePen,
   Lightbulb,
+  LocateFixed,
   Save,
 } from "lucide-react";
 import { useApp } from "../lib/context";
@@ -77,6 +78,23 @@ export default function Analysis() {
     [sharing, setSharing] = useState(false),
     [exporting, setExporting] = useState(false),
     [moveInput, setMoveInput] = useState("");
+  const notationRef = useRef<HTMLDivElement>(null);
+  const [followNotation, setFollowNotation] = useState(true);
+  useLayoutEffect(() => {
+    const list = notationRef.current;
+    if (followNotation && list && cursor === 0) {
+      list.scrollTop = 0;
+      return;
+    }
+    const current =
+      list?.querySelector<HTMLElement>("button.current")?.parentElement;
+    if (!followNotation || !list || !current) return;
+    const row = current.getBoundingClientRect(),
+      box = list.getBoundingClientRect();
+    if (row.top < box.top + 35 || row.bottom > box.bottom)
+      list.scrollTop +=
+        row.top - box.top - list.clientHeight / 2 + row.height / 2;
+  }, [cursor, notation.length, followNotation]);
   const fen = positions[cursor] || initial,
     engine = useEngine(fen, true, appearance.searchTime, appearance.multiPV);
   const c = new Chess(fen);
@@ -167,9 +185,7 @@ export default function Analysis() {
     setLibrary((l) => ({ ...l, games: [g, ...l.games] }));
     notify("Study saved to your library.");
   }
-  let material: Record<string, number> = { w: 0, b: 0 };
-  const pv: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
-  for (const p of c.board().flat()) if (p) material[p.color] += pv[p.type];
+  const insights = positionInsights(fen, engine.lines[0]);
   const white = engine.lines[0]?.score || 0;
   return (
     <>
@@ -190,10 +206,20 @@ export default function Analysis() {
       <div className="chess-layout">
         <div className="board-column">
           <div className="board-topline">
-            <span className="turn-indicator">
-              <i className={c.turn() === "w" ? "white-piece" : "black-piece"} />
-              {c.turn() === "w" ? "White" : "Black"} to move
-            </span>
+            <div className="analysis-position-meta">
+              <span
+                className="evaluation-readout"
+                aria-label={`Evaluation ${scoreLabel(engine.lines[0])}`}
+              >
+                {scoreLabel(engine.lines[0])}
+              </span>
+              <span
+                className={`analysis-turn-dot ${c.turn() === "w" ? "white-turn" : "black-turn"}`}
+                role="img"
+                aria-label={`${c.turn() === "w" ? "White" : "Black"} to move`}
+                title={`${c.turn() === "w" ? "White" : "Black"} to move`}
+              />
+            </div>
             <div className="button-row">
               <IconButton
                 label="Edit position"
@@ -212,10 +238,10 @@ export default function Analysis() {
           <div className="board-with-eval">
             <div
               className="eval-meter"
+              role="img"
               aria-label={`Evaluation ${scoreLabel(engine.lines[0])}`}
             >
               <div style={{ height: `${50 + Math.tanh(white / 450) * 46}%` }} />
-              <span>{scoreLabel(engine.lines[0])}</span>
             </div>
             <Board
               fen={fen}
@@ -232,7 +258,7 @@ export default function Analysis() {
               }
             />
           </div>
-          <div className="board-navigation">
+          <div className="board-navigation analysis-navigation">
             <IconButton
               label="First position"
               disabled={!cursor}
@@ -298,35 +324,63 @@ export default function Analysis() {
               <h2>Positional insights</h2>
               <Lightbulb size={18} />
             </div>
-            <div className="insights">
-              <p>
-                Material: White {material.w} · Black {material.b}
-              </p>
-              <p>
-                {c.isCheckmate()
-                  ? "Checkmate."
-                  : c.isStalemate()
-                    ? "Stalemate."
-                    : c.isCheck()
-                      ? "The king is in check."
-                      : `${c.moves().length} legal moves available.`}
-              </p>
-              <p>
-                {material.w === material.b
-                  ? "Material is balanced."
-                  : `${material.w > material.b ? "White" : "Black"} has a material advantage.`}
-              </p>
-              {c.isInsufficientMaterial() && (
-                <p>Insufficient material to checkmate.</p>
-              )}
+            <div className="insights" aria-live="polite">
+              {insights.map((text) => (
+                <p key={text}>{text}</p>
+              ))}
             </div>
           </Card>
           <Card>
             <div className="card-heading">
               <h2>Notation</h2>
-              <span className="pill">{Math.ceil(moves.length / 2)} moves</span>
+              <div className="button-row">
+                <span className="pill">
+                  {Math.ceil(moves.length / 2)} moves
+                </span>
+                {!followNotation && (
+                  <IconButton
+                    label="Follow current move"
+                    onClick={() => setFollowNotation(true)}
+                  >
+                    <LocateFixed size={17} />
+                  </IconButton>
+                )}
+              </div>
             </div>
-            <div className="notation-table">
+            <div
+              className="notation-table"
+              ref={notationRef}
+              tabIndex={0}
+              aria-label="Game notation"
+              onWheel={() => {
+                const l = notationRef.current;
+                if (l && l.scrollHeight > l.clientHeight)
+                  setFollowNotation(false);
+              }}
+              onTouchMove={() => {
+                const l = notationRef.current;
+                if (l && l.scrollHeight > l.clientHeight)
+                  setFollowNotation(false);
+              }}
+              onPointerDown={(e) => {
+                if (e.target === e.currentTarget) setFollowNotation(false);
+              }}
+              onKeyDown={(e) => {
+                if (
+                  [
+                    "ArrowUp",
+                    "ArrowDown",
+                    "PageUp",
+                    "PageDown",
+                    "Home",
+                    "End",
+                  ].includes(e.key)
+                ) {
+                  setFollowNotation(false);
+                  e.stopPropagation();
+                }
+              }}
+            >
               <div>
                 <span>#</span>
                 <span>White</span>
@@ -342,7 +396,10 @@ export default function Analysis() {
                         key={k}
                         disabled={!notation[i * 2 + k]}
                         className={cursor === i * 2 + k + 1 ? "current" : ""}
-                        onClick={() => setCursor(i * 2 + k + 1)}
+                        onClick={() => {
+                          setCursor(i * 2 + k + 1);
+                          setFollowNotation(true);
+                        }}
                       >
                         {notation[i * 2 + k] || "—"}
                       </button>
@@ -358,7 +415,6 @@ export default function Analysis() {
           <Card>
             <div className="card-heading">
               <h2>Study</h2>
-              <GitBranch size={18} />
             </div>
             <Field label="Name">
               <input
@@ -367,7 +423,7 @@ export default function Analysis() {
                 maxLength={80}
               />
             </Field>
-            {branches.length ? (
+            {branches.length > 0 && (
               <div className="branch-list">
                 {branches.map((b, i) => (
                   <div key={i}>
@@ -407,15 +463,7 @@ export default function Analysis() {
                   </div>
                 ))}
               </div>
-            ) : (
-              <p className="caption">
-                Go back and play a different move to create a branch.
-              </p>
             )}
-            <Button className="text-button" onClick={() => setEditing(true)}>
-              <SquarePen size={14} />
-              Set up a position
-            </Button>
           </Card>
         </div>
       </div>

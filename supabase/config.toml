@@ -2,3 +2,6 @@ project_id = "novachess"
 [functions.chess]
 verify_jwt = false
 import_map = "./functions/chess/deno.json"
+
+[functions.federation-records]
+verify_jwt = false

@@ -3589,3 +3589,166 @@ select.theme-select {
   white-space: nowrap;
   border: 0;
 }
+
+.home-practice-grid .daily-meme {
+  margin: 0;
+  align-self: center;
+  min-width: 0;
+}
+.home-practice-grid .daily-meme-image {
+  width: 100%;
+  max-width: 560px;
+}
+.analysis-position-meta {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.evaluation-readout {
+  font-size: clamp(1.65rem, 2.4vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+.analysis-turn-dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid #a8bab5;
+  flex: none;
+}
+.analysis-turn-dot.black-turn {
+  background: #101418;
+}
+.analysis-turn-dot.white-turn {
+  background: #f4f8f5;
+}
+.analysis-navigation {
+  padding: 5px 5px !important;
+  margin-top: 24px;
+}
+.analysis-navigation .icon-btn {
+  min-height: 32px;
+  height: 32px;
+}
+.game-setup-page .resume-game-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  margin: 20px auto 0;
+  padding: 13px 24px;
+  background: #c1adef;
+  color: #271d3d;
+  border: 1px solid #c1adef;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-align: center;
+}
+.puzzle-layout .side-panels {
+  padding-top: var(--puzzle-rating-offset, 47px);
+}
+@media (max-width: 1000px) {
+  .puzzle-layout .side-panels {
+    padding-top: 0;
+  }
+}
+
+.federation-profiles {
+  grid-column: 1/-1;
+}
+.federation-edit-grid,
+.federation-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.federation-edit-grid fieldset {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  min-width: 0;
+}
+.federation-edit-grid legend {
+  padding: 0 8px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.federation-id-row {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+.federation-id-row .field {
+  flex: 1;
+  min-width: 0;
+}
+.federation-id-row .icon-btn {
+  margin-bottom: 14px;
+}
+.federation-rating-fields,
+.federation-rating-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.federation-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.federation-rating-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.federation-rating-summary strong {
+  font-size: 1.6rem;
+}
+.federation-rating-summary span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.federation-cards {
+  margin-bottom: 22px;
+}
+.activity-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.activity-range select {
+  width: auto;
+  max-width: 165px;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
+.activity-range input {
+  width: 70px;
+  padding: 8px;
+}
+.activity-chart {
+  overflow-x: auto;
+}
+@media (max-width: 680px) {
+  .federation-edit-grid,
+  .federation-cards {
+    grid-template-columns: 1fr;
+  }
+  .federation-edit-grid {
+    gap: 16px;
+  }
+}
+
+.activity-chart {
+  display: grid;
+}
+
+.activity-range {
+  max-width: 65%;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}

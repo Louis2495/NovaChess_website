@@ -1,3 +1,4 @@
+import Rankings from "./Rankings";
 import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -21,8 +22,10 @@ import { useData } from "../lib/store";
 import { PageTitle, Card, Button, IconButton } from "../components/UI";
 type Country = { code: string; polygons: number[][][] };
 export default function Stats() {
-  const { library } = useApp();
-  const [tab, setTab] = useState("Overview");
+  const { library, detail } = useApp();
+  const [tab, setTab] = useState(
+    detail === "rankings" ? "Rankings" : "Overview",
+  );
   const games = library.games.filter(
       (g) => g.result !== "*" && g.folder !== "Studies",
     ),
@@ -173,7 +176,7 @@ export default function Stats() {
     <>
       <PageTitle title="Stats" />
       <div className="segmented page-segments">
-        {["Overview", "Achievements", "World map"].map((t) => (
+        {["Overview", "Rankings", "Achievements", "World map"].map((t) => (
           <button
             key={t}
             className={tab === t ? "active" : ""}
@@ -212,6 +215,8 @@ export default function Stats() {
             </Card>
           ))}
         </div>
+      ) : tab === "Rankings" ? (
+        <Rankings embedded />
       ) : tab === "World map" ? (
         <WorldMap visited={visited} />
       ) : (
@@ -244,20 +249,47 @@ function StatsOverview({
 }) {
   const { library, navigate } = useApp();
   const rate = games.length ? Math.round((wins / games.length) * 100) : null;
-  const days = Array.from({ length: 7 }, (_, i) => {
+  const [dayRange, setDayRange] = useState(7),
+    [customRange, setCustomRange] = useState(false);
+  const completedByDay = new Map<number, number>();
+  for (const game of games) {
+    const d = new Date(game.created);
+    d.setHours(0, 0, 0, 0);
+    completedByDay.set(d.getTime(), (completedByDay.get(d.getTime()) || 0) + 1);
+  }
+  const dayFormatter = new Intl.DateTimeFormat(
+    undefined,
+    dayRange <= 7
+      ? { weekday: "short" }
+      : dayRange > 365
+        ? { month: "short", year: "2-digit" }
+        : { month: "short", day: "numeric" },
+  );
+  const days = Array.from({ length: dayRange }, (_, i) => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() - 6 + i);
-    const end = new Date(d);
-    end.setDate(end.getDate() + 1);
+    d.setDate(d.getDate() - dayRange + 1 + i);
     return {
-      label: d.toLocaleDateString(undefined, { weekday: "short" }),
-      count: games.filter(
-        (g) => g.created >= d.getTime() && g.created < end.getTime(),
-      ).length,
+      label: dayFormatter.format(d),
+      count: completedByDay.get(d.getTime()) || 0,
     };
   });
-  const max = Math.max(1, ...days.map((d) => d.count));
+  const bucketSize = Math.max(1, Math.ceil(dayRange / 30));
+  const activity = Array.from(
+    { length: Math.ceil(days.length / bucketSize) },
+    (_, i) => {
+      const group = days.slice(i * bucketSize, (i + 1) * bucketSize);
+      return {
+        label: group[0].label,
+        range:
+          group.length > 1
+            ? `${group[0].label} – ${group.at(-1)!.label}`
+            : group[0].label,
+        count: group.reduce((n, d) => n + d.count, 0),
+      };
+    },
+  );
+  const max = Math.max(1, ...activity.map((d) => d.count));
   const winStop = games.length ? (wins / games.length) * 100 : 0,
     drawStop = games.length ? ((wins + draws) / games.length) * 100 : 0;
   return (
@@ -327,26 +359,69 @@ function StatsOverview({
         <Card className="activity-card">
           <div className="card-heading">
             <h2>Activity</h2>
-            <span className="caption">Last 7 days</span>
+            <div className="activity-range">
+              <select
+                aria-label="Activity period"
+                value={customRange ? "custom" : dayRange}
+                onChange={(e) => {
+                  setCustomRange(e.target.value === "custom");
+                  if (e.target.value !== "custom")
+                    setDayRange(Number(e.target.value));
+                }}
+              >
+                {[7, 14, 30, 90, 365].map((n) => (
+                  <option value={n} key={n}>
+                    Last {n} days
+                  </option>
+                ))}
+                <option value="custom">Custom</option>
+              </select>
+              {customRange && (
+                <input
+                  type="number"
+                  aria-label="Activity days"
+                  min={1}
+                  max={3650}
+                  value={dayRange}
+                  onChange={(e) =>
+                    setDayRange(
+                      Math.max(1, Math.min(3650, Number(e.target.value) || 1)),
+                    )
+                  }
+                />
+              )}
+            </div>
           </div>
-          <div className="activity-chart">
-            {days.map((d, i) => (
+          <div
+            className="activity-chart"
+            style={{
+              gap: activity.length > 14 ? 4 : 12,
+              gridTemplateColumns: `repeat(${activity.length},minmax(6px,1fr))`,
+            }}
+          >
+            {activity.map((d, i) => (
               <div className="activity-day" key={i}>
                 <div className="activity-track">
                   <span
                     role="img"
-                    aria-label={`${d.label}: ${d.count} completed games`}
+                    title={`${d.range}: ${d.count} completed games`}
+                    aria-label={`${d.range}: ${d.count} completed games`}
                     style={{ height: `${(d.count / max) * 100}%` }}
                   >
-                    {d.count > 0 && <b>{d.count}</b>}
+                    {d.count > 0 && activity.length <= 14 && <b>{d.count}</b>}
                   </span>
                 </div>
-                <small>{d.label}</small>
+                <small>
+                  {i % Math.ceil(activity.length / 7) === 0 ||
+                  i === activity.length - 1
+                    ? d.label
+                    : ""}
+                </small>
               </div>
             ))}
           </div>
           {!days.some((d) => d.count) && (
-            <p className="activity-empty">No completed games this week.</p>
+            <p className="activity-empty">No completed games in this period.</p>
           )}
         </Card>
       </div>
@@ -368,13 +443,6 @@ function StatsOverview({
           />
           <div className="stats-training-footer">
             <span>{library.repertoire.length} repertoire lines</span>
-            <button
-              className="text-link"
-              onClick={() => navigate("learn", "repertoire")}
-            >
-              Train
-              <ArrowRight size={14} />
-            </button>
           </div>
         </Card>
         <Card>

@@ -333,12 +333,8 @@ export default function Research() {
                 <ChevronRight size={17} />
               </button>
             ))}
-            {!branches.length && (
-              <p className="muted">
-                {games.length
-                  ? "No continuations at this position."
-                  : "Load a public player’s games to explore."}
-              </p>
+            {!branches.length && games.length > 0 && (
+              <p className="muted">No continuations at this position.</p>
             )}
           </div>
           {games.length > 0 && (

@@ -30,12 +30,9 @@ export default function DailyMeme() {
   return (
     <section
       className="daily-meme"
-      aria-labelledby="meme-title"
+      aria-label="Chess meme"
       data-meme-id={meme.id}
     >
-      <div className="home-section-heading">
-        <h2 id="meme-title">Daily meme</h2>
-      </div>
       <img
         className="daily-meme-image"
         src={`${base}memes/${meme.image}`}
