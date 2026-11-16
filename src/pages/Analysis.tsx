@@ -14,14 +14,12 @@ import {
   GitBranch,
   Trash2,
   SquarePen,
-  Pause,
-  Play,
   Lightbulb,
   Save,
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import { initialFen, uid, download, copyText } from "../lib/store";
-import { useEngine, sanLine, scoreLabel } from "../lib/engine";
+import { useEngine, scoreLabel } from "../lib/engine";
 import { exportGIF, exportPNG } from "../lib/export";
 import type { SavedGame } from "../lib/types";
 import { useControl } from "../lib/controls";
@@ -34,7 +32,6 @@ import {
   PageTitle,
   Modal,
   Field,
-  Toggle,
 } from "../components/UI";
 type Line = {
   name: string;
@@ -74,8 +71,6 @@ export default function Analysis() {
       detail.startsWith("fen:") ? 0 : (source?.positions.length || 1) - 1,
     ),
     [flipped, setFlipped] = useState(false),
-    [enabled, setEnabled] = useState(true),
-    [insights, setInsights] = useState(false),
     [editing, setEditing] = useState(false),
     [branches, setBranches] = useState<Line[]>(source?.branches || []),
     [name, setName] = useState(source?.title || "Analysis"),
@@ -83,7 +78,7 @@ export default function Analysis() {
     [exporting, setExporting] = useState(false),
     [moveInput, setMoveInput] = useState("");
   const fen = positions[cursor] || initial,
-    engine = useEngine(fen, enabled, appearance.searchTime, appearance.multiPV);
+    engine = useEngine(fen, true, appearance.searchTime, appearance.multiPV);
   const c = new Chess(fen);
   useEffect(() => {
     setLibrary((l) => ({
@@ -180,13 +175,18 @@ export default function Analysis() {
     <>
       <PageTitle
         title="Analysis"
-        subtitle="Stockfish 19 Lite · local WebAssembly"
+        subtitle={`Stockfish 19 Lite · Depth ${engine.lines[0]?.depth ?? 0}`}
       >
         <Button onClick={save}>
           <Save size={16} />
           Save study
         </Button>
       </PageTitle>
+      {engine.error && (
+        <p className="error" role="alert">
+          {engine.error}
+        </p>
+      )}
       <div className="chess-layout">
         <div className="board-column">
           <div className="board-topline">
@@ -287,91 +287,39 @@ export default function Analysis() {
             <Button disabled={!moveInput.trim()}>Play</Button>
           </form>
           <div className="button-row board-actions">
-            <Button
-              className="secondary"
-              onClick={() =>
-                download(
-                  "novachess-study.pgn",
-                  pgn(),
-                  "application/x-chess-pgn",
-                )
-              }
-            >
-              <Download size={15} />
-              PGN
-            </Button>
             <Button className="text-button" onClick={() => reset(initialFen)}>
               Reset
             </Button>
           </div>
         </div>
         <div className="side-panels">
-          <Card>
+          <Card className="positional-insights">
             <div className="card-heading">
-              <h2>Engine</h2>
-              <IconButton
-                label={enabled ? "Pause analysis" : "Start analysis"}
-                onClick={() => setEnabled(!enabled)}
-              >
-                {enabled ? <Pause size={17} /> : <Play size={17} />}
-              </IconButton>
+              <h2>Positional insights</h2>
+              <Lightbulb size={18} />
             </div>
-            <div className="engine-status">
-              <span className={enabled ? "status-dot" : ""} />
-              {engine.status}
-              {engine.lines[0] && <span>Depth {engine.lines[0].depth}</span>}
-            </div>
-            {engine.error && <p className="error">{engine.error}</p>}
-            <div className="engine-lines">
-              {engine.lines.filter(Boolean).map((line, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    const m = line.moves[0];
-                    if (m) play(m.slice(0, 2), m.slice(2, 4), m[4]);
-                  }}
-                >
-                  <b>{scoreLabel(line)}</b>
-                  <span>{sanLine(fen, line.moves)}</span>
-                  <ChevronRight size={14} />
-                </button>
-              ))}
-              {!engine.lines.length && (
-                <p className="muted">
-                  {enabled ? "Starting engine…" : "Analysis paused."}
-                </p>
+            <div className="insights">
+              <p>
+                Material: White {material.w} · Black {material.b}
+              </p>
+              <p>
+                {c.isCheckmate()
+                  ? "Checkmate."
+                  : c.isStalemate()
+                    ? "Stalemate."
+                    : c.isCheck()
+                      ? "The king is in check."
+                      : `${c.moves().length} legal moves available.`}
+              </p>
+              <p>
+                {material.w === material.b
+                  ? "Material is balanced."
+                  : `${material.w > material.b ? "White" : "Black"} has a material advantage.`}
+              </p>
+              {c.isInsufficientMaterial() && (
+                <p>Insufficient material to checkmate.</p>
               )}
             </div>
-            <Toggle
-              label="Position insights"
-              checked={insights}
-              onChange={setInsights}
-            />
-            {insights && (
-              <div className="insights">
-                <p>
-                  <Lightbulb size={15} />
-                  Material: White {material.w} · Black {material.b}
-                </p>
-                <p>
-                  {c.isCheckmate()
-                    ? "Checkmate."
-                    : c.isStalemate()
-                      ? "Stalemate."
-                      : c.isCheck()
-                        ? "The king is in check."
-                        : `${c.moves().length} legal moves available.`}
-                </p>
-                <p>
-                  {material.w === material.b
-                    ? "Material is balanced."
-                    : `${material.w > material.b ? "White" : "Black"} has a material advantage.`}
-                </p>
-                {c.isInsufficientMaterial() && (
-                  <p>Insufficient material to checkmate.</p>
-                )}
-              </div>
-            )}
           </Card>
           <Card>
             <div className="card-heading">
@@ -485,6 +433,20 @@ export default function Analysis() {
       {sharing && (
         <Modal title="Share position" onClose={() => setSharing(false)}>
           <div className="share-grid">
+            <Button
+              className="secondary"
+              onClick={() =>
+                download(
+                  "novachess-study.pgn",
+                  pgn(),
+                  "application/x-chess-pgn",
+                )
+              }
+            >
+              <Download size={15} />
+              Download PGN
+            </Button>
+
             <Button
               className="secondary"
               onClick={async () =>

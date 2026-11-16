@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useApp } from "./context";
-import { useControl } from "./controls";
 import { previewPremoves, premoveOptions, type PremoveSide } from "./premoves";
 export function usePremoves({
   fen,
@@ -32,10 +31,6 @@ export function usePremoves({
   fn.current = execute;
   const allowed = enabled && appearance.premoves && active,
     turn = fen.split(" ")[1];
-  useControl("clearMarks", () => {
-    setQueue([]);
-    setSent(null);
-  });
   useEffect(() => {
     setQueue([]);
     setSent(null);
@@ -89,6 +84,12 @@ export function usePremoves({
   return {
     queue,
     setQueue,
+    cancelOnRightClick: () => {
+      if (!queue.length && sent?.fen !== fen) return false;
+      setQueue([]);
+      setSent(null);
+      return true;
+    },
     enqueue: (m: string) => {
       if (!allowed) return;
       setQueue((q) => (q.length < 32 ? [...q, m] : q));

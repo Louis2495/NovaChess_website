@@ -252,6 +252,7 @@ export default function Community() {
                 <Board
                   fen={premove.preview}
                   materialFen={room.state.fen}
+                  onCancelPremoves={premove.cancelOnRightClick}
                   flipped={me?.team === "b"}
                   disabled={
                     busy ||

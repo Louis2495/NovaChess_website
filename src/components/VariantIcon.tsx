@@ -1,4 +1,26 @@
+import type { CSSProperties } from "react";
 import { base } from "../lib/store";
+// Row-major tile order in the illustration sheet.
+const tiles = [
+  "chess",
+  "dropping",
+  "chaos",
+  "random",
+  "blind",
+  "blindtext",
+  "crazyhouse",
+  "duck",
+  "atomic",
+  "cvfog",
+  "3check",
+  "kingofthehill",
+  "horde",
+  "antichess",
+  "cvpawns",
+  "cvpawnrace",
+  "chess960",
+  "bughouse",
+];
 export default function VariantIcon({
   id,
   size = 24,
@@ -6,14 +28,18 @@ export default function VariantIcon({
   id: string;
   size?: number;
 }) {
+  const index = Math.max(0, tiles.indexOf(id));
   return (
-    <img
+    <span
       className="variant-picture"
-      src={`${base}variants/${id}.svg`}
-      width={size}
-      height={size}
-      alt=""
-      draggable={false}
+      aria-hidden="true"
+      style={
+        {
+          "--variant-size": `${size}px`,
+          backgroundImage: `url("${base}variants/illustrations.webp")`,
+          backgroundPosition: `${(index % 6) * 20}% ${Math.floor(index / 6) * 50}%`,
+        } as CSSProperties
+      }
     />
   );
 }

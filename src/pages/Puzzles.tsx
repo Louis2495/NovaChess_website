@@ -252,6 +252,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             <Board
               fen={premove.preview}
               materialFen={fen}
+              onCancelPremoves={premove.cancelOnRightClick}
               legalMoves={c.turn() === learner ? undefined : premove.options}
               onMove={(from, to, promotion) =>
                 c.turn() === learner

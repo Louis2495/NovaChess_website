@@ -345,6 +345,7 @@ function RepertoireTrainer({
         <Board
           fen={premove.preview}
           materialFen={fen}
+          onCancelPremoves={premove.cancelOnRightClick}
           disabled={done || (c.turn() !== line.side && !appearance.premoves)}
           legalMoves={c.turn() === line.side ? undefined : premove.options}
           flipped={line.side === "b"}

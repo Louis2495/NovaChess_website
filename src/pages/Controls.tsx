@@ -8,15 +8,8 @@ const labels: Record<string, string> = {
   focusMode: "Board-only focus mode",
   newGame: "New game setup",
   analysis: "Open analysis",
-  puzzles: "Open puzzles",
-  learn: "Open Learn",
   home: "Go Home",
   search: "Search",
-  legalHints: "Toggle move hints",
-  coordinates: "Toggle coordinates",
-  sound: "Toggle move sounds",
-  catalog: "Browse opening lessons",
-  practice: "Practice lesson moves",
   previous: "Previous move",
   next: "Next move",
   first: "First move",
@@ -84,6 +77,10 @@ export default function Controls({ embedded = false }: { embedded?: boolean }) {
         ))}
       </Card>
       <Card className="controls-card">
+        <div className="control-row">
+          <span>Cancel premoves</span>
+          <kbd>Right click</kbd>
+        </div>
         <h2>Right-click annotations</h2>
         {[
           ["mark", "green", "Square / arrow"],

@@ -718,7 +718,7 @@ export default function Play() {
                 aria-pressed={variant === v.id}
                 onClick={() => setVariant(v.id)}
               >
-                <VariantIcon id={v.id} size={100} />
+                <VariantIcon id={v.id} size={118} />
                 <span>{v.name}</span>
               </button>
             ))}
@@ -846,11 +846,6 @@ export default function Play() {
                         </select>
                       </Field>
                     )}
-                    <p className="caption">
-                      Standard: Stockfish 19 Lite. Variants: Fairy-Stockfish
-                      rules with a local search opponent. Strength targets are
-                      approximate.
-                    </p>
                   </>
                 )}
               </div>
@@ -901,6 +896,7 @@ export default function Play() {
                 <Board
                   fen={duck?.fen || premove.preview}
                   materialFen={valid.fen}
+                  onCancelPremoves={premove.cancelOnRightClick}
                   onMove={play}
                   legalMoves={premoveLegal}
                   onSquare={

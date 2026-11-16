@@ -3559,3 +3559,21 @@ select.theme-select {
 .avatar .default-avatar {
   filter: drop-shadow(0 2px 2px #0004);
 }
+
+.variant-picture {
+  display: inline-block;
+  width: var(--variant-size);
+  height: var(--variant-size);
+  background-repeat: no-repeat;
+  background-size: 600% 300%;
+  vertical-align: middle;
+}
+.variant-gallery .variant-picture {
+  border-radius: 12px;
+}
+@media (max-width: 500px) {
+  .variant-gallery .variant-picture {
+    width: 80px;
+    height: 80px;
+  }
+}

@@ -20,6 +20,7 @@ export function fairy() {
   return promise;
 }
 export const variantList = [
+  { id: "chess", name: "Standard", description: "" },
   {
     id: "dropping",
     name: "Dropping Squares",
@@ -36,7 +37,6 @@ export const variantList = [
     name: "Random",
     description: "Each turn selects the piece you must move.",
   },
-  { id: "chess", name: "Standard", description: "" },
   {
     id: "blind",
     name: "Blindfold · board",

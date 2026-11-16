@@ -55,6 +55,7 @@ export function Board({
   onMarksChange,
   marks: externalMarks,
   onCancel,
+  onCancelPremoves,
   onFlip,
   materialFen,
   guides = [],
@@ -75,6 +76,7 @@ export function Board({
   marks?: BoardMark[];
   onMarksChange?: (marks: BoardMark[]) => void;
   onCancel?: () => void;
+  onCancelPremoves?: () => boolean;
   onFlip?: () => void;
   materialFen?: string;
   guides?: BoardMark[];
@@ -277,6 +279,7 @@ export function Board({
         }
         onContextMenu={(e) => {
           e.preventDefault();
+          if (onCancelPremoves?.()) return;
           onCancel?.();
         }}
         onPointerMove={(e) => {
@@ -336,6 +339,10 @@ export function Board({
                   pointer.current = { x: e.clientX, y: e.clientY };
                   if (e.button === 2) {
                     e.preventDefault();
+                    if (onCancelPremoves?.()) {
+                      gesture.current = null;
+                      return;
+                    }
                     if (onCancel) {
                       onCancel();
                       return;
@@ -485,18 +492,14 @@ export function Board({
           })}
         </svg>
       </div>
-      <div
-        className={`material-imbalance ${compact ? "compact-material" : ""}`}
-        aria-label={
-          imbalance > 0
-            ? `Material advantage for ${flipped ? "Black" : "White"}: +${imbalance}`
-            : imbalance === 0
-              ? "Material is equal"
-              : undefined
-        }
-      >
-        <b>{imbalance > 0 ? `+${imbalance}` : imbalance === 0 ? "0" : ""}</b>
-      </div>
+      {imbalance > 0 && (
+        <div
+          className={`material-imbalance ${compact ? "compact-material" : ""}`}
+          aria-label={`Material advantage for ${flipped ? "Black" : "White"}: +${imbalance}`}
+        >
+          <b>+{imbalance}</b>
+        </div>
+      )}
       {drag && (
         <div
           className="drag-piece"

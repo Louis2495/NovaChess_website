@@ -163,6 +163,7 @@ export default function SpecialPlay({
           <Board
             fen={premove.preview}
             materialFen={state.fen}
+            onCancelPremoves={premove.cancelOnRightClick}
             flipped={side === "b"}
             legalMoves={turn === side ? legal : premove.options}
             blocked={state.blocked}

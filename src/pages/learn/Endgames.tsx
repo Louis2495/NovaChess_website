@@ -160,6 +160,7 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
         <Board
           fen={premove.preview}
           materialFen={fen}
+          onCancelPremoves={premove.cancelOnRightClick}
           legalMoves={c.turn() === exercise.side ? undefined : premove.options}
           flipped={exercise.side === "b"}
           disabled={

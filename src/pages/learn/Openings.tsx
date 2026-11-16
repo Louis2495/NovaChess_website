@@ -215,13 +215,6 @@ function LessonWorkspace({
     const t = setTimeout(() => show(step + 1), 1500);
     return () => clearTimeout(t);
   }, [autoplay, practice, step, branch]);
-  useControl("catalog", () => setCatalog((v) => !v));
-  useControl("practice", () => {
-    setPractice((v) => !v);
-    show(0);
-    setPerfect(true);
-    setAutoplay(false);
-  });
   useControl("next", () => {
     if (!practice) show(step + 1);
   });
@@ -649,6 +642,7 @@ function LessonWorkspace({
           <Board
             fen={premove.preview}
             materialFen={fen}
+            onCancelPremoves={premove.cancelOnRightClick}
             legalMoves={
               practice && c.turn() !== side ? premove.options : undefined
             }

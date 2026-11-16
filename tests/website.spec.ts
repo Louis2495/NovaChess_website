@@ -136,9 +136,15 @@ test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image
   page,
 }) => {
   await page.goto("/#analysis");
-  await expect(page.locator(".engine-lines button").first()).toBeVisible({
-    timeout: 20000,
-  });
+  await expect(
+    page.getByText(/Stockfish 19 Lite · Depth [1-9]\d*/),
+  ).toBeVisible({ timeout: 20000 });
+  await expect(
+    page.getByRole("heading", { name: "Engine", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Positional insights", exact: true }),
+  ).toBeVisible();
   await expect(page.getByText(/Depth \d+/)).toBeVisible();
   await uiMove(page, "e2e4");
   await expect(page.locator(".notation-table")).toContainText("e4");
@@ -149,13 +155,18 @@ test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image
   await expect(page.locator(".branch-list")).toContainText("Branch 1");
   await page.getByRole("button", { name: "Save study", exact: true }).click();
   expect((await stored(page)).games).toHaveLength(1);
-  const pgn = page.waitForEvent("download");
-  await page.getByRole("button", { name: "PGN", exact: true }).click();
-  expect((await pgn).suggestedFilename()).toMatch(/\.pgn$/);
+  await expect(
+    page.getByRole("button", { name: "Download PGN", exact: true }),
+  ).toHaveCount(0);
   await page
     .getByRole("button", { name: "Share position", exact: true })
     .click();
   const dialog = page.getByRole("dialog");
+  const pgn = page.waitForEvent("download");
+  await dialog
+    .getByRole("button", { name: "Download PGN", exact: true })
+    .click();
+  expect((await pgn).suggestedFilename()).toMatch(/\.pgn$/);
   const png = page.waitForEvent("download");
   await dialog
     .getByRole("button", { name: "Board image", exact: true })

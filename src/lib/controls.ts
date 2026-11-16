@@ -5,19 +5,12 @@ export const defaultControls = {
   focusMode: "z",
   newGame: "n",
   analysis: "a",
-  puzzles: "p",
-  learn: "l",
   home: "h",
   search: "/",
-  legalHints: "i",
-  coordinates: "k",
-  sound: "m",
-  catalog: "o",
-  practice: "t",
   previous: "ArrowLeft",
   next: "ArrowRight",
-  first: "Home",
-  last: "End",
+  first: "ArrowUp",
+  last: "ArrowDown",
   autoplay: " ",
   clearMarks: "Escape",
   mark: "none",
@@ -27,6 +20,11 @@ export const defaultControls = {
 };
 export type ControlAction = keyof typeof defaultControls;
 export function resolveControls(overrides: Record<string, string> = {}) {
+  overrides = Object.fromEntries(
+    Object.entries(overrides).filter(([key]) => key in defaultControls),
+  );
+  if (overrides.first === "Home") delete overrides.first;
+  if (overrides.last === "End") delete overrides.last;
   const result: Record<string, string> = { ...defaultControls, ...overrides };
   for (const key of Object.keys(defaultControls)) {
     if (key in overrides || key.startsWith("mark")) continue;
