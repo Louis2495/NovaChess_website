@@ -23,8 +23,10 @@ test("puzzles hide turn/status text and move history until the first answer, wit
     r.fulfill({ json: [puzzle] }),
   );
   await page.goto("/#puzzles");
-  const input = page.getByLabel("Puzzle move", { exact: true });
-  await expect(input).toBeVisible();
+  await expect(
+    page.getByRole("group", { name: "Chessboard", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Puzzle move", { exact: true })).toHaveCount(0);
   await expect(squares(page).last()).toHaveAttribute("aria-label", /^a8,/);
   await expect(
     page.getByText(/Black to move|White to move|In progress/),
@@ -43,13 +45,15 @@ test("puzzles hide turn/status text and move history until the first answer, wit
   const c = new Chess(puzzle.fen);
   c.move(puzzle.moves[0]);
   const answer = c.move(puzzle.moves[1]);
-  await input.fill(answer.san);
-  await input.press("Enter");
+  for (const sq of [answer.from, answer.to])
+    await page
+      .getByRole("group", { name: "Chessboard", exact: true })
+      .getByRole("button", { name: new RegExp("^" + sq + ",") })
+      .click();
   await expect(
     page.getByRole("heading", { name: "Moves", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".puzzle-moves")).toContainText(answer.san);
-  await expect(input).toBeFocused();
 });
 
 test("every quiz position faces its side to move and introductions/results have illustrations", async ({

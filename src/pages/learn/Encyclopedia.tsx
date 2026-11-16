@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Search, ArrowUpRight, BookOpen, ChevronRight } from "lucide-react";
 import { useData } from "../../lib/store";
 import { useApp } from "../../lib/context";
-import { Card, Button, Loading } from "../../components/UI";
+import { ChoiceSelect, Card, Button, Loading } from "../../components/UI";
 type Entry = {
   id: string;
   title: string;
@@ -49,7 +49,7 @@ export default function Encyclopedia() {
             }}
           />
         </div>
-        <select
+        <ChoiceSelect
           aria-label="Encyclopedia category"
           value={category}
           onChange={(e) => {
@@ -61,7 +61,7 @@ export default function Encyclopedia() {
           {[...new Set(data.map((e) => e.category))].map((c) => (
             <option key={c}>{c}</option>
           ))}
-        </select>
+        </ChoiceSelect>
       </div>
       <div className="encyclopedia-layout">
         <div className="encyclopedia-index card">

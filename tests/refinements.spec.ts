@@ -54,12 +54,15 @@ test("Research keeps a running request across navigation and weights its move ar
   await expect(page.getByRole("status")).toContainText("3 games loaded");
   expect(requests).toBe(1);
   await expect(page.locator(".board-marks line")).toHaveCount(2);
-  await expect(page.locator(".board-marks")).toContainText("67%");
-  await expect(page.locator(".board-marks")).toContainText("33%");
+  await expect(page.locator(".board-marks text")).toHaveCount(0);
   const widths = await page
     .locator(".board-marks line")
     .evaluateAll((es) => es.map((e) => Number(e.getAttribute("stroke-width"))));
-  expect(widths[0]).toBeGreaterThan(widths[1]);
+  expect(widths[0]).toBe(widths[1]);
+  const opacity = await page
+    .locator(".board-marks g")
+    .evaluateAll((es) => es.map((e) => Number(e.getAttribute("opacity"))));
+  expect(opacity[0]).toBeGreaterThan(opacity[1]);
   await sq(page, "e4").click({ button: "right" });
   await expect(page.locator(".board-marks rect")).toHaveCount(1);
   await expect(page.locator(".board-marks line")).toHaveCount(2);

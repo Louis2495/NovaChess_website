@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Trophy, ArrowUpRight } from "lucide-react";
 import { online, useOnlineSession } from "../lib/online";
 import { regions } from "../lib/regions";
-import { Button, Card, Field, PageTitle } from "../components/UI";
+import { ChoiceSelect, Button, Card, Field, PageTitle } from "../components/UI";
 type Ranking = {
   id: string;
   username: string;
@@ -94,7 +94,7 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
       </div>
       <div className="section-toolbar">
         <h2>Leaderboard</h2>
-        <select
+        <ChoiceSelect
           aria-label="Rankings country"
           value={country}
           onChange={(e) => setCountry(e.target.value)}
@@ -105,7 +105,7 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
               {r.name}
             </option>
           ))}
-        </select>
+        </ChoiceSelect>
       </div>
       <Card className="rank-table">
         {!online ? (
@@ -130,13 +130,13 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
         <h2>Federation ratings</h2>
         <div className="inline-form">
           <Field label="Federation">
-            <select
+            <ChoiceSelect
               value={federation}
               onChange={(e) => setFederation(e.target.value)}
             >
               <option>FIDE</option>
-              <option>US Chess</option>
-            </select>
+              <option>USCF</option>
+            </ChoiceSelect>
           </Field>
           <Field label="Member ID">
             <input

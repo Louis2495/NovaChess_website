@@ -70,11 +70,9 @@ test("analysis explains positions, has a separate large evaluation and a compact
       .locator(".evaluation-readout")
       .evaluate((e) => parseFloat(getComputedStyle(e).fontSize)),
   ).toBeGreaterThan(25);
-  const study = page
-    .locator(".side-panels>.card")
-    .filter({
-      has: page.getByRole("heading", { name: "Top lines", exact: true }),
-    });
+  const study = page.locator(".side-panels>.card").filter({
+    has: page.getByRole("heading", { name: "Top lines", exact: true }),
+  });
   await expect(study.locator(".card-heading svg")).toHaveCount(0);
   await expect(
     study.getByRole("button", { name: "Set up a position", exact: true }),
@@ -93,7 +91,7 @@ test("analysis explains positions, has a separate large evaluation and a compact
   ).toBeVisible();
   await expect(page.getByText("Black to move", { exact: true })).toHaveCount(0);
 });
-test("puzzle typing stays focused through replies and rating aligns with the board", async ({
+test("puzzle board entry and reply notation work while rating aligns with the board", async ({
   page,
 }) => {
   const puzzle = JSON.parse(
@@ -103,8 +101,9 @@ test("puzzle typing stays focused through replies and rating aligns with the boa
     r.fulfill({ json: [puzzle] }),
   );
   await page.goto("/#puzzles");
-  const input = page.getByLabel("Puzzle move", { exact: true });
-  await expect(input).toBeVisible();
+  await expect(page.getByLabel("Puzzle move", { exact: true })).toHaveCount(0);
+  const board = page.getByRole("group", { name: "Chessboard", exact: true });
+  await expect(board).toBeVisible();
   await expect(page.getByText("0 moves", { exact: true })).toHaveCount(0);
   await expect(
     page.getByText(
@@ -130,14 +129,16 @@ test("puzzle typing stays focused through replies and rating aligns with the boa
   const first = c.move(puzzle.moves[1]),
     reply = c.move(puzzle.moves[2]),
     second = c.move(puzzle.moves[3]);
-  await input.fill(first.san);
-  await input.press("Enter");
-  await expect(input).toBeFocused();
+  for (const sq of [first.from, first.to])
+    await board
+      .getByRole("button", { name: new RegExp("^" + sq + ",") })
+      .click();
   await expect(page.locator(".move-chips")).toContainText(reply.san);
-  await expect(input).toBeFocused();
-  await input.fill(second.san);
-  await input.press("Enter");
-  await expect(input).toBeFocused();
+  for (const sq of [second.from, second.to])
+    await board
+      .getByRole("button", { name: new RegExp("^" + sq + ",") })
+      .click();
+  await expect(page.locator(".move-chips")).toContainText(second.san);
 });
 test("Stats has configurable activity periods and embeds Rankings with attached federation records", async ({
   page,

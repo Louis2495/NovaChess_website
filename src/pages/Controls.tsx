@@ -2,7 +2,7 @@ import { useState } from "react";
 import { RotateCcw, Keyboard } from "lucide-react";
 import { useApp } from "../lib/context";
 import { defaultControls, resolveControls } from "../lib/controls";
-import { Button, Card, PageTitle } from "../components/UI";
+import { ChoiceSelect, Button, Card, PageTitle } from "../components/UI";
 const labels: Record<string, string> = {
   flip: "Flip board",
   focusMode: "Board-only focus mode",
@@ -118,7 +118,7 @@ export default function Controls({ embedded = false }: { embedded?: boolean }) {
               />
               {label}
             </label>
-            <select
+            <ChoiceSelect
               aria-label={`${label} modifier`}
               value={keys[key as keyof typeof keys]}
               onChange={(e) => {
@@ -142,7 +142,7 @@ export default function Controls({ embedded = false }: { embedded?: boolean }) {
               <option value="shift">Shift + right click</option>
               <option value="alt">Alt + right click</option>
               <option value="ctrl">Ctrl / ⌘ + right click</option>
-            </select>
+            </ChoiceSelect>
           </div>
         ))}
         <p className="caption">

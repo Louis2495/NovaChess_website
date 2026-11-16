@@ -1,6 +1,6 @@
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
-import { parseTypedMove, humanTheme } from "../lib/moves";
+import { humanTheme } from "../lib/moves";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { Lightbulb, ArrowRight, RotateCcw, Calendar } from "lucide-react";
@@ -10,7 +10,14 @@ import type { PuzzleData } from "../lib/types";
 import GuessEval from "./GuessEval";
 import { dailyPuzzle } from "./Home";
 import { Board } from "../components/Board";
-import { PageTitle, Card, Button, Loading, Field } from "../components/UI";
+import {
+  ChoiceSelect,
+  PageTitle,
+  Card,
+  Button,
+  Loading,
+  Field,
+} from "../components/UI";
 export default function Puzzles() {
   const { detail: puzzleView, navigate: changePuzzleView } = useApp();
   if (puzzleView === "eval")
@@ -35,8 +42,7 @@ function ClassicPuzzles() {
   return <PuzzleTrainer puzzles={data} />;
 }
 function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
-  const { library, setLibrary, detail, navigate, appearance } =
-    useApp();
+  const { library, setLibrary, detail, navigate, appearance } = useApp();
   const daily = detail === "daily";
   const [theme, setTheme] = useState("All themes");
   const pool = useMemo(
@@ -77,9 +83,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     [done, setDone] = useState(false),
     [hint, setHint] = useState(""),
     [wrong, setWrong] = useState(false),
-    [played, setPlayed] = useState<string[]>([]),
-    [moveInput, setMoveInput] = useState("");
-  const moveInputRef = useRef<HTMLInputElement>(null);
+    [played, setPlayed] = useState<string[]>([]);
   const layoutRef = useRef<HTMLDivElement>(null),
     puzzleBoardRef = useRef<HTMLDivElement>(null);
   const [ratingOffset, setRatingOffset] = useState(47);
@@ -142,13 +146,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     const assisted = graded.current;
     grade(true);
     setDone(true);
-    setMessage(
-      daily && library.progress.daily[today()]
-        ? "Daily puzzle replayed. No rating change."
-        : assisted
-          ? "Completed. Earlier hints or mistakes remain recorded."
-          : "Solved.",
-    );
+    setMessage("");
     if (daily)
       setLibrary((l) => ({
         ...l,
@@ -179,7 +177,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     setWrong(false);
     setPlayed([]);
     graded.current = daily && !!library.progress.daily[today()];
-    setMoveInput("");
   }
   function attempt(from: string, to: string, promotion?: string) {
     if (done || c.turn() !== learner) return;
@@ -318,34 +315,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               {daily ? "Replay" : done ? "Next puzzle" : "Skip"}
             </Button>
           </div>
-          <form
-            className="inline-form move-entry"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (done || c.turn() !== learner) return;
-              try {
-                const m = parseTypedMove(new Chess(fen), moveInput);
-                attempt(m.from, m.to, m.promotion);
-                setMoveInput("");
-              } catch {
-              } finally {
-                moveInputRef.current?.focus();
-              }
-            }}
-          >
-            <input
-              aria-label="Puzzle move"
-              ref={moveInputRef}
-              value={moveInput}
-              onChange={(e) => setMoveInput(e.target.value)}
-              placeholder="Enter move"
-              readOnly={done}
-              aria-disabled={done}
-            />
-            <Button className="secondary" disabled={!moveInput || done}>
-              Play
-            </Button>
-          </form>
         </div>
         <div className="side-panels">
           <Card>
@@ -357,7 +326,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             <Card>
               <h2>Practice</h2>
               <Field label="Theme">
-                <select
+                <ChoiceSelect
                   className="theme-select"
                   value={theme}
                   onChange={(e) => {
@@ -383,7 +352,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
                       {humanTheme(t)}
                     </option>
                   ))}
-                </select>
+                </ChoiceSelect>
               </Field>
             </Card>
           )}

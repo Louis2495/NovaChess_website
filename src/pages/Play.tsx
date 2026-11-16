@@ -1,3 +1,4 @@
+import { matchTypedMove } from "../lib/moves";
 import { previewPremoves } from "../lib/premoves";
 import { usePremoves } from "../lib/usePremoves";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -27,6 +28,7 @@ import { uid, useData, pieceUrl } from "../lib/store";
 import type { Opening, SavedGame } from "../lib/types";
 import { Board, Piece } from "../components/Board";
 import {
+  ChoiceSelect,
   Card,
   Button,
   Field,
@@ -133,6 +135,7 @@ export default function Play() {
     } | null>(null),
     [pocket, setPocket] = useState(""),
     [confirm, setConfirm] = useState(false),
+    [moveText, setMoveText] = useState(""),
     [busy, setBusy] = useState(false);
   const { data: openings } = useData<Opening[]>("openings");
   const game = library.activeGame;
@@ -644,7 +647,7 @@ export default function Play() {
             {options && (
               <div className="game-options">
                 <Field label="Variant">
-                  <select
+                  <ChoiceSelect
                     value={variant}
                     onChange={(e) => setVariant(e.target.value)}
                   >
@@ -653,7 +656,7 @@ export default function Play() {
                         {v.name}
                       </option>
                     ))}
-                  </select>
+                  </ChoiceSelect>
                 </Field>
                 <div className="variant-summary">
                   <VariantIcon id={variant} />
@@ -666,24 +669,24 @@ export default function Play() {
                 )}
                 {variant === "dropping" && (
                   <Field label="Squares to drop">
-                    <select
+                    <ChoiceSelect
                       value={dropCount}
                       onChange={(e) => setDropCount(+e.target.value)}
                     >
                       {[1, 2, 3, 4].map((n) => (
                         <option key={n}>{n}</option>
                       ))}
-                    </select>
+                    </ChoiceSelect>
                   </Field>
                 )}
                 <Field label="Your color">
-                  <select
+                  <ChoiceSelect
                     value={human}
                     onChange={(e) => setHuman(e.target.value as "w" | "b")}
                   >
                     <option value="w">White</option>
                     <option value="b">Black</option>
-                  </select>
+                  </ChoiceSelect>
                 </Field>
                 {!["dropping", "chaos", "random"].includes(variant) && (
                   <>
@@ -739,7 +742,7 @@ export default function Play() {
                           />
                         </Field>
                         <Field label="Request an opening">
-                          <select
+                          <ChoiceSelect
                             value={openingId}
                             onChange={(e) => setOpeningId(e.target.value)}
                           >
@@ -759,7 +762,7 @@ export default function Play() {
                                   {o.eco} · {o.name}
                                 </option>
                               ))}
-                          </select>
+                          </ChoiceSelect>
                         </Field>
                       </div>
                     )}
@@ -853,7 +856,7 @@ export default function Play() {
                     : undefined
                 }
                 highlights={
-                  game.moves.length
+                  game.variant !== "cvfog" && game.moves.length
                     ? [
                         game.moves.at(-1)!.slice(0, 2),
                         game.moves.at(-1)!.slice(2, 4),
@@ -904,6 +907,62 @@ export default function Play() {
                 />
               )}
             </div>
+            {game.variant === "blindtext" && (
+              <form
+                className="inline-form blindfold-move-entry"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  try {
+                    const b = makeBoard(
+                      ff!,
+                      game.variant,
+                      valid.turn === game.human ? valid.fen : premove.preview,
+                      [],
+                    );
+                    let move: string | undefined;
+                    try {
+                      move = matchTypedMove(
+                        moveText,
+                        premoveLegal.map((uci) => {
+                          let san = uci;
+                          try {
+                            san = b.sanMove(uci);
+                          } catch {}
+                          return { uci, san };
+                        }),
+                      );
+                    } finally {
+                      b.delete();
+                    }
+                    if (move) {
+                      if (valid.turn === game.human) apply(move);
+                      else if (appearance.premoves) premove.enqueue(move);
+                      setMoveText("");
+                    }
+                  } catch {}
+                }}
+              >
+                <input
+                  aria-label="Blindfold move"
+                  value={moveText}
+                  onChange={(e) => setMoveText(e.target.value)}
+                  placeholder="Move"
+                  disabled={
+                    game.result !== "*" ||
+                    (valid.turn !== game.human && !appearance.premoves)
+                  }
+                />
+                <Button
+                  disabled={
+                    !moveText.trim() ||
+                    game.result !== "*" ||
+                    (valid.turn !== game.human && !appearance.premoves)
+                  }
+                >
+                  Play
+                </Button>
+              </form>
+            )}
             {premoves.length > 0 && (
               <div className="premove-queue">
                 <span>Premoves: {premoves.join(" → ")}</span>
@@ -1037,7 +1096,7 @@ export default function Play() {
                 </Button>
               </div>
             )}
-            {!["blind", "blindtext", "cvfog"].includes(game.variant) && (
+            {game.variant !== "cvfog" && (
               <Card>
                 <div className="card-heading">
                   <h2>Moves</h2>

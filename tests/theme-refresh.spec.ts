@@ -21,9 +21,9 @@ test("returning users receive the refreshed default palette while keeping board 
     previous,
   );
   await page.goto("/");
-  await expect(page.locator(".app")).toHaveCSS("--base", "#292d43");
-  await expect(page.locator(".app")).toHaveCSS("--accent", "#c7c1ff");
-  await expect(page.locator(".app")).toHaveCSS("--button", "#b7c7ed");
+  await expect(page.locator(".app")).toHaveCSS("--base", "#252e3a");
+  await expect(page.locator(".app")).toHaveCSS("--accent", "#b2d3e7");
+  await expect(page.locator(".app")).toHaveCSS("--button", "#a7bfd6");
   await expect
     .poll(() =>
       page.evaluate(
@@ -32,7 +32,7 @@ test("returning users receive the refreshed default palette while keeping board 
             .theme,
       ),
     )
-    .toBe("Periwinkle");
+    .toBe("Steel");
   const saved = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("novachess-appearance-v2") || "{}"),
   );

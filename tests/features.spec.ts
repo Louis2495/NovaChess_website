@@ -263,7 +263,10 @@ test("history era navigation and champion ratings are intuitive and factual", as
       .filter({ hasText: /\d{4} · \d{4}/ })
       .first(),
   ).toBeVisible();
-  await page.getByLabel("Championship lineage").selectOption("fide");
+  await page
+    .getByRole("group", { name: "Championship lineage", exact: true })
+    .getByRole("button", { name: /FIDE split/ })
+    .click();
   expect(
     await page.locator(".champion-timeline>.card").count(),
   ).toBeGreaterThan(0);

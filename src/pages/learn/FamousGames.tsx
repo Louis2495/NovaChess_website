@@ -15,7 +15,13 @@ import {
 } from "lucide-react";
 import { useControl } from "../../lib/controls";
 import { Board } from "../../components/Board";
-import { Card, Button, IconButton, Loading } from "../../components/UI";
+import {
+  ChoiceSelect,
+  Card,
+  Button,
+  IconButton,
+  Loading,
+} from "../../components/UI";
 import { useApp } from "../../lib/context";
 import { download, useData } from "../../lib/store";
 import { exportGIF } from "../../lib/export";
@@ -160,7 +166,7 @@ function Archive({ games }: { games: FamousGame[] }) {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <select
+        <ChoiceSelect
           aria-label="Game theme"
           value={motif}
           onChange={(e) => setMotif(e.target.value)}
@@ -169,7 +175,7 @@ function Archive({ games }: { games: FamousGame[] }) {
           {[...new Set(games.map((g) => g.motif))].map((m) => (
             <option key={m}>{m}</option>
           ))}
-        </select>
+        </ChoiceSelect>
         <div className="master-game-rows">
           {filtered.map((g) => (
             <button
@@ -276,7 +282,7 @@ function Archive({ games }: { games: FamousGame[] }) {
           </span>
           <label>
             Speed
-            <select
+            <ChoiceSelect
               aria-label="Replay speed"
               value={speed}
               onChange={(e) => setSpeed(+e.target.value)}
@@ -286,7 +292,7 @@ function Archive({ games }: { games: FamousGame[] }) {
               <option value={1000}>1s / move</option>
               <option value={500}>0.5s / move</option>
               <option value={250}>0.25s / move</option>
-            </select>
+            </ChoiceSelect>
           </label>
         </div>
       </div>

@@ -21,6 +21,7 @@ import { useControl } from "../../lib/controls";
 import type { Opening } from "../../lib/types";
 import { Board } from "../../components/Board";
 import {
+  ChoiceSelect,
   Card,
   Button,
   Field,
@@ -581,7 +582,7 @@ function LessonWorkspace({
               />
               {practice && (
                 <Field label="Train as">
-                  <select
+                  <ChoiceSelect
                     value={side}
                     onChange={(e) => {
                       setSide(e.target.value as "w" | "b");
@@ -591,7 +592,7 @@ function LessonWorkspace({
                   >
                     <option value="w">White</option>
                     <option value="b">Black</option>
-                  </select>
+                  </ChoiceSelect>
                 </Field>
               )}
               <Button
@@ -619,7 +620,7 @@ function LessonWorkspace({
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
             clear={premove.clear}
           />
-          <select
+          <ChoiceSelect
             aria-label="Lesson variation"
             value={branch}
             onChange={(e) => {
@@ -636,7 +637,7 @@ function LessonWorkspace({
                 {l.name}
               </option>
             ))}
-          </select>
+          </ChoiceSelect>
           <Board
             fen={premove.preview}
             materialFen={fen}
@@ -698,13 +699,13 @@ function LessonWorkspace({
             />
           </Field>
           <Field label="Train as">
-            <select
+            <ChoiceSelect
               value={side}
               onChange={(e) => setSide(e.target.value as "w" | "b")}
             >
               <option value="w">White</option>
               <option value="b">Black</option>
-            </select>
+            </ChoiceSelect>
           </Field>
           <Button
             disabled={!name.trim()}

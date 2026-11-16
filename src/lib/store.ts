@@ -5,6 +5,7 @@ export const base = import.meta.env.BASE_URL;
 export const initialFen =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 export const themes: Record<string, string> = {
+  Steel: "#b2d3e7",
   Periwinkle: "#c7c1ff",
   Forest: "#96d9b8",
   Pink: "#ef7eb6",
@@ -55,14 +56,14 @@ export const backgrounds = [
   "Flag",
 ];
 export const defaults: Appearance = {
-  theme: "Periwinkle",
+  theme: "Steel",
   background: "Default",
-  backgroundColor: "#292d43",
-  accent: "#c7c1ff",
-  buttonColor: "#b7c7ed",
-  textColor: "#fbf8ff",
-  mutedColor: "#c6c7dc",
-  panelColor: "#3b425d",
+  backgroundColor: "#252e3a",
+  accent: "#b2d3e7",
+  buttonColor: "#a7bfd6",
+  textColor: "#f3f6fa",
+  mutedColor: "#bdc9d5",
+  panelColor: "#354354",
   board: "Classic",
   light: boards.Classic[0],
   dark: boards.Classic[1],
@@ -238,3 +239,6 @@ export const dateLabel = (time: number) =>
     month: "short",
     day: "numeric",
   });
+
+export const boardSizeKey = (tab: string, detail: string) =>
+  `${tab}:${tab === "learn" ? detail.split(":")[0] : ""}`;

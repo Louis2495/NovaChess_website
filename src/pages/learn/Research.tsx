@@ -1,3 +1,4 @@
+import { isNovaChessGame } from "../../lib/library";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -42,7 +43,7 @@ function parsePGN(text: string, username = ""): PublicGame | null {
   }
 }
 export default function Research() {
-  const { appearance } = useApp();
+  const { appearance, library } = useApp();
   const [site, setSite] = useState("Chess.com"),
     [username, setUsername] = useState(""),
     [identity, setIdentity] = useState(""),
@@ -116,7 +117,36 @@ export default function Research() {
       return r.json();
     }
     try {
-      if (site === "Chess.com") {
+      if (site === "NovaChess") {
+        if (name.toLowerCase() !== library.profile.name.toLowerCase())
+          throw Error("No saved NovaChess games for that username.");
+        const records =
+          library.activeGame &&
+          !library.games.some((g) => g.id === library.activeGame?.id)
+            ? [...library.games, library.activeGame]
+            : library.games;
+        for (const g of records.filter(
+          (g) =>
+            isNovaChessGame(g) &&
+            ["chess", "blind", "blindtext"].includes(g.variant),
+        )) {
+          try {
+            const b = new Chess(g.initial);
+            for (const move of g.moves) b.move(move);
+            b.setHeader(
+              "White",
+              g.human === "w" ? name : g.opponent || "Computer",
+            );
+            b.setHeader(
+              "Black",
+              g.human === "b" ? name : g.opponent || "Computer",
+            );
+            b.setHeader("Result", g.result);
+            const parsed = parsePGN(b.pgn(), name);
+            if (parsed) loaded.push(parsed);
+          } catch {}
+        }
+      } else if (site === "Chess.com") {
         const archives = await json(
           `https://api.chess.com/pub/player/${encodeURIComponent(name)}/games/archives`,
         );
@@ -190,7 +220,7 @@ export default function Research() {
       setError(
         (e as Error).name === "AbortError"
           ? "Loading canceled. Previous results retained."
-          : `${(e as Error).message} Public access or browser CORS may be unavailable; try again later.`,
+          : `${(e as Error).message}${site === "NovaChess" ? "" : " Public access or browser CORS may be unavailable; try again later."}`,
       );
     } finally {
       setBusy(false);
@@ -201,12 +231,24 @@ export default function Research() {
     <>
       <Card className="research-form">
         <div className="research-fields">
-          <Field label="Source">
-            <select value={site} onChange={(e) => setSite(e.target.value)}>
-              <option>Chess.com</option>
-              <option>Lichess</option>
-            </select>
-          </Field>
+          <div className="research-source field">
+            <span>Source</span>
+            <div className="segmented-control" role="group" aria-label="Source">
+              {["NovaChess", "Chess.com", "Lichess"].map((value) => (
+                <button
+                  key={value}
+                  aria-pressed={site === value}
+                  onClick={() => {
+                    setSite(value);
+                    if (value === "NovaChess")
+                      setUsername(library.profile.name);
+                  }}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+          </div>
           <Field label="Public username">
             <input
               value={username}
@@ -215,6 +257,27 @@ export default function Research() {
               maxLength={50}
             />
           </Field>
+          <div className="research-color field">
+            <span>Color</span>
+            <div
+              className="segmented-control"
+              role="group"
+              aria-label="Player’s color"
+            >
+              {[
+                ["w", "White"],
+                ["b", "Black"],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  aria-pressed={side === value}
+                  onClick={() => setSide(value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <Button
             disabled={busy || !username.trim()}
             onClick={() => void load()}
@@ -259,10 +322,9 @@ export default function Research() {
               from: b.move.slice(0, 2),
               to: b.move.slice(2, 4),
               color: appearance.accent,
-              weight:
-                0.8 +
-                (3.2 * b.count) / Math.max(1, ...branches.map((m) => m.count)),
-              label: `${Math.round((100 * b.count) / Math.max(1, matching.length))}%`,
+              opacity:
+                0.2 +
+                (0.75 * b.count) / Math.max(1, ...branches.map((m) => m.count)),
             }))}
             onMove={(from, to, promotion) => {
               try {
@@ -300,12 +362,6 @@ export default function Research() {
             <h2>{identity || "Opening explorer"}</h2>
             <span className="pill">{matching.length} games</span>
           </div>
-          <Field label="Player’s color">
-            <select value={side} onChange={(e) => setSide(e.target.value)}>
-              <option value="w">White</option>
-              <option value="b">Black</option>
-            </select>
-          </Field>
           <div className="research-branches">
             {branches.map((b) => (
               <button

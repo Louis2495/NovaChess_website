@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { useApp } from "../lib/context";
-import { base, pieceUrl } from "../lib/store";
+import { base, pieceUrl, boardSizeKey } from "../lib/store";
 import { squares } from "../lib/variants";
 import { defaultControls, useControl } from "../lib/controls";
 export function Piece({ symbol, style }: { symbol: string; style?: string }) {
@@ -36,6 +36,7 @@ export type BoardMark = {
   to: string;
   color: string;
   weight?: number;
+  opacity?: number;
   label?: string;
 };
 export function Board({
@@ -81,7 +82,15 @@ export function Board({
   materialFen?: string;
   guides?: BoardMark[];
 }) {
-  const { appearance } = useApp();
+  const { appearance, setAppearance, tab, detail } = useApp();
+  const sizeKey = boardSizeKey(tab, detail);
+  const manualBoardSize =
+    appearance.boardSizes?.[sizeKey] ?? appearance.globalBoardSize;
+  const resizeGesture = useRef<{ x: number; y: number; size: number } | null>(
+    null,
+  );
+  const [measuredSize, setMeasuredSize] = useState(appearance.boardSize);
+  const [viewportLimit, setViewportLimit] = useState<number | null>(null);
   const boardRef = useRef<HTMLDivElement>(null),
     pointer = useRef({ x: 0, y: 0 });
   const [selected, setSelected] = useState<string | null>(null),
@@ -172,7 +181,7 @@ export function Board({
     if (!g || g.right) return false;
     gesture.current = null;
     setDrag(null);
-    setSelected(null);
+    setSelected(g.from);
     suppressClick.current = true;
     canceledRight.current = true;
     boardRef.current
@@ -216,12 +225,9 @@ export function Board({
     return files[col] + ranks[row];
   }
   function choose(from: string, to: string) {
+    setSelected(from);
     const options = moves!.filter((m) => m.startsWith(from + to));
-    if (!options.length) {
-      setSelected(null);
-
-      return;
-    }
+    if (!options.length) return;
     const choices = [
       ...new Set(options.map((m) => m.split(",")[0].slice(4)).filter(Boolean)),
     ].sort((a, b) => "qrbn".indexOf(a) - "qrbn".indexOf(b));
@@ -247,7 +253,6 @@ export function Board({
       return;
     }
     onMove?.(from, to, choices.includes("q") ? "q" : choices[0]);
-    setSelected(null);
   }
   function click(square: string) {
     if (suppressClick.current) {
@@ -286,6 +291,35 @@ export function Board({
           s + (values[p.toLowerCase()] || 0) * (p === p.toUpperCase() ? 1 : -1),
         0,
       ) * (flipped ? -1 : 1);
+  function resizeBoard(size: number) {
+    const next = Math.max(160, Math.min(1400, Math.round(size)));
+    setAppearance((a) => ({
+      ...a,
+      boardSizes: { ...a.boardSizes, [sizeKey]: next },
+    }));
+  }
+  useEffect(() => {
+    const el = boardRef.current;
+    if (!el) return;
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      setMeasuredSize(Math.round(rect.width));
+      // Leave room for material and replay controls; use document position so
+      // scrolling never changes the board size while someone is using it.
+      const top = rect.top + window.scrollY;
+      const available = window.innerHeight - top - 90;
+      const limit = Math.floor(Math.max(160, available >= 160 ? available : window.innerHeight - 230));
+      setViewportLimit(previous => previous === limit ? previous : limit);
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    if (el.parentElement) observer.observe(el.parentElement);
+    window.addEventListener("resize", measure);
+    let active = true;
+    document.fonts.ready.then(() => { if (active) measure(); });
+    measure();
+    return () => { active = false; observer.disconnect(); window.removeEventListener("resize", measure); };
+  }, []);
   function coord(square: string) {
     return {
       x: ((files.indexOf(square[0]) + 0.5) * 100) / 8,
@@ -293,7 +327,15 @@ export function Board({
     };
   }
   return (
-    <div className={`board-frame ${compact ? "compact-frame" : ""}`}>
+    <div
+      className={`board-frame ${compact ? "compact-frame" : ""}`}
+      style={
+        {
+          maxWidth: compact ? undefined : viewportLimit !== null ? `${viewportLimit}px` : "max(160px, calc(100dvh - 230px))",
+          ...(manualBoardSize ? { width: `min(100%, ${manualBoardSize}px)`, flex: "0 1 auto" } : {}),
+        }
+      }
+    >
       {imbalance < 0 && (
         <div
           className="material-advantage material-top"
@@ -351,9 +393,12 @@ export function Board({
             suppressClick.current = true;
             const to = squareAt(e.clientX, e.clientY);
             if (to && to !== g.from) choose(g.from, to);
+            else setSelected(g.from);
           }
         }}
         onPointerCancel={() => {
+          const g = gesture.current;
+          if (g && !g.right) setSelected(g.from);
           gesture.current = null;
           setDrag(null);
         }}
@@ -376,6 +421,7 @@ export function Board({
                 }
                 onClick={() => click(square)}
                 onPointerDown={(e) => {
+                  if (e.button === 0) suppressClick.current = false;
                   pointer.current = { x: e.clientX, y: e.clientY };
                   if (e.button === 2) {
                     e.preventDefault();
@@ -429,7 +475,6 @@ export function Board({
                     blocked.includes(square)
                   )
                     return;
-                  suppressClick.current = false;
                   gesture.current = {
                     from: square,
                     startX: e.clientX,
@@ -466,10 +511,10 @@ export function Board({
                 }}
               >
                 {!concealed && piece && <Piece symbol={piece} />}{" "}
-                {appearance.coordinates && col === 0 && (
+                {!fogged && appearance.coordinates && col === 0 && (
                   <span className="rank">{rank}</span>
                 )}
-                {appearance.coordinates && row === 7 && (
+                {!fogged && appearance.coordinates && row === 7 && (
                   <span className="file">{file}</span>
                 )}
                 {appearance.legalMoves &&
@@ -513,7 +558,12 @@ export function Board({
                 y: b.y - Math.sin(angle) * 3,
               };
             return (
-              <g key={i} stroke={m.color} fill={m.color} opacity=".85">
+              <g
+                key={i}
+                stroke={m.color}
+                fill={m.color}
+                opacity={m.opacity ?? 0.85}
+              >
                 {knight ? (
                   <polyline
                     points={`${a.x},${a.y} ${elbow.x},${elbow.y} ${end.x},${end.y}`}
@@ -554,6 +604,87 @@ export function Board({
             );
           })}
         </svg>
+        <div
+          className="board-resize-handle"
+          role="slider"
+          aria-label="Resize board"
+          title="Drag to resize · double-click to reset"
+          aria-valuemin={160}
+          aria-valuemax={1400}
+          aria-valuenow={measuredSize}
+          aria-valuetext={`${measuredSize} pixels`}
+          tabIndex={0}
+          onClick={(e) => e.stopPropagation()}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            setAppearance((a) => {
+              const sizes = { ...a.boardSizes };
+              delete sizes[sizeKey];
+              return { ...a, boardSizes: sizes };
+            });
+          }}
+          onPointerDown={(e) => {
+            if (e.button !== 0) return;
+            e.preventDefault();
+            e.stopPropagation();
+            resizeGesture.current = {
+              x: e.clientX,
+              y: e.clientY,
+              size: boardRef.current!.getBoundingClientRect().width,
+            };
+            e.currentTarget.setPointerCapture(e.pointerId);
+          }}
+          onPointerMove={(e) => {
+            if (!resizeGesture.current) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const r = resizeGesture.current;
+            resizeBoard(
+              r.size +
+                (Math.abs(e.clientX - r.x) > Math.abs(e.clientY - r.y)
+                  ? e.clientX - r.x
+                  : e.clientY - r.y),
+            );
+          }}
+          onPointerUp={(e) => {
+            if (!resizeGesture.current) return;
+            e.stopPropagation();
+            resizeGesture.current = null;
+            if (e.currentTarget.hasPointerCapture(e.pointerId))
+              e.currentTarget.releasePointerCapture(e.pointerId);
+          }}
+          onPointerCancel={() => {
+            resizeGesture.current = null;
+          }}
+          onKeyDown={(e) => {
+            if (
+              ["ArrowLeft", "ArrowDown", "ArrowRight", "ArrowUp"].includes(
+                e.key,
+              )
+            ) {
+              e.preventDefault();
+              e.stopPropagation();
+              resizeBoard(
+                measuredSize +
+                  (["ArrowRight", "ArrowUp"].includes(e.key) ? 20 : -20),
+              );
+            }
+          }}
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M4 12 12 4M8 13l5-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
       </div>
       {imbalance > 0 && (
         <div
@@ -592,8 +723,9 @@ export function Board({
                 (appearance.controls?.clearMarks || "Escape").toLowerCase()
               ) {
                 e.preventDefault();
+                e.stopPropagation();
+                setSelected(promotion.from);
                 setPromotion(null);
-                setSelected(null);
               }
             }}
             style={{
@@ -613,8 +745,8 @@ export function Board({
                 aria-label={`Promote to ${names[p]}`}
                 onClick={() => {
                   onMove?.(promotion.from, promotion.to, p);
+                  setSelected(promotion.from);
                   setPromotion(null);
-                  setSelected(null);
                 }}
               >
                 <Piece symbol={turn === "w" ? p.toUpperCase() : p} />

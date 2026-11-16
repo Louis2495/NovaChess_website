@@ -1,5 +1,7 @@
 import {
   useEffect,
+  Children,
+  Fragment,
   useRef,
   cloneElement,
   isValidElement,
@@ -65,6 +67,95 @@ export function PageTitle({
     </div>
   );
 }
+type ChoiceChange = {
+  target: { value: string };
+  currentTarget: { value: string };
+};
+export function ChoiceSelect({
+  children,
+  onChange,
+  ...props
+}: Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange"> & {
+  onChange?: (event: ChoiceChange) => void;
+}) {
+  const options: { value: string; label: ReactNode; disabled?: boolean }[] = [];
+  const text = (nodes: ReactNode): string =>
+    Children.toArray(nodes)
+      .map((n) =>
+        typeof n === "string" || typeof n === "number" ? String(n) : "",
+      )
+      .join("");
+  const collect = (nodes: ReactNode) =>
+    Children.forEach(nodes, (node) => {
+      if (
+        !isValidElement<{
+          children?: ReactNode;
+          value?: string | number;
+          disabled?: boolean;
+        }>(node)
+      )
+        return;
+      if (node.type === "option")
+        options.push({
+          value: String(node.props.value ?? text(node.props.children)),
+          label: node.props.children,
+          disabled: node.props.disabled,
+        });
+      else if (node.type === Fragment || node.type === "optgroup")
+        collect(node.props.children);
+    });
+  collect(children);
+  if (props.multiple || options.length < 2 || options.length > 3)
+    return (
+      <select {...props} onChange={onChange}>
+        {children}
+      </select>
+    );
+  const selected = String(
+    props.value ?? props.defaultValue ?? options[0].value,
+  );
+  const choose = (value: string) =>
+    onChange?.({ target: { value }, currentTarget: { value } });
+  return (
+    <div
+      className={`segmented-control choice-select ${props.className || ""}`}
+      role="group"
+      aria-label={props["aria-label"]}
+      aria-labelledby={props["aria-labelledby"]}
+      aria-disabled={props.disabled || undefined}
+      id={props.id}
+      style={props.style}
+      title={props.title}
+    >
+      {options.map((option, index) => (
+        <button
+          key={option.value}
+          type="button"
+          disabled={props.disabled || option.disabled}
+          aria-pressed={selected === option.value}
+          onClick={() => choose(option.value)}
+          onKeyDown={(e) => {
+            if (!["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const step = e.key === "ArrowRight" ? 1 : -1;
+            let next = (index + step + options.length) % options.length;
+            while (options[next].disabled && next !== index)
+              next = (next + step + options.length) % options.length;
+            if (!options[next].disabled) {
+              choose(options[next].value);
+              e.currentTarget.parentElement
+                ?.querySelectorAll<HTMLButtonElement>("button")
+                [next]?.focus();
+            }
+          }}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 export function Field({
   label,
   children,
@@ -72,11 +163,16 @@ export function Field({
   label: string;
   children: ReactNode;
 }) {
+  const Wrapper =
+    isValidElement(children) && children.type === ChoiceSelect
+      ? "div"
+      : "label";
   return (
-    <label className="field">
+    <Wrapper className="field">
       <span>{label}</span>
       {isValidElement(children) &&
-      ["input", "select", "textarea"].includes(String(children.type))
+      (["input", "select", "textarea"].includes(String(children.type)) ||
+        children.type === ChoiceSelect)
         ? cloneElement(children as ReactElement<Record<string, unknown>>, {
             "aria-label":
               (children as ReactElement<Record<string, unknown>>).props[
@@ -84,7 +180,7 @@ export function Field({
               ] ?? label,
           })
         : children}
-    </label>
+    </Wrapper>
   );
 }
 export function Toggle({

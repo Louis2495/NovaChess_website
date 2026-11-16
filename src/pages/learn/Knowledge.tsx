@@ -3,7 +3,7 @@ import { Lightbulb, ArrowUpRight } from "lucide-react";
 import { useData } from "../../lib/store";
 import { Piece } from "../../components/Board";
 import HistoryExplorer from "./History";
-import { Card, Loading } from "../../components/UI";
+import { ChoiceSelect, Card, Loading } from "../../components/UI";
 type Fact = {
   id: string;
   title: string;
@@ -52,7 +52,7 @@ export default function KnowledgePage({ section }: { section: string }) {
   return section === "facts" ? (
     <>
       <div className="section-toolbar">
-        <select
+        <ChoiceSelect
           aria-label="Fact category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -61,7 +61,7 @@ export default function KnowledgePage({ section }: { section: string }) {
           {[...new Set(data.facts.map((f) => f.category))].map((c) => (
             <option key={c}>{c}</option>
           ))}
-        </select>
+        </ChoiceSelect>
       </div>
       <div className="facts-grid">
         {facts.map((f) => (

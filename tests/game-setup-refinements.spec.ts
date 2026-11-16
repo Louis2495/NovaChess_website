@@ -73,7 +73,7 @@ test("game setup offers two strength choices, defaults to rated, searches openin
   }
 });
 
-test("desktop daily puzzle and meme share their top and bottom, and Analysis gives more space to the board", async ({
+test("desktop daily puzzle and meme share their top and bottom, and Analysis starts at a screen-friendly board size", async ({
   page,
   isMobile,
 }) => {
@@ -91,6 +91,6 @@ test("desktop daily puzzle and meme share their top and bottom, and Analysis giv
   const panels = (await page
     .locator(".analysis-layout .side-panels")
     .boundingBox())!;
-  expect(board.width).toBeGreaterThan(600);
-  expect(panels.width).toBeLessThanOrEqual(340);
+  expect(board.width).toBeLessThanOrEqual(540);
+  expect(panels.width).toBeGreaterThan(280);
 });

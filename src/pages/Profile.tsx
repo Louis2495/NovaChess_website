@@ -7,7 +7,14 @@ import { online, useOnlineSession } from "../lib/online";
 import { useApp } from "../lib/context";
 import { imageFile, pieceUrl } from "../lib/store";
 import { regions } from "../lib/regions";
-import { PageTitle, Card, Button, Field, Toggle } from "../components/UI";
+import {
+  ChoiceSelect,
+  PageTitle,
+  Card,
+  Button,
+  Field,
+  Toggle,
+} from "../components/UI";
 export default function Profile({ embedded = false }: { embedded?: boolean }) {
   const {
     library,
@@ -169,7 +176,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
                 />
               </Field>
               <Field label="Country (optional)">
-                <select
+                <ChoiceSelect
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                 >
@@ -179,7 +186,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
                       {r.name}
                     </option>
                   ))}
-                </select>
+                </ChoiceSelect>
               </Field>
               <Button type="submit" disabled={!name.trim()}>
                 <Save size={16} />

@@ -77,8 +77,9 @@ test("Library separates recorded games, branching training studies and NovaChess
   await expect(page.locator(".saved-game-card")).toContainText("2 lines");
   await page.getByRole("button", { name: "Train lines", exact: true }).click();
   await page
-    .getByLabel("Study line", { exact: true })
-    .selectOption({ label: "Queen pawn" });
+    .getByRole("group", { name: "Study line", exact: true })
+    .getByRole("button", { name: "Queen pawn", exact: true })
+    .click();
   const board = page.getByRole("group", { name: "Chessboard", exact: true });
   await board.getByRole("button", { name: /^d2,/ }).click();
   await board.getByRole("button", { name: /^d4,/ }).click();
@@ -99,7 +100,7 @@ test("profile photo is inside the cover with a small accessible upload icon and 
   await expect(
     page.getByLabel("Upload profile picture", { exact: true }),
   ).toHaveCount(1);
-  await expect(page.locator(".app")).toHaveCSS("--button", "#b7c7ed");
+  await expect(page.locator(".app")).toHaveCSS("--button", "#a7bfd6");
   await expect(
     page.getByRole("button", { name: "Multiplayer", exact: true }),
   ).toHaveCount(0);

@@ -32,6 +32,7 @@ import GameGIFButton from "../components/GameGIFButton";
 import { useControl } from "../lib/controls";
 import { Board } from "../components/Board";
 import {
+  ChoiceSelect,
   PageTitle,
   Card,
   Button,
@@ -304,22 +305,25 @@ function StudyTraining({
       </PageTitle>
       <div className="section-toolbar">
         <Field label="Study line">
-          <select value={index} onChange={(e) => setIndex(+e.target.value)}>
+          <ChoiceSelect
+            value={index}
+            onChange={(e) => setIndex(+e.target.value)}
+          >
             {lines.map((line, i) => (
               <option key={line.id} value={i}>
                 {line.name}
               </option>
             ))}
-          </select>
+          </ChoiceSelect>
         </Field>
         <Field label="Practice as">
-          <select
+          <ChoiceSelect
             value={side}
             onChange={(e) => setSide(e.target.value as "w" | "b")}
           >
             <option value="w">White</option>
             <option value="b">Black</option>
-          </select>
+          </ChoiceSelect>
         </Field>
       </div>
       <RepertoireTrainer
@@ -676,7 +680,7 @@ function GameViewer({
           <div className="replay-speed">
             <label>
               Speed
-              <select
+              <ChoiceSelect
                 aria-label="Replay speed"
                 value={replaySpeed}
                 onChange={(e) => setReplaySpeed(+e.target.value)}
@@ -685,7 +689,7 @@ function GameViewer({
                 <option value={1000}>1s / move</option>
                 <option value={650}>0.65s / move</option>
                 <option value={250}>0.25s / move</option>
-              </select>
+              </ChoiceSelect>
             </label>
             <GameGIFButton
               positions={game.positions}
@@ -754,7 +758,7 @@ function GameViewer({
               </IconButton>
             </div>
             <Field label="Folder">
-              <select
+              <ChoiceSelect
                 value={game.folder}
                 onChange={(e) =>
                   setLibrary((l) => ({
@@ -768,7 +772,7 @@ function GameViewer({
                 {library.folders.map((f) => (
                   <option key={f}>{f}</option>
                 ))}
-              </select>
+              </ChoiceSelect>
             </Field>
           </Card>
         </div>
@@ -788,7 +792,7 @@ function GameViewer({
               </p>
               {standard && (
                 <Field label="Time per position">
-                  <select
+                  <ChoiceSelect
                     disabled={reviewing}
                     value={budget}
                     onChange={(e) => setBudget(Number(e.target.value))}
@@ -797,7 +801,7 @@ function GameViewer({
                     <option value={500}>0.5 seconds</option>
                     <option value={1000}>1 second</option>
                     <option value={3000}>3 seconds</option>
-                  </select>
+                  </ChoiceSelect>
                 </Field>
               )}
               <Button

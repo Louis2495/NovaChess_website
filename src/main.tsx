@@ -32,6 +32,7 @@ import {
   APP_SOURCE,
   contrast,
   pieceUrl,
+  boardSizeKey,
 } from "./lib/store";
 import type { Appearance as AppearanceType, Library, Tab } from "./lib/types";
 import { IconButton, Modal, Loading, External } from "./components/UI";
@@ -153,7 +154,11 @@ function App() {
   const musicReady = useRef<Promise<void> | null>(null);
   const { tab, detail } = locationState;
   const notify = (text: string) => {
-    if (!/illegal move|move is not legal|drop is not legal|premove is unavailable/i.test(text))
+    if (
+      !/illegal move|move is not legal|drop is not legal|premove is unavailable/i.test(
+        text,
+      )
+    )
       setMessage(text);
   };
   function navigate(tab: Tab, detail = "") {
@@ -260,54 +265,71 @@ function App() {
   }, [appearance.sound, appearance.volume]);
   useEffect(() => {
     setAppearance((a) =>
-      a.buttonColor === "#f1bb98"
-        ? { ...a, buttonColor: defaults.buttonColor }
-        : a.background === "Default" &&
-            a.backgroundColor === "#20313b" &&
-            a.panelColor === "#304651" &&
-            a.textColor === "#f4f8f5" &&
-            a.mutedColor === "#b5c8c5"
-          ? {
-              ...a,
-              backgroundColor: defaults.backgroundColor,
-              panelColor: defaults.panelColor,
-              textColor: defaults.textColor,
-              mutedColor: defaults.mutedColor,
-              theme:
-                a.theme === "Forest" && a.accent === "#96d9b8"
-                  ? defaults.theme
-                  : a.theme,
-              accent:
-                a.theme === "Forest" && a.accent === "#96d9b8"
-                  ? defaults.accent
-                  : a.accent,
-              buttonColor:
-                a.theme === "Forest" &&
-                a.accent === "#96d9b8" &&
-                a.buttonColor === "#96d9b8"
-                  ? defaults.buttonColor
-                  : a.buttonColor,
-            }
-          : a.backgroundColor === "#80350d"
-            ? { ...a, backgroundColor: defaults.backgroundColor }
-            : ["#101418", "#101612", "#19262e"].includes(a.backgroundColor) &&
-                ["#1b2126", "#1c271f", "#263840"].includes(a.panelColor) &&
-                ["#f0f3f1", "#eef4ed", "#f4f8f5"].includes(a.textColor) &&
-                ["#a6b0aa", "#abb8aa", "#b5c8c5"].includes(a.mutedColor)
-              ? {
-                  ...a,
-                  backgroundColor: defaults.backgroundColor,
-                  panelColor: defaults.panelColor,
-                  textColor: defaults.textColor,
-                  mutedColor: defaults.mutedColor,
-                  accent: a.accent === "#78b58a" ? defaults.accent : a.accent,
-                  buttonColor:
-                    a.buttonColor === "#78b58a"
-                      ? defaults.buttonColor
-                      : a.buttonColor,
-                  font: a.font === "DM Sans" ? defaults.font : a.font,
-                }
-              : a,
+      a.background === "Default" &&
+      a.backgroundColor === "#292d43" &&
+      a.panelColor === "#3b425d"
+        ? {
+            ...a,
+            backgroundColor: defaults.backgroundColor,
+            panelColor: defaults.panelColor,
+            textColor:
+              a.textColor === "#fbf8ff" ? defaults.textColor : a.textColor,
+            mutedColor:
+              a.mutedColor === "#c6c7dc" ? defaults.mutedColor : a.mutedColor,
+            theme: a.theme === "Periwinkle" ? defaults.theme : a.theme,
+            accent: a.accent === "#c7c1ff" ? defaults.accent : a.accent,
+            buttonColor: ["#b7c7ed", "#f1bb98"].includes(a.buttonColor)
+              ? defaults.buttonColor
+              : a.buttonColor,
+          }
+        : a.buttonColor === "#f1bb98"
+          ? { ...a, buttonColor: defaults.buttonColor }
+          : a.background === "Default" &&
+              a.backgroundColor === "#20313b" &&
+              a.panelColor === "#304651" &&
+              a.textColor === "#f4f8f5" &&
+              a.mutedColor === "#b5c8c5"
+            ? {
+                ...a,
+                backgroundColor: defaults.backgroundColor,
+                panelColor: defaults.panelColor,
+                textColor: defaults.textColor,
+                mutedColor: defaults.mutedColor,
+                theme:
+                  a.theme === "Forest" && a.accent === "#96d9b8"
+                    ? defaults.theme
+                    : a.theme,
+                accent:
+                  a.theme === "Forest" && a.accent === "#96d9b8"
+                    ? defaults.accent
+                    : a.accent,
+                buttonColor:
+                  a.theme === "Forest" &&
+                  a.accent === "#96d9b8" &&
+                  a.buttonColor === "#96d9b8"
+                    ? defaults.buttonColor
+                    : a.buttonColor,
+              }
+            : a.backgroundColor === "#80350d"
+              ? { ...a, backgroundColor: defaults.backgroundColor }
+              : ["#101418", "#101612", "#19262e"].includes(a.backgroundColor) &&
+                  ["#1b2126", "#1c271f", "#263840"].includes(a.panelColor) &&
+                  ["#f0f3f1", "#eef4ed", "#f4f8f5"].includes(a.textColor) &&
+                  ["#a6b0aa", "#abb8aa", "#b5c8c5"].includes(a.mutedColor)
+                ? {
+                    ...a,
+                    backgroundColor: defaults.backgroundColor,
+                    panelColor: defaults.panelColor,
+                    textColor: defaults.textColor,
+                    mutedColor: defaults.mutedColor,
+                    accent: a.accent === "#78b58a" ? defaults.accent : a.accent,
+                    buttonColor:
+                      a.buttonColor === "#78b58a"
+                        ? defaults.buttonColor
+                        : a.buttonColor,
+                    font: a.font === "DM Sans" ? defaults.font : a.font,
+                  }
+                : a,
     );
   }, []);
   useEffect(() => {
@@ -333,6 +355,9 @@ function App() {
   const panelRgb = [0, 2, 4]
     .map((i) => parseInt(panelHex.slice(i, i + 2), 16))
     .join(",");
+  const manualBoardSize =
+    appearance.boardSizes?.[boardSizeKey(tab, detail)] ??
+    appearance.globalBoardSize;
   const style = {
     "--accent": appearance.accent,
     "--accent-soft": `${appearance.accent}20`,
@@ -352,7 +377,13 @@ function App() {
         : appearance.density === "Spacious"
           ? "28px"
           : "21px",
-    "--board-max": `${appearance.boardSize}px`,
+    "--board-max": `${manualBoardSize || appearance.boardSize}px`,
+    "--analysis-board-size": manualBoardSize
+      ? `${manualBoardSize}px`
+      : `min(${appearance.boardSize}px, max(220px, calc(100dvh - 350px)))`,
+    "--play-board-size": manualBoardSize
+      ? `${manualBoardSize}px`
+      : "calc(100dvh - 150px)",
     "--background-dim": `${appearance.backgroundDim / 100}`,
     "--background-blur": `${appearance.backgroundBlur}px`,
     "--background-image":
@@ -400,7 +431,7 @@ function App() {
       }}
     >
       <div
-        className={`app ${focusMode ? "focus-mode" : ""} ${appearance.animation ? "" : "no-motion"} bg-${appearance.background.toLowerCase()}`}
+        className={`app ${manualBoardSize ? "manual-boards" : ""} ${focusMode ? "focus-mode" : ""} ${appearance.animation ? "" : "no-motion"} bg-${appearance.background.toLowerCase()}`}
         style={style}
       >
         <WorkspaceShortcuts

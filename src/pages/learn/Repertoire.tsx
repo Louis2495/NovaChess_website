@@ -17,6 +17,7 @@ import { initialFen, uid, download, dateLabel } from "../../lib/store";
 import type { Repertoire as Line } from "../../lib/types";
 import { Board } from "../../components/Board";
 import {
+  ChoiceSelect,
   Card,
   Button,
   Field,
@@ -201,13 +202,13 @@ export default function Repertoire() {
                 />
               </Field>
               <Field label="Train as">
-                <select
+                <ChoiceSelect
                   value={side}
                   onChange={(e) => setSide(e.target.value as "w" | "b")}
                 >
                   <option value="w">White</option>
                   <option value="b">Black</option>
-                </select>
+                </ChoiceSelect>
               </Field>
               <p className="caption">
                 Play both sides to build the line. Add separate lines for

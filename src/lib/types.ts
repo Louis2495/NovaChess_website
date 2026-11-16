@@ -72,6 +72,8 @@ export type Appearance = {
   multiPV: number;
   searchTime: number;
   boardSize: number;
+  boardSizes?: Record<string, number>;
+  globalBoardSize?: number;
 };
 export type SavedGame = {
   kind?: "study" | "game";

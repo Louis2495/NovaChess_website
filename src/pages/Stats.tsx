@@ -20,7 +20,13 @@ import {
 import type { SavedGame } from "../lib/types";
 import { useApp } from "../lib/context";
 import { useData } from "../lib/store";
-import { PageTitle, Card, Button, IconButton } from "../components/UI";
+import {
+  ChoiceSelect,
+  PageTitle,
+  Card,
+  Button,
+  IconButton,
+} from "../components/UI";
 type Country = { code: string; polygons: number[][][] };
 export default function Stats() {
   const { library, detail } = useApp();
@@ -365,7 +371,7 @@ function StatsOverview({
           <div className="card-heading">
             <h2>Activity</h2>
             <div className="activity-range">
-              <select
+              <ChoiceSelect
                 aria-label="Activity period"
                 value={customRange ? "custom" : dayRange}
                 onChange={(e) => {
@@ -380,7 +386,7 @@ function StatsOverview({
                   </option>
                 ))}
                 <option value="custom">Custom</option>
-              </select>
+              </ChoiceSelect>
               {customRange && (
                 <input
                   type="number"

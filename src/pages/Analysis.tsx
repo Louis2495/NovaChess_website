@@ -1,5 +1,5 @@
+import { engineMoveRows } from "../lib/engineNotation";
 import { positionInsights } from "../lib/positionInsights";
-import { parseTypedMove } from "../lib/moves";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -18,16 +18,19 @@ import {
   Lightbulb,
   LocateFixed,
   Save,
+  Ellipsis,
+  RotateCcw,
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import { initialFen, uid, download, copyText } from "../lib/store";
-import { useEngine, scoreLabel, sanLine } from "../lib/engine";
+import { useEngine, scoreLabel } from "../lib/engine";
 import { exportGIF, exportPNG } from "../lib/export";
 import type { SavedGame } from "../lib/types";
 import { useControl } from "../lib/controls";
 import { Board } from "../components/Board";
 import PositionEditor from "../components/PositionEditor";
 import {
+  ChoiceSelect,
   Card,
   Button,
   IconButton,
@@ -85,10 +88,19 @@ export default function Analysis() {
     [name, setName] = useState(source?.title || "Analysis"),
     [sharing, setSharing] = useState(false),
     [saving, setSaving] = useState(false),
+    [toolsOpen, setToolsOpen] = useState(false),
     [notationOpen, setNotationOpen] = useState(false),
     [lineCount, setLineCount] = useState(3),
-    [exporting, setExporting] = useState(false),
-    [moveInput, setMoveInput] = useState("");
+    [exporting, setExporting] = useState(false);
+  const toolsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!toolsOpen) return;
+    const close = (e: PointerEvent) => {
+      if (!toolsRef.current?.contains(e.target as Node)) setToolsOpen(false);
+    };
+    window.addEventListener("pointerdown", close);
+    return () => window.removeEventListener("pointerdown", close);
+  }, [toolsOpen]);
   const notationRef = useRef<HTMLDivElement>(null);
   const [followNotation, setFollowNotation] = useState(true);
   useLayoutEffect(() => {
@@ -206,10 +218,75 @@ export default function Analysis() {
         title="Analysis"
         subtitle={`Stockfish 19 Lite · Depth ${engine.lines[0]?.depth ?? 0}`}
       >
-        <Button onClick={() => setSaving(true)}>
-          <Save size={16} />
-          Save study
-        </Button>
+        <div
+          className="analysis-tools"
+          ref={toolsRef}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setToolsOpen(false);
+              e.stopPropagation();
+              toolsRef.current
+                ?.querySelector<HTMLButtonElement>("button")
+                ?.focus();
+            }
+          }}
+        >
+          <IconButton
+            label="Analysis tools"
+            aria-expanded={toolsOpen}
+            aria-controls="analysis-tools-menu"
+            onClick={() => setToolsOpen((v) => !v)}
+          >
+            <Ellipsis size={22} />
+          </IconButton>
+          {toolsOpen && (
+            <div
+              id="analysis-tools-menu"
+              className="analysis-tools-menu"
+              role="group"
+              aria-label="Analysis actions"
+            >
+              <button
+                onClick={() => {
+                  setToolsOpen(false);
+                  setSaving(true);
+                }}
+              >
+                <Save size={16} />
+                Save study
+              </button>
+              <button
+                aria-label="Edit position"
+                onClick={() => {
+                  setToolsOpen(false);
+                  setEditing(true);
+                }}
+              >
+                <SlidersHorizontal size={16} />
+                Set up position
+              </button>
+              <button
+                aria-label="Share position"
+                onClick={() => {
+                  setToolsOpen(false);
+                  setSharing(true);
+                }}
+              >
+                <Share2 size={16} />
+                Share
+              </button>
+              <button
+                onClick={() => {
+                  setToolsOpen(false);
+                  reset(initialFen);
+                }}
+              >
+                <RotateCcw size={16} />
+                Reset
+              </button>
+            </div>
+          )}
+        </div>
       </PageTitle>
       {engine.error && (
         <p className="error" role="alert">
@@ -232,20 +309,6 @@ export default function Analysis() {
                 aria-label={`${c.turn() === "w" ? "White" : "Black"} turn`}
                 title={`${c.turn() === "w" ? "White" : "Black"} turn`}
               />
-            </div>
-            <div className="button-row">
-              <IconButton
-                label="Edit position"
-                onClick={() => setEditing(true)}
-              >
-                <SlidersHorizontal size={17} />
-              </IconButton>
-              <IconButton
-                label="Share position"
-                onClick={() => setSharing(true)}
-              >
-                <Share2 size={17} />
-              </IconButton>
             </div>
           </div>
           <div className="board-with-eval">
@@ -303,30 +366,6 @@ export default function Analysis() {
             >
               <ChevronsRight size={18} />
             </IconButton>
-          </div>
-          <form
-            className="inline-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              try {
-                const m = parseTypedMove(new Chess(fen), moveInput);
-                play(m.from, m.to, m.promotion);
-                setMoveInput("");
-              } catch {}
-            }}
-          >
-            <input
-              aria-label="Enter analysis move"
-              value={moveInput}
-              onChange={(e) => setMoveInput(e.target.value)}
-              placeholder="Move · e.g. Nf3 or g1f3"
-            />
-            <Button disabled={!moveInput.trim()}>Play</Button>
-          </form>
-          <div className="button-row board-actions">
-            <Button className="text-button" onClick={() => reset(initialFen)}>
-              Reset
-            </Button>
           </div>
         </div>
         <div className="side-panels">
@@ -436,7 +475,7 @@ export default function Analysis() {
           <Card className="engine-top-lines">
             <div className="card-heading">
               <h2>Top lines</h2>
-              <select
+              <ChoiceSelect
                 aria-label="Number of engine lines"
                 value={lineCount}
                 onChange={(e) => setLineCount(+e.target.value)}
@@ -446,15 +485,48 @@ export default function Analysis() {
                     {n}
                   </option>
                 ))}
-              </select>
+              </ChoiceSelect>
             </div>
-            <div className="engine-lines">
+            <div
+              className="engine-lines"
+              style={
+                {
+                  "--engine-columns": Math.min(lineCount, 3),
+                } as React.CSSProperties
+              }
+            >
               {Array.from({ length: lineCount }, (_, i) => {
                 const line = engine.lines[i];
                 return (
                   <div className="engine-line" key={i}>
-                    <strong>{scoreLabel(line)}</strong>
-                    <span>{line ? sanLine(fen, line.moves) : "…"}</span>
+                    <div className="pv-heading">
+                      <span>{i + 1}</span>
+                      <strong>{scoreLabel(line)}</strong>
+                    </div>
+                    <table aria-label={`Engine line ${i + 1}`}>
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">White</th>
+                          <th scope="col">Black</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {line ? (
+                          engineMoveRows(fen, line.moves).map((row) => (
+                            <tr key={row.number}>
+                              <td>{row.number}</td>
+                              <td>{row.white || "—"}</td>
+                              <td>{row.black || "—"}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={3}>…</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                 );
               })}

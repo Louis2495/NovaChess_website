@@ -25,7 +25,7 @@ import {
 } from "../lib/store";
 import { regions } from "../lib/regions";
 import type { Appearance as AppearanceType } from "../lib/types";
-import { Modal, Button, Field, Toggle } from "./UI";
+import { ChoiceSelect, Modal, Button, Field, Toggle } from "./UI";
 import { Board, Piece } from "./Board";
 const sections = [
   ["Colors", Palette],
@@ -98,7 +98,15 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
           max={max}
           step={step}
           value={a[key]}
-          onChange={(e) => change(key, Number(e.target.value))}
+          onChange={(e) => {
+            change(key, Number(e.target.value));
+            if (key === "boardSize")
+              set((v) => ({
+                ...v,
+                boardSizes: {},
+                globalBoardSize: Number(e.target.value),
+              }));
+          }}
         />
       </label>
     );
@@ -172,7 +180,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
           {tab === "Background" && (
             <>
               <Field label="Background">
-                <select
+                <ChoiceSelect
                   value={a.background}
                   onChange={(e) =>
                     set((a) => ({
@@ -185,11 +193,11 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                   {backgrounds.map((b) => (
                     <option key={b}>{b}</option>
                   ))}
-                </select>
+                </ChoiceSelect>
               </Field>
               {a.background === "Flag" && (
                 <Field label="Country flag">
-                  <select
+                  <ChoiceSelect
                     value={a.flag || "US"}
                     onChange={(e) => change("flag", e.target.value)}
                   >
@@ -198,7 +206,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                         {r.name}
                       </option>
                     ))}
-                  </select>
+                  </ChoiceSelect>
                 </Field>
               )}
               {color("Base color", "backgroundColor")}
@@ -255,7 +263,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
           {tab === "Board" && (
             <>
               <Field label="Board palette">
-                <select
+                <ChoiceSelect
                   value={a.board}
                   onChange={(e) => {
                     const b = e.target.value;
@@ -270,7 +278,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                   {Object.keys(boards).map((b) => (
                     <option key={b}>{b}</option>
                   ))}
-                </select>
+                </ChoiceSelect>
               </Field>
               {color("Light squares", "light")}
               {color("Dark squares", "dark")}
@@ -287,7 +295,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                   </button>
                 ))}
               </div>
-              {slider("Board width", "boardSize", 340, 700, 10)}
+              {slider("Board width", "boardSize", 160, 1400, 10)}
               <Toggle
                 label="Coordinates"
                 checked={a.coordinates}
@@ -308,7 +316,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
           {tab === "Layout" && (
             <>
               <Field label="Font">
-                <select
+                <ChoiceSelect
                   value={a.font}
                   onChange={(e) => change("font", e.target.value)}
                 >
@@ -321,19 +329,19 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                   ].map((f) => (
                     <option key={f}>{f}</option>
                   ))}
-                </select>
+                </ChoiceSelect>
               </Field>
               {slider("Text size", "fontSize", 12, 18)}
               {slider("Corner radius", "radius", 0, 32)}
               <Field label="Spacing">
-                <select
+                <ChoiceSelect
                   value={a.density}
                   onChange={(e) => change("density", e.target.value)}
                 >
                   <option>Compact</option>
                   <option>Comfortable</option>
                   <option>Spacious</option>
-                </select>
+                </ChoiceSelect>
               </Field>
               <Toggle
                 label="Animations"
@@ -393,16 +401,16 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                 onChange={(v) => change("confirmResign", v)}
               />
               <Field label="Analysis candidates">
-                <select
+                <ChoiceSelect
                   value={a.multiPV}
                   onChange={(e) => change("multiPV", Number(e.target.value))}
                 >
                   <option value={1}>One line</option>
                   <option value={3}>Three lines</option>
-                </select>
+                </ChoiceSelect>
               </Field>
               <Field label="Analysis time per position">
-                <select
+                <ChoiceSelect
                   value={a.searchTime}
                   onChange={(e) => change("searchTime", Number(e.target.value))}
                 >
@@ -410,7 +418,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                   <option value={1200}>1.2 seconds</option>
                   <option value={3000}>3 seconds</option>
                   <option value={8000}>8 seconds</option>
-                </select>
+                </ChoiceSelect>
               </Field>
             </>
           )}

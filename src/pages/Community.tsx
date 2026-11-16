@@ -23,7 +23,7 @@ import { specialLegal, type SpecialState } from "../lib/specialRules";
 import { Board, type BoardMark } from "../components/Board";
 import OnlineAccount from "../components/OnlineAccount";
 import GameResult from "../components/GameResult";
-import { Button, Card, Field, PageTitle } from "../components/UI";
+import { ChoiceSelect, Button, Card, Field, PageTitle } from "../components/UI";
 type Member = { id: string; team: "w" | "b" | null };
 type Room = {
   id: string;
@@ -503,7 +503,7 @@ export default function Community() {
                 </Field>
                 {mode !== "vote" && (
                   <Field label="Variant">
-                    <select
+                    <ChoiceSelect
                       value={variant}
                       onChange={(e) => setVariant(e.target.value)}
                     >
@@ -511,18 +511,18 @@ export default function Community() {
                       <option value="dropping">Dropping Squares</option>
                       <option value="chaos">Chaos chess</option>
                       <option value="random">Random</option>
-                    </select>
+                    </ChoiceSelect>
                   </Field>
                 )}
                 {mode === "team" && (
                   <Field label="Opponent">
-                    <select
+                    <ChoiceSelect
                       value={bot ? "bot" : "friends"}
                       onChange={(e) => setBot(e.target.value === "bot")}
                     >
                       <option value="friends">Another team</option>
                       <option value="bot">Computer · standard</option>
-                    </select>
+                    </ChoiceSelect>
                   </Field>
                 )}
                 <Button

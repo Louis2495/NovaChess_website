@@ -28,6 +28,9 @@ test("analysis starts with closed notation and three adjustable engine lines, na
   await expect(page.getByLabel("Game notation", { exact: true })).toContainText(
     "e4",
   );
+  await page
+    .getByRole("button", { name: "Analysis tools", exact: true })
+    .click();
   await page.getByRole("button", { name: "Save study", exact: true }).click();
   await page.getByLabel("Study name", { exact: true }).fill("My study");
   await page

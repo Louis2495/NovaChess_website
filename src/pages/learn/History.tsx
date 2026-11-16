@@ -12,7 +12,7 @@ import {
   Globe,
   Trophy,
 } from "lucide-react";
-import { Card, IconButton, Toggle } from "../../components/UI";
+import { ChoiceSelect, Card, IconButton, Toggle } from "../../components/UI";
 export type HistoryData = {
   coverageThrough: number;
   ratingNote: string;
@@ -194,14 +194,14 @@ export default function History({ data }: { data: HistoryData }) {
           <div className="section-toolbar">
             <label className="field">
               <span>Championship lineage</span>
-              <select
+              <ChoiceSelect
                 aria-label="Championship lineage"
                 value={track}
                 onChange={(e) => setTrack(e.target.value)}
               >
                 <option value="main">Classical / unified</option>
                 <option value="fide">FIDE split, 1993–2006</option>
-              </select>
+              </ChoiceSelect>
             </label>
             <Toggle
               label="Show event ratings"

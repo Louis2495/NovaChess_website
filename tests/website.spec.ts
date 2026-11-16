@@ -36,7 +36,7 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
   await expect(page.getByRole("link", { name: /Daily puzzle/ })).toBeVisible();
   await expect(page.locator(".app")).toHaveCSS(
     "background-color",
-    "rgb(41, 45, 67)",
+    "rgb(37, 46, 58)",
   );
   await expect(
     page.getByRole("heading", { name: /Your next move|A little brighter/ }),
@@ -110,7 +110,7 @@ test("appearance themes, custom colors, board/pieces/layout persist and presets 
     .getByRole("dialog", { name: "Appearance" })
     .getByRole("button", { name: "Reset appearance", exact: true })
     .click();
-  await expect(page.locator(".app")).toHaveCSS("--accent", "#c7c1ff");
+  await expect(page.locator(".app")).toHaveCSS("--accent", "#b2d3e7");
 });
 
 test("uploaded backgrounds stay local and can be removed", async ({ page }) => {
@@ -153,6 +153,9 @@ test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image
     .click();
   await uiMove(page, "d2d4");
   await expect(page.locator(".branch-list")).toContainText("Branch 1");
+  await page
+    .getByRole("button", { name: "Analysis tools", exact: true })
+    .click();
   await page.getByRole("button", { name: "Save study", exact: true }).click();
   await page
     .getByRole("dialog", { name: "Save study" })
@@ -162,6 +165,9 @@ test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image
   await expect(
     page.getByRole("button", { name: "Download PGN", exact: true }),
   ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Analysis tools", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Share position", exact: true })
     .click();
@@ -189,6 +195,9 @@ test("position editor validates kings, applies a position and underpromotion is 
   page,
 }) => {
   await page.goto("/#analysis");
+  await page
+    .getByRole("button", { name: "Analysis tools", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Edit position", exact: true })
     .click();
@@ -236,9 +245,8 @@ test("all 4,000 puzzles load; adaptive solution, grading, hints and daily replay
         .click();
     if (i + 2 < p.moves.length) await page.waitForTimeout(550);
   }
-  await expect(
-    page.getByRole("status").filter({ hasText: "Solved." }),
-  ).toBeVisible();
+  await expect(page.locator(".puzzle-board")).toHaveClass(/solved/);
+  await expect(page.getByText("Solved.", { exact: true })).toHaveCount(0);
   expect((await stored(page)).progress.solved).toBe(1);
   await page.getByRole("button", { name: "Next puzzle", exact: true }).click();
   await page.getByRole("button", { name: "Hint", exact: true }).click();
@@ -355,7 +363,10 @@ test("facts, history, dated ratings and map controls provide real content", asyn
     .getByRole("button", { name: "World champions", exact: true })
     .click();
   await expect(page.locator(".champion-timeline .card").first()).toBeVisible();
-  await page.getByLabel("Championship lineage").selectOption("fide");
+  await page
+    .getByRole("group", { name: "Championship lineage", exact: true })
+    .getByRole("button", { name: /FIDE split/ })
+    .click();
   expect(
     await page.locator(".champion-timeline .card").count(),
   ).toBeGreaterThan(0);
@@ -525,7 +536,7 @@ test.beforeAll(async () => {
     wasmBinary: fs.readFileSync("node_modules/ffish-es6/ffish.wasm"),
   } as Parameters<typeof load>[0]);
   ff.loadVariantConfig(
-    "[cvfog:chess]\nking = -\ncommoner = k\ncastlingKingPiece = k\nextinctionValue = loss\nextinctionPieceTypes = k\nstalemateValue = draw\n[cvpawns:chess]\nstartFen = 4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1\ncastling = false\n[cvpawnrace:chess]\nking = -\nstartFen = 8/pppppppp/8/8/8/8/PPPPPPPP/8 w - - 0 1\ncastling = false\npromotionPieceTypes = -\nmandatoryPawnPromotion = false\nflagPiece = p\nflagRegionWhite = *8\nflagRegionBlack = *1\nextinctionValue = loss\nextinctionPieceTypes = *\nstalemateValue = loss",
+    "[cvfog:chess]\n[cvpawns:chess]\nstartFen = 4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1\ncastling = false\n[cvpawnrace:chess]\nking = -\nstartFen = 8/pppppppp/8/8/8/8/PPPPPPPP/8 w - - 0 1\ncastling = false\npromotionPieceTypes = -\nmandatoryPawnPromotion = false\nflagPiece = p\nflagRegionWhite = *8\nflagRegionBlack = *1\nextinctionValue = loss\nextinctionPieceTypes = *\nstalemateValue = loss",
   );
 });
 for (const variant of [
@@ -567,7 +578,10 @@ for (const variant of [
       variant === "chess960",
     );
     const move = b.legalMoves().split(" ")[0];
-    await uiMove(page, move);
+    if (variant === "blindtext") {
+      await page.getByLabel("Blindfold move", { exact: true }).fill(move);
+      await page.getByLabel("Blindfold move", { exact: true }).press("Enter");
+    } else await uiMove(page, move);
     if (variant === "duck") await square(page, move.slice(-2));
     await expect
       .poll(async () => (await stored(page)).activeGame?.moves.length || 0, {

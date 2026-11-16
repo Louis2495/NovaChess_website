@@ -4,7 +4,7 @@ import { Trash2, RotateCcw } from "lucide-react";
 import { squares } from "../lib/variants";
 import { initialFen } from "../lib/store";
 import { Board, Piece } from "./Board";
-import { Modal, Button, Field } from "./UI";
+import { ChoiceSelect, Modal, Button, Field } from "./UI";
 export function buildFen(
   p: Record<string, string>,
   turn: string,
@@ -100,10 +100,13 @@ export default function PositionEditor({
             </Button>
           </div>
           <Field label="To move">
-            <select value={turn} onChange={(e) => setTurn(e.target.value)}>
+            <ChoiceSelect
+              value={turn}
+              onChange={(e) => setTurn(e.target.value)}
+            >
               <option value="w">White</option>
               <option value="b">Black</option>
-            </select>
+            </ChoiceSelect>
           </Field>
           <div className="field">
             <span>Castling rights</span>

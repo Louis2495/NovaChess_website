@@ -1,7 +1,7 @@
 import load, { type FairyStockfish, type Board } from "ffish-es6";
 import wasm from "ffish-es6/ffish.wasm?url";
 let promise: Promise<FairyStockfish> | null = null;
-export const customVariants = `[cvfog:chess]\nking = -\ncommoner = k\ncastlingKingPiece = k\nextinctionValue = loss\nextinctionPieceTypes = k\nstalemateValue = draw\n[cvpawns:chess]\nstartFen = 4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1\ncastling = false\n[cvpawnrace:chess]\nking = -\nstartFen = 8/pppppppp/8/8/8/8/PPPPPPPP/8 w - - 0 1\ncastling = false\npromotionPieceTypes = -\nmandatoryPawnPromotion = false\nflagPiece = p\nflagRegionWhite = *8\nflagRegionBlack = *1\nextinctionValue = loss\nextinctionPieceTypes = *\nstalemateValue = loss`;
+export const customVariants = `[cvfog:chess]\n[cvpawns:chess]\nstartFen = 4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1\ncastling = false\n[cvpawnrace:chess]\nking = -\nstartFen = 8/pppppppp/8/8/8/8/PPPPPPPP/8 w - - 0 1\ncastling = false\npromotionPieceTypes = -\nmandatoryPawnPromotion = false\nflagPiece = p\nflagRegionWhite = *8\nflagRegionBlack = *1\nextinctionValue = loss\nextinctionPieceTypes = *\nstalemateValue = loss`;
 export function fairy() {
   if (!promise)
     promise = load({
@@ -65,7 +65,7 @@ export const variantList = [
   {
     id: "cvfog",
     name: "Fog of War",
-    description: "Limited visibility. Capture the king.",
+    description: "Limited visibility. Win by checkmate.",
   },
   {
     id: "3check",
@@ -215,8 +215,6 @@ export function fog(fen: string, side: "w" | "b") {
       ds = [
         [-1, side === "w" ? 1 : -1],
         [1, side === "w" ? 1 : -1],
-        [0, side === "w" ? 1 : -1],
-        [0, side === "w" ? 2 : -2],
       ];
     for (const [dx, dy] of ds)
       for (let n = 1; n <= (["p", "k", "n"].includes(kind) ? 1 : 7); n++) {
