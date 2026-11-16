@@ -9,12 +9,10 @@ import {
   Flag,
   Handshake,
   ChevronDown,
-  FlipVertical2,
   ArrowRight,
   MonitorPlay,
   Trash2,
   Save,
-  Info,
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import {
@@ -41,6 +39,11 @@ import {
   IconButton,
   Loading,
 } from "../components/UI";
+import SpecialPlay from "./SpecialPlay";
+import GameResult from "../components/GameResult";
+import { newSpecial } from "../lib/specialRules";
+import type { SpecialVariant } from "../lib/specialRules";
+import VariantIcon, { variantSymbols } from "../components/VariantIcon";
 import { buildFen } from "../components/PositionEditor";
 function addPocket(fen: string, piece: string) {
   if (!piece) return fen;
@@ -106,19 +109,18 @@ function variantMove(
   });
 }
 export default function Play() {
-  const {
-    library,
-    setLibrary,
-    appearance,
-    setAppearance,
-    navigate,
-    detail,
-    notify,
-  } = useApp();
+  const { library, setLibrary, appearance, navigate, detail, notify } =
+    useApp();
   const [ff, setFF] = useState<FairyStockfish | null>(null),
     [error, setError] = useState(""),
     [playing, setPlaying] = useState(detail === "resume"),
     [variant, setVariant] = useState("chess"),
+    [special, setSpecial] = useState<SpecialVariant | null>(
+      detail === "resume" && library.activeGame?.special
+        ? (library.activeGame.variant as SpecialVariant)
+        : null,
+    ),
+    [dropCount, setDropCount] = useState(2),
     [human, setHuman] = useState<"w" | "b">("w"),
     [choice, setChoice] = useState("Current Rating"),
     [rating, setRating] = useState(1200),
@@ -186,6 +188,47 @@ export default function Play() {
     };
   }
   function start() {
+    if (["dropping", "chaos", "random"].includes(variant)) {
+      const state = newSpecial(variant as SpecialVariant, dropCount),
+        id = uid();
+      try {
+        localStorage.setItem(
+          "novachess-special-" + variant,
+          JSON.stringify({ id, state, human }),
+        );
+      } catch {
+        notify("Browser storage is unavailable.");
+      }
+      setLibrary((l) => ({
+        ...l,
+        games:
+          l.activeGame?.result === "*" && l.activeGame.moves.length
+            ? [
+                {
+                  ...l.activeGame,
+                  title: l.activeGame.title + " · unfinished",
+                },
+                ...l.games.filter((g) => g.id !== l.activeGame!.id),
+              ]
+            : l.games,
+        activeGame: {
+          id,
+          title: variantList.find((v) => v.id === variant)!.name,
+          created: Date.now(),
+          initial: state.fen,
+          variant,
+          moves: [],
+          notation: [],
+          positions: state.positions,
+          result: "*",
+          human,
+          folder: "Games",
+          special: state,
+        },
+      }));
+      setSpecial(variant as SpecialVariant);
+      return;
+    }
     if (!ff) return;
     const initial =
       variant === "chess960"
@@ -569,6 +612,15 @@ export default function Play() {
     setPremoves([]);
   }
   if (!ff && !error) return <Loading />;
+  if (special)
+    return (
+      <SpecialPlay
+        variant={special}
+        human={game?.special ? game.human : human}
+        dropCount={game?.special?.dropCount || dropCount}
+        onBack={() => setSpecial(null)}
+      />
+    );
   return (
     <>
       <PageTitle
@@ -579,7 +631,7 @@ export default function Play() {
             : undefined
         }
       >
-        {playing && (
+        {playing && game?.result === "*" && (
           <Button
             className="secondary"
             onClick={() => {
@@ -592,7 +644,7 @@ export default function Play() {
             New game
           </Button>
         )}
-        {playing && (
+        {playing && game?.result === "*" && (
           <Button
             className="secondary"
             onClick={() => {
@@ -614,43 +666,34 @@ export default function Play() {
       {!playing || !game || !valid ? (
         <div className="game-setup-page">
           <section
-            className="play-feature setup-launch"
-            aria-labelledby="new-game-title"
+            className="new-game-section setup-launch"
+            aria-label="New game"
           >
             <div className="play-feature-copy">
-              <span className="feature-overline">
-                {variantList.find((v) => v.id === variant)?.name}
-              </span>
-              <h2 id="new-game-title">New game</h2>
-              <p>
-                {human === "w" ? "White" : "Black"} · {choice}
-              </p>
               <Button
                 className="new-game-primary"
                 disabled={!ff}
                 onClick={start}
               >
                 Start game
-                <ArrowRight size={24} />
+                <ArrowRight size={32} />
               </Button>
               {game?.result === "*" && (
                 <button
                   className="resume-link"
                   onClick={() => {
+                    if (game.special) {
+                      setSpecial(game.variant as SpecialVariant);
+                      return;
+                    }
                     setPlaying(true);
                     setFlipped(game.human === "b");
                   }}
                 >
                   <RotateCcw size={15} />
                   Resume saved game
-                  <ChevronDown size={15} />
                 </button>
               )}
-            </div>
-            <div className="play-feature-art" aria-hidden="true">
-              <div className="piece-halo" />
-              <div className="piece-floor" />
-              <Piece symbol="N" />
             </div>
           </section>
           <Card className="game-settings-card">
@@ -671,14 +714,32 @@ export default function Play() {
                   >
                     {variantList.map((v) => (
                       <option key={v.id} value={v.id}>
-                        {v.name}
+                        {variantSymbols[v.id]} {v.name}
                       </option>
                     ))}
                   </select>
                 </Field>
-                <p className="caption">
-                  {variantList.find((v) => v.id === variant)?.description}
-                </p>
+                <div className="variant-summary">
+                  <VariantIcon id={variant} />
+                  <span>{variantList.find((v) => v.id === variant)?.name}</span>
+                </div>
+                {variantList.find((v) => v.id === variant)?.description && (
+                  <p className="caption">
+                    {variantList.find((v) => v.id === variant)?.description}
+                  </p>
+                )}
+                {variant === "dropping" && (
+                  <Field label="Squares to drop">
+                    <select
+                      value={dropCount}
+                      onChange={(e) => setDropCount(+e.target.value)}
+                    >
+                      {[1, 2, 3, 4].map((n) => (
+                        <option key={n}>{n}</option>
+                      ))}
+                    </select>
+                  </Field>
+                )}
                 <Field label="Your color">
                   <select
                     value={human}
@@ -688,77 +749,83 @@ export default function Play() {
                     <option value="b">Black</option>
                   </select>
                 </Field>
-                <div className="opponent-choices">
-                  {[
-                    "Current Rating",
-                    "Adaptive",
-                    "Play the Developer",
-                    "Custom",
-                  ].map((v) => (
-                    <label key={v}>
-                      <input
-                        type="radio"
-                        name="opponent"
-                        checked={choice === v}
-                        onChange={() => setChoice(v)}
-                      />
-                      <span>
-                        {v}
-                        {v === "Current Rating" && (
-                          <small>{Math.round(library.localRating)}</small>
-                        )}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-                {choice === "Custom" && (
-                  <Field label="Strength target (approximate)">
-                    <input
-                      type="number"
-                      min={1}
-                      max={10000}
-                      value={rating}
-                      onChange={(e) =>
-                        setRating(
-                          Math.max(
-                            1,
-                            Math.min(10000, Number(e.target.value) || 1),
-                          ),
+                {!["dropping", "chaos", "random"].includes(variant) && (
+                  <>
+                    <div className="opponent-choices">
+                      {[
+                        "Current Rating",
+                        "Adaptive",
+                        "Play the Developer",
+                        "Custom",
+                      ].map((v) => (
+                        <label key={v}>
+                          <input
+                            type="radio"
+                            name="opponent"
+                            checked={choice === v}
+                            onChange={() => setChoice(v)}
+                          />
+                          <span>
+                            {v}
+                            {v === "Current Rating" && (
+                              <small>{Math.round(library.localRating)}</small>
+                            )}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                    {choice === "Custom" && (
+                      <Field label="Strength target (approximate)">
+                        <input
+                          type="number"
+                          min={1}
+                          max={10000}
+                          value={rating}
+                          onChange={(e) =>
+                            setRating(
+                              Math.max(
+                                1,
+                                Math.min(10000, Number(e.target.value) || 1),
+                              ),
+                            )
+                          }
+                        />
+                      </Field>
+                    )}
+                    <Toggle
+                      label="Rated locally"
+                      description="Local estimate, not an official rating."
+                      checked={
+                        rated && choice !== "Adaptive" && variant === "chess"
+                      }
+                      onChange={(v) =>
+                        setRated(
+                          v && choice !== "Adaptive" && variant === "chess",
                         )
                       }
                     />
-                  </Field>
+                    {variant === "chess" && (
+                      <Field label="Request an opening">
+                        <select
+                          value={openingId}
+                          onChange={(e) => setOpeningId(e.target.value)}
+                        >
+                          <option value="">Any opening</option>
+                          {openings?.map((o) => (
+                            <option key={o.id} value={o.id}>
+                              {o.eco} · {o.name}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                    )}
+                    <p className="caption">
+                      Standard: Stockfish 19 Lite. Variants: Fairy-Stockfish
+                      rules with a local search opponent. Strength targets are
+                      approximate.
+                    </p>
+                  </>
                 )}
-                <Toggle
-                  label="Rated locally"
-                  description="Local estimate, not an official rating."
-                  checked={
-                    rated && choice !== "Adaptive" && variant === "chess"
-                  }
-                  onChange={(v) =>
-                    setRated(v && choice !== "Adaptive" && variant === "chess")
-                  }
-                />
-                {variant === "chess" && (
-                  <Field label="Request an opening">
-                    <select
-                      value={openingId}
-                      onChange={(e) => setOpeningId(e.target.value)}
-                    >
-                      <option value="">Any opening</option>
-                      {openings?.map((o) => (
-                        <option key={o.id} value={o.id}>
-                          {o.eco} · {o.name}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                )}
-                <p className="caption">
-                  Standard: Stockfish 19 Lite. Variants: Fairy-Stockfish rules
-                  with a local search opponent. Strength targets are
-                  approximate.
-                </p>
               </div>
             )}
           </Card>
@@ -770,6 +837,7 @@ export default function Play() {
           }
         >
           <div className="board-column">
+            <GameResult result={game.result} />
             <div
               className={`player-strip ${valid.turn !== game.human ? "to-move" : ""}`}
             >
@@ -780,12 +848,6 @@ export default function Play() {
                 <b>{game.opponent}</b>
                 <small>{game.botRating} requested · approximate</small>
               </div>
-              <IconButton
-                label="Flip board"
-                onClick={() => setFlipped(!flipped)}
-              >
-                <FlipVertical2 size={17} />
-              </IconButton>
             </div>
             {game.variant === "blindtext" ? (
               <Card className="blind-text">
@@ -835,6 +897,7 @@ export default function Play() {
                         : undefined
                   }
                   flipped={flipped}
+                  onFlip={() => setFlipped((v) => !v)}
                   disabled={
                     paused ||
                     game.result !== "*" ||
@@ -1081,9 +1144,14 @@ export default function Play() {
               <Card>
                 <div className="card-heading">
                   <h2>Game</h2>
-                  <span className="pill">{variantInfo?.name}</span>
+                  <span className="pill variant-summary">
+                    <VariantIcon id={game.variant} />
+                    {variantInfo?.name}
+                  </span>
                 </div>
-                <p className="caption">{variantInfo?.description}</p>
+                {variantInfo?.description && (
+                  <p className="caption">{variantInfo.description}</p>
+                )}
                 <p className="caption">
                   {game.rated ? "Rated locally" : "Unrated"} ·{" "}
                   {game.opponentChoice}
@@ -1133,23 +1201,6 @@ export default function Play() {
                   </div>
                 </Card>
               )}
-              <Card>
-                <div className="card-heading">
-                  <h2>Options</h2>
-                  <Info size={17} />
-                </div>
-                <Toggle
-                  label="Premoves"
-                  checked={appearance.premoves}
-                  onChange={(v) =>
-                    setAppearance((a) => ({ ...a, premoves: v }))
-                  }
-                />
-                <p className="caption">
-                  Leaving Play pauses opponent work. Games save automatically.
-                  Variant strength is a search budget, not a calibrated rating.
-                </p>
-              </Card>
             </div>
           )}
         </div>

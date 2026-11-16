@@ -6,7 +6,11 @@ export type Tab =
   | "learn"
   | "library"
   | "stats"
-  | "community";
+  | "community"
+  | "research"
+  | "profile"
+  | "controls"
+  | "rankings";
 export type Opening = {
   id: string;
   eco: string;
@@ -32,6 +36,9 @@ export type Endgame = {
   tip: string;
 };
 export type Appearance = {
+  controls?: Record<string, string>;
+  markColors?: { green: string; blue: string; red: string; gold: string };
+  flag?: string;
   theme: string;
   background: string;
   backgroundColor: string;
@@ -67,6 +74,7 @@ export type Appearance = {
   boardSize: number;
 };
 export type SavedGame = {
+  special?: import("./specialRules").SpecialState;
   id: string;
   title: string;
   created: number;
@@ -121,6 +129,7 @@ export type Repertoire = {
   successes: number;
 };
 export type Profile = {
+  bio?: string;
   name: string;
   country: string;
   avatar: string;
@@ -135,6 +144,12 @@ export type Progress = {
   daily: Record<string, { id: string; correct: boolean; completed: boolean }>;
   learned: string[];
   endgames: string[];
+  triviaCorrect?: number;
+  triviaBest?: number;
+  evalPerfect?: number;
+  evalBest?: number;
+  mastered?: string[];
+  famous?: string[];
 };
 export type Library = {
   games: SavedGame[];

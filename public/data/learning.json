@@ -3,44 +3,268 @@
   "ratingNote": "Recorded event Elo with its year—not peak ratings. — means no contemporaneous event rating supplied. Early titles predate published FIDE lists.",
   "facts": [
     {
-      "id": "squares",
-      "title": "A small board, huge possibilities",
-      "detail": "An 8×8 board has 64 squares, split evenly between light and dark.",
-      "category": "Numbers",
-      "metric": "64",
-      "symbol": "square.grid.3x3.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": null
+      "id": "insight-1",
+      "title": "Ninety-two queens",
+      "detail": "Eight queens can occupy an otherwise empty board without attacking one another in 92 arrangements. Treating rotations and reflections as the same leaves just 12.",
+      "category": "Mathematics",
+      "metric": "92 / 12",
+      "source": "https://en.wikipedia.org/wiki/Eight_queens_puzzle"
     },
     {
-      "id": "pieces",
-      "title": "Two tiny armies",
-      "detail": "Each side starts with 16 pieces: eight pawns and eight other pieces.",
-      "category": "Pieces",
-      "metric": "32",
-      "symbol": "person.2.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": null
+      "id": "insight-2",
+      "title": "A knight can visit every square",
+      "detail": "A knight’s tour visits all 64 squares exactly once. In a closed tour, its final square is one knight move from its starting square.",
+      "category": "Mathematics",
+      "metric": "64 stops",
+      "source": "https://en.wikipedia.org/wiki/Knight%27s_tour"
     },
     {
-      "id": "first-moves",
-      "title": "Twenty ways to begin",
-      "detail": "White has 16 pawn moves and four knight moves in the starting position.",
-      "category": "Numbers",
-      "metric": "20",
-      "symbol": "arrow.triangle.branch",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": null
+      "id": "insight-3",
+      "title": "Why odd boards break closed knight tours",
+      "detail": "Every knight move switches square color. That simple fact proves that a closed knight tour on a board with an odd number of squares is impossible.",
+      "category": "Mathematics",
+      "metric": "Color parity",
+      "source": "https://en.wikipedia.org/wiki/Knight%27s_tour"
     },
     {
-      "id": "first-pair",
-      "title": "One move each",
-      "detail": "After White and Black have each moved once, 400 distinct positions are possible.",
-      "category": "Numbers",
-      "metric": "400",
-      "symbol": "square.grid.3x3.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": null
+      "id": "insight-4",
+      "title": "Two corners break the domino puzzle",
+      "detail": "Remove two opposite corners from a chessboard and 31 dominoes can no longer cover it. Both corners share a color; every domino must cover one square of each color.",
+      "category": "Mathematics",
+      "metric": "62 squares",
+      "source": "https://en.wikipedia.org/wiki/Mutilated_chessboard_problem"
+    },
+    {
+      "id": "insight-6",
+      "title": "A rook can hold a queen to a draw",
+      "detail": "In a fortress, the stronger side may have no way to make progress. Some carefully arranged rook-and-pawn fortresses hold against a queen despite the material deficit.",
+      "category": "Endgames",
+      "metric": "Fortress",
+      "source": "https://en.wikipedia.org/wiki/Fortress_(chess)"
+    },
+    {
+      "id": "insight-7",
+      "title": "A square can be mined",
+      "detail": "In a trebuchet position, two kings defend mutually attacked pawns. Whoever must move first loses a pawn: the turn itself becomes a disadvantage.",
+      "category": "Endgames",
+      "metric": "Trebuchet",
+      "source": "https://en.wikipedia.org/wiki/Zugzwang"
+    },
+    {
+      "id": "insight-8",
+      "title": "A king can chase two targets at once",
+      "detail": "Réti’s 1921 study draws because a king approaches an enemy pawn and supports its own pawn along the same diagonal. Moving diagonally need not cost extra moves.",
+      "category": "Endgames",
+      "metric": "1921",
+      "source": "https://en.wikipedia.org/wiki/R%C3%A9ti_endgame_study"
+    },
+    {
+      "id": "insight-9",
+      "title": "A rook promotion can save the win",
+      "detail": "The Saavedra study requires promotion to a rook. Choosing a queen allows a stalemate trick; the less powerful piece keeps a winning threat alive.",
+      "category": "Endgames",
+      "metric": "1895",
+      "source": "https://en.wikipedia.org/wiki/Saavedra_position"
+    },
+    {
+      "id": "insight-10",
+      "title": "The board has 204 squares",
+      "detail": "There are 64 one-by-one squares, but also 49 two-by-two squares, 36 three-by-three squares, and so on. Add all eight sizes to get 204.",
+      "category": "Mathematics",
+      "metric": "204",
+      "source": "https://en.wikipedia.org/wiki/Square_pyramidal_number"
+    },
+    {
+      "id": "insight-11",
+      "title": "A five-queen covering puzzle",
+      "detail": "Five queens suffice to attack or occupy every square on an otherwise empty 8×8 board. Four cannot do it. This is a domination problem, distinct from the eight-queens puzzle.",
+      "category": "Mathematics",
+      "metric": "5 queens",
+      "source": "https://en.wikipedia.org/wiki/Mathematical_chess_problem"
+    },
+    {
+      "id": "insight-12",
+      "title": "The first move can arrive last",
+      "detail": "A move-order transposition reaches the same position through different moves. Opening names describe a route; the resulting position, side to move and available rights determine what can happen next.",
+      "category": "Strategy",
+      "metric": "Transposition",
+      "source": "https://en.wikipedia.org/wiki/Transposition_(chess)"
+    },
+    {
+      "id": "insight-13",
+      "title": "A sacrifice can be temporary",
+      "detail": "In a desperado combination, an already doomed piece captures something before disappearing. Its apparent sacrifice may recover material that would otherwise be lost.",
+      "category": "Tactics",
+      "metric": "Desperado",
+      "source": "https://en.wikipedia.org/wiki/Desperado_(chess)"
+    },
+    {
+      "id": "insight-14",
+      "title": "A piece can block its own army",
+      "detail": "An interference sacrifice places a piece on a line between two enemy pieces. Capturing it may obstruct a different defender, which is the point of a Novotny theme.",
+      "category": "Tactics",
+      "metric": "Novotny",
+      "source": "https://en.wikipedia.org/wiki/Novotny_(chess)"
+    },
+    {
+      "id": "insight-15",
+      "title": "A move can threaten nothing",
+      "detail": "A waiting move in a composed problem can create zugzwang: it makes no direct threat, yet every legal reply gives something away.",
+      "category": "Tactics",
+      "metric": "Waiting move",
+      "source": "https://en.wikipedia.org/wiki/Zugzwang"
+    },
+    {
+      "id": "insight-16",
+      "title": "A bishop can be trapped by its own strength",
+      "detail": "A bishop controls only one square color, so the wrong rook-pawn corner can be a draw even with an extra bishop and pawn. The defending king must actually reach the safe corner.",
+      "category": "Endgames",
+      "metric": "Wrong bishop",
+      "source": "https://en.wikipedia.org/wiki/Wrong_rook_pawn"
+    },
+    {
+      "id": "insight-17",
+      "title": "The longest-known forced mates exceed the move limit",
+      "detail": "Seven-piece tablebases contain positions requiring more than 500 moves to mate with perfect resistance when the fifty-move rule is ignored. A theoretical win is not always a tournament win.",
+      "category": "Computers",
+      "metric": "500+",
+      "source": "https://en.wikipedia.org/wiki/Endgame_tablebase"
+    },
+    {
+      "id": "insight-18",
+      "title": "A computer champion ran on a phone",
+      "detail": "Pocket Fritz 4 won the 2009 Copa Mercosur with 9½/10 while running on an HTC Touch HD. Its search speed was tiny beside desktop engines, showing the value of evaluation and software.",
+      "category": "Computers",
+      "metric": "2009",
+      "source": "https://en.wikipedia.org/wiki/Pocket_Fritz"
+    },
+    {
+      "id": "insight-19",
+      "title": "A chess program played by hand",
+      "detail": "Turing’s Turochamp algorithm was conceived before a suitable computer was available to him. He manually simulated it in a 1952 game against Alick Glennie.",
+      "category": "Computers",
+      "metric": "1952",
+      "source": "https://en.wikipedia.org/wiki/Turochamp"
+    },
+    {
+      "id": "insight-20",
+      "title": "Chess moves by electric telegraph",
+      "detail": "The 1844 correspondence match between Washington and Baltimore used the new electric telegraph. Moves traveled faster than mailed letters long before internet chess.",
+      "category": "History",
+      "metric": "1844",
+      "source": "https://en.wikipedia.org/wiki/Correspondence_chess"
+    },
+    {
+      "id": "insight-21",
+      "title": "An international match by radio",
+      "detail": "The 1945 USA–USSR radio match connected players in New York and Moscow. The Soviet team won 15½–4½ without the teams sharing a room.",
+      "category": "History",
+      "metric": "1945",
+      "source": "https://en.wikipedia.org/wiki/USA%E2%80%93USSR_radio_match"
+    },
+    {
+      "id": "insight-22",
+      "title": "A Candidates tournament on an island",
+      "detail": "The 1962 Candidates tournament took place in Curaçao, with eight players meeting four times each. Tigran Petrosian won without losing a game.",
+      "category": "History",
+      "metric": "28 rounds",
+      "source": "https://en.wikipedia.org/wiki/Candidates_Tournament_1962"
+    },
+    {
+      "id": "insight-23",
+      "title": "A champion was also a mathematician",
+      "detail": "Max Euwe earned a doctorate in mathematics in 1926, became world chess champion in 1935, and later served as FIDE president.",
+      "category": "People",
+      "metric": "1926 / 1935",
+      "source": "https://en.wikipedia.org/wiki/Max_Euwe"
+    },
+    {
+      "id": "insight-24",
+      "title": "A world champion wrote about philosophy",
+      "detail": "Emanuel Lasker earned a mathematics doctorate and wrote philosophical works, including Kampf. His chess title reign lasted from 1894 to 1921.",
+      "category": "People",
+      "metric": "27 years",
+      "source": "https://en.wikipedia.org/wiki/Emanuel_Lasker"
+    },
+    {
+      "id": "insight-25",
+      "title": "One sister broke Fischer’s age record",
+      "detail": "Judit Polgár became a grandmaster in 1991 at 15 years and 4 months, younger than Fischer had been. She later reached eighth in the world on a FIDE rating list.",
+      "category": "People",
+      "metric": "15 years",
+      "source": "https://en.wikipedia.org/wiki/Judit_Polg%C3%A1r"
+    },
+    {
+      "id": "insight-26",
+      "title": "Chess once had adjournment strategy",
+      "detail": "Before powerful portable engines, long games could be paused with a sealed move. Players and their teams analyzed overnight, making preparation part of the unfinished game.",
+      "category": "History",
+      "metric": "Sealed moves",
+      "source": "https://en.wikipedia.org/wiki/Adjournment_(games)"
+    },
+    {
+      "id": "insight-27",
+      "title": "A sealed move could lose without being played",
+      "detail": "Under adjournment rules, an ambiguous or illegal sealed move could cost the game when the envelope was opened. Players had to record the exact move, not just an intention.",
+      "category": "Rules",
+      "metric": "The envelope",
+      "source": "https://en.wikipedia.org/wiki/Adjournment_(games)"
+    },
+    {
+      "id": "insight-28",
+      "title": "Fischer’s random chess still has rules",
+      "detail": "Chess960 has 960 legal starting arrangements: bishops must stand on opposite colors, and the king must be between the rooks. Not every shuffle qualifies.",
+      "category": "Variants",
+      "metric": "960",
+      "source": "https://en.wikipedia.org/wiki/Chess960"
+    },
+    {
+      "id": "insight-29",
+      "title": "The mirror of a game can change who wins",
+      "detail": "In the game-theory strategy-stealing argument, being able to imitate a first player does not prove chess is a win for White: zugzwang means an extra move can be harmful.",
+      "category": "Mathematics",
+      "metric": "No free tempo",
+      "source": "https://en.wikipedia.org/wiki/Strategy-stealing_argument"
+    },
+    {
+      "id": "insight-30",
+      "title": "The alphabet stopped at h for a reason",
+      "detail": "Algebraic notation is a coordinate system, while older descriptive notation names squares from each player’s perspective. The same square could therefore have different descriptive names.",
+      "category": "History",
+      "metric": "Two perspectives",
+      "source": "https://en.wikipedia.org/wiki/Descriptive_notation"
+    },
+    {
+      "id": "insight-31",
+      "title": "A knight move has survived centuries",
+      "detail": "While the queen and bishop changed dramatically as modern chess evolved, the knight’s familiar leap is inherited from much earlier forms of the game.",
+      "category": "History",
+      "metric": "A lasting leap",
+      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+    },
+    {
+      "id": "insight-33",
+      "title": "Opposite bishops can favor the attacker",
+      "detail": "Opposite-colored bishop endgames often draw, but in a middlegame the attacking bishop can operate on squares its rival can never defend. Queens and exposed kings change the story.",
+      "category": "Strategy",
+      "metric": "Same pieces, new role",
+      "source": "https://en.wikipedia.org/wiki/Opposite-colored_bishops_endgame"
+    },
+    {
+      "id": "insight-34",
+      "title": "A famous queen offer was declined",
+      "detail": "After Marshall’s 23...Qg3 in the 1912 Levitsky game, White resigned rather than capture the queen. The famous position is a threat calculation, not a queen blunder.",
+      "category": "Tactics",
+      "metric": "23…Qg3",
+      "source": "https://en.wikipedia.org/wiki/Levitsky_versus_Marshall"
+    },
+    {
+      "id": "insight-35",
+      "title": "A king marched into the middlegame",
+      "detail": "Against Timman in 1991, Nigel Short walked his king from g1 through h2, g3, f4 and g5. Its destination helped finish an attack while queens remained on the board.",
+      "category": "Strategy",
+      "metric": "A royal attack",
+      "source": "https://en.wikipedia.org/wiki/Nigel_Short"
     },
     {
       "id": "shannon",
@@ -50,86 +274,6 @@
       "metric": "≈10¹²⁰",
       "symbol": "lightbulb.fill",
       "source": "https://en.wikipedia.org/wiki/Shannon_number",
-      "diagram": null
-    },
-    {
-      "id": "knight-reach",
-      "title": "The knight’s eight exits",
-      "detail": "From a central square on an empty board, a knight can reach eight squares.",
-      "category": "Pieces",
-      "metric": "8",
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": "n"
-    },
-    {
-      "id": "rook-reach",
-      "title": "Straight-line specialist",
-      "detail": "On an empty board, a rook has 14 destinations from any square.",
-      "category": "Pieces",
-      "metric": "14",
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": "r"
-    },
-    {
-      "id": "bishop-reach",
-      "title": "Diagonal specialist",
-      "detail": "A centrally placed bishop can reach 13 squares on an empty board.",
-      "category": "Pieces",
-      "metric": "13",
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": "b"
-    },
-    {
-      "id": "queen-reach",
-      "title": "Maximum mobility",
-      "detail": "A central queen can reach 27 squares on an otherwise empty board.",
-      "category": "Pieces",
-      "metric": "27",
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": "q"
-    },
-    {
-      "id": "king-reach",
-      "title": "One step, every direction",
-      "detail": "A central king has eight neighboring squares, though attacks can make them illegal.",
-      "category": "Pieces",
-      "metric": "8",
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": "k"
-    },
-    {
-      "id": "bishop-color",
-      "title": "A lifetime on one color",
-      "detail": "A bishop stays on its starting square color for the whole game.",
-      "category": "Pieces",
-      "metric": null,
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": "b"
-    },
-    {
-      "id": "knight-color",
-      "title": "Always changing color",
-      "detail": "Every knight move lands on the opposite square color.",
-      "category": "Pieces",
-      "metric": null,
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": "n"
-    },
-    {
-      "id": "promotion",
-      "title": "A pawn chooses its future",
-      "detail": "Promotion may produce a queen, rook, bishop or knight—even if none has been captured.",
-      "category": "Rules",
-      "metric": "4",
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
       "diagram": null
     },
     {
@@ -163,29 +307,9 @@
       "diagram": null
     },
     {
-      "id": "castle-check",
-      "title": "The king’s safe passage",
-      "detail": "You cannot castle out of, through, or into check.",
-      "category": "Rules",
-      "metric": null,
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": null
-    },
-    {
       "id": "castle-rook",
       "title": "An attacked rook can still castle",
       "detail": "A rook being attacked does not by itself prevent castling.",
-      "category": "Rules",
-      "metric": null,
-      "symbol": "lightbulb.fill",
-      "source": "https://handbook.fide.com/chapter/E012023",
-      "diagram": null
-    },
-    {
-      "id": "stalemate",
-      "title": "No move, no check",
-      "detail": "In standard chess, no legal move without being in check is stalemate: a draw.",
       "category": "Rules",
       "metric": null,
       "symbol": "lightbulb.fill",

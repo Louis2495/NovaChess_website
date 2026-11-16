@@ -1,10 +1,9 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
   Palette,
   ImagePlus,
   RotateCcw,
   Download,
-  Upload,
   SlidersHorizontal,
   Square,
   Volume2,
@@ -24,6 +23,7 @@ import {
   initialFen,
   contrast,
 } from "../lib/store";
+import { regions } from "../lib/regions";
 import type { Appearance as AppearanceType } from "../lib/types";
 import { Modal, Button, Field, Toggle } from "./UI";
 import { Board, Piece } from "./Board";
@@ -42,7 +42,6 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
       { name: string; settings: AppearanceType }[]
     >("novachess-presets-v2", []),
     [name, setName] = useState("");
-  const file = useRef<HTMLInputElement>(null);
   const change = <K extends keyof AppearanceType>(
     key: K,
     value: AppearanceType[K],
@@ -103,35 +102,6 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
         />
       </label>
     );
-  }
-  async function importSettings(file: File) {
-    try {
-      if (file.size > 3e6) throw new Error("Preset file is too large.");
-      const value = JSON.parse(await file.text());
-      if (value?.type === "novachess-library" && value.appearance)
-        value.settings = value.appearance;
-      else if (value?.type !== "novachess-appearance")
-        throw new Error("Choose a NovaChess appearance or backup file.");
-      const next = { ...defaults };
-      for (const key of Object.keys(defaults) as (keyof AppearanceType)[]) {
-        const v = value.settings[key];
-        if (typeof v !== typeof defaults[key]) continue;
-        if (
-          typeof v === "string" &&
-          key.toLowerCase().includes("color") &&
-          !/^#[0-9a-f]{6}$/i.test(v)
-        )
-          continue;
-        Object.assign(next, { [key]: v });
-      }
-      next.radius = Math.min(32, Math.max(0, next.radius));
-      next.fontSize = Math.min(18, Math.max(12, next.fontSize));
-      next.panelOpacity = Math.min(100, Math.max(20, next.panelOpacity));
-      set(next);
-      notify("Appearance imported.");
-    } catch (e) {
-      notify((e as Error).message);
-    }
   }
   return (
     <Modal title="Appearance" onClose={onClose} wide>
@@ -204,13 +174,33 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
               <Field label="Background">
                 <select
                   value={a.background}
-                  onChange={(e) => change("background", e.target.value)}
+                  onChange={(e) =>
+                    set((a) => ({
+                      ...a,
+                      background: e.target.value,
+                      flag: a.flag || "US",
+                    }))
+                  }
                 >
                   {backgrounds.map((b) => (
                     <option key={b}>{b}</option>
                   ))}
                 </select>
               </Field>
+              {a.background === "Flag" && (
+                <Field label="Country flag">
+                  <select
+                    value={a.flag || "US"}
+                    onChange={(e) => change("flag", e.target.value)}
+                  >
+                    {regions.map((r) => (
+                      <option key={r.code} value={r.code}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              )}
               {color("Base color", "backgroundColor")}
               <label className="upload-tile">
                 <ImagePlus />
@@ -476,24 +466,6 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                 <Download size={15} />
                 Export
               </Button>
-              <Button
-                className="secondary"
-                onClick={() => file.current?.click()}
-              >
-                <Upload size={15} />
-                Import
-              </Button>
-              <input
-                hidden
-                ref={file}
-                type="file"
-                accept="application/json"
-                onChange={(e) => {
-                  if (e.target.files?.[0])
-                    void importSettings(e.target.files[0]);
-                  e.target.value = "";
-                }}
-              />
             </div>
             <Button
               className="text-button"

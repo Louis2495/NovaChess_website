@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests",
+  testMatch: "**/*.spec.ts",
   fullyParallel: true,
   workers: 2,
   reporter: "list",
@@ -31,7 +32,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --port 4173 --strictPort",
+    command: "npm run dev -- --port 4173 --strictPort --base /",
     url: "http://127.0.0.1:4173",
     reuseExistingServer: !process.env.CI,
   },

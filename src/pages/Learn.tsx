@@ -2,19 +2,24 @@ import {
   BookOpen,
   GraduationCap,
   Library,
-  Search,
+  Clapperboard,
   Target,
   Lightbulb,
   History,
+  Brain,
+  Sparkles,
+  BookMarked,
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
 import { useApp } from "../lib/context";
-import { PageTitle, Card, Button } from "../components/UI";
+import { PageTitle, Button } from "../components/UI";
 import Openings from "./learn/Openings";
 import Repertoire from "./learn/Repertoire";
-import Research from "./learn/Research";
+import FamousGames from "./learn/FamousGames";
 import Endgames from "./learn/Endgames";
+import Encyclopedia from "./learn/Encyclopedia";
+import Playground from "./learn/Playground";
 import Knowledge from "./learn/Knowledge";
 export default function Learn() {
   const { detail, navigate, library } = useApp();
@@ -24,24 +29,37 @@ export default function Learn() {
     train: "Train an opening",
     lessons: "Opening lessons",
     search: "Opening library",
-    research: "Research",
-    endgames: "Endgames",
+    famous: "Famous games",
+    endgames: "Endgame Lessons",
     facts: "Fun facts",
     history: "History",
+    encyclopedia: "Encyclopedia",
+    trivia: "Trivia",
+    quizzes: "Quizzes",
   };
   if (detail)
     return (
       <>
-        <PageTitle title={labels[section] || "Learn"}>
-          <Button className="secondary" onClick={() => navigate("learn")}>
-            <ArrowLeft size={15} />
-            Learn
+        <div className="learn-page-heading">
+          <Button
+            className="learn-back"
+            aria-label="Back to Learn"
+            onClick={() => navigate("learn")}
+          >
+            <ArrowLeft size={21} />
           </Button>
-        </PageTitle>
-        {section === "repertoire" ? (
+          <PageTitle title={labels[section] || "Learn"}></PageTitle>
+        </div>
+        {section === "encyclopedia" ? (
+          <Encyclopedia />
+        ) : section === "trivia" ? (
+          <Playground trivia />
+        ) : section === "quizzes" ? (
+          <Playground />
+        ) : section === "repertoire" ? (
           <Repertoire />
-        ) : section === "research" ? (
-          <Research />
+        ) : section === "famous" ? (
+          <FamousGames />
         ) : section === "endgames" ? (
           <Endgames />
         ) : section === "facts" || section === "history" ? (
@@ -64,6 +82,27 @@ export default function Learn() {
       <div className="learn-hub">
         {[
           {
+            id: "encyclopedia",
+            title: "Encyclopedia",
+            text: "Motifs, players, events & more",
+            icon: BookMarked,
+            color: "blue",
+          },
+          {
+            id: "trivia",
+            title: "Trivia",
+            text: "Test your chess knowledge",
+            icon: Brain,
+            color: "purple",
+          },
+          {
+            id: "quizzes",
+            title: "Quizzes",
+            text: "Choose moves, find your style",
+            icon: Sparkles,
+            color: "orange",
+          },
+          {
             id: "repertoire",
             title: "Your repertoire",
             text: `${library.repertoire.length} saved lines`,
@@ -80,20 +119,20 @@ export default function Learn() {
           {
             id: "lessons",
             title: "Opening lessons",
-            text: "111 curated lessons",
+            text: "129 guided lessons",
             icon: BookOpen,
             color: "blue",
           },
           {
-            id: "research",
-            title: "Research",
-            text: "Explore public games",
-            icon: Search,
+            id: "famous",
+            title: "Famous games",
+            text: "Master games · replay & explore",
+            icon: Clapperboard,
             color: "orange",
           },
           {
             id: "endgames",
-            title: "Endgames",
+            title: "Endgame Lessons",
             text: "17 positions · engine replies",
             icon: Target,
             color: "blue",
@@ -101,7 +140,7 @@ export default function Learn() {
           {
             id: "facts",
             title: "Fun facts",
-            text: "56 sourced cards",
+            text: "75 selected stories",
             icon: Lightbulb,
             color: "orange",
           },
@@ -127,18 +166,6 @@ export default function Learn() {
           </button>
         ))}
       </div>
-      <Card className="learn-summary">
-        <BookOpen size={22} />
-        <div>
-          <h3>Local progress</h3>
-          <p>
-            {library.progress.learned.length} lessons completed ·{" "}
-            {library.progress.endgames.length} endgames completed ·{" "}
-            {library.repertoire.filter((r) => r.due < Date.now()).length}{" "}
-            repertoire lines due
-          </p>
-        </div>
-      </Card>
     </>
   );
 }

@@ -4,14 +4,18 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  RotateCcw,
+  PanelLeftClose,
+  PanelLeftOpen,
   Lightbulb,
   Check,
   Save,
-  FlipVertical2,
+  RotateCcw,
+  Play,
+  Pause,
 } from "lucide-react";
 import { useApp } from "../../lib/context";
 import { useData, initialFen, uid } from "../../lib/store";
+import { useControl } from "../../lib/controls";
 import type { Opening } from "../../lib/types";
 import { Board } from "../../components/Board";
 import {
@@ -23,6 +27,23 @@ import {
   IconButton,
   Modal,
 } from "../../components/UI";
+type Guide = {
+  id: string;
+  family: string;
+  idea: string;
+  structure: string;
+  white: string[];
+  black: string[];
+  breaks: string[];
+  avoid: string;
+  quiz: {
+    question: string;
+    answers: string[];
+    correct: number;
+    explanation: string;
+  };
+  lines: { name: string; moves: string[] }[];
+};
 export default function Openings({
   mode,
   query = "",
@@ -33,27 +54,36 @@ export default function Openings({
   selectedId?: string;
 }) {
   const { data: lessons, error } = useData<Opening[]>("lessons"),
-    { data: all } = useData<Opening[]>("openings");
-  if (!lessons) return <Loading error={error} />;
+    { data: all, error: allError } = useData<Opening[]>("openings"),
+    { data: guides } = useData<Guide[]>("opening-guides");
+  if (
+    !lessons ||
+    !guides ||
+    (selectedId && !lessons.some((l) => l.id === selectedId) && !all)
+  )
+    return <Loading error={error || allError} />;
   return (
-    <OpeningLibrary
+    <LessonWorkspace
       lessons={lessons}
       all={all || lessons}
+      guides={guides}
       mode={mode}
       query={query}
       selectedId={selectedId}
     />
   );
 }
-function OpeningLibrary({
+function LessonWorkspace({
   lessons,
   all,
+  guides,
   mode,
   query,
   selectedId,
 }: {
   lessons: Opening[];
   all: Opening[];
+  guides: Guide[];
   mode: "train" | "lesson";
   query: string;
   selectedId?: string;
@@ -61,17 +91,47 @@ function OpeningLibrary({
   const { library, setLibrary, notify } = useApp();
   const [search, setSearch] = useState(query),
     [selected, setSelected] = useState(
-      lessons.find((l) => l.id === selectedId) || lessons[0],
+      lessons.find((l) => l.id === selectedId) ||
+        all.find((l) => l.id === selectedId) ||
+        lessons[0],
     ),
+    [catalog, setCatalog] = useState(!selectedId),
+    [branch, setBranch] = useState(0),
     [step, setStep] = useState(0),
     [practice, setPractice] = useState(mode === "train"),
     [side, setSide] = useState<"w" | "b">("w"),
     [hint, setHint] = useState(false),
     [message, setMessage] = useState(""),
+    [perfect, setPerfect] = useState(true),
     [limit, setLimit] = useState(80),
-    [flipped, setFlipped] = useState(false),
     [saving, setSaving] = useState(false),
-    [name, setName] = useState("");
+    [name, setName] = useState(""),
+    [info, setInfo] = useState("Plan"),
+    [answer, setAnswer] = useState<number | null>(null),
+    [autoplay, setAutoplay] = useState(false);
+  const family = selected.name.split(":")[0],
+    guide =
+      guides.find((g) => g.family === family) ||
+      guides.find((g) => selected.name.startsWith(g.family))!;
+  const lines = useMemo(
+    () => [
+      {
+        name: selected.name.includes("Core plans")
+          ? "Main line"
+          : selected.name.split(":").slice(1).join(":") || "Selected line",
+        moves: selected.moves,
+      },
+      ...(guide?.lines || []).filter(
+        (l) => l.moves.join(" ") !== selected.moves.join(" "),
+      ),
+    ],
+    [guide, selected],
+  );
+  const moves = lines[branch]?.moves || selected.moves,
+    c = new Chess();
+  for (const m of moves.slice(0, step)) c.move(m);
+  const fen = c.fen(),
+    expected = step < moves.length ? new Chess(fen).move(moves[step]) : null;
   const candidates = useMemo(
     () =>
       search.trim()
@@ -79,44 +139,68 @@ function OpeningLibrary({
             (o.name + " " + o.eco).toLowerCase().includes(search.toLowerCase()),
           )
         : lessons,
-    [search, lessons, all],
+    [all, lessons, search],
   );
-  const c = new Chess();
-  for (const m of selected.moves.slice(0, step)) c.move(m);
-  const fen = c.fen();
-  const expected =
-    step < selected.moves.length
-      ? new Chess(fen).move(selected.moves[step])
-      : null;
   function show(n: number) {
-    setStep(n);
+    setStep(Math.max(0, Math.min(moves.length, n)));
     setHint(false);
     setMessage("");
-    if (n === selected.moves.length)
-      setLibrary((l) => ({
-        ...l,
-        progress: {
-          ...l.progress,
-          learned: [...new Set([...l.progress.learned, selected.id])],
-        },
-      }));
   }
   useEffect(() => {
-    if (mode !== "train" || !practice || c.turn() === side || !expected) return;
-    const t = setTimeout(() => show(step + 1), 400);
+    if (step !== moves.length) return;
+    setAutoplay(false);
+    setLibrary((l) => ({
+      ...l,
+      progress: {
+        ...l.progress,
+        learned: [...new Set([...l.progress.learned, selected.id])],
+        mastered:
+          practice && perfect
+            ? [
+                ...new Set([
+                  ...(l.progress.mastered || []),
+                  selected.id + ":" + branch,
+                ]),
+              ]
+            : l.progress.mastered || [],
+      },
+    }));
+  }, [step]);
+  useEffect(() => {
+    if (!practice || c.turn() === side || !expected) return;
+    const t = setTimeout(() => show(step + 1), 500);
     return () => clearTimeout(t);
-  }, [step, selected, practice, side]);
+  }, [step, selected, practice, side, branch]);
+  useEffect(() => {
+    if (!autoplay || practice || !expected) return;
+    const t = setTimeout(() => show(step + 1), 1500);
+    return () => clearTimeout(t);
+  }, [autoplay, practice, step, branch]);
+  useControl("next", () => {
+    if (!practice) show(step + 1);
+  });
+  useControl("previous", () => show(step - 1));
+  useControl("first", () => show(0));
+  useControl("last", () => {
+    if (!practice) show(moves.length);
+  });
+  useControl("autoplay", () => {
+    if (!practice) setAutoplay((v) => !v);
+  });
+  function choose(o: Opening) {
+    setSelected(o);
+    setBranch(0);
+    show(0);
+    setPerfect(true);
+    setAnswer(null);
+    setCatalog(false);
+    setAutoplay(false);
+  }
   function play(from: string, to: string, promotion?: string) {
     try {
-      const move = new Chess(fen).move({
-        from,
-        to,
-        promotion: promotion || "q",
-      });
-      if (
-        move.from + move.to + (move.promotion || "") !==
-        selected.moves[step]
-      ) {
+      const m = new Chess(fen).move({ from, to, promotion: promotion || "q" });
+      if (m.from + m.to + (m.promotion || "") !== moves[step]) {
+        setPerfect(false);
         setMessage("Try another move, or use Hint.");
         return;
       }
@@ -125,186 +209,307 @@ function OpeningLibrary({
       notify("Illegal move.");
     }
   }
-  let explanation = "";
-  if (expected) {
-    explanation =
-      expected.flags.includes("k") || expected.flags.includes("q")
-        ? "Castling develops the rook and shelters the king."
-        : expected.captured
-          ? "Compare the capture with the available recaptures."
-          : expected.piece === "p"
-            ? "Notice the change in pawn structure and central control."
-            : ["n", "b"].includes(expected.piece)
-              ? "Develop the piece and compare its activity."
-              : expected.piece === "r"
-                ? "Compare the rook’s file and activity."
-                : "Check the piece’s threats and safety.";
-  }
+  const explanation = expected
+    ? moveNote(c, expected, guide)
+    : guide?.structure;
+  const shift = selected.id.length % 3,
+    answers =
+      guide?.quiz.answers.map((_, i) => guide.quiz.answers[(i + shift) % 3]) ||
+      [];
+  const navigation = (
+    <div className="lesson-step-controls">
+      <IconButton
+        label="Restart lesson"
+        onClick={() => {
+          show(0);
+          setPerfect(true);
+        }}
+      >
+        <RotateCcw size={17} />
+      </IconButton>
+      <Button
+        className="secondary"
+        disabled={!step}
+        onClick={() => show(step - 1)}
+      >
+        <ChevronLeft size={16} />
+        Back
+      </Button>
+      {practice ? (
+        <Button
+          disabled={!expected}
+          onClick={() => {
+            setHint(true);
+            setPerfect(false);
+          }}
+        >
+          <Lightbulb size={16} />
+          Hint
+        </Button>
+      ) : (
+        <Button disabled={!expected} onClick={() => show(step + 1)}>
+          Next
+          <ChevronRight size={16} />
+        </Button>
+      )}
+      {!practice && (
+        <IconButton
+          label={autoplay ? "Pause lesson" : "Play lesson"}
+          onClick={() => setAutoplay((v) => !v)}
+        >
+          {autoplay ? <Pause size={16} /> : <Play size={16} />}
+        </IconButton>
+      )}
+    </div>
+  );
   return (
     <>
-      <div className="learning-layout">
-        <Card className="opening-list">
-          <div className="search-field">
-            <Search size={16} />
-            <input
-              aria-label="Search openings"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setLimit(80);
-              }}
-              placeholder="Name or ECO code"
-            />
-          </div>
-          <div className="list-summary">
-            {search ? `${candidates.length} lines` : "111 curated lessons"}
-          </div>
-          <div className="scroll-list">
-            {candidates.slice(0, limit).map((o) => (
-              <button
-                className={`opening-row ${selected.id === o.id ? "active" : ""}`}
-                key={o.id}
+      <div
+        className={`lesson-workspace ${catalog ? "catalog-open" : "catalog-closed"}`}
+      >
+        <div className="lesson-sidebar">
+          <Button
+            className="secondary catalog-toggle"
+            onClick={() => setCatalog((v) => !v)}
+          >
+            {catalog ? (
+              <PanelLeftClose size={18} />
+            ) : (
+              <PanelLeftOpen size={18} />
+            )}
+            Openings<span>{catalog ? "Hide" : "Browse"}</span>
+          </Button>
+          {catalog ? (
+            <Card className="opening-list">
+              <div className="search-field">
+                <Search size={16} />
+                <input
+                  aria-label="Search openings"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setLimit(80);
+                  }}
+                  placeholder="Name or ECO code"
+                />
+              </div>
+              <div className="list-summary">
+                {search
+                  ? `${candidates.length} lines`
+                  : `${lessons.length} lessons`}
+              </div>
+              <div className="scroll-list">
+                {candidates.slice(0, limit).map((o) => (
+                  <button
+                    className={`opening-row ${selected.id === o.id ? "active" : ""}`}
+                    key={o.id}
+                    onClick={() => choose(o)}
+                  >
+                    <span className="eco">{o.eco}</span>
+                    <span>
+                      {o.name}
+                      <small>{Math.ceil(o.moves.length / 2)} moves</small>
+                    </span>
+                    {library.progress.learned.includes(o.id) && (
+                      <Check size={15} />
+                    )}
+                  </button>
+                ))}
+                {candidates.length > limit && (
+                  <Button
+                    className="secondary"
+                    onClick={() => setLimit(limit + 80)}
+                  >
+                    Show more
+                  </Button>
+                )}
+              </div>
+            </Card>
+          ) : (
+            <Card className="lesson-desk">
+              <div className="lesson-next">
+                <span className="eyebrow">
+                  {step} / {moves.length}
+                </span>
+                <h3>
+                  {expected
+                    ? practice && !hint
+                      ? "Play the next move"
+                      : `Next: ${expected.san}`
+                    : "Line complete"}
+                </h3>
+                {(!practice || hint) && <p>{explanation}</p>}
+                {message && (
+                  <p className="feedback" role="status">
+                    {message}
+                  </p>
+                )}
+              </div>
+              {navigation}
+              <div className="segmented">
+                {["Plan", "Structure", "Review"].map((v) => (
+                  <button
+                    key={v}
+                    className={info === v ? "active" : ""}
+                    onClick={() => setInfo(v)}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+              <div
+                className="lesson-info-scroll"
+                tabIndex={0}
+                aria-label="Lesson notes"
+              >
+                {guide ? (
+                  info === "Plan" ? (
+                    <>
+                      <p>{guide.idea}</p>
+                      <h3>White’s plan</h3>
+                      <ul>
+                        {guide.white.map((s) => (
+                          <li key={s}>{s}</li>
+                        ))}
+                      </ul>
+                      <h3>Black’s plan</h3>
+                      <ul>
+                        {guide.black.map((s) => (
+                          <li key={s}>{s}</li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : info === "Structure" ? (
+                    <>
+                      <p>{guide.structure}</p>
+                      <h3>Pawn breaks</h3>
+                      <div className="button-row">
+                        {guide.breaks.map((s) => (
+                          <span className="pill" key={s}>
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                      <h3>Watch for</h3>
+                      <p>{guide.avoid}</p>
+                    </>
+                  ) : (
+                    <>
+                      <h3>{guide.quiz.question}</h3>
+                      <div className="lesson-quiz">
+                        {answers.map((a, i) => (
+                          <button
+                            key={a}
+                            className={answer === i ? "selected" : ""}
+                            onClick={() => setAnswer(i)}
+                          >
+                            {a}
+                          </button>
+                        ))}
+                      </div>
+                      {answer !== null && (
+                        <p role="status">
+                          {answers[answer] ===
+                          guide.quiz.answers[guide.quiz.correct]
+                            ? "Correct. "
+                            : "Try again. "}
+                          {guide.quiz.explanation}
+                        </p>
+                      )}
+                    </>
+                  )
+                ) : (
+                  <p>
+                    Compare development, central pawn breaks and king safety in
+                    this position.
+                  </p>
+                )}
+              </div>
+              <Toggle
+                label="Practice moves"
+                checked={practice}
+                onChange={(v) => {
+                  setPractice(v);
+                  show(0);
+                  setPerfect(true);
+                  setAutoplay(false);
+                }}
+              />
+              {practice && (
+                <Field label="Train as">
+                  <select
+                    value={side}
+                    onChange={(e) => {
+                      setSide(e.target.value as "w" | "b");
+                      show(0);
+                      setPerfect(true);
+                    }}
+                  >
+                    <option value="w">White</option>
+                    <option value="b">Black</option>
+                  </select>
+                </Field>
+              )}
+              <Button
+                className="text-button"
                 onClick={() => {
-                  setSelected(o);
-                  setStep(0);
-                  setMessage("");
-                  setHint(false);
+                  setName(selected.name);
+                  setSaving(true);
                 }}
               >
-                <span className="eco">{o.eco}</span>
-                <span>
-                  {o.name}
-                  <small>{Math.ceil(o.moves.length / 2)} moves</small>
-                </span>
-                {library.progress.learned.includes(o.id) && <Check size={15} />}
-              </button>
-            ))}
-            {candidates.length > limit && (
-              <Button
-                className="secondary"
-                onClick={() => setLimit(limit + 80)}
-              >
-                Show more
+                <Save size={15} />
+                Save to repertoire
               </Button>
-            )}
-            {!candidates.length && (
-              <p className="muted">No matching openings.</p>
-            )}
-          </div>
-        </Card>
-        <div className="board-column">
+            </Card>
+          )}
+        </div>
+        <div className="lesson-board-area">
           <div className="card-heading">
             <div>
               <span className="eyebrow">{selected.eco}</span>
               <h2>{selected.name}</h2>
             </div>
-            <IconButton label="Flip board" onClick={() => setFlipped(!flipped)}>
-              <FlipVertical2 size={17} />
-            </IconButton>
           </div>
+          <select
+            aria-label="Lesson variation"
+            value={branch}
+            onChange={(e) => {
+              setBranch(+e.target.value);
+              setStep(0);
+              setHint(false);
+              setPerfect(true);
+              setMessage("");
+            }}
+          >
+            {lines.map((l, i) => (
+              <option key={i} value={i}>
+                {l.name}
+              </option>
+            ))}
+          </select>
           <Board
             fen={fen}
             onMove={play}
-            disabled={
-              !practice ||
-              step >= selected.moves.length ||
-              (mode === "train" && c.turn() !== side)
-            }
-            flipped={flipped}
+            disabled={!practice || !expected || c.turn() !== side}
+            flipped={practice && side === "b"}
             highlights={
               step
-                ? [
-                    selected.moves[step - 1].slice(0, 2),
-                    selected.moves[step - 1].slice(2, 4),
-                  ]
+                ? [moves[step - 1].slice(0, 2), moves[step - 1].slice(2, 4)]
                 : []
             }
             hint={hint ? expected?.from : undefined}
           />
           <div className="lesson-bar">
-            <span
-              style={{ width: `${(step / selected.moves.length) * 100}%` }}
-            />
+            <span style={{ width: `${(step / moves.length) * 100}%` }} />
           </div>
-          <Card className="lesson-controls">
-            <div className="card-heading">
-              <b>
-                {step === selected.moves.length
-                  ? "Lesson complete"
-                  : practice && !hint
-                    ? "Play the next move"
-                    : `Next: ${expected?.san}`}
-              </b>
-              <span className="muted">
-                {step} / {selected.moves.length}
-              </span>
-            </div>
-            {(!practice || hint) && expected && (
-              <p className="caption">{explanation}</p>
-            )}
-            {message && (
-              <p className="feedback" role="status">
-                {message}
+          {catalog && (
+            <div className="lesson-compact-controls">
+              {navigation}
+              <p className="caption">
+                {expected ? `Next: ${expected.san}` : "Line complete"}
               </p>
-            )}
-            <div className="button-row equal-buttons">
-              <Button
-                className="secondary"
-                disabled={!step}
-                onClick={() => show(step - 1)}
-              >
-                <ChevronLeft size={16} />
-                Back
-              </Button>
-              {practice ? (
-                <Button disabled={!expected} onClick={() => setHint(true)}>
-                  <Lightbulb size={16} />
-                  Hint
-                </Button>
-              ) : (
-                <Button disabled={!expected} onClick={() => show(step + 1)}>
-                  Next
-                  <ChevronRight size={16} />
-                </Button>
-              )}
-              <IconButton label="Restart lesson" onClick={() => show(0)}>
-                <RotateCcw size={16} />
-              </IconButton>
             </div>
-            <Toggle
-              label="Practice moves"
-              checked={practice}
-              onChange={(v) => {
-                setPractice(v);
-                show(0);
-              }}
-            />
-            {mode === "train" && (
-              <Field label="Train as">
-                <select
-                  value={side}
-                  onChange={(e) => {
-                    setSide(e.target.value as "w" | "b");
-                    setFlipped(e.target.value === "b");
-                    show(0);
-                  }}
-                >
-                  <option value="w">White</option>
-                  <option value="b">Black</option>
-                </select>
-              </Field>
-            )}
-            <Button
-              className="text-button"
-              onClick={() => {
-                setName(selected.name);
-                setSaving(true);
-              }}
-            >
-              <Save size={15} />
-              Save to repertoire
-            </Button>
-          </Card>
+          )}
         </div>
       </div>
       {saving && (
@@ -337,7 +542,7 @@ function OpeningLibrary({
                     name: name.trim(),
                     side,
                     initial: initialFen,
-                    moves: selected.moves,
+                    moves,
                     due: Date.now(),
                     trained: 0,
                     successes: 0,
@@ -354,4 +559,55 @@ function OpeningLibrary({
       )}
     </>
   );
+}
+function moveNote(c: Chess, m: ReturnType<Chess["move"]>, g?: Guide) {
+  const piece = {
+      p: "pawn",
+      n: "knight",
+      b: "bishop",
+      r: "rook",
+      q: "queen",
+      k: "king",
+    }[m.piece],
+    side = m.color === "w" ? "White" : "Black";
+  if (m.san === "O-O" || m.san === "O-O-O")
+    return `${side} castles to connect the rooks. Before opening ${g?.breaks[0] || "the center"}, compare which king will be safer.`;
+  if (m.captured)
+    return `${m.san} exchanges the ${m.captured === "p" ? "pawn" : { n: "knight", b: "bishop", r: "rook", q: "queen", k: "king" }[m.captured as "n"] || "piece"} on ${m.to}. Recount the attackers and defenders before choosing a recapture. ${g?.structure || ""}`;
+  if (m.piece === "p") {
+    const direction = m.color === "w" ? 1 : -1,
+      file = m.to.charCodeAt(0) - 97,
+      rank = +m.to[1] + direction;
+    const squares = [file - 1, file + 1]
+      .filter((f) => f >= 0 && f < 8 && rank >= 1 && rank <= 8)
+      .map((f) => "abcdefgh"[f] + rank);
+    const specific: Record<string, string> = {
+      "w:c3":
+        "It prepares d4, but removes c3 as a knight square; Nb1–d2 is the usual alternative.",
+      "w:d3":
+        "It supports e4 and opens the c1 bishop’s diagonal while keeping central tension.",
+      "w:h3":
+        "It takes g4 away from an enemy minor piece, at the cost of a tempo before central play.",
+      "w:g3":
+        "It prepares Bg2 and pressure on the long diagonal; watch the resulting dark-square weaknesses.",
+      "b:c6":
+        "It supports d5 and controls b5, but blocks the b8 knight’s most natural developing square.",
+      "b:d6":
+        "It supports e5 or prepares a restrained center; the c8 bishop gains a diagonal.",
+      "b:a6":
+        "It takes b5 away from White’s minor pieces and may prepare ...b5; central development still matters.",
+      "b:g6":
+        "It prepares ...Bg7. Keep the long diagonal open enough for the bishop to influence the center.",
+    };
+    const isBreak = g?.breaks.some(
+      (b) => b.replace("...", "").toLowerCase() === m.san.toLowerCase(),
+    );
+    return `${m.san} controls ${squares.join(" and ")}. ${isBreak ? g?.structure : specific[m.color + ":" + m.san] || "The pawn cannot step back: compare the space gained with the squares left behind."}`;
+  }
+  const after = new Chess(c.fen());
+  after.move(m.san);
+  const pressure = after
+    .moves({ verbose: true })
+    .filter((reply) => reply.to === m.to).length;
+  return `${m.san} places the ${piece} on ${m.to}. ${pressure ? "The opponent can challenge this square; check the exchanges before relying on it. " : ""}${(m.color === "w" ? g?.white : g?.black)?.[Math.floor(c.history().length / 6) % 3] || g?.idea || "Compare central control and king safety before the next move."}`;
 }

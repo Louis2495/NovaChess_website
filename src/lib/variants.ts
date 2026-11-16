@@ -20,7 +20,23 @@ export function fairy() {
   return promise;
 }
 export const variantList = [
-  { id: "chess", name: "Standard", description: "Checkmate the king." },
+  {
+    id: "dropping",
+    name: "Dropping Squares",
+    description:
+      "A square drops every five full moves. Dropped squares block movement.",
+  },
+  {
+    id: "chaos",
+    name: "Chaos chess",
+    description: "Two-step pawns, one freeze and one piece switch per player.",
+  },
+  {
+    id: "random",
+    name: "Random",
+    description: "Each turn selects the piece you must move.",
+  },
+  { id: "chess", name: "Standard", description: "" },
   {
     id: "blind",
     name: "Blindfold · board",

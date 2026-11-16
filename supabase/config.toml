@@ -1,0 +1,4 @@
+project_id = "novachess"
+[functions.chess]
+verify_jwt = false
+import_map = "./functions/chess/deno.json"

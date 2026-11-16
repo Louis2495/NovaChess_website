@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
   Search,
-  Upload,
   X,
   ChevronRight,
   ChevronLeft,
@@ -138,7 +137,7 @@ export default function Research() {
         );
         if (!r.ok) throw new Error(`Lichess returned HTTP ${r.status}.`);
         if (!r.body)
-          throw new Error("Streaming is unavailable. Import PGN instead.");
+          throw new Error("Streaming is unavailable. Try again later.");
         const reader = r.body.getReader(),
           decoder = new TextDecoder();
         let buffer = "";
@@ -190,33 +189,13 @@ export default function Research() {
     } catch (e) {
       setError(
         (e as Error).name === "AbortError"
-          ? "Import canceled. Previous results retained."
-          : `${(e as Error).message} Public access or browser CORS may be unavailable; you can import PGN.`,
+          ? "Loading canceled. Previous results retained."
+          : `${(e as Error).message} Public access or browser CORS may be unavailable; try again later.`,
       );
     } finally {
       setBusy(false);
       controller.current = null;
     }
-  }
-  async function importFile(file: File) {
-    if (file.size > 25e6) {
-      notify("Choose a PGN file smaller than 25 MB.");
-      return;
-    }
-    const text = await file.text();
-    const chunks = text.split(/(?=\[Event\s)/).filter((s) => s.trim());
-    const imported = chunks
-      .map((t) => parsePGN(t))
-      .filter((g): g is PublicGame => !!g);
-    if (!imported.length) {
-      setError("No valid standard games found in the file.");
-      return;
-    }
-    setGames(imported);
-    setIdentity(file.name);
-    setPath([]);
-    setStatus(`${imported.length} games imported.`);
-    setError("");
   }
   return (
     <>
@@ -241,7 +220,7 @@ export default function Research() {
             onClick={() => void load()}
           >
             <Search size={16} />
-            Import games
+            Load games
           </Button>
           {busy && (
             <Button
@@ -252,21 +231,9 @@ export default function Research() {
               Cancel
             </Button>
           )}
-          <label className="btn secondary file-button">
-            <Upload size={15} />
-            PGN file
-            <input
-              type="file"
-              accept=".pgn,.txt"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void importFile(f);
-              }}
-            />
-          </label>
         </div>
         <p className="caption">
-          Imports available public standard games. Trees cover the first 40
+          Explore available public standard games. Trees cover the first 40
           half-moves. Service availability and rate limits apply.
         </p>
         {status && (
@@ -322,7 +289,7 @@ export default function Research() {
             <h2>{identity || "Opening explorer"}</h2>
             <span className="pill">{matching.length} games</span>
           </div>
-          <Field label="Imported player’s color">
+          <Field label="Player’s color">
             <select value={side} onChange={(e) => setSide(e.target.value)}>
               <option value="w">White</option>
               <option value="b">Black</option>
@@ -357,7 +324,7 @@ export default function Research() {
               <p className="muted">
                 {games.length
                   ? "No continuations at this position."
-                  : "Import public games or a PGN file to explore."}
+                  : "Load a public player’s games to explore."}
               </p>
             )}
           </div>
@@ -373,7 +340,7 @@ export default function Research() {
               }
             >
               <Download size={14} />
-              Export imported games
+              Export games
             </Button>
           )}
         </Card>

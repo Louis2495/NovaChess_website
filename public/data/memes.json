@@ -1,0 +1,2662 @@
+[
+  {
+    "id": "meme-1",
+    "top": "I have calculated everything.",
+    "bottom": "Except their next move.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-2",
+    "top": "My queen is perfectly safe.",
+    "bottom": "Their knight: funny you should say that.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-3",
+    "top": "Me: one quiet developing move.",
+    "bottom": "Also me: what if I sacrifice the rook?",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-4",
+    "top": "The engine says +0.2.",
+    "bottom": "I celebrate like I found mate in three.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-5",
+    "top": "I saw the fork coming.",
+    "bottom": "I moved into it anyway.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-6",
+    "top": "A free pawn?",
+    "bottom": "A free lesson.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-7",
+    "top": "My opponent offers a queen trade.",
+    "bottom": "But I just learned where my queen goes.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-8",
+    "top": "I developed all my pieces.",
+    "bottom": "Unfortunately, all to the same square.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-9",
+    "top": "I prepared this opening for weeks.",
+    "bottom": "They played 1.b3.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-10",
+    "top": "My bishop has a beautiful diagonal.",
+    "bottom": "My pawn is also enjoying the view.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-11",
+    "top": "I found a brilliant sacrifice.",
+    "bottom": "The engine found a missing rook.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-12",
+    "top": "My king needs some air.",
+    "bottom": "I opened every window.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-13",
+    "top": "Just one more puzzle.",
+    "bottom": "The sun has developed on the kingside.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-14",
+    "top": "I know this endgame.",
+    "bottom": "I just do not know which side is winning.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-15",
+    "top": "I play positional chess.",
+    "bottom": "Mostly because I missed the tactic.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-16",
+    "top": "The knight on the rim is dim.",
+    "bottom": "Mine applied for permanent residency.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-17",
+    "top": "The engine prefers a quiet move.",
+    "bottom": "I prefer the move with a check symbol.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-18",
+    "top": "The plan was to win the queen.",
+    "bottom": "The plan has been revised to save the bishop.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-19",
+    "top": "A bad bishop is still a bishop.",
+    "bottom": "Mine is a very well-paid pawn.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-20",
+    "top": "I played the book move.",
+    "bottom": "The book would like its move back.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-21",
+    "top": "I never hang pieces.",
+    "bottom": "I offer unsound positional investments.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-22",
+    "top": "My opponent is taking a long time.",
+    "bottom": "They are calculating how bad my move is.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-23",
+    "top": "I have a space advantage.",
+    "bottom": "For my king to run through.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-24",
+    "top": "The position is completely equal.",
+    "bottom": "I can fix that.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-25",
+    "top": "I will simplify into a winning endgame.",
+    "bottom": "Update: it was the other side’s winning endgame.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-26",
+    "top": "I spotted mate in one.",
+    "bottom": "Unfortunately, it was not my turn.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-27",
+    "top": "The rook belongs on an open file.",
+    "bottom": "Mine is behind three pawns, reflecting.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-28",
+    "top": "I have the bishop pair.",
+    "bottom": "They have the rest of the army.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-29",
+    "top": "My pawn is one square from promotion.",
+    "bottom": "Their rook is one square from my pawn.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-30",
+    "top": "I am attacking on both wings.",
+    "bottom": "My king would like a word.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-31",
+    "top": "The opening is unfamiliar.",
+    "bottom": "Good. Neither of us has expectations.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-32",
+    "top": "I can win this pawn.",
+    "bottom": "I can also finish developing. Tough choice.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-33",
+    "top": "I am up a rook.",
+    "bottom": "I am down a plan.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-34",
+    "top": "The move was a surprise.",
+    "bottom": "Especially to the piece I left undefended.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-35",
+    "top": "This is a theoretical draw.",
+    "bottom": "I bring practical uncertainty.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-36",
+    "top": "I have a protected passed pawn.",
+    "bottom": "It has no interest in passing.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-37",
+    "top": "The rook endgame is simple.",
+    "bottom": "There are only forty-seven things to remember.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-38",
+    "top": "I calculated three variations.",
+    "bottom": "They found the fourth.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-39",
+    "top": "My king is very active.",
+    "bottom": "The game is still in the opening.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-40",
+    "top": "I will check before every capture.",
+    "bottom": "I captured before that thought finished.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-41",
+    "top": "I have excellent piece coordination.",
+    "bottom": "They are all defending the same lost pawn.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-42",
+    "top": "The queen is overworked.",
+    "bottom": "So I gave it another defensive task.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-43",
+    "top": "I chose the safest move.",
+    "bottom": "According to my very optimistic definition of safe.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-44",
+    "top": "One knight can fork eight squares.",
+    "bottom": "Mine found the only square with no threats.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-45",
+    "top": "I am learning a new opening.",
+    "bottom": "I am relearning that development matters.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-46",
+    "top": "The opponent’s attack is imaginary.",
+    "bottom": "My king has begun packing.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-47",
+    "top": "I love closed positions.",
+    "bottom": "My bishop has filed a complaint.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-48",
+    "top": "I traded my bad bishop.",
+    "bottom": "For their very good rook. The engine approves.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-49",
+    "top": "I play best with a plan.",
+    "bottom": "Step one: acquire a plan.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-50",
+    "top": "I nearly trapped their queen.",
+    "bottom": "Only seven escape squares remained.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-51",
+    "top": "A pawn storm is coming.",
+    "bottom": "My king forgot its umbrella.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-52",
+    "top": "I will not push another pawn.",
+    "bottom": "Unless it looks really interesting.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-53",
+    "top": "The knight has an outpost.",
+    "bottom": "The bishop has a long commute.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-54",
+    "top": "I am threatening a back-rank mate.",
+    "bottom": "They are threatening the front, too.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-55",
+    "top": "The queen sacrifice works in every line.",
+    "bottom": "Except the line where they do not take it.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-56",
+    "top": "I stopped their only threat.",
+    "bottom": "They introduced a second threat.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-57",
+    "top": "I used prophylaxis.",
+    "bottom": "To prevent myself from winning too quickly.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-58",
+    "top": "My position has no weaknesses.",
+    "bottom": "The king would prefer a second opinion.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-59",
+    "top": "I have the initiative.",
+    "bottom": "I am not entirely sure where to take it.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-60",
+    "top": "I studied the wrong-bishop ending.",
+    "bottom": "I now know precisely why I am drawing.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-61",
+    "top": "This pawn will become a queen.",
+    "bottom": "The opposing king has other career advice.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-62",
+    "top": "I am playing a gambit.",
+    "bottom": "The compensation is personal growth.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-63",
+    "top": "A quiet move wins.",
+    "bottom": "My mouse is already hovering over the check.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-64",
+    "top": "I found a zwischenzug.",
+    "bottom": "I learned the spelling after the game.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-65",
+    "top": "I can attack that pinned knight.",
+    "bottom": "The knight ignored the memo and gave check.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-66",
+    "top": "I want an open position.",
+    "bottom": "My king is still on e1.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-67",
+    "top": "I made a waiting move.",
+    "bottom": "My opponent did not wait.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-68",
+    "top": "I am two moves from castling.",
+    "bottom": "The enemy rook is one move from visiting.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-69",
+    "top": "The exchange was favorable.",
+    "bottom": "For the party I was not representing.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-70",
+    "top": "I recognized the pattern.",
+    "bottom": "One move after it happened.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-71",
+    "top": "The king is trapped in the center.",
+    "bottom": "Mine or theirs? Let us stay positive.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-72",
+    "top": "I will double rooks on the file.",
+    "bottom": "First I must convince one to leave the corner.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-73",
+    "top": "My queen is extremely active.",
+    "bottom": "My back rank is extremely available.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-74",
+    "top": "It is just a harmless pawn move.",
+    "bottom": "It changed all thirty-two squares I cared about.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-75",
+    "top": "I could play the solid line.",
+    "bottom": "But the dubious one has a better name.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-76",
+    "top": "I won the opening battle.",
+    "bottom": "The middlegame has requested a rematch.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-77",
+    "top": "They have an isolated pawn.",
+    "bottom": "It has more active friends than my king.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-78",
+    "top": "My knight has found a perfect square.",
+    "bottom": "Their pawn has found one step forward.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-79",
+    "top": "I will trade into a pawn ending.",
+    "bottom": "I will now learn opposition at considerable cost.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-80",
+    "top": "I have calculated the pawn race.",
+    "bottom": "The other pawn had a promotion option.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-81",
+    "top": "My rook is behind the passed pawn.",
+    "bottom": "Unfortunately, it is their passed pawn.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-82",
+    "top": "The engine calls it a missed win.",
+    "bottom": "I call it a successful draw proposal.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-83",
+    "top": "This opening is easy to remember.",
+    "bottom": "The move order disagrees.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-84",
+    "top": "The center is locked.",
+    "bottom": "My attack has left the keys inside.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-85",
+    "top": "I will exploit the weak dark squares.",
+    "bottom": "First, locate my dark-squared bishop.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-86",
+    "top": "I won a tempo.",
+    "bottom": "I spent it moving the same knight again.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-87",
+    "top": "I saw an amazing rook lift.",
+    "bottom": "The rook landed on an undefended square.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-88",
+    "top": "My bishop sees the whole board.",
+    "bottom": "It cannot do much about any of it.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-89",
+    "top": "I have a dangerous passed pawn.",
+    "bottom": "Dangerous primarily to my confidence.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-90",
+    "top": "I am building a fortress.",
+    "bottom": "The queen found the side entrance.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-91",
+    "top": "The knight fork is unstoppable.",
+    "bottom": "Unless the knight can be captured. Minor detail.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-92",
+    "top": "I declined the draw.",
+    "bottom": "The position has declined my confidence.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-93",
+    "top": "I am playing the long game.",
+    "bottom": "My opponent is playing the forcing game.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-94",
+    "top": "I finally understood the pawn structure.",
+    "bottom": "It immediately changed.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-95",
+    "top": "My attack has every ingredient.",
+    "bottom": "Except a legal follow-up.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-96",
+    "top": "I saved the queen with check.",
+    "bottom": "The rook would like to know who saves it.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-97",
+    "top": "The endgame is all technique.",
+    "bottom": "I have brought enthusiasm.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-98",
+    "top": "My opponent made an inaccuracy.",
+    "bottom": "I responded with historical perspective.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-99",
+    "top": "I will not fall for that trap twice.",
+    "bottom": "I found a closely related third option.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-100",
+    "top": "The computer wants a king move.",
+    "bottom": "I would prefer it explain itself first.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-101",
+    "top": "Every piece has a job.",
+    "bottom": "The a1 rook is on annual leave.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-102",
+    "top": "I am a move ahead in development.",
+    "bottom": "My queen is three moves behind in safety.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-103",
+    "top": "I could win material.",
+    "bottom": "Or I could investigate this suspicious sacrifice.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-104",
+    "top": "The pawn looks poisoned.",
+    "bottom": "I have decided to conduct an experiment.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-105",
+    "top": "I found the only drawing move.",
+    "bottom": "In a position where every other move wins.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-106",
+    "top": "The knight is beautifully centralized.",
+    "bottom": "It is also absolutely pinned.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-107",
+    "top": "I am controlling the only open file.",
+    "bottom": "Nothing has agreed to visit it yet.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-108",
+    "top": "I was winning until the endgame.",
+    "bottom": "The endgame began after move six.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-109",
+    "top": "I remembered the trap perfectly.",
+    "bottom": "My opponent remembered the refutation.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-110",
+    "top": "The position needs patience.",
+    "bottom": "I have supplied a pawn break instead.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-111",
+    "top": "I am protecting the king with pieces.",
+    "bottom": "The pieces are requesting evacuation.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-112",
+    "top": "I will calculate without moving.",
+    "bottom": "My hand is currently appealing this decision.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-113",
+    "top": "The bishops are opposite colored.",
+    "bottom": "Our plans are also completely unrelated.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-114",
+    "top": "I saw a free rook.",
+    "bottom": "The rook saw a mating net.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-115",
+    "top": "I have a mating attack.",
+    "bottom": "They have an inconvenient check.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-116",
+    "top": "The best move is obvious.",
+    "bottom": "After the engine shows it.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-117",
+    "top": "My king can stop the pawn.",
+    "bottom": "If the pawn agrees to wait.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-118",
+    "top": "I played the natural move.",
+    "bottom": "Nature can be tactically unsound.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-119",
+    "top": "I will make a useful waiting move.",
+    "bottom": "I have created zugzwang for myself.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-120",
+    "top": "The knight belongs near the center.",
+    "bottom": "Mine took the scenic route through a8.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-121",
+    "top": "I am winning the queen.",
+    "bottom": "They are winning the game. Split decision.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-122",
+    "top": "The pawn break is thematic.",
+    "bottom": "The timing is experimental.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-123",
+    "top": "I stopped calculating because it looked good.",
+    "bottom": "The position continued calculating.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-124",
+    "top": "This move attacks everything.",
+    "bottom": "It defends a carefully selected nothing.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-125",
+    "top": "I know the main line.",
+    "bottom": "They have strong feelings about a sideline.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-126",
+    "top": "My pieces are harmoniously placed.",
+    "bottom": "For an entirely different pawn structure.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-127",
+    "top": "The queen trade reduces danger.",
+    "bottom": "The remaining danger is called technique.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-128",
+    "top": "I found the final move of the combination.",
+    "bottom": "Now to find the first five.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-129",
+    "top": "The material is equal.",
+    "bottom": "The kings disagree about the experience.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-130",
+    "top": "I am studying master games.",
+    "bottom": "The masters keep choosing different moves than I do.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-131",
+    "top": "I have two connected passers.",
+    "bottom": "They have one very persuasive rook.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-132",
+    "top": "I will play accurately from here.",
+    "bottom": "Here has moved several times.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-133",
+    "top": "A draw would be a good result.",
+    "bottom": "My queen has just made it an ambitious one.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-134",
+    "top": "I improved my worst piece.",
+    "bottom": "A new worst piece has been elected.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-135",
+    "top": "I am one move from a brilliant finish.",
+    "bottom": "My opponent is also allowed to move.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-136",
+    "top": "The rook sacrifice is forced.",
+    "bottom": "The resignation is optional.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-137",
+    "top": "I finally got the position I wanted.",
+    "bottom": "The opponent got the one they prepared.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-138",
+    "top": "I avoided all the opening traps.",
+    "bottom": "Now entering original mistakes.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-139",
+    "top": "My plan is to improve every piece.",
+    "bottom": "The opponent’s plan appears less time-consuming.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-140",
+    "top": "I have a strong pawn chain.",
+    "bottom": "Its base is experiencing technical difficulties.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-141",
+    "top": "I gave the king luft.",
+    "bottom": "The knight appreciated the new entry square.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-142",
+    "top": "There are no checks in the position.",
+    "bottom": "I checked after making the move.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-143",
+    "top": "I am analyzing my loss.",
+    "bottom": "The rook has declined to comment.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-144",
+    "top": "The engine has found a beautiful line.",
+    "bottom": "It contains several moves I would never consider.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-145",
+    "top": "I am controlling the center from afar.",
+    "bottom": "Very, very afar.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-146",
+    "top": "My opponent sacrificed a bishop.",
+    "bottom": "My defensive confidence accepted it.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-147",
+    "top": "I correctly evaluated the position.",
+    "bottom": "I incorrectly evaluated my ability to play it.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-148",
+    "top": "I would like a quiet game.",
+    "bottom": "The Sicilian has entered the chat.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-149",
+    "top": "I can recover the pawn later.",
+    "bottom": "The pawn has started a new life.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-150",
+    "top": "The position is too complicated.",
+    "bottom": "I added another attacker to simplify the decision.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-151",
+    "top": "I am keeping the tension.",
+    "bottom": "The tension is keeping me.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-152",
+    "top": "I developed with tempo.",
+    "bottom": "Then undeveloped with confidence.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-153",
+    "top": "My opponent has one weakness.",
+    "bottom": "I have volunteered a second.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-154",
+    "top": "I found a perpetual check.",
+    "bottom": "My opponent found an exit.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-155",
+    "top": "The queen is trapped.",
+    "bottom": "The trap has one rather large door.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-156",
+    "top": "I have the better minor piece.",
+    "bottom": "They have the better major pieces.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-157",
+    "top": "I am calculating a sacrifice.",
+    "bottom": "My bishop is reviewing its contract.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-158",
+    "top": "I chose the ambitious continuation.",
+    "bottom": "The evaluation chose a new direction.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-159",
+    "top": "My pawn reached the seventh rank.",
+    "bottom": "It has been waiting for management approval.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-160",
+    "top": "This is a model endgame.",
+    "bottom": "A model of what not to do.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-161",
+    "top": "I know when to exchange queens.",
+    "bottom": "Mostly immediately before wishing I had not.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-162",
+    "top": "The knight fork wins a rook.",
+    "bottom": "The pinned knight cannot submit the paperwork.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-163",
+    "top": "I play for the initiative.",
+    "bottom": "The initiative sometimes plays for the other side.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-164",
+    "top": "I remembered to check for threats.",
+    "bottom": "After admiring my own for a while.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-165",
+    "top": "The move improves my position.",
+    "bottom": "The previous move set a very achievable standard.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-166",
+    "top": "I am attacking a weakness.",
+    "bottom": "It turns out to be well defended.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-167",
+    "top": "I won the bishop pair.",
+    "bottom": "The position closed in protest.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-168",
+    "top": "The rook is on the seventh rank.",
+    "bottom": "The king is on an unscheduled walking tour.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-169",
+    "top": "I have studied king safety.",
+    "bottom": "I have yet to apply for certification.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-170",
+    "top": "My opponent missed a tactic.",
+    "bottom": "I generously missed it too.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-171",
+    "top": "I solved the puzzle on the first try.",
+    "bottom": "The board had a different definition of try.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-172",
+    "top": "I am converting an extra pawn.",
+    "bottom": "Current exchange rate: one pawn for three worries.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-173",
+    "top": "The position calls for a pawn sacrifice.",
+    "bottom": "I would like to hear from the position directly.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-174",
+    "top": "I found a quiet defensive resource.",
+    "bottom": "I had already played a loud attacking blunder.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-175",
+    "top": "My plan was strategically sound.",
+    "bottom": "Tactically, there were questions.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-176",
+    "top": "I have a move-order trick.",
+    "bottom": "My opponent has a move-order answer.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-177",
+    "top": "The combination wins by force.",
+    "bottom": "The first move remains under investigation.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-178",
+    "top": "I will keep the bishop outside the chain.",
+    "bottom": "The chain has expanded its jurisdiction.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-179",
+    "top": "The queen covers all the escape squares.",
+    "bottom": "The rook is checking from somewhere inconvenient.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-180",
+    "top": "I have built a mating net.",
+    "bottom": "The king brought scissors.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-181",
+    "top": "I was sure the pawn was pinned.",
+    "bottom": "The king had quietly left the line.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-182",
+    "top": "I made the move instantly.",
+    "bottom": "I understood it considerably later.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-183",
+    "top": "My opening preparation ended here.",
+    "bottom": "So did my positional understanding.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-184",
+    "top": "I am defending actively.",
+    "bottom": "The rook has crossed the border without a plan.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-185",
+    "top": "The position is balanced.",
+    "bottom": "It is balanced on a hanging queen.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-186",
+    "top": "I gave up the exchange for activity.",
+    "bottom": "The activity has not arrived yet.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-187",
+    "top": "I played a prophylactic king move.",
+    "bottom": "Into a previously theoretical fork.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-188",
+    "top": "The knight can jump over pieces.",
+    "bottom": "Mine jumps to conclusions.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-189",
+    "top": "I am following opening principles.",
+    "bottom": "The concrete tactic has filed an objection.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-190",
+    "top": "The pawn is backward.",
+    "bottom": "My rook is not particularly forward either.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-191",
+    "top": "I have a plan for both wings.",
+    "bottom": "The center has requested representation.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-192",
+    "top": "The computer prefers Black.",
+    "bottom": "The computer was not invited to take sides.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-193",
+    "top": "I will use the extra tempo carefully.",
+    "bottom": "I have pushed the a-pawn again.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-194",
+    "top": "I am enjoying a positional squeeze.",
+    "bottom": "My rook is the one being squeezed.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-195",
+    "top": "They offered a poisoned pawn.",
+    "bottom": "I asked for seconds.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-196",
+    "top": "The king is safe behind its pawns.",
+    "bottom": "The bishop has found a diagonal loophole.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-197",
+    "top": "I will not be distracted by pawns.",
+    "bottom": "Except that one. It looks free.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-198",
+    "top": "This position rewards calculation.",
+    "bottom": "I brought pattern recognition and hope.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-199",
+    "top": "The engine line is only six moves.",
+    "bottom": "Each one is a plot twist.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-200",
+    "top": "I have a passed pawn on the a-file.",
+    "bottom": "The action is taking place in another timezone.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-201",
+    "top": "I played the same opening as a grandmaster.",
+    "bottom": "The similarities ended on move four.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-202",
+    "top": "I traded my inactive rook.",
+    "bottom": "For an extremely active problem.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-203",
+    "top": "I have a winning position.",
+    "bottom": "I am accepting instructions on the next part.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-204",
+    "top": "There is a brilliant move here.",
+    "bottom": "I would like it to identify itself.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-205",
+    "top": "I can trap the bishop.",
+    "bottom": "If it agrees not to move on its next turn.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-206",
+    "top": "My rook has entered the game.",
+    "bottom": "The rest of the army has already left.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-207",
+    "top": "I am about to promote.",
+    "bottom": "My opponent is about to interrupt.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-208",
+    "top": "The draw is within reach.",
+    "bottom": "I have chosen a more adventurous destination.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-209",
+    "top": "The computer found mate in twelve.",
+    "bottom": "I found a nice-looking pawn move.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-210",
+    "top": "I am exploiting an open diagonal.",
+    "bottom": "It is open toward my king too.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-211",
+    "top": "The opponent’s pieces are awkward.",
+    "bottom": "Mine are offering emotional support.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-212",
+    "top": "I will regroup before attacking.",
+    "bottom": "My queen has already sent the invitation.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-213",
+    "top": "The plan requires one more tempo.",
+    "bottom": "The opponent has declined the extension.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-214",
+    "top": "This is an instructive loss.",
+    "bottom": "I would prefer a less comprehensive lesson.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-215",
+    "top": "I am winning on the queenside.",
+    "bottom": "The king has submitted an urgent kingside report.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-216",
+    "top": "The knight has nowhere useful to go.",
+    "bottom": "It has plenty of creative alternatives.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-217",
+    "top": "I found a beautiful defensive idea.",
+    "bottom": "The only problem was the attacking idea.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-218",
+    "top": "I am choosing between two good moves.",
+    "bottom": "There is a third move that wins.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-219",
+    "top": "My opponent is in zugzwang.",
+    "bottom": "I have not yet explained it to their queen.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-220",
+    "top": "I have central control.",
+    "bottom": "The rook on the back rank has a different agenda.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-221",
+    "top": "I am not greedy for material.",
+    "bottom": "I simply noticed an available rook.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-222",
+    "top": "I have a protected outpost.",
+    "bottom": "The protecting pawn has been exchanged.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-223",
+    "top": "The sacrifice was completely intuitive.",
+    "bottom": "The follow-up requires more than intuition.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-224",
+    "top": "I won a pawn with a tactic.",
+    "bottom": "I lost two pawns while explaining it.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-225",
+    "top": "I am improving at chess.",
+    "bottom": "My mistakes are becoming much more sophisticated.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-226",
+    "top": "I reached a familiar position.",
+    "bottom": "I remember losing this one.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-227",
+    "top": "The opponent cannot stop both threats.",
+    "bottom": "They stopped the move that created them.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-228",
+    "top": "My king is participating in the attack.",
+    "bottom": "Participation was not entirely voluntary.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-229",
+    "top": "I will play a solid opening today.",
+    "bottom": "The gambit had a convincing name.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-230",
+    "top": "I understand the evaluation.",
+    "bottom": "I disagree with its tone.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-231",
+    "top": "I kept my strong bishop.",
+    "bottom": "The pawn structure kept it too.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-232",
+    "top": "The rook belongs behind the pawn.",
+    "bottom": "Mine read the instruction from the wrong side.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-233",
+    "top": "I am using the whole board.",
+    "bottom": "My king would have preferred a smaller tour.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-234",
+    "top": "I found a way to simplify.",
+    "bottom": "The remaining endgame is a new complication.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-235",
+    "top": "This is not a blunder.",
+    "bottom": "The engine and I have a terminology dispute.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-236",
+    "top": "I am confident about the endgame.",
+    "bottom": "There are still twelve pieces on the board.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-237",
+    "top": "The knight is a tactical monster.",
+    "bottom": "It is currently being attacked by a pawn.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-238",
+    "top": "I made room for my bishop.",
+    "bottom": "The enemy queen moved in first.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-239",
+    "top": "The position has a hidden resource.",
+    "bottom": "I have hidden it from myself.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-240",
+    "top": "I am turning a small edge into a win.",
+    "bottom": "The edge is turning into an equal position.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-241",
+    "top": "I calculated until the position was clear.",
+    "bottom": "I stopped before the recapture.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-242",
+    "top": "The weak pawn cannot run.",
+    "bottom": "My attacking rook cannot get there either.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-243",
+    "top": "I have a permanent advantage.",
+    "bottom": "The opponent is challenging the lease.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-244",
+    "top": "I am ready for their attack.",
+    "bottom": "The second attacker was unexpected.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-245",
+    "top": "The queen trade is forced.",
+    "bottom": "My emotional attachment is not relevant.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-246",
+    "top": "I am studying tactical motifs.",
+    "bottom": "Today’s motif is an undefended queen.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-247",
+    "top": "I gave up a pawn for development.",
+    "bottom": "The pieces are still discussing the offer.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-248",
+    "top": "The king can help in the endgame.",
+    "bottom": "It has requested notice before move fifteen.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-249",
+    "top": "I have a passed pawn.",
+    "bottom": "It is passing on the opportunity to move.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-250",
+    "top": "I won the critical exchange.",
+    "bottom": "The next exchange was more critical.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-251",
+    "top": "I am looking for a decisive move.",
+    "bottom": "The position suggests several decisive mistakes.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-252",
+    "top": "I have the right plan.",
+    "bottom": "The wrong move order is handling execution.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-253",
+    "top": "The bishop pair is worth half a pawn.",
+    "bottom": "The trapped bishop would like a valuation review.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-254",
+    "top": "I am playing a quiet system.",
+    "bottom": "The opponent has enabled complications.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-255",
+    "top": "I spotted the queen sacrifice.",
+    "bottom": "I did not spot the refusal.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-256",
+    "top": "The plan is to open the center.",
+    "bottom": "My king has asked us to reconsider.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-257",
+    "top": "I found an excellent knight maneuver.",
+    "bottom": "It returned to its starting square with questions.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-258",
+    "top": "My opponent has weak pawns.",
+    "bottom": "Their pieces are defending them with enthusiasm.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-259",
+    "top": "I am controlling the promotion square.",
+    "bottom": "The knight can promote with check somewhere else.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-260",
+    "top": "The rook is very active.",
+    "bottom": "It is also the only defender.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-261",
+    "top": "I am playing for two results.",
+    "bottom": "The position has suggested a third.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-262",
+    "top": "My opening is objectively sound.",
+    "bottom": "My next move is subjectively exciting.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-263",
+    "top": "The attack runs out of steam.",
+    "bottom": "I have ordered another pawn.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-264",
+    "top": "I kept my options open.",
+    "bottom": "Including several losing ones.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-265",
+    "top": "The endgame looks drawish.",
+    "bottom": "My king has found a creative losing route.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-266",
+    "top": "I am setting a clever trap.",
+    "bottom": "It requires the opponent to miss three checks.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-267",
+    "top": "The knight is heading for d5.",
+    "bottom": "The c-pawn has been informed.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-268",
+    "top": "I have eliminated the defender.",
+    "bottom": "The defender had a replacement.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-269",
+    "top": "I am ready for the counterattack.",
+    "bottom": "I have not ruled out being surprised.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-270",
+    "top": "The move is a practical choice.",
+    "bottom": "The computer is conducting an audit.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-271",
+    "top": "I found the best move instantly.",
+    "bottom": "In the analysis after the game.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-272",
+    "top": "The king is perfectly centralized.",
+    "bottom": "The queens are still present.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-273",
+    "top": "I have restricted the bishop.",
+    "bottom": "The bishop has restricted my entire queenside.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-274",
+    "top": "I will play one game before work.",
+    "bottom": "The opening has become a research project.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-275",
+    "top": "The pawn structure is fixed.",
+    "bottom": "My plan is still under construction.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-276",
+    "top": "I captured with the correct pawn.",
+    "bottom": "The other pawn had a better future.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-277",
+    "top": "My rook has a clear file.",
+    "bottom": "The entry square has security.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-278",
+    "top": "The opponent has no plan.",
+    "bottom": "They appear very efficient without one.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-279",
+    "top": "I will use the time to calculate.",
+    "bottom": "I used it to worry about the knight.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-280",
+    "top": "I know the theoretical result.",
+    "bottom": "I am adding experimental evidence.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-281",
+    "top": "The opponent made a waiting move.",
+    "bottom": "I supplied the weakness they were waiting for.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-282",
+    "top": "My knight is better than their bishop.",
+    "bottom": "The position changed the interview criteria.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-283",
+    "top": "I can always force a draw.",
+    "bottom": "The perpetual-check exit is under maintenance.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-284",
+    "top": "I have created a second weakness.",
+    "bottom": "It is on my side of the board.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-285",
+    "top": "The queen can defend everything.",
+    "bottom": "It would like a day off.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-286",
+    "top": "I am threatening to win material.",
+    "bottom": "They are threatening to end the game.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-287",
+    "top": "The pawn break is ready.",
+    "bottom": "The king is not.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-288",
+    "top": "My best piece is the knight.",
+    "bottom": "The trade offer felt personal.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-289",
+    "top": "The endgame requires precision.",
+    "bottom": "I have selected a comfortable-looking square.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-290",
+    "top": "I am following the master game.",
+    "bottom": "The opponent has left the archive.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-291",
+    "top": "The rook is immune because of mate.",
+    "bottom": "The opponent would like to see the full proof.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-292",
+    "top": "I have an unstoppable passer.",
+    "bottom": "The stopping move was rather quiet.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-293",
+    "top": "I am making threats every turn.",
+    "bottom": "The threats are becoming smaller.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-294",
+    "top": "The opponent’s queen is trapped.",
+    "bottom": "My queen is providing company.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-295",
+    "top": "This exchange opens the diagonal.",
+    "bottom": "I was standing at the other end.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-296",
+    "top": "I can calculate the forcing line.",
+    "bottom": "The quiet move is still causing trouble.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-297",
+    "top": "I have a huge space advantage.",
+    "bottom": "My pieces have still found a traffic jam.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-298",
+    "top": "The knight fork was inevitable.",
+    "bottom": "Not playing my previous move was an option.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-299",
+    "top": "I am one pawn up.",
+    "bottom": "The rook ending charges interest.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-300",
+    "top": "The attack is fully prepared.",
+    "bottom": "The center has opened negotiations.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-301",
+    "top": "I am taking a calculated risk.",
+    "bottom": "The calculation section is pending.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-302",
+    "top": "The bishop has a target.",
+    "bottom": "The target has a defender, unfortunately.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-303",
+    "top": "I have studied the trap from both sides.",
+    "bottom": "I have lost from both sides too.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-304",
+    "top": "The position is objectively equal.",
+    "bottom": "My understanding is unequally distributed.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-305",
+    "top": "I have blocked the passed pawn.",
+    "bottom": "The king has started escort service.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-306",
+    "top": "The queen can escape through h5.",
+    "bottom": "The knight has closed that branch.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-307",
+    "top": "I am threatening a fork.",
+    "bottom": "The fork is absolutely pinned.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-308",
+    "top": "The center is stable.",
+    "bottom": "Until the next pawn move.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-309",
+    "top": "I have solved every defensive problem.",
+    "bottom": "A new problem has been appointed.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-310",
+    "top": "I chose the sharper variation.",
+    "bottom": "The variation has chosen sides.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-311",
+    "top": "The computer says it is still a draw.",
+    "bottom": "That is a lot of responsibility.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-312",
+    "top": "I have found the winning plan.",
+    "bottom": "Step two is finding legal moves that implement it.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-313",
+    "top": "The opponent is offering an exchange.",
+    "bottom": "The fine print says mating attack.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-314",
+    "top": "I am improving the king position.",
+    "bottom": "The rook is revising its safety assessment.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-315",
+    "top": "I have complete control of d5.",
+    "bottom": "The game is happening on h2.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-316",
+    "top": "I know this tactical pattern.",
+    "bottom": "The extra defending bishop is new.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-317",
+    "top": "The queen trade is strategically correct.",
+    "bottom": "The pawn recapture is tactically unfortunate.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-318",
+    "top": "I am keeping the better bishop.",
+    "bottom": "The worse bishop has more useful moves.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-319",
+    "top": "The rook can enter on c7.",
+    "bottom": "Leaving c1 was apparently important too.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-320",
+    "top": "I found a quiet move.",
+    "bottom": "My king found the noise afterward.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-321",
+    "top": "The pawn ending is a matter of counting.",
+    "bottom": "I counted the wrong pawn first.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-322",
+    "top": "I am attacking the base of the chain.",
+    "bottom": "The chain has attacked my king.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-323",
+    "top": "The position calls for restraint.",
+    "bottom": "I have played g4.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-324",
+    "top": "My rook sacrifice has compensation.",
+    "bottom": "The compensation is a very memorable game.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-325",
+    "top": "I have a clear plan for the middlegame.",
+    "bottom": "The opponent has offered an endgame.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-326",
+    "top": "The king can never take that piece.",
+    "bottom": "The word never required more calculation.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-327",
+    "top": "I am making natural moves.",
+    "bottom": "The unnatural one was the only defense.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-328",
+    "top": "The knight is beautifully supported.",
+    "bottom": "The supporting pawn is pinned.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-329",
+    "top": "I am enjoying the advantage.",
+    "bottom": "The position is not obliged to maintain it.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-330",
+    "top": "I have reached the critical position.",
+    "bottom": "Every position since move ten has said that.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-331",
+    "top": "The rook has trapped the king.",
+    "bottom": "The checking knight has a scheduling conflict.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-332",
+    "top": "I found a beautiful pawn sacrifice.",
+    "bottom": "The opponent found a beautiful extra pawn.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-333",
+    "top": "The queen is defending from afar.",
+    "bottom": "The king has requested closer support.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-334",
+    "top": "I am ready for anything.",
+    "bottom": "Anything played ...d5.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-335",
+    "top": "The bishop controls the promotion square.",
+    "bottom": "The pawn has selected a knight instead.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-336",
+    "top": "I have a dangerous initiative.",
+    "bottom": "It is dangerous to stop and count the material.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-337",
+    "top": "The position is simple enough now.",
+    "bottom": "The opposition has entered the discussion.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-338",
+    "top": "I have played the only move.",
+    "bottom": "I would like fewer positions with only moves.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-339",
+    "top": "The attack wins a pawn.",
+    "bottom": "The defense wins a rook.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-340",
+    "top": "I see why the master played it.",
+    "bottom": "I would not have played it.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-341",
+    "top": "The knight has a perfect blockade.",
+    "bottom": "The other wing has different priorities.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-342",
+    "top": "I am converting the advantage patiently.",
+    "bottom": "The advantage is checking its watch.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-343",
+    "top": "The position is under control.",
+    "bottom": "Control has changed hands.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-344",
+    "top": "The opponent offered a draw.",
+    "bottom": "My ego made the next move.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-345",
+    "top": "The rook is tied to the pawn.",
+    "bottom": "The pawn is tied to my evaluation.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-346",
+    "top": "I have chosen a flexible setup.",
+    "bottom": "My pieces are waiting for a decision.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-347",
+    "top": "The calculation is straightforward.",
+    "bottom": "The first branching point is move one.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-348",
+    "top": "I have prepared a novelty.",
+    "bottom": "The novelty is that it loses a bishop.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-349",
+    "top": "The king is safe enough.",
+    "bottom": "Enough is a very tactical word.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-350",
+    "top": "I improved my pawn structure.",
+    "bottom": "The open file has new ownership.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-351",
+    "top": "I have a tactical justification.",
+    "bottom": "It relies on a cooperative opponent.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-352",
+    "top": "The sacrifice creates lasting pressure.",
+    "bottom": "The material deficit is also lasting.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-353",
+    "top": "I have won the battle for e5.",
+    "bottom": "The war for my back rank continues.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-354",
+    "top": "I am about to win the endgame.",
+    "bottom": "The stalemate resource has arrived.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-355",
+    "top": "The exchange of bishops is favorable.",
+    "bottom": "The remaining knight has objections.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-356",
+    "top": "I have an ideal piece setup.",
+    "bottom": "The position has chosen an inconvenient pawn break.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-357",
+    "top": "The rook is trapped in the corner.",
+    "bottom": "My queen is also considering relocation.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-358",
+    "top": "I have found counterplay.",
+    "bottom": "The original attack was not waiting for it.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-359",
+    "top": "The queen trade removes the threat.",
+    "bottom": "The passed pawn has inherited the role.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-360",
+    "top": "I am calculating a long variation.",
+    "bottom": "I should probably check the short one.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-361",
+    "top": "The knight has found a fork.",
+    "bottom": "The king has found a capture.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-362",
+    "top": "I have blocked the diagonal.",
+    "bottom": "The rook has opened a file.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-363",
+    "top": "The position is winning with correct play.",
+    "bottom": "That last part seems important.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-364",
+    "top": "I have the more active king.",
+    "bottom": "The remaining queens are expressing interest.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-365",
+    "top": "The pawn promotion is unstoppable.",
+    "bottom": "My king is currently in check.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-366",
+    "top": "I found the right defensive setup.",
+    "bottom": "I assembled it one move late.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-367",
+    "top": "The opponent’s plan is obvious.",
+    "bottom": "Preventing it remains a separate task.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-368",
+    "top": "The pawn cannot be captured.",
+    "bottom": "The tactical explanation has expired.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-369",
+    "top": "I have a promising attack.",
+    "bottom": "The opponent has requested delivery.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-370",
+    "top": "The rook ending is drawn.",
+    "bottom": "I can make it interesting.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-371",
+    "top": "I have calculated to a clear advantage.",
+    "bottom": "The opponent has submitted a correction.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-372",
+    "top": "The knight controls all the key squares.",
+    "bottom": "The queen has found an unlisted square.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-373",
+    "top": "I am playing for a long-term edge.",
+    "bottom": "The short-term checkmate was unexpected.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-374",
+    "top": "The queen has no safe squares.",
+    "bottom": "The opponent chose a very unsafe check.",
+    "piece": "Q",
+    "reply": "n"
+  },
+  {
+    "id": "meme-375",
+    "top": "I have mastered the opening.",
+    "bottom": "The next chapter is called middlegame.",
+    "piece": "R",
+    "reply": "r"
+  },
+  {
+    "id": "meme-376",
+    "top": "The position rewards creativity.",
+    "bottom": "I have created a new weakness.",
+    "piece": "B",
+    "reply": "q"
+  },
+  {
+    "id": "meme-377",
+    "top": "My king is on the right side.",
+    "bottom": "The attack has changed sides.",
+    "piece": "K",
+    "reply": "b"
+  },
+  {
+    "id": "meme-378",
+    "top": "I have a strong grip on the position.",
+    "bottom": "The position is rather slippery.",
+    "piece": "P",
+    "reply": "k"
+  },
+  {
+    "id": "meme-379",
+    "top": "The final move is forced.",
+    "bottom": "The previous decision was voluntary.",
+    "piece": "N",
+    "reply": "p"
+  },
+  {
+    "id": "meme-380",
+    "top": "I am done studying for today.",
+    "bottom": "One more position looks interesting.",
+    "piece": "Q",
+    "reply": "n"
+  }
+]

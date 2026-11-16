@@ -9,18 +9,22 @@ import {
   FolderOpen,
   ChartNoAxesCombined,
   Users,
-  Palette,
   Search,
   ChevronRight,
   X,
   Command,
   ShieldCheck,
   Menu,
+  UserRound,
+  Keyboard,
+  Trophy,
 } from "lucide-react";
 import "@fontsource/dm-sans/latin-400.css";
 import "@fontsource/dm-sans/latin-500.css";
 import "@fontsource/dm-sans/latin-600.css";
 import "@fontsource/dm-sans/latin-700.css";
+import "@fontsource/manrope/latin-400.css";
+import "@fontsource/manrope/latin-500.css";
 import "@fontsource/manrope/latin-600.css";
 import "@fontsource/manrope/latin-700.css";
 import { AppContext } from "./lib/context";
@@ -33,7 +37,7 @@ import {
   contrast,
 } from "./lib/store";
 import type { Appearance as AppearanceType, Library, Tab } from "./lib/types";
-import { Button, IconButton, Modal, Loading, External } from "./components/UI";
+import { IconButton, Modal, Loading, External } from "./components/UI";
 import Appearance from "./components/Appearance";
 import HomePage from "./pages/Home";
 import "./styles.css";
@@ -41,6 +45,10 @@ import "./redesign.css";
 const Analysis = lazy(() => import("./pages/Analysis")),
   Play = lazy(() => import("./pages/Play")),
   Puzzles = lazy(() => import("./pages/Puzzles")),
+  Research = lazy(() => import("./pages/Research")),
+  Controls = lazy(() => import("./pages/Controls")),
+  Rankings = lazy(() => import("./pages/Rankings")),
+  ProfilePage = lazy(() => import("./pages/Profile")),
   Learn = lazy(() => import("./pages/Learn")),
   LibraryPage = lazy(() => import("./pages/Library")),
   Stats = lazy(() => import("./pages/Stats")),
@@ -51,11 +59,15 @@ const mainNav = [
   { id: "play", label: "Play", icon: MonitorPlay },
   { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
+  { id: "research", label: "Research", icon: Search },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
 ] as const;
 const secondaryNav = [
+  { id: "controls", label: "Controls", icon: Keyboard },
+  { id: "rankings", label: "Rankings", icon: Trophy },
+  { id: "profile", label: "Profile", icon: UserRound },
   { id: "library", label: "Saved games", icon: FolderOpen },
-  { id: "community", label: "Players & sharing", icon: Users },
+  { id: "community", label: "Multiplayer", icon: Users },
 ] as const;
 const validTabs = new Set([...mainNav, ...secondaryNav].map((v) => v.id));
 function route() {
@@ -193,16 +205,22 @@ function App() {
   }, [appearance.sound, appearance.volume]);
   useEffect(() => {
     setAppearance((a) =>
-      a.backgroundColor === "#101612" &&
-      a.panelColor === "#1c271f" &&
-      a.textColor === "#eef4ed" &&
-      a.mutedColor === "#abb8aa"
+      ["#101418", "#101612"].includes(a.backgroundColor) &&
+      ["#1b2126", "#1c271f"].includes(a.panelColor) &&
+      ["#f0f3f1", "#eef4ed"].includes(a.textColor) &&
+      ["#a6b0aa", "#abb8aa"].includes(a.mutedColor)
         ? {
             ...a,
             backgroundColor: defaults.backgroundColor,
             panelColor: defaults.panelColor,
             textColor: defaults.textColor,
             mutedColor: defaults.mutedColor,
+            accent: a.accent === "#78b58a" ? defaults.accent : a.accent,
+            buttonColor:
+              a.buttonColor === "#78b58a"
+                ? defaults.buttonColor
+                : a.buttonColor,
+            font: a.font === "DM Sans" ? defaults.font : a.font,
           }
         : a,
     );
@@ -252,9 +270,13 @@ function App() {
     "--board-max": `${appearance.boardSize}px`,
     "--background-dim": `${appearance.backgroundDim / 100}`,
     "--background-blur": `${appearance.backgroundBlur}px`,
-    "--background-image": appearance.customBackground
-      ? `url("${appearance.customBackground}")`
-      : "none",
+    "--background-image":
+      appearance.background === "Flag" &&
+      /^[A-Z]{2}$/.test(appearance.flag || "")
+        ? `url("${base}flags/${appearance.flag!.toLowerCase()}.svg")`
+        : appearance.customBackground
+          ? `url("${appearance.customBackground}")`
+          : "none",
   } as React.CSSProperties;
   const page =
     tab === "home" ? (
@@ -267,6 +289,14 @@ function App() {
       <Puzzles />
     ) : tab === "learn" ? (
       <Learn />
+    ) : tab === "research" ? (
+      <Research />
+    ) : tab === "controls" ? (
+      <Controls />
+    ) : tab === "rankings" ? (
+      <Rankings />
+    ) : tab === "profile" ? (
+      <ProfilePage />
     ) : tab === "library" ? (
       <LibraryPage />
     ) : tab === "stats" ? (
@@ -336,7 +366,11 @@ function App() {
             ))}
           </nav>
           <div className="sidebar-bottom">
-            <div className="account-stamp">
+            <button
+              className="account-stamp"
+              onClick={() => navigate("profile")}
+              aria-label="Open profile"
+            >
               <span className="avatar">
                 {library.profile.avatar ? (
                   <img src={library.profile.avatar} alt="" />
@@ -345,7 +379,7 @@ function App() {
                 )}
               </span>
               <span>{library.profile.name}</span>
-            </div>
+            </button>
             <div className="sidebar-footer">
               <button onClick={() => setInfo(true)}>
                 <ShieldCheck size={13} /> Privacy & source
@@ -382,16 +416,7 @@ function App() {
                 <Command size={10} /> K
               </kbd>
             </button>
-            <div className="topbar-right">
-              <Button
-                className="secondary appearance-trigger"
-                aria-label="Customize"
-                onClick={() => setShowAppearance(true)}
-              >
-                <Palette size={16} />
-                <span>Customize</span>
-              </Button>
-            </div>
+            <div className="topbar-right"></div>
           </header>
           <main id="workspace" tabIndex={-1} className="workspace">
             <Suspense fallback={<Loading />}>
@@ -460,16 +485,6 @@ function App() {
                 Search opening library
                 <ChevronRight size={15} />
               </button>
-              <button
-                onClick={() => {
-                  setCommand(false);
-                  setShowAppearance(true);
-                }}
-              >
-                <Palette size={18} />
-                Customize appearance
-                <ChevronRight size={15} />
-              </button>
             </div>
           </Modal>
         )}
@@ -478,8 +493,9 @@ function App() {
             <div className="prose">
               <p>
                 Games, repertoire, profiles and preferences are saved locally in
-                this browser. No analytics, advertising cookies, sign-up or
-                hosted player directory is used.
+                this browser. Optional online accounts, multiplayer games, chat
+                and rankings use the connected Supabase project. No analytics or
+                advertising cookies are used.
               </p>
               <p>
                 Public-game research contacts only the Chess.com or Lichess
@@ -494,8 +510,8 @@ function App() {
                 human ratings.
               </p>
               <p>
-                The iPhone app’s CloudKit and Game Center are native-only. Local
-                friends and shareable PGN games provide web alternatives.{" "}
+                The iPhone app’s CloudKit and Game Center are native-only.
+                Online web features use separate NovaChess accounts.
               </p>
               <p>
                 Artwork, chess pieces, puzzles, lessons and piano recordings are

@@ -1,0 +1,167 @@
+import { readFileSync, writeFileSync } from "node:fs";
+const rows = [
+  [
+    "Dutch Defense",
+    "Black uses ...f5 to control e4, accepting a king-side weakness. Stonewall and fluid-center structures require different plans.",
+    "In a Stonewall, the d5–e6–f5 chain grips e4 but leaves e5 weak.",
+    "Occupy e5; exchange the dark-squared bishops when favorable; break with cxd5 or e4 when supported.",
+    "Activate the c8 bishop via b7 or d7–e8–h5; use ...Ne4; open the f-file only when the king is safe.",
+    "e4 / ...c5",
+    "Do not ignore e5 merely because e4 looks secure.",
+  ],
+  [
+    "Alekhine Defense",
+    "Black provokes advancing pawns and then attacks them. White must avoid confusing space with secure control.",
+    "An e5 pawn gains a tempo against the knight but can become a target of ...d6.",
+    "Support the pawn center with pieces; develop before another pawn advance; open lines if Black falls behind.",
+    "Attack the center with ...d6 and ...c5; keep the knights coordinated; develop before taking a poisoned pawn.",
+    "...d6 / ...c5",
+    "A large unsupported pawn center can collapse after one exchange.",
+  ],
+  [
+    "Petrov's Defense",
+    "Black counterattacks e4 instead of immediately defending e5. Accurate timing prevents a tactical loss in the center.",
+    "Early central exchanges often lead to symmetrical pawns, but open files reward the better-developed side.",
+    "Develop with threats; compare central pawn recaptures; use the open e-file carefully.",
+    "Recover e4 with sound timing; finish development before queen activity; use ...d5 for central space.",
+    "d4 / ...d5",
+    "After Nxe5, immediate ...Nxe4 can allow Qe2 tactics; know when ...d6 is needed.",
+  ],
+  [
+    "Vienna Game",
+    "White keeps the f-pawn free by developing Nc3 first. A later f4 must be timed against Black’s central counterplay.",
+    "The e4 pawn can be reinforced with d3 or paired with d4; f4 changes king safety.",
+    "Decide whether to play f4 or develop quietly; meet ...d5 concretely; castle before opening too many lines.",
+    "Challenge with ...d5; develop without chasing pawns; consider exchanging the e4 pawn to free the center.",
+    "f4 / d4 / ...d5",
+    "A Vienna pawn sacrifice is not the same as an automatically sound kingside attack.",
+  ],
+  [
+    "Four Knights Game",
+    "Fast symmetrical development brings both sides close to castling. The first central break decides the structure.",
+    "The center can become open after d4 or stay restrained with d3.",
+    "Prepare d4; develop the f1 bishop actively; avoid trading away every source of pressure.",
+    "Meet d4 with active piece play; compare ...Bb4 and ...Bc5; castle before initiating central tactics.",
+    "d4 / ...d5",
+    "The Halloween knight sacrifice is speculative and should be studied as a gamble, not a forced win.",
+  ],
+  [
+    "Tarrasch Defense",
+    "Black accepts an isolated d-pawn in exchange for active bishops and central space. Exchanges can change the balance.",
+    "The isolated d5 pawn controls c4 and e4 but cannot be defended by another pawn.",
+    "Blockade d5; exchange attacking pieces; target the pawn only after development.",
+    "Keep pieces active; prepare ...d4; use open c- and e-files to compensate for the pawn weakness.",
+    "...d4 / e4",
+    "Trading every piece without winning something leaves Black defending the isolated pawn.",
+  ],
+  [
+    "King's Gambit Accepted",
+    "White gives a pawn for rapid development and open lines. Black can return material to complete development safely.",
+    "The f-file opens for White, but f2 no longer shields the king.",
+    "Develop before recovering f4; castle if possible; calculate every queen check near the exposed king.",
+    "Strike with ...d5; return f4 if it gains development; resist unnecessary pawn grabbing.",
+    "d4 / ...d5",
+    "Pushing g-pawns to hold f4 can win material but creates tactical targets and costs development.",
+  ],
+  [
+    "Queen's Indian Defense",
+    "Black controls e4 with pieces and the b7 bishop rather than an early central occupation. White tries to make that bishop ineffective.",
+    "A d4–c4 center can be challenged by ...d5 or ...c5; e3 changes the g1 knight’s options.",
+    "Prepare e4; use the g2 bishop in fianchetto lines; watch pressure on the long diagonal.",
+    "Coordinate ...Bb7 and ...Nf6 against e4; choose a central break; develop the king’s bishop without blocking key lines.",
+    "e4 / ...d5 / ...c5",
+    "A fianchettoed bishop is not active if its own central pawns permanently block it.",
+  ],
+  [
+    "Bogo-Indian Defense",
+    "The early ...Bb4+ makes White choose a block before Black commits the center. The bishop may trade or retreat.",
+    "The structure depends on whether White blocks with Bd2, Nd2 or Nc3.",
+    "Meet the check with development; preserve useful bishops; prepare e4 without weakening d4.",
+    "Use the check to influence development; choose ...d5 or ...d6; avoid losing tempos with repeated bishop retreats.",
+    "e4 / ...d5",
+    "An early bishop check is only useful if the follow-up fits the central structure.",
+  ],
+  [
+    "Benoni Defense",
+    "Black concedes a space advantage to create asymmetric counterplay. The d6 pawn is a weakness, while the queenside majority can move.",
+    "White has d5 and e4 against Black’s d6 and c5; the g7 bishop pressures the queenside.",
+    "Support e4; target d6; prepare e5 before Black’s queenside play arrives.",
+    "Prepare ...b5 or ...f5; use the e5 square; keep the g7 bishop active.",
+    "e5 / ...b5 / ...f5",
+    "Passive defense leaves Black with less space and a backward d6 pawn.",
+  ],
+  [
+    "Benko Gambit Accepted",
+    "Black sacrifices a queenside pawn for lasting pressure on the a- and b-files. The compensation may survive queen exchanges.",
+    "After the a- and b-pawns open files, Black’s rooks and g7 bishop target White’s queenside.",
+    "Complete development before holding every pawn; consider returning material; neutralize the open files.",
+    "Double rooks on the queenside; keep the g7 bishop; build pressure rather than search only for immediate tactics.",
+    "e4 / ...c4",
+    "The extra pawn is not easy to convert if White’s pieces remain tied to a2 and b2.",
+  ],
+  [
+    "Philidor Defense",
+    "Black supports e5 with d6 and builds a compact position. The central break must arrive before the pieces become cramped.",
+    "The d6–e5 chain is stable, but the dark-squared bishop needs a route into the game.",
+    "Use the space advantage; develop before opening the center; watch tactical pins on the d-file.",
+    "Prepare ...exd4 or ...d5; develop behind the pawn chain; avoid passive piece placement with no break.",
+    "dxe5 / ...d5",
+    "A solid pawn chain does not compensate for a permanent development deficit.",
+  ],
+  [
+    "Queen's Pawn Game",
+    "The Colle uses a compact center to prepare e4. Its central break is more important than mechanically repeating a setup.",
+    "The d4–e3–c3 triangle supports a future e4 but limits the c1 bishop until the center changes.",
+    "Prepare e4 with Bd3 and Re1; develop the queen’s knight to d2; activate the c1 bishop when the center opens.",
+    "Challenge d4 with ...c5; develop the c8 bishop actively; do not allow a free e4 break.",
+    "e4 / ...c5",
+    "A quiet setup can become too slow if Black gets ...e5 first.",
+  ],
+  [
+    "Neo-Grünfeld Defense",
+    "White delays Nc3 and fianchettoes, avoiding some Exchange Grünfeld structures. Black still seeks pressure against the center.",
+    "The g2 bishop influences d5; the structure changes sharply after cxd5 or ...dxc4.",
+    "Keep central flexibility; coordinate the g2 bishop with e4; develop before recovering a pawn.",
+    "Use ...d5 to contest the center; prepare ...c5; calculate long-diagonal tactics.",
+    "e4 / ...c5",
+    "Delaying Nc3 changes tactics: do not copy an Exchange Grünfeld line without checking the move order.",
+  ],
+];
+const lessons = JSON.parse(readFileSync("public/data/lessons.json")),
+  guides = JSON.parse(readFileSync("public/data/opening-guides.json"));
+for (const [family, idea, structure, white, black, breaks, avoid] of rows) {
+  const related = lessons
+    .filter((l) => l.name.startsWith(family + ":"))
+    .slice(0, 3);
+  if (!related.length) throw new Error(family);
+  guides.push({
+    id: related[0].id,
+    family,
+    eco: related[0].eco,
+    idea,
+    structure,
+    white: white.split("; "),
+    black: black.split("; "),
+    breaks: breaks.split(" / "),
+    avoid,
+    quiz: {
+      question: "Which plan fits this structure?",
+      answers: [
+        white.split("; ")[0],
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately",
+      ],
+      correct: 0,
+      explanation: structure,
+    },
+    lines: related.map((l) => ({
+      name: l.name.split(":").slice(1).join(":").trim(),
+      moves: l.moves,
+    })),
+  });
+}
+writeFileSync(
+  "public/data/opening-guides.json",
+  JSON.stringify(guides, null, 2) + "\n",
+);
+console.log(guides.length, "family guides");

@@ -7,3 +7,5 @@ test-results/
 *.tsbuildinfo
 .npm-cache/
 public/engine/
+
+.env

@@ -3,7 +3,6 @@ import { Chess } from "chess.js";
 import {
   FolderOpen,
   Plus,
-  Upload,
   Download,
   Trash2,
   ChevronLeft,
@@ -23,6 +22,8 @@ import { uid, download, dateLabel } from "../lib/store";
 import { search } from "../lib/engine";
 import { fairy, legal, squares } from "../lib/variants";
 import type { SavedGame, ReviewRow } from "../lib/types";
+import GameGIFButton from "../components/GameGIFButton";
+import { useControl } from "../lib/controls";
 import { Board } from "../components/Board";
 import {
   PageTitle,
@@ -74,10 +75,7 @@ export default function LibraryPage() {
     [query, setQuery] = useState(""),
     [newFolder, setNewFolder] = useState(false),
     [name, setName] = useState(""),
-    [selected, setSelected] = useState(detail || ""),
-    [importing, setImporting] = useState(false),
-    [input, setInput] = useState(""),
-    [error, setError] = useState("");
+    [selected, setSelected] = useState(detail || "");
   const games = library.games.filter(
     (g) =>
       (folder === "All" || g.folder === folder) &&
@@ -85,18 +83,6 @@ export default function LibraryPage() {
   );
   const g = library.games.find((v) => v.id === selected);
   if (g) return <GameViewer game={g} onClose={() => setSelected("")} />;
-  function importPGN() {
-    try {
-      const chunks = input.split(/(?=\[Event\s)/).filter((t) => t.trim());
-      const imported = chunks.map(parseGame);
-      setLibrary((l) => ({ ...l, games: [...imported, ...l.games] }));
-      setImporting(false);
-      setError("");
-      notify(`${imported.length} games imported.`);
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }
   return (
     <>
       <PageTitle
@@ -106,10 +92,6 @@ export default function LibraryPage() {
         <Button className="secondary" onClick={() => setNewFolder(true)}>
           <Plus size={16} />
           Folder
-        </Button>
-        <Button onClick={() => setImporting(true)}>
-          <Upload size={16} />
-          Import PGN
         </Button>
       </PageTitle>
       <div className="section-toolbar">
@@ -178,7 +160,7 @@ export default function LibraryPage() {
           <Empty
             icon={<FolderOpen size={35} />}
             title="No games here"
-            description="Save an analysis study, finish a game, or import PGN."
+            description="Save an analysis study or finish a game."
           />
         </Card>
       )}
@@ -203,42 +185,6 @@ export default function LibraryPage() {
             }}
           >
             Create folder
-          </Button>
-        </Modal>
-      )}
-      {importing && (
-        <Modal title="Import games" onClose={() => setImporting(false)}>
-          <textarea
-            aria-label="PGN games"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            rows={8}
-            placeholder="Paste standard PGN games"
-          />
-          <label className="file-link">
-            Choose PGN file
-            <input
-              type="file"
-              accept=".pgn,.txt"
-              onChange={async (e) => {
-                const f = e.target.files?.[0];
-                if (f) {
-                  if (f.size > 20e6) {
-                    setError("File must be smaller than 20 MB.");
-                    return;
-                  }
-                  setInput(await f.text());
-                }
-              }}
-            />
-          </label>
-          {error && (
-            <p role="alert" className="error">
-              {error}
-            </p>
-          )}
-          <Button disabled={!input.trim()} onClick={importPGN}>
-            Import
           </Button>
         </Modal>
       )}
@@ -288,11 +234,22 @@ function GameViewer({
   const { library, setLibrary, navigate, notify } = useApp();
   const [cursor, setCursor] = useState(0),
     [playing, setPlaying] = useState(false),
+    [replaySpeed, setReplaySpeed] = useState(650),
     [reviewing, setReviewing] = useState(false),
     [budget, setBudget] = useState(500),
     [status, setStatus] = useState(""),
     [flipped, setFlipped] = useState(game.human === "b"),
     [title, setTitle] = useState(game.title);
+  useControl("next", () =>
+    setCursor((n) => Math.min(game.moves.length, n + 1)),
+  );
+  useControl("previous", () => setCursor((n) => Math.max(0, n - 1)));
+  useControl("first", () => setCursor(0));
+  useControl("last", () => setCursor(game.moves.length));
+  useControl("autoplay", () => {
+    if (cursor === game.moves.length) setCursor(0);
+    setPlaying((v) => !v);
+  });
   const controller = useRef<AbortController | null>(null);
   const standard = ["chess", "blind", "blindtext"].includes(game.variant),
     rows = game.review || [];
@@ -303,9 +260,9 @@ function GameViewer({
       setPlaying(false);
       return;
     }
-    const t = setTimeout(() => setCursor((v) => v + 1), 650);
+    const t = setTimeout(() => setCursor((v) => v + 1), replaySpeed);
     return () => clearTimeout(t);
-  }, [playing, cursor]);
+  }, [playing, cursor, replaySpeed]);
   async function review() {
     setReviewing(true);
     const ctrl = new AbortController();
@@ -508,8 +465,12 @@ function GameViewer({
         <div className="board-column">
           <Board
             fen={game.positions[cursor] || game.initial}
+            blocked={
+              game.special?.blocked.slice(0, Math.floor(cursor / 10)) || []
+            }
             disabled
             flipped={flipped}
+            onFlip={() => setFlipped((v) => !v)}
             highlights={
               cursor
                 ? [
@@ -554,6 +515,27 @@ function GameViewer({
             >
               <ChevronsRight size={18} />
             </IconButton>
+          </div>
+          <div className="replay-speed">
+            <label>
+              Speed
+              <select
+                aria-label="Replay speed"
+                value={replaySpeed}
+                onChange={(e) => setReplaySpeed(+e.target.value)}
+              >
+                <option value={2000}>2s / move</option>
+                <option value={1000}>1s / move</option>
+                <option value={650}>0.65s / move</option>
+                <option value={250}>0.25s / move</option>
+              </select>
+            </label>
+            <GameGIFButton
+              positions={game.positions}
+              blocked={game.special?.blocked}
+              flipped={flipped}
+              delay={replaySpeed}
+            />
           </div>
           <input
             className="replay-slider"
@@ -631,92 +613,88 @@ function GameViewer({
                 ))}
               </select>
             </Field>
-            <Button
-              className="text-button"
-              onClick={() => setFlipped(!flipped)}
-            >
-              Flip board
-            </Button>
           </Card>
         </div>
         <div className="side-panels">
-          <Card>
-            <div className="card-heading">
-              <h2>{standard ? "Engine review" : "Variant review"}</h2>
-              <span className="pill">
-                {rows.length} / {game.moves.length}
-              </span>
-            </div>
-            <p className="caption">
-              {standard
-                ? "Stockfish 19 Lite. Scores depend on search time."
-                : "Legal replay and local material alternatives, not a full-strength engine verdict."}
-            </p>
-            {standard && (
-              <Field label="Time per position">
-                <select
-                  disabled={reviewing}
-                  value={budget}
-                  onChange={(e) => setBudget(Number(e.target.value))}
-                >
-                  <option value={300}>0.3 seconds</option>
-                  <option value={500}>0.5 seconds</option>
-                  <option value={1000}>1 second</option>
-                  <option value={3000}>3 seconds</option>
-                </select>
-              </Field>
-            )}
-            <Button
-              disabled={rows.length >= game.moves.length}
-              onClick={() =>
-                reviewing ? controller.current?.abort() : void review()
-              }
-            >
-              {reviewing ? <Pause size={15} /> : <Play size={15} />}{" "}
-              {reviewing
-                ? "Pause"
-                : rows.length
-                  ? "Resume review"
-                  : "Review game"}
-            </Button>
-            {status && (
-              <p role="status" className="feedback">
-                {status}
-              </p>
-            )}
-            {rows.length > 0 && !reviewing && (
-              <Button
-                className="text-button"
-                onClick={() => {
-                  setLibrary((l) => ({
-                    ...l,
-                    games: l.games.map((g) =>
-                      g.id === game.id ? { ...g, review: [] } : g,
-                    ),
-                  }));
-                  setStatus("");
-                }}
-              >
-                Reset review
-              </Button>
-            )}
-            {standard && (
-              <div className="metric-pair">
-                <div>
-                  <b>{average("w") ?? "—"}</b>
-                  <span>White avg. cp loss</span>
-                </div>
-                <div>
-                  <b>{average("b") ?? "—"}</b>
-                  <span>Black avg. cp loss</span>
-                </div>
+          {!game.special && (
+            <Card>
+              <div className="card-heading">
+                <h2>{standard ? "Engine review" : "Variant review"}</h2>
+                <span className="pill">
+                  {rows.length} / {game.moves.length}
+                </span>
               </div>
-            )}
-            <Button className="text-button" onClick={() => navigate("stats")}>
-              <ChartNoAxesCombined size={15} />
-              Improvement patterns
-            </Button>
-          </Card>
+              <p className="caption">
+                {standard
+                  ? "Stockfish 19 Lite. Scores depend on search time."
+                  : "Legal replay and local material alternatives, not a full-strength engine verdict."}
+              </p>
+              {standard && (
+                <Field label="Time per position">
+                  <select
+                    disabled={reviewing}
+                    value={budget}
+                    onChange={(e) => setBudget(Number(e.target.value))}
+                  >
+                    <option value={300}>0.3 seconds</option>
+                    <option value={500}>0.5 seconds</option>
+                    <option value={1000}>1 second</option>
+                    <option value={3000}>3 seconds</option>
+                  </select>
+                </Field>
+              )}
+              <Button
+                disabled={rows.length >= game.moves.length}
+                onClick={() =>
+                  reviewing ? controller.current?.abort() : void review()
+                }
+              >
+                {reviewing ? <Pause size={15} /> : <Play size={15} />}{" "}
+                {reviewing
+                  ? "Pause"
+                  : rows.length
+                    ? "Resume review"
+                    : "Review game"}
+              </Button>
+              {status && (
+                <p role="status" className="feedback">
+                  {status}
+                </p>
+              )}
+              {rows.length > 0 && !reviewing && (
+                <Button
+                  className="text-button"
+                  onClick={() => {
+                    setLibrary((l) => ({
+                      ...l,
+                      games: l.games.map((g) =>
+                        g.id === game.id ? { ...g, review: [] } : g,
+                      ),
+                    }));
+                    setStatus("");
+                  }}
+                >
+                  Reset review
+                </Button>
+              )}
+              {standard && (
+                <div className="metric-pair">
+                  <div>
+                    <b>{average("w") ?? "—"}</b>
+                    <span>White avg. cp loss</span>
+                  </div>
+                  <div>
+                    <b>{average("b") ?? "—"}</b>
+                    <span>Black avg. cp loss</span>
+                  </div>
+                </div>
+              )}
+              <Button className="text-button" onClick={() => navigate("stats")}>
+                <ChartNoAxesCombined size={15} />
+                Improvement patterns
+              </Button>
+            </Card>
+          )}
           <Card>
             <h2>Moves</h2>
             <div className="review-moves">

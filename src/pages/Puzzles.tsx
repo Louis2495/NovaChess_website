@@ -12,10 +12,29 @@ import {
 import { useApp } from "../lib/context";
 import { useData, today } from "../lib/store";
 import type { PuzzleData } from "../lib/types";
+import GuessEval from "./GuessEval";
 import { dailyPuzzle } from "./Home";
 import { Board } from "../components/Board";
 import { PageTitle, Card, Button, Loading, Field } from "../components/UI";
 export default function Puzzles() {
+  const { detail: puzzleView, navigate: changePuzzleView } = useApp();
+  if (puzzleView === "eval")
+    return (
+      <>
+        <PageTitle title="Guess the eval">
+          <Button
+            className="secondary"
+            onClick={() => changePuzzleView("puzzles")}
+          >
+            Puzzles
+          </Button>
+        </PageTitle>
+        <GuessEval />
+      </>
+    );
+  return <ClassicPuzzles />;
+}
+function ClassicPuzzles() {
   const { data, error } = useData<PuzzleData[]>("puzzles");
   if (!data) return <Loading error={error} />;
   return <PuzzleTrainer puzzles={data} />;
@@ -206,6 +225,12 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           {daily ? "Adaptive practice" : "Daily puzzle"}
         </Button>
       </PageTitle>
+      <Button
+        className="eval-tab secondary"
+        onClick={() => navigate("puzzles", "eval")}
+      >
+        Guess the eval
+      </Button>
       <div className="chess-layout">
         <div className="board-column">
           <div className="board-topline">

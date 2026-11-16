@@ -22,6 +22,7 @@ export async function renderBoard(
   a: Appearance,
   flipped = false,
   size = 640,
+  blocked: string[] = [],
 ) {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = size;
@@ -35,6 +36,19 @@ export async function renderBoard(
         sq = "abcdefgh"[file] + rank;
       ctx.fillStyle = (file + 8 - rank) % 2 ? a.dark : a.light;
       ctx.fillRect(x * cell, y * cell, cell, cell);
+      if (blocked.includes(sq)) {
+        ctx.fillStyle = a.backgroundColor;
+        ctx.fillRect(x * cell, y * cell, cell, cell);
+        ctx.strokeStyle = a.mutedColor;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x * cell + cell * 0.35, y * cell + cell * 0.35);
+        ctx.lineTo(x * cell + cell * 0.65, y * cell + cell * 0.65);
+        ctx.moveTo(x * cell + cell * 0.65, y * cell + cell * 0.35);
+        ctx.lineTo(x * cell + cell * 0.35, y * cell + cell * 0.65);
+        ctx.stroke();
+        continue;
+      }
       const piece = p[sq];
       if (piece) {
         const url =
@@ -71,17 +85,27 @@ export async function exportGIF(
   a: Appearance,
   flipped = false,
   onProgress?: (n: number) => void,
+  options: { delay?: number; filename?: string; blocked?: string[] } = {},
 ) {
   const gif = GIFEncoder();
-  const frames = positions.slice(0, 160);
+  const frames = positions;
   for (let i = 0; i < frames.length; i++) {
-    const canvas = await renderBoard(frames[i], a, flipped, 320),
+    const canvas = await renderBoard(
+        frames[i],
+        a,
+        flipped,
+        320,
+        options.blocked?.slice(0, Math.floor(i / 10)) || [],
+      ),
       data = canvas.getContext("2d")!.getImageData(0, 0, 320, 320).data,
       palette = quantize(data, 128),
       index = applyPalette(data, palette);
     gif.writeFrame(index, 320, 320, {
       palette,
-      delay: i === 0 || i === frames.length - 1 ? 1200 : 550,
+      delay:
+        i === 0 || i === frames.length - 1
+          ? Math.max(1200, options.delay || 550)
+          : options.delay || 550,
       repeat: 0,
     });
     onProgress?.(Math.round(((i + 1) / frames.length) * 100));
@@ -89,7 +113,7 @@ export async function exportGIF(
   }
   gif.finish();
   download(
-    "novachess-game.gif",
+    options.filename || "novachess-game.gif",
     new Blob([gif.bytesView().slice().buffer], { type: "image/gif" }),
   );
 }

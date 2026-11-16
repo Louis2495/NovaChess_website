@@ -33,12 +33,10 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
   await expect(
     page.getByRole("heading", { name: "Home", exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Solve puzzle", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /Daily puzzle/ })).toBeVisible();
   await expect(page.locator(".app")).toHaveCSS(
     "background-color",
-    "rgb(16, 20, 24)",
+    "rgb(25, 38, 46)",
   );
   await expect(
     page.getByRole("heading", { name: /Your next move|A little brighter/ }),
@@ -61,7 +59,7 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
 test("appearance themes, custom colors, board/pieces/layout persist and presets export", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/#profile");
   await page
     .getByRole("button", { name: "Customize", exact: true })
     .first()
@@ -112,11 +110,11 @@ test("appearance themes, custom colors, board/pieces/layout persist and presets 
     .getByRole("dialog", { name: "Appearance" })
     .getByRole("button", { name: "Reset appearance", exact: true })
     .click();
-  await expect(page.locator(".app")).toHaveCSS("--accent", "#78b58a");
+  await expect(page.locator(".app")).toHaveCSS("--accent", "#91d7b6");
 });
 
 test("uploaded backgrounds stay local and can be removed", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/#profile");
   await page
     .getByRole("button", { name: "Customize", exact: true })
     .first()
@@ -167,13 +165,9 @@ test("analysis runs real Stockfish, supports moves, branches, FEN, PGN and image
   await dialog.getByRole("button", { name: "Game GIF", exact: true }).click();
   expect((await gif).suggestedFilename()).toMatch(/\.gif$/);
   await dialog.getByRole("button", { name: "Close", exact: true }).click();
-  await page.getByRole("button", { name: "FEN / PGN", exact: true }).click();
-  await page.getByLabel("FEN input").fill("invalid");
-  await page.getByRole("button", { name: "Import FEN", exact: true }).click();
-  await expect(page.getByRole("alert")).toBeVisible();
-  await page.getByLabel("FEN input").fill(initial);
-  await page.getByRole("button", { name: "Import FEN", exact: true }).click();
-  await expect(page.locator(".notation-table")).toContainText("Play a move");
+  await expect(
+    page.getByRole("button", { name: /Import|FEN \/ PGN/ }),
+  ).toHaveCount(0);
 });
 
 test("position editor validates kings, applies a position and underpromotion is available", async ({
@@ -188,9 +182,9 @@ test("position editor validates kings, applies a position and underpromotion is 
   await d.getByRole("button", { name: "Use position", exact: true }).click();
   await expect(d.getByRole("alert")).toBeVisible();
   await d.getByRole("button", { name: "Close", exact: true }).click();
-  await page.getByRole("button", { name: "FEN / PGN", exact: true }).click();
-  await page.getByLabel("FEN input").fill("7k/P7/8/8/8/8/8/7K w - - 0 1");
-  await page.getByRole("button", { name: "Import FEN", exact: true }).click();
+  await page.goto(
+    "/#analysis/" + encodeURIComponent("fen:7k/P7/8/8/8/8/8/7K w - - 0 1"),
+  );
   await uiMove(page, "a7a8");
   await page
     .getByRole("button", { name: "Promote to knight", exact: true })
@@ -249,9 +243,11 @@ test("curated opening lesson and searchable full opening library work", async ({
   page,
 }) => {
   await page.goto("/#learn/lessons");
-  await expect(page.locator(".list-summary")).toHaveText("111 curated lessons");
+  await expect(page.locator(".list-summary")).toHaveText("129 lessons");
   await page.getByRole("button", { name: "Next", exact: true }).click();
-  await expect(page.locator(".lesson-controls")).toContainText("1 /");
+  await expect(page.locator(".lesson-compact-controls")).toContainText(
+    "Next: e5",
+  );
   await page.getByLabel("Search openings", { exact: true }).fill("Najdorf");
   await expect(page.locator(".opening-row").first()).toContainText("Najdorf");
   await page.locator(".opening-row").first().click();
@@ -293,18 +289,36 @@ test("endgame trainer uses legal goals and saves completion", async ({
   expect((await stored(page)).progress.endgames).toContain("queen-finish");
 });
 
-test("research imports PGN and calculates real opening frequencies", async ({
+test("Research loads public games and calculates real opening frequencies", async ({
   page,
 }) => {
-  await page.goto("/#learn/research");
-  await page.locator(".file-button input").setInputFiles({
-    name: "games.pgn",
-    mimeType: "text/plain",
-    buffer: Buffer.from(
-      '[Event "One"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 Nc6 1-0\n\n[Event "Two"]\n[Result "0-1"]\n\n1. e4 c5 0-1',
-    ),
-  });
-  await expect(page.getByRole("status")).toContainText("2 games imported");
+  await page.route("https://api.chess.com/pub/player/*/games/archives", (r) =>
+    r.fulfill({
+      json: {
+        archives: ["https://api.chess.com/pub/player/test/games/2024/01"],
+      },
+    }),
+  );
+  await page.route("https://api.chess.com/pub/player/test/games/2024/01", (r) =>
+    r.fulfill({
+      json: {
+        games: [
+          {
+            rules: "chess",
+            pgn: '[Event "One"]\n[White "test"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 Nc6 1-0',
+          },
+          {
+            rules: "chess",
+            pgn: '[Event "Two"]\n[White "test"]\n[Result "0-1"]\n\n1. e4 c5 0-1',
+          },
+        ],
+      },
+    }),
+  );
+  await page.goto("/#research");
+  await page.getByLabel("Public username").fill("test");
+  await page.getByRole("button", { name: "Load games", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("2 games");
   await expect(page.locator(".research-branches")).toContainText(
     "2 games · 100%",
   );
@@ -317,20 +331,22 @@ test("facts, history, dated ratings and map controls provide real content", asyn
   page,
 }) => {
   await page.goto("/#learn/facts");
-  await expect(page.locator(".facts-grid .card")).toHaveCount(56);
-  await page.getByLabel("Search facts").fill("knight");
+  await expect(page.locator(".facts-grid .card")).toHaveCount(75);
+  await expect(page.getByLabel("Search facts")).toHaveCount(0);
   await expect(page.locator(".facts-grid .card").first()).toBeVisible();
   await page.goto("/#learn/history");
-  await expect(page.locator(".history-timeline .card")).toHaveCount(22);
-  await page.getByRole("button", { name: "Ratings", exact: true }).click();
-  await expect(page.locator(".champions-grid .card").first()).toBeVisible();
+  await expect(page.locator(".history-event-list>button")).toHaveCount(22);
+  await page
+    .getByRole("button", { name: "World champions", exact: true })
+    .click();
+  await expect(page.locator(".champion-timeline .card").first()).toBeVisible();
   await page.getByLabel("Championship lineage").selectOption("fide");
-  expect(await page.locator(".champions-grid .card").count()).toBeGreaterThan(
-    0,
-  );
+  expect(
+    await page.locator(".champion-timeline .card").count(),
+  ).toBeGreaterThan(0);
   await page.goto("/#stats");
   await page.getByRole("button", { name: "Achievements", exact: true }).click();
-  await expect(page.locator(".achievement")).toHaveCount(14);
+  await expect(page.locator(".achievement")).toHaveCount(18);
   await page.getByRole("button", { name: "World map", exact: true }).click();
   await expect(page.locator(".world-map path").first()).toBeVisible();
   await page.getByRole("button", { name: "Zoom in", exact: true }).click();
@@ -355,56 +371,45 @@ test("facts, history, dated ratings and map controls provide real content", asyn
   await expect(page.locator(".map-controls")).toContainText("1.0×");
 });
 
-test("local profile, friends and shared games work without invented online services", async ({
+test("Profile saves username, bio and avatar; defaults are auto-queen off and premoves on", async ({
   page,
 }) => {
-  await page.goto("/#community");
-  await page.getByLabel("Display name").fill("Alex");
+  await page.goto("/#profile");
+  await page.getByLabel("Username", { exact: true }).fill("Alex");
+  await page
+    .getByLabel("Bio", { exact: true })
+    .fill("Rook endings and coffee.");
   await page.getByLabel("Country (optional)").selectOption("US");
+  await page
+    .getByRole("button", { name: "Use wN avatar", exact: true })
+    .click();
   await page.getByRole("button", { name: "Save profile", exact: true }).click();
-  await page.getByRole("button", { name: "Friends", exact: true }).click();
-  await page.getByRole("button", { name: "Add friend", exact: true }).click();
-  const d = page.getByRole("dialog");
-  await d.getByLabel("Name", { exact: true }).fill("Sam");
-  await d.getByLabel("Country", { exact: true }).selectOption("CA");
-  await d.getByRole("button", { name: "Save contact", exact: true }).click();
-  await page
-    .locator(".friends-grid")
-    .getByRole("button", { name: "Play", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "New shared game", exact: true })
-    .click();
-  await uiMove(page, "e2e4");
-  await expect(page.locator(".move-chips")).toContainText("e4");
-  await page
-    .getByRole("button", { name: "Copy game link", exact: true })
-    .click();
-  await expect(page.getByLabel("Game link")).toHaveValue(/#community\/invite/);
-  const link = await page.getByLabel("Game link").inputValue();
-  await page.goto(link);
-  await expect(page.locator(".incoming-game")).toContainText("Alex – Sam");
-  await page.getByRole("button", { name: "Open game", exact: true }).click();
-  await uiMove(page, "e7e5");
-  expect((await stored(page)).games[0].moves).toEqual(["e2e4", "e7e5"]);
-  await page.getByRole("button", { name: "Data", exact: true }).click();
-  const dl = page.waitForEvent("download");
-  await page
-    .getByRole("button", { name: "Export backup", exact: true })
-    .first()
-    .click();
-  expect((await dl).suggestedFilename()).toBe("novachess-backup.json");
+  await expect.poll(async () => (await stored(page)).profile.name).toBe("Alex");
+  await expect(
+    page.getByLabel("Auto-queen", { exact: true }),
+  ).not.toBeChecked();
+  await expect(page.getByLabel("Premoves", { exact: true })).toBeChecked();
+  await page.reload();
+  await expect(page.getByLabel("Bio", { exact: true })).toHaveValue(
+    "Rook endings and coffee.",
+  );
+  await expect(page.getByAltText("Your profile picture")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Sharing", exact: true }),
+  ).toHaveCount(0);
+  await page.goto("/#community");
+  await expect(
+    page.getByText("Not connected yet.", { exact: true }),
+  ).toBeVisible();
 });
 
 test("saved games replay and engine review persist real results", async ({
   page,
 }) => {
+  await page.goto("/#analysis");
+  for (const m of ["e2e4", "e7e5", "g1f3", "b8c6"]) await uiMove(page, m);
+  await page.getByRole("button", { name: "Save study", exact: true }).click();
   await page.goto("/#library");
-  await page.getByRole("button", { name: "Import PGN", exact: true }).click();
-  await page
-    .getByLabel("PGN games")
-    .fill('[Event "Review test"]\n\n1. e4 e5 2. Nf3 Nc6');
-  await page.getByRole("button", { name: "Import", exact: true }).click();
   await page
     .getByRole("button", { name: "Replay & review", exact: true })
     .click();
@@ -448,6 +453,7 @@ test("default dark views and customization dialog pass automated WCAG checks", a
       })),
     ).toEqual([]);
   }
+  await page.goto("/#profile");
   await page
     .getByRole("button", { name: "Customize", exact: true })
     .first()
@@ -684,7 +690,7 @@ test("simplified Home has one large New Game action and no repeated tool or stat
   page,
 }) => {
   await page.goto("/");
-  const section = page.getByRole("region", { name: "Play chess", exact: true });
+  const section = page.getByRole("region", { name: "New game", exact: true });
   const action = section.getByRole("button", { name: "New game", exact: true });
   await expect(action).toBeVisible();
   await expect(
@@ -693,7 +699,7 @@ test("simplified Home has one large New Game action and no repeated tool or stat
   expect((await action.boundingBox())!.height).toBeGreaterThanOrEqual(58);
   await expect(
     page.getByRole("button", { name: "Customize", exact: true }),
-  ).toHaveCount(1);
+  ).toHaveCount(0);
   await expect(
     page.locator(".tool-grid,.stats-strip,.home-bottom"),
   ).toHaveCount(0);

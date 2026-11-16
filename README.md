@@ -27,34 +27,35 @@ Set `CHROMIUM_PATH` to use another Chromium binary. The build creates static fil
 
 ## Features
 
-- **Home:** a dedicated New Game section, daily puzzle, suggested opening lessons and recent games.
-- **Analysis:** local Stockfish 19 Lite, one/three candidate lines, evaluation, material/check insights, legal moves, FEN/PGN import, position editing, branching, saved studies, FEN/link/PNG/GIF export.
-- **Play:** computer games, adaptive strength, Developer opening book, requested openings, all app variants, two-board Bughouse, drops, Duck placement, premoves, underpromotions, takebacks, draw offers and local history.
-- **Puzzles:** all 4,000 source puzzles; adaptive selection, automatic replies, hints, first-attempt grading, streaks and a deterministic daily puzzle.
-- **Learn:** all 111 curated lessons and 3,865 searchable opening lines, practice, repertoire editing/import/training with transpositions and spaced review, public-game research, 17 playable endgames, 56 facts and 22 historical milestones with championship/event-rating views.
-- **Library:** folders, imports, replay, persistent/resumable reviews, repertoire recall suggestions, engine alternatives and exports.
-- **Stats:** dedicated navigation, result and activity charts, training/game totals, improvement patterns, 14 achievements and a zoomable country map.
-- **Players & sharing:** local profile/avatar/country, local friends, pass-and-play, portable correspondence files, position/game links and read-only shared replays.
-- **Appearance:** nine app themes, all 12 board palettes and six piece sets, 12 app background styles plus uploaded backgrounds, custom base/accent/button/text/panel/board colors, background blur/dimming, panel opacity, font/size, spacing, corners, board size, move display, audio, personal presets and settings import/export. Changes persist locally.
+- **Home:** one large New Game action, a fully clickable daily puzzle, opening suggestions, and one of 380 original daily chess memes.
+- **Boards:** forgiving piece-centered dragging, material imbalance beneath every board, cursor-positioned promotion, configurable right-click marks/arrows, and keyboard controls (`f` flips by default).
+- **Play:** all 15 original app modes plus Dropping Squares, Chaos chess and Random. Games include persistent state, legal moves, local opponents and a large result banner.
+- **Puzzles:** 4,000 adaptive positions and Guess the Eval, a five-round game scored against an actual local Stockfish search.
+- **Learn:** 129 opening lessons, 32 family guides and 84 playable branches; plans, pawn structures, mistakes, review questions and unassisted recall. The catalog collapses into a compact lesson desk beside the board.
+- **Knowledge:** 75 selected facts, an era-based historical explorer, championship timelines with dated ratings, 3,330 searchable encyclopedia entries, 125 trivia questions, and chess-choice personality quizzes.
+- **Famous games:** 12 complete annotated master games, key-moment jumps, move-by-move replay, adjustable autoplay, analysis links, saving and full-game GIF export. Saved games also export GIFs.
+- **Analysis / Research:** browser Stockfish, branches, studies, position editor, exports, a dedicated public-game research tab and opening-frequency trees.
+- **Profile / Controls:** username, bio, uploaded or chess-piece avatar, country, personal settings, configurable shortcuts and annotation colors. Auto-queen defaults off; premoves default on. Customize is available only from Profile.
+- **Appearance:** nine themes, 12 palettes, six piece sets, custom colors/background images, bundled country flags, typography, layout, audio and personal presets. Defaults use brighter dark surfaces and mint accents.
+- **Stats:** results, activity, training, 18 harder achievements, a country map and improvement patterns. Endgame Lessons use the same name throughout the site.
+- **Online, when connected:** Supabase accounts, persistent Throne queues, one-day Vote Chess, team rooms versus friends/bots, shared annotations, global chat, and real global/country rankings and percentiles.
 
-## Browser differences
+Manual file/PGN/settings import controls have been removed as requested. Existing saved data remains readable. Public-game Research loads a named player’s available games through the source API.
 
-This is a working web adaptation, not a wrapper around SwiftUI. Standard analysis/play uses **Stockfish 19 Lite** with a smaller network than the native app. Variant legality uses **Fairy-Stockfish via ffish-es6**; variant opponents and variant review use lighter local searches/material heuristics. Their strength is not a calibrated human rating.
+## Online setup and browser differences
 
-Apple CloudKit and Game Center are not browser services. The website uses local profiles/contacts and game files/snapshot links instead; it does not invent a live player directory, automatic public broadcasts, matchmaking or cloud synchronization. Saved games and progress belong to this browser. Export backups to keep copies.
+The local tools work without an account. Online multiplayer, chat and rankings need a Supabase project; the app shows a disconnected state until configured. Follow [the budget-conscious setup guide](docs/ONLINE_SETUP.md), then set the two public Vite variables in `.env.local` or GitHub Actions. A service-role key must never be exposed to the browser.
 
-Opening research calls the selected service only after a user requests it. Browser CORS, site availability and rate limits apply. PGN-file research works independently of those services. Live Chess.com/Lichess access could not be verified in this cloud instance because its outbound proxy blocked both destinations; representative PGN imports and opening-tree results were validated.
-
-See [feature mapping](docs/APP_REVIEW.md) for source references and differences.
+Federation lookup opens the official FIDE/US Chess record by member ID; official rating/stat ingestion is not claimed. Public-game research depends on the source’s availability and CORS policy. Clock and camera features remain excluded.
 
 ## Deploy
 
-Host `dist/` on a static host. Relative asset paths and hash routes support the GitHub Pages repository path. Workers/WASM are included locally and need no cross-origin-isolation headers.
+Host `dist/` on a static host. The Vite base path is `/NovaChess_website/` for GitHub Pages; hash routes keep navigation within that path. Change the base if hosting at another path. Workers/WASM are included locally and need no cross-origin-isolation headers.
 
 For GitHub Pages, select **Settings → Pages → Source → GitHub Actions**, then run **Actions → Deploy website → Run workflow** on `main`. The CI workflow builds and runs browser tests on pushes and pull requests. Source pushes alone do not publish the website.
 
 ## Privacy and licenses
 
-There are no analytics, ads, advertising cookies or sign-ups. Games, profiles, contacts, backgrounds, presets and progress use browser storage. Service-worker caches hold static application assets; they do not upload personal data. Shared files/links contain the game/profile information the user explicitly exports. Static hosts may retain request logs.
+There are no analytics, ads or advertising cookies. Local games, profiles, backgrounds, presets and progress use browser storage. With Supabase connected, accounts, public profiles, multiplayer games, votes, chat and rankings use that project’s database. Service-worker caches hold static application assets. Static hosts and Supabase may retain request logs.
 
 [THIRD_PARTY.md](THIRD_PARTY.md) records artwork, data, fonts, engine source references and music attribution. The source is AGPL-3.0-or-later; see [LICENSE](LICENSE). Piano has its separate CC BY-SA 4.0 license. Full third-party license texts are under `public/licenses/`.

@@ -1,27 +1,22 @@
-import { useEffect, useState, type DragEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { useApp } from "../lib/context";
 import { base, pieceUrl } from "../lib/store";
 import { squares } from "../lib/variants";
-import { Modal } from "./UI";
+import { defaultControls, useControl } from "../lib/controls";
 export function Piece({ symbol, style }: { symbol: string; style?: string }) {
   const { appearance } = useApp();
-  if (symbol === "*")
-    return (
-      <img
-        className="piece duck-piece"
-        src={`${base}duck.webp`}
-        alt=""
-        draggable={false}
-      />
-    );
   return (
     <img
-      className="piece"
-      src={pieceUrl(
-        `${symbol === symbol.toUpperCase() ? "w" : "b"}${symbol.toUpperCase()}`,
-        style || appearance.pieceStyle,
-      )}
+      className={`piece ${symbol === "*" ? "duck-piece" : ""}`}
+      src={
+        symbol === "*"
+          ? `${base}duck.webp`
+          : pieceUrl(
+              `${symbol === symbol.toUpperCase() ? "w" : "b"}${symbol.toUpperCase()}`,
+              style || appearance.pieceStyle,
+            )
+      }
       alt=""
       draggable={false}
     />
@@ -36,12 +31,13 @@ const names: Record<string, string> = {
   k: "king",
   "*": "duck",
 };
+export type BoardMark = { from: string; to: string; color: string };
 export function Board({
   fen,
   onMove,
   onSquare,
   legalMoves,
-  flipped = false,
+  flipped: initialFlip = false,
   disabled = false,
   hidden = false,
   visible,
@@ -49,6 +45,11 @@ export function Board({
   hint,
   selected: externalSelected,
   compact = false,
+  blocked = [],
+  onMarksChange,
+  marks: externalMarks,
+  onCancel,
+  onFlip,
 }: {
   fen: string;
   onMove?: (from: string, to: string, promotion?: string) => void;
@@ -62,22 +63,71 @@ export function Board({
   hint?: string;
   selected?: string | null;
   compact?: boolean;
+  blocked?: string[];
+  marks?: BoardMark[];
+  onMarksChange?: (marks: BoardMark[]) => void;
+  onCancel?: () => void;
+  onFlip?: () => void;
 }) {
   const { appearance, notify } = useApp();
+  const boardRef = useRef<HTMLDivElement>(null),
+    pointer = useRef({ x: 0, y: 0 });
   const [selected, setSelected] = useState<string | null>(null),
+    [flipOffset, setFlipOffset] = useState(false),
     [promotion, setPromotion] = useState<{
       from: string;
       to: string;
       choices: string[];
+      x: number;
+      y: number;
+      size: number;
+      leftwards: boolean;
+    } | null>(null),
+    [marks, setMarks] = useState<BoardMark[]>([]),
+    [drag, setDrag] = useState<{
+      from: string;
+      symbol: string;
+      x: number;
+      y: number;
+      size: number;
     } | null>(null);
-  const cells = squares(fen),
-    turn = fen.split(" ")[1];
+  const gesture = useRef<{
+      from: string;
+      startX: number;
+      startY: number;
+      offsetX: number;
+      offsetY: number;
+      right: boolean;
+      color: string;
+      moving: boolean;
+      pointerId: number;
+    } | null>(null),
+    suppressClick = useRef(false);
+  const flipped = initialFlip !== flipOffset,
+    cells = squares(fen),
+    turn = fen.split(" ")[1],
+    files = flipped ? "hgfedcba" : "abcdefgh",
+    ranks = flipped ? "12345678" : "87654321";
+  useControl("flip", () => {
+    if (!compact) {
+      if (onFlip) onFlip();
+      else setFlipOffset((v) => !v);
+    }
+  });
+  useControl("clearMarks", () => {
+    updateMarks([]);
+    setPromotion(null);
+    setSelected(null);
+    onCancel?.();
+  });
   useEffect(() => {
     setSelected(null);
     setPromotion(null);
+    setDrag(null);
+    updateMarks([]);
   }, [fen]);
   let moves = legalMoves;
-  if (!moves) {
+  if (!moves)
     try {
       moves = new Chess(fen)
         .moves({ verbose: true })
@@ -85,13 +135,38 @@ export function Board({
     } catch {
       moves = [];
     }
+  const active = externalSelected ?? selected,
+    targets = active
+      ? moves.filter((m) => m.startsWith(active)).map((m) => m.slice(2, 4))
+      : [];
+  const currentMarks = externalMarks || marks;
+  function updateMarks(next: BoardMark[]) {
+    setMarks(next);
+    onMarksChange?.(next);
   }
-  const files = flipped ? "hgfedcba" : "abcdefgh";
-  const ranks = flipped ? "12345678" : "87654321";
-  const active = externalSelected ?? selected;
-  const targets = active
-    ? moves.filter((m) => m.startsWith(active)).map((m) => m.slice(2, 4))
-    : [];
+  function mark(from: string, to: string, color: string) {
+    const exists = currentMarks.some(
+      (m) => m.from === from && m.to === to && m.color === color,
+    );
+    updateMarks([
+      ...currentMarks.filter((m) => !(m.from === from && m.to === to)),
+      ...(exists ? [] : [{ from, to, color }]),
+    ]);
+  }
+  function squareAt(x: number, y: number) {
+    const box = boardRef.current!.getBoundingClientRect(),
+      size = box.width / 8;
+    if (
+      x < box.left - size * 0.4 ||
+      x > box.right + size * 0.4 ||
+      y < box.top - size * 0.4 ||
+      y > box.bottom + size * 0.4
+    )
+      return null;
+    const col = Math.max(0, Math.min(7, Math.floor((x - box.left) / size))),
+      row = Math.max(0, Math.min(7, Math.floor((y - box.top) / size)));
+    return files[col] + ranks[row];
+  }
   function choose(from: string, to: string) {
     const options = moves!.filter((m) => m.startsWith(from + to));
     if (!options.length) {
@@ -101,15 +176,37 @@ export function Board({
     }
     const choices = [
       ...new Set(options.map((m) => m.split(",")[0].slice(4)).filter(Boolean)),
-    ];
+    ].sort((a, b) => "qrbn".indexOf(a) - "qrbn".indexOf(b));
     if (choices.length && !appearance.autoQueen) {
-      setPromotion({ from, to, choices });
+      const size = Math.min(72, boardRef.current!.clientWidth / 6),
+        x = Math.max(
+          size / 2,
+          Math.min(innerWidth - size / 2, pointer.current.x),
+        ),
+        y = Math.max(
+          size / 2,
+          Math.min(innerHeight - size / 2, pointer.current.y),
+        );
+      setPromotion({
+        from,
+        to,
+        choices,
+        x,
+        y,
+        size,
+        leftwards: x + size * (choices.length - 0.5) > innerWidth,
+      });
       return;
     }
     onMove?.(from, to, choices.includes("q") ? "q" : choices[0]);
     setSelected(null);
   }
   function click(square: string) {
+    if (suppressClick.current) {
+      suppressClick.current = false;
+      return;
+    }
+    if (blocked.includes(square)) return;
     if (onSquare) {
       onSquare(square);
       return;
@@ -123,18 +220,34 @@ export function Board({
       choose(selected, square);
       return;
     }
-    if (hidden || moves!.some((m) => m.startsWith(square)))
-      setSelected(selected === square ? null : square);
-    else setSelected(null);
+    setSelected(
+      hidden || moves!.some((m) => m.startsWith(square))
+        ? selected === square
+          ? null
+          : square
+        : null,
+    );
   }
-  function drop(e: DragEvent, square: string) {
-    e.preventDefault();
-    const from = e.dataTransfer.getData("text/x-chess-square");
-    if (!disabled && from && from !== square) choose(from, square);
+  const values: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9 },
+    pieces =
+      Object.values(cells).join("") +
+      (fen.split(" ")[0].match(/\[([^\]]*)\]/)?.[1] || ""),
+    imbalance =
+      [...pieces].reduce(
+        (s, p) =>
+          s + (values[p.toLowerCase()] || 0) * (p === p.toUpperCase() ? 1 : -1),
+        0,
+      ) * (flipped ? -1 : 1);
+  function coord(square: string) {
+    return {
+      x: ((files.indexOf(square[0]) + 0.5) * 100) / 8,
+      y: ((ranks.indexOf(square[1]) + 0.5) * 100) / 8,
+    };
   }
   return (
-    <>
+    <div className={`board-frame ${compact ? "compact-frame" : ""}`}>
       <div
+        ref={boardRef}
         className={`board ${compact ? "compact-board" : ""}`}
         role="group"
         aria-label="Chessboard"
@@ -144,6 +257,45 @@ export function Board({
             "--dark-square": appearance.dark,
           } as React.CSSProperties
         }
+        onContextMenu={(e) => {
+          e.preventDefault();
+          onCancel?.();
+        }}
+        onPointerMove={(e) => {
+          pointer.current = { x: e.clientX, y: e.clientY };
+          const g = gesture.current;
+          if (!g) return;
+          if (Math.hypot(e.clientX - g.startX, e.clientY - g.startY) > 4)
+            g.moving = true;
+          if (!g.right && g.moving && cells[g.from])
+            setDrag({
+              from: g.from,
+              symbol: cells[g.from],
+              x: e.clientX - g.offsetX,
+              y: e.clientY - g.offsetY,
+              size: boardRef.current!.clientWidth / 8,
+            });
+        }}
+        onPointerUp={(e) => {
+          const g = gesture.current;
+          if (!g) return;
+          gesture.current = null;
+          setDrag(null);
+          if (g.right) {
+            const to = squareAt(e.clientX, e.clientY);
+            if (to) mark(g.from, to, g.color);
+            return;
+          }
+          if (g.moving) {
+            suppressClick.current = true;
+            const to = squareAt(e.clientX - g.offsetX, e.clientY - g.offsetY);
+            if (to && to !== g.from) choose(g.from, to);
+          }
+        }}
+        onPointerCancel={() => {
+          gesture.current = null;
+          setDrag(null);
+        }}
       >
         {[...ranks].flatMap((rank, row) =>
           [...files].map((file, col) => {
@@ -155,18 +307,78 @@ export function Board({
             return (
               <button
                 key={square}
-                disabled={disabled && !onSquare}
-                className={`board-square ${isDark ? "dark" : "light"} ${active === square ? "selected" : ""} ${hint === square ? "hinted" : ""} ${appearance.lastMove && highlights.includes(square) ? "last-move" : ""} ${fogged ? "fogged" : ""}`}
-                aria-label={`${square}${!concealed && piece ? `, ${piece === "*" ? "duck" : `${piece === piece.toUpperCase() ? "white" : "black"} ${names[piece.toLowerCase()] || piece}`}` : ", empty"}`}
+                className={`board-square ${isDark ? "dark" : "light"} ${active === square ? "selected" : ""} ${hint === square ? "hinted" : ""} ${appearance.lastMove && highlights.includes(square) ? "last-move" : ""} ${fogged ? "fogged" : ""} ${blocked.includes(square) ? "dropped-square" : ""} ${drag?.from === square ? "drag-origin" : ""}`}
+                aria-label={`${square}${blocked.includes(square) ? ", unavailable" : !concealed && piece ? `, ${piece === "*" ? "duck" : `${piece === piece.toUpperCase() ? "white" : "black"} ${names[piece.toLowerCase()] || piece}`}` : ", empty"}`}
                 aria-pressed={active === square}
+                aria-disabled={
+                  blocked.includes(square) || (disabled && !onSquare)
+                }
                 onClick={() => click(square)}
-                draggable={!disabled && !!onMove && !concealed && !!piece}
-                onDragStart={(e) => {
-                  e.dataTransfer.setData("text/x-chess-square", square);
-                  setSelected(square);
+                onPointerDown={(e) => {
+                  pointer.current = { x: e.clientX, y: e.clientY };
+                  if (e.button === 2) {
+                    e.preventDefault();
+                    if (onCancel) {
+                      onCancel();
+                      return;
+                    }
+                    const modifier = e.shiftKey
+                      ? "shift"
+                      : e.altKey
+                        ? "alt"
+                        : e.ctrlKey || e.metaKey
+                          ? "ctrl"
+                          : "none";
+                    const key =
+                      Object.entries({
+                        ...defaultControls,
+                        ...appearance.controls,
+                      }).find(
+                        ([k, v]) => k.startsWith("mark") && v === modifier,
+                      )?.[0] || "mark";
+                    const colors = {
+                      mark: appearance.markColors?.green || "#63d6a1",
+                      markBlue: appearance.markColors?.blue || "#67b8ff",
+                      markRed: appearance.markColors?.red || "#ff7b92",
+                      markGold: appearance.markColors?.gold || "#ffd071",
+                    };
+                    gesture.current = {
+                      from: square,
+                      startX: e.clientX,
+                      startY: e.clientY,
+                      offsetX: 0,
+                      offsetY: 0,
+                      right: true,
+                      color: colors[key as keyof typeof colors] || colors.mark,
+                      moving: false,
+                      pointerId: e.pointerId,
+                    };
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                    return;
+                  }
+                  if (
+                    e.button !== 0 ||
+                    disabled ||
+                    !onMove ||
+                    !piece ||
+                    concealed ||
+                    blocked.includes(square)
+                  )
+                    return;
+                  const box = e.currentTarget.getBoundingClientRect();
+                  gesture.current = {
+                    from: square,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    offsetX: e.clientX - box.left - box.width / 2,
+                    offsetY: e.clientY - box.top - box.height / 2,
+                    right: false,
+                    color: "",
+                    moving: false,
+                    pointerId: e.pointerId,
+                  };
+                  e.currentTarget.setPointerCapture(e.pointerId);
                 }}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => drop(e, square)}
                 onKeyDown={(e) => {
                   let delta = 0;
                   if (e.key === "ArrowRight") delta = 1;
@@ -175,6 +387,7 @@ export function Board({
                   if (e.key === "ArrowDown") delta = 8;
                   if (delta) {
                     e.preventDefault();
+                    e.stopPropagation();
                     const buttons =
                       e.currentTarget.parentElement?.querySelectorAll("button");
                     buttons?.[
@@ -200,13 +413,104 @@ export function Board({
             );
           }),
         )}
+        <svg className="board-marks" viewBox="0 0 100 100" aria-hidden="true">
+          {currentMarks.map((m, i) => {
+            const a = coord(m.from),
+              b = coord(m.to);
+            if (m.from === m.to)
+              return (
+                <circle
+                  key={i}
+                  cx={a.x}
+                  cy={a.y}
+                  r={5.3}
+                  fill={m.color}
+                  opacity=".5"
+                />
+              );
+            const angle = Math.atan2(b.y - a.y, b.x - a.x),
+              end = {
+                x: b.x - Math.cos(angle) * 3,
+                y: b.y - Math.sin(angle) * 3,
+              };
+            return (
+              <g key={i} stroke={m.color} fill={m.color} opacity=".85">
+                <line
+                  x1={a.x}
+                  y1={a.y}
+                  x2={end.x}
+                  y2={end.y}
+                  strokeWidth="2.3"
+                  strokeLinecap="round"
+                />
+                <path
+                  d={`M ${b.x} ${b.y} L ${b.x - Math.cos(angle - 0.55) * 5} ${b.y - Math.sin(angle - 0.55) * 5} L ${b.x - Math.cos(angle + 0.55) * 5} ${b.y - Math.sin(angle + 0.55) * 5} Z`}
+                />
+              </g>
+            );
+          })}
+        </svg>
       </div>
+      <div
+        className={`material-imbalance ${compact ? "compact-material" : ""}`}
+        aria-label={`Material imbalance for ${flipped ? "Black" : "White"}: ${imbalance > 0 ? "+" : ""}${imbalance}`}
+      >
+        <span
+          className={flipped ? "black-piece" : "white-piece"}
+          aria-hidden="true"
+        />
+        <b>
+          {imbalance > 0 ? "+" : ""}
+          {imbalance}
+        </b>
+      </div>
+      {drag && (
+        <div
+          className="drag-piece"
+          style={{
+            left: drag.x - drag.size / 2,
+            top: drag.y - drag.size / 2,
+            width: drag.size,
+            height: drag.size,
+          }}
+        >
+          <Piece symbol={drag.symbol} />
+        </div>
+      )}
       {promotion && (
-        <Modal title="Promote pawn" onClose={() => setPromotion(null)}>
-          <div className="promotion-choices">
-            {promotion.choices.map((p) => (
+        <>
+          <div
+            className="promotion-dismiss"
+            onPointerDown={() => setPromotion(null)}
+          />
+          <div
+            className="promotion-inline"
+            role="dialog"
+            aria-label="Promote pawn"
+            onKeyDown={(e) => {
+              if (
+                e.key.toLowerCase() ===
+                (appearance.controls?.clearMarks || "Escape").toLowerCase()
+              ) {
+                e.preventDefault();
+                setPromotion(null);
+                setSelected(null);
+              }
+            }}
+            style={{
+              left: promotion.x - promotion.size / 2,
+              top: promotion.y - promotion.size / 2,
+              flexDirection: promotion.leftwards ? "row-reverse" : "row",
+              transform: promotion.leftwards
+                ? `translateX(-${promotion.size * (promotion.choices.length - 1)}px)`
+                : undefined,
+            }}
+          >
+            {promotion.choices.map((p, i) => (
               <button
                 key={p}
+                autoFocus={i === 0}
+                style={{ width: promotion.size, height: promotion.size }}
                 aria-label={`Promote to ${names[p]}`}
                 onClick={() => {
                   onMove?.(promotion.from, promotion.to, p);
@@ -215,12 +519,11 @@ export function Board({
                 }}
               >
                 <Piece symbol={turn === "w" ? p.toUpperCase() : p} />
-                <span>{names[p]}</span>
               </button>
             ))}
           </div>
-        </Modal>
+        </>
       )}
-    </>
+    </div>
   );
 }

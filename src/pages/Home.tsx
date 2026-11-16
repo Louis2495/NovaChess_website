@@ -4,6 +4,7 @@ import { useApp } from "../lib/context";
 import { useData, today, dateLabel } from "../lib/store";
 import type { Opening, PuzzleData } from "../lib/types";
 import { Chess } from "chess.js";
+import DailyMeme from "../components/DailyMeme";
 import { Board, Piece } from "../components/Board";
 import { Button, PageTitle } from "../components/UI";
 export function dailyPuzzle(puzzles: PuzzleData[]) {
@@ -44,34 +45,35 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <PageTitle title="Home" />
-      <section className="play-feature" aria-labelledby="play-feature-title">
-        <div className="play-feature-copy">
-          <span className="feature-overline">COMPUTER & VARIANTS</span>
-          <h2 id="play-feature-title">Play chess</h2>
-          <p>Choose your opponent and color.</p>
-          <Button className="new-game-primary" onClick={() => navigate("play")}>
-            New game
-            <ArrowRight size={24} />
-          </Button>
-          {resumable && (
-            <button
-              className="resume-link"
-              onClick={() => navigate("play", "resume")}
-            >
-              <RotateCcw size={15} />
-              Resume saved game
-              <ChevronRight size={15} />
-            </button>
-          )}
-        </div>
-        <div className="play-feature-art" aria-hidden="true">
-          <div className="piece-halo" />
-          <div className="piece-floor" />
-          <Piece symbol="N" />
-        </div>
+      <section className="new-game-section" aria-label="New game">
+        <Button className="new-game-primary" onClick={() => navigate("play")}>
+          New game <ArrowRight size={32} />
+        </Button>
+        {resumable && (
+          <button
+            className="resume-link"
+            onClick={() => navigate("play", "resume")}
+          >
+            <RotateCcw size={15} />
+            Resume saved game
+            <ChevronRight size={15} />
+          </button>
+        )}
       </section>
       <div className="home-practice-grid">
-        <section className="home-puzzle" aria-labelledby="daily-title">
+        <section
+          className="home-puzzle"
+          aria-labelledby="daily-title"
+          role="link"
+          tabIndex={0}
+          onClick={() => navigate("puzzles", "daily")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              navigate("puzzles", "daily");
+            }
+          }}
+        >
           <div className="home-section-heading">
             <h2 id="daily-title">Daily puzzle</h2>
             {daily && (
@@ -83,7 +85,7 @@ export default function HomePage() {
           </div>
           <div className="home-puzzle-content">
             {fen ? (
-              <div className="daily-board-preview">
+              <div className="daily-board-preview" inert>
                 <Board fen={fen} disabled compact />
               </div>
             ) : (
@@ -100,13 +102,6 @@ export default function HomePage() {
                   ? `${fen.split(" ")[1] === "w" ? "White" : "Black"} to move`
                   : "Loading…"}
               </span>
-              <Button
-                className="secondary"
-                onClick={() => navigate("puzzles", "daily")}
-              >
-                {daily ? "Replay puzzle" : "Solve puzzle"}
-                <ArrowRight size={16} />
-              </Button>
             </div>
           </div>
         </section>
@@ -147,6 +142,7 @@ export default function HomePage() {
           </div>
         </section>
       </div>
+      <DailyMeme />
       {library.games.length > 0 && (
         <section className="home-recent">
           <div className="home-section-heading">

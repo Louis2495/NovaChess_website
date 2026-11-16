@@ -1,0 +1,3059 @@
+[
+  {
+    "id": "foundation-italian-game",
+    "family": "Italian Game",
+    "eco": "C50",
+    "idea": "Build d4 without rushing it. The c4 bishop points at f7, but a prepared center break is usually more useful than a one-piece attack.",
+    "structure": "c3 supports d4; d3 keeps the center stable until the pieces are ready.",
+    "white": [
+      "Reroute Nb1–d2–f1–g3",
+      "use Re1 to support e4",
+      "time d4 after castling."
+    ],
+    "black": [
+      "Challenge the center with ...d5",
+      "develop the c8 bishop before closing its diagonal",
+      "watch the f7 battery."
+    ],
+    "breaks": [
+      "d4",
+      "...d5"
+    ],
+    "avoid": "Do not play Ng5 just because f7 looks weak: ...d5 can hit the bishop and open the center.",
+    "quiz": {
+      "question": "Why play c3 before d4?",
+      "answers": [
+        "To support the central break",
+        "To attack the king immediately",
+        "To exchange queens"
+      ],
+      "correct": 0,
+      "explanation": "Build d4 without rushing it. The c4 bishop points at f7, but a prepared center break is usually more useful than a one-piece attack."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "f1c4",
+          "f8c5",
+          "c2c3",
+          "g8f6",
+          "d2d3",
+          "d7d6",
+          "e1g1",
+          "e8g8",
+          "f1e1",
+          "a7a6",
+          "c4b3",
+          "c5a7",
+          "b1d2",
+          "h7h6",
+          "d2f1",
+          "f8e8",
+          "f1g3",
+          "c8e6",
+          "b3c2",
+          "d6d5"
+        ]
+      },
+      {
+        "name": "Two Knights",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "f1c4",
+          "g8f6",
+          "d2d3",
+          "f8c5",
+          "c2c3",
+          "d7d6",
+          "e1g1",
+          "e8g8",
+          "f1e1",
+          "a7a6",
+          "c4b3",
+          "c5a7",
+          "b1d2",
+          "h7h6"
+        ]
+      },
+      {
+        "name": "Evans Gambit",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "f1c4",
+          "f8c5",
+          "b2b4",
+          "c5b4",
+          "c2c3",
+          "b4a5",
+          "d2d4",
+          "e5d4",
+          "e1g1",
+          "d7d6",
+          "c3d4",
+          "a5b6"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-ruy-lopez",
+    "family": "Ruy Lopez",
+    "eco": "C84",
+    "idea": "Pressure e5 indirectly. White often preserves the bishop and builds a center while Black gains queenside space.",
+    "structure": "A closed center gives both sides time to maneuver; opening it changes which pieces are strong.",
+    "white": [
+      "Protect e4 with Re1",
+      "prepare d4 with c3",
+      "reroute the queen’s knight toward the kingside."
+    ],
+    "black": [
+      "Complete development before ...d5",
+      "use ...c5 for central pressure",
+      "do not weaken dark squares for a bishop chase alone."
+    ],
+    "breaks": [
+      "d4",
+      "...d5",
+      "...c5"
+    ],
+    "avoid": "After 3.Bb5, taking c6 does not simply win e5: Black often has a queen move with a double attack.",
+    "quiz": {
+      "question": "What is the purpose of Re1?",
+      "answers": [
+        "Defend e4 and support d4",
+        "Force an immediate exchange",
+        "Move the king again"
+      ],
+      "correct": 0,
+      "explanation": "Pressure e5 indirectly. White often preserves the bishop and builds a center while Black gains queenside space."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "f1b5",
+          "a7a6",
+          "b5a4",
+          "g8f6",
+          "e1g1",
+          "f8e7",
+          "f1e1",
+          "b7b5",
+          "a4b3",
+          "d7d6",
+          "c2c3",
+          "e8g8",
+          "h2h3",
+          "c6b8",
+          "d2d4",
+          "b8d7",
+          "b1d2",
+          "c8b7",
+          "b3c2",
+          "f8e8"
+        ]
+      },
+      {
+        "name": "Exchange",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "f1b5",
+          "a7a6",
+          "b5c6",
+          "d7c6",
+          "e1g1",
+          "f7f6",
+          "d2d4",
+          "e5d4",
+          "f3d4",
+          "c6c5",
+          "d4b3",
+          "d8d1",
+          "f1d1"
+        ]
+      },
+      {
+        "name": "Berlin",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "f1b5",
+          "g8f6",
+          "e1g1",
+          "f6e4",
+          "d2d4",
+          "e4d6",
+          "b5c6",
+          "d7c6",
+          "d4e5",
+          "d6f5",
+          "d1d8",
+          "e8d8"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-queen-s-gambit-declined",
+    "family": "Queen's Gambit Declined",
+    "eco": "D35",
+    "idea": "Use pressure on d5 to choose a favorable pawn structure. Black is solid but must solve the c8 bishop.",
+    "structure": "After cxd5 exd5, White’s queenside minority can target c6; keeping central tension leaves more options.",
+    "white": [
+      "Develop before pushing e4",
+      "consider cxd5 only with a plan",
+      "use the c-file after it opens."
+    ],
+    "black": [
+      "Free the c8 bishop with ...b6 or ...e5",
+      "time ...c5",
+      "exchange a cramped minor piece."
+    ],
+    "breaks": [
+      "cxd5",
+      "e4",
+      "...c5",
+      "...e5"
+    ],
+    "avoid": "Releasing the center without a follow-up can solve Black’s development for free.",
+    "quiz": {
+      "question": "Which Black piece often needs a plan?",
+      "answers": [
+        "The c8 bishop",
+        "The already-developed king’s knight",
+        "The queen on d8 alone"
+      ],
+      "correct": 0,
+      "explanation": "Use pressure on d5 to choose a favorable pawn structure. Black is solid but must solve the c8 bishop."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "e7e6",
+          "b1c3",
+          "g8f6",
+          "c1g5",
+          "f8e7",
+          "e2e3",
+          "e8g8",
+          "g1f3",
+          "b8d7",
+          "a1c1",
+          "c7c6",
+          "f1d3",
+          "d5c4",
+          "d3c4",
+          "f6d5",
+          "g5e7",
+          "d8e7",
+          "e1g1",
+          "d5c3",
+          "c1c3",
+          "e6e5"
+        ]
+      },
+      {
+        "name": "Exchange",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "e7e6",
+          "b1c3",
+          "g8f6",
+          "c4d5",
+          "e6d5",
+          "c1g5",
+          "f8e7",
+          "e2e3",
+          "e8g8",
+          "f1d3",
+          "b8d7",
+          "d1c2",
+          "f8e8",
+          "g1e2",
+          "d7f8"
+        ]
+      },
+      {
+        "name": "Tartakower",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "e7e6",
+          "b1c3",
+          "g8f6",
+          "c1g5",
+          "f8e7",
+          "e2e3",
+          "e8g8",
+          "g1f3",
+          "h7h6",
+          "g5h4",
+          "b7b6",
+          "c4d5",
+          "f6d5",
+          "h4e7",
+          "d8e7"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-queen-s-gambit-accepted",
+    "family": "Queen's Gambit Accepted",
+    "eco": "D27",
+    "idea": "Black gives up the center temporarily for development and a later ...c5 break. Holding c4 at all costs is unnecessary.",
+    "structure": "White’s d4–e4 center gains space, but can become a target after exchanges.",
+    "white": [
+      "Recover c4 efficiently",
+      "develop before e4",
+      "use the open files if the d-pawn becomes isolated."
+    ],
+    "black": [
+      "Return the extra pawn when needed",
+      "strike d4 with ...c5",
+      "develop the bishop to b7 or e7."
+    ],
+    "breaks": [
+      "e4",
+      "...c5"
+    ],
+    "avoid": "Trying to keep c4 with ...b5 before preparation can let a4 undermine the pawn chain.",
+    "quiz": {
+      "question": "Why does Black usually play ...c5?",
+      "answers": [
+        "Challenge White’s central space",
+        "Keep the extra pawn forever",
+        "Trade both bishops immediately"
+      ],
+      "correct": 0,
+      "explanation": "Black gives up the center temporarily for development and a later ...c5 break. Holding c4 at all costs is unnecessary."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "d5c4",
+          "g1f3",
+          "g8f6",
+          "e2e3",
+          "e7e6",
+          "f1c4",
+          "c7c5",
+          "e1g1",
+          "a7a6",
+          "d1e2",
+          "b7b5",
+          "c4b3",
+          "c8b7",
+          "f1d1",
+          "b8d7",
+          "b1c3",
+          "f8d6",
+          "e3e4",
+          "c5d4",
+          "f3d4"
+        ]
+      },
+      {
+        "name": "Central expansion",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "d5c4",
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "e5d4",
+          "f1c4",
+          "b8c6",
+          "e1g1",
+          "c8e6",
+          "c4e6",
+          "f7e6"
+        ]
+      },
+      {
+        "name": "Quiet development",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "d5c4",
+          "g1f3",
+          "g8f6",
+          "e2e3",
+          "e7e6",
+          "f1c4",
+          "c7c5",
+          "e1g1",
+          "b8c6",
+          "d1e2",
+          "a7a6",
+          "f1d1"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-sicilian-defense",
+    "family": "Sicilian Defense",
+    "eco": "B50",
+    "idea": "The c-pawn exchange gives Black a semi-open c-file and a central pawn majority. White gets quick development and space.",
+    "structure": "White’s d-pawn has disappeared; the d5 square can become an outpost if Black plays ...e5.",
+    "white": [
+      "Develop with a concrete plan",
+      "use d5 when it is permanent",
+      "consider f4 or a kingside attack only after king safety."
+    ],
+    "black": [
+      "Create counterplay on the c-file",
+      "prepare ...d5",
+      "watch d6 and d5 when playing ...e5."
+    ],
+    "breaks": [
+      "...d5",
+      "f4",
+      "...b5"
+    ],
+    "avoid": "A kingside pawn storm is not automatic: castling on the same side changes the risk.",
+    "quiz": {
+      "question": "Which central break often frees Black?",
+      "answers": [
+        "...d5",
+        "...h5 in every position",
+        "...a5 without development"
+      ],
+      "correct": 0,
+      "explanation": "The c-pawn exchange gives Black a semi-open c-file and a central pawn majority. White gets quick development and space."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "e2e4",
+          "c7c5",
+          "g1f3",
+          "d7d6",
+          "d2d4",
+          "c5d4",
+          "f3d4",
+          "g8f6",
+          "b1c3",
+          "a7a6",
+          "f1e2",
+          "e7e5",
+          "d4b3",
+          "f8e7",
+          "e1g1",
+          "e8g8",
+          "c1e3",
+          "c8e6",
+          "d1d2",
+          "b8d7",
+          "a1d1",
+          "d8c7",
+          "a2a4",
+          "a8c8"
+        ]
+      },
+      {
+        "name": "Dragon",
+        "moves": [
+          "e2e4",
+          "c7c5",
+          "g1f3",
+          "d7d6",
+          "d2d4",
+          "c5d4",
+          "f3d4",
+          "g8f6",
+          "b1c3",
+          "g7g6",
+          "c1e3",
+          "f8g7",
+          "f2f3",
+          "e8g8",
+          "d1d2",
+          "b8c6",
+          "f1c4",
+          "c8d7"
+        ]
+      },
+      {
+        "name": "Sveshnikov",
+        "moves": [
+          "e2e4",
+          "c7c5",
+          "g1f3",
+          "b8c6",
+          "d2d4",
+          "c5d4",
+          "f3d4",
+          "g8f6",
+          "b1c3",
+          "e7e5",
+          "d4b5",
+          "d7d6",
+          "c1g5",
+          "a7a6",
+          "b5a3",
+          "b7b5",
+          "c3d5",
+          "f8e7"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-caro-kann-defense",
+    "family": "Caro-Kann Defense",
+    "eco": "B18",
+    "idea": "Black develops the light-squared bishop before ...e6. White’s space is useful only if it becomes activity.",
+    "structure": "The c6 pawn supports d5; ...c5 challenges the center later but costs a second c-pawn move.",
+    "white": [
+      "Use space to develop quickly",
+      "compare long castling with king safety",
+      "control e5."
+    ],
+    "black": [
+      "Finish kingside development",
+      "challenge d4 with ...c5",
+      "make sure the bishop has a retreat after h4–h5."
+    ],
+    "breaks": [
+      "...c5",
+      "...e5"
+    ],
+    "avoid": "A bishop trapped on g6 can turn a sound setup into a tactical problem.",
+    "quiz": {
+      "question": "Why bring the bishop out before ...e6?",
+      "answers": [
+        "Avoid trapping it behind the pawn chain",
+        "Win a pawn by force",
+        "Prevent White from castling"
+      ],
+      "correct": 0,
+      "explanation": "Black develops the light-squared bishop before ...e6. White’s space is useful only if it becomes activity."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "e2e4",
+          "c7c6",
+          "d2d4",
+          "d7d5",
+          "b1c3",
+          "d5e4",
+          "c3e4",
+          "c8f5",
+          "e4g3",
+          "f5g6",
+          "h2h4",
+          "h7h6",
+          "g1f3",
+          "b8d7",
+          "h4h5",
+          "g6h7",
+          "f1d3",
+          "h7d3",
+          "d1d3",
+          "e7e6",
+          "c1d2",
+          "g8f6",
+          "e1c1",
+          "f8e7"
+        ]
+      },
+      {
+        "name": "Advance",
+        "moves": [
+          "e2e4",
+          "c7c6",
+          "d2d4",
+          "d7d5",
+          "e4e5",
+          "c8f5",
+          "g1f3",
+          "e7e6",
+          "f1e2",
+          "c6c5",
+          "e1g1",
+          "b8c6",
+          "c1e3",
+          "c5d4",
+          "f3d4",
+          "g8e7"
+        ]
+      },
+      {
+        "name": "Panov",
+        "moves": [
+          "e2e4",
+          "c7c6",
+          "d2d4",
+          "d7d5",
+          "e4d5",
+          "c6d5",
+          "c2c4",
+          "g8f6",
+          "b1c3",
+          "e7e6",
+          "g1f3",
+          "f8b4",
+          "f1d3",
+          "d5c4",
+          "d3c4",
+          "e8g8"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-french-defense",
+    "family": "French Defense",
+    "eco": "C11",
+    "idea": "Attack the base of the pawn chain, not just its head. Black pressures d4; White often uses the kingside space.",
+    "structure": "The locked e5–d4 versus e6–d5 chains direct attacks to opposite wings.",
+    "white": [
+      "Support d4",
+      "prepare f5 with pieces",
+      "judge whether the d4 base can survive before attacking."
+    ],
+    "black": [
+      "Use ...c5 and ...f6 to undermine the chain",
+      "find a role for the c8 bishop",
+      "counter in the center before White’s attack lands."
+    ],
+    "breaks": [
+      "...c5",
+      "...f6",
+      "f5"
+    ],
+    "avoid": "Exchanging c5 too early can remove pressure from the d4 pawn.",
+    "quiz": {
+      "question": "Which pawn is the base of White’s chain?",
+      "answers": [
+        "d4",
+        "e5",
+        "h2"
+      ],
+      "correct": 0,
+      "explanation": "Attack the base of the pawn chain, not just its head. Black pressures d4; White often uses the kingside space."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "e2e4",
+          "e7e6",
+          "d2d4",
+          "d7d5",
+          "b1c3",
+          "g8f6",
+          "e4e5",
+          "f6d7",
+          "f2f4",
+          "c7c5",
+          "g1f3",
+          "b8c6",
+          "c1e3",
+          "a7a6",
+          "d1d2",
+          "b7b5",
+          "a2a3",
+          "d8b6",
+          "c3e2",
+          "c5c4",
+          "c2c3",
+          "a6a5",
+          "g2g3",
+          "f8e7"
+        ]
+      },
+      {
+        "name": "Winawer",
+        "moves": [
+          "e2e4",
+          "e7e6",
+          "d2d4",
+          "d7d5",
+          "b1c3",
+          "f8b4",
+          "e4e5",
+          "c7c5",
+          "a2a3",
+          "b4c3",
+          "b2c3",
+          "g8e7",
+          "d1g4",
+          "d8c7",
+          "g1f3",
+          "b8c6"
+        ]
+      },
+      {
+        "name": "Tarrasch",
+        "moves": [
+          "e2e4",
+          "e7e6",
+          "d2d4",
+          "d7d5",
+          "b1d2",
+          "c7c5",
+          "e4d5",
+          "e6d5",
+          "g1f3",
+          "b8c6",
+          "f1b5",
+          "f8d6",
+          "e1g1",
+          "g8e7"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-nimzo-indian-defense",
+    "family": "Nimzo-Indian Defense",
+    "eco": "E32",
+    "idea": "Black trades a bishop to slow e4 and influence the center. White chooses between clean pawns and faster development.",
+    "structure": "Bxc3 can double White’s c-pawns; Qc2 avoids that but spends a queen tempo.",
+    "white": [
+      "Use the bishop pair if the position opens",
+      "build e4 carefully",
+      "watch c4 if the c-pawns are doubled."
+    ],
+    "black": [
+      "Challenge c4 and e4",
+      "choose ...d5 or ...c5 according to structure",
+      "do not trade the bishop without gaining something."
+    ],
+    "breaks": [
+      "e4",
+      "...c5",
+      "...d5"
+    ],
+    "avoid": "The bishop pair is a long-term asset, not permission to neglect development.",
+    "quiz": {
+      "question": "What does 4.Qc2 often prevent?",
+      "answers": [
+        "Doubled c-pawns after Bxc3",
+        "All possible checks",
+        "Black from castling"
+      ],
+      "correct": 0,
+      "explanation": "Black trades a bishop to slow e4 and influence the center. White chooses between clean pawns and faster development."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "b1c3",
+          "f8b4",
+          "d1c2",
+          "e8g8",
+          "a2a3",
+          "b4c3",
+          "c2c3",
+          "b7b6",
+          "c1g5",
+          "c8b7",
+          "e2e3",
+          "d7d6",
+          "g1f3",
+          "b8d7",
+          "f1e2",
+          "h7h6",
+          "g5h4",
+          "c7c5",
+          "e1g1"
+        ]
+      },
+      {
+        "name": "Rubinstein",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "b1c3",
+          "f8b4",
+          "e2e3",
+          "e8g8",
+          "f1d3",
+          "d7d5",
+          "g1f3",
+          "c7c5",
+          "e1g1",
+          "b8c6",
+          "a2a3",
+          "b4c3",
+          "b2c3",
+          "d5c4",
+          "d3c4"
+        ]
+      },
+      {
+        "name": "Sämisch",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "b1c3",
+          "f8b4",
+          "a2a3",
+          "b4c3",
+          "b2c3",
+          "c7c5",
+          "e2e3",
+          "b8c6",
+          "f1d3",
+          "e8g8",
+          "g1e2"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-king-s-indian-defense",
+    "family": "King's Indian Defense",
+    "eco": "E97",
+    "idea": "White owns central space; Black accepts less room to seek a kingside pawn break. Speed matters when attacks run on opposite wings.",
+    "structure": "Once d5 locks the center, White tends toward c5 and Black toward ...f5–f4.",
+    "white": [
+      "Seek queenside play with c5",
+      "keep enough kingside defenders",
+      "prevent a pawn avalanche from arriving with tempo."
+    ],
+    "black": [
+      "Prepare ...f5 without losing e5",
+      "reroute knights behind the pawns",
+      "use the locked center to protect the king."
+    ],
+    "breaks": [
+      "c5",
+      "...f5"
+    ],
+    "avoid": "Copying the kingside attack before the center is closed may expose Black’s own king.",
+    "quiz": {
+      "question": "Why can Black push kingside pawns in the locked center?",
+      "answers": [
+        "Central lines are harder to open quickly",
+        "The king no longer needs defense",
+        "Queens are always exchanged"
+      ],
+      "correct": 0,
+      "explanation": "White owns central space; Black accepts less room to seek a kingside pawn break. Speed matters when attacks run on opposite wings."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "g7g6",
+          "b1c3",
+          "f8g7",
+          "e2e4",
+          "d7d6",
+          "g1f3",
+          "e8g8",
+          "f1e2",
+          "e7e5",
+          "e1g1",
+          "b8c6",
+          "d4d5",
+          "c6e7",
+          "f3e1",
+          "f6d7",
+          "c1e3",
+          "f7f5",
+          "f2f3",
+          "f5f4",
+          "e3f2",
+          "g6g5"
+        ]
+      },
+      {
+        "name": "Fianchetto",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "g7g6",
+          "g1f3",
+          "f8g7",
+          "g2g3",
+          "e8g8",
+          "f1g2",
+          "d7d6",
+          "e1g1",
+          "b8d7",
+          "b1c3",
+          "e7e5",
+          "e2e4",
+          "c7c6",
+          "h2h3"
+        ]
+      },
+      {
+        "name": "Sämisch",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "g7g6",
+          "b1c3",
+          "f8g7",
+          "e2e4",
+          "d7d6",
+          "f2f3",
+          "e8g8",
+          "c1e3",
+          "b8c6",
+          "g1e2",
+          "a7a6",
+          "d1d2",
+          "a8b8"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-gr-nfeld-defense",
+    "family": "Grünfeld Defense",
+    "eco": "D85",
+    "idea": "Black invites a broad center, then attacks it from a distance. White’s task is to make the center mobile before it becomes a target.",
+    "structure": "The c3 pawn becomes d4’s support after bxc3; exchanges can leave an isolated central pawn.",
+    "white": [
+      "Develop before chasing queens",
+      "use d5 when tactically sound",
+      "protect the base of the center."
+    ],
+    "black": [
+      "Combine ...c5, ...Bg7 and queen pressure on d4",
+      "calculate before grabbing queenside pawns."
+    ],
+    "breaks": [
+      "d5",
+      "...c5"
+    ],
+    "avoid": "Winning a pawn with the queen can concede too many development tempos.",
+    "quiz": {
+      "question": "What is Black attacking?",
+      "answers": [
+        "The large white pawn center",
+        "Only the h-pawn",
+        "The castled king immediately"
+      ],
+      "correct": 0,
+      "explanation": "Black invites a broad center, then attacks it from a distance. White’s task is to make the center mobile before it becomes a target."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "g7g6",
+          "b1c3",
+          "d7d5",
+          "c4d5",
+          "f6d5",
+          "e2e4",
+          "d5c3",
+          "b2c3",
+          "f8g7",
+          "g1f3",
+          "c7c5",
+          "a1b1",
+          "e8g8",
+          "f1e2",
+          "c5d4",
+          "c3d4",
+          "d8a5",
+          "c1d2",
+          "a5a2",
+          "e1g1"
+        ]
+      },
+      {
+        "name": "Classical exchange",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "g7g6",
+          "b1c3",
+          "d7d5",
+          "c4d5",
+          "f6d5",
+          "e2e4",
+          "d5c3",
+          "b2c3",
+          "f8g7",
+          "f1c4",
+          "c7c5",
+          "g1e2",
+          "e8g8",
+          "e1g1",
+          "b8c6"
+        ]
+      },
+      {
+        "name": "Russian system",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "g7g6",
+          "b1c3",
+          "d7d5",
+          "g1f3",
+          "f8g7",
+          "d1b3",
+          "d5c4",
+          "b3c4",
+          "e8g8",
+          "e2e4",
+          "c8g4",
+          "c1e3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-catalan-opening",
+    "family": "Catalan Opening",
+    "eco": "E04",
+    "idea": "The g2 bishop creates long-term queenside pressure. White can recover c4 without rushing if development compensates.",
+    "structure": "The long diagonal matters most when the center opens; a closed d5 pawn can blunt the bishop.",
+    "white": [
+      "Use the bishop on the long diagonal",
+      "prepare e4",
+      "recover c4 without wasting development."
+    ],
+    "black": [
+      "Choose whether to hold c4 or complete development",
+      "use ...c5 to equalize central space",
+      "watch b7."
+    ],
+    "breaks": [
+      "e4",
+      "...c5"
+    ],
+    "avoid": "An automatic queen chase for c4 may cost the initiative that justified the opening.",
+    "quiz": {
+      "question": "Which piece gives the Catalan its long-term pressure?",
+      "answers": [
+        "The g2 bishop",
+        "The a1 rook before development",
+        "The king on g1"
+      ],
+      "correct": 0,
+      "explanation": "The g2 bishop creates long-term queenside pressure. White can recover c4 without rushing if development compensates."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g2g3",
+          "d7d5",
+          "f1g2",
+          "f8e7",
+          "g1f3",
+          "e8g8",
+          "e1g1",
+          "d5c4",
+          "d1c2",
+          "a7a6",
+          "a2a4",
+          "c8d7",
+          "c2c4",
+          "d7c6",
+          "c1g5",
+          "c6d5",
+          "c4d3",
+          "d5e4",
+          "d3d2"
+        ]
+      },
+      {
+        "name": "Closed",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g2g3",
+          "d7d5",
+          "f1g2",
+          "f8e7",
+          "g1f3",
+          "e8g8",
+          "e1g1",
+          "b8d7",
+          "d1c2",
+          "c7c6",
+          "b1d2",
+          "b7b6"
+        ]
+      },
+      {
+        "name": "Open",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g2g3",
+          "d7d5",
+          "f1g2",
+          "d5c4",
+          "g1f3",
+          "a7a6",
+          "e1g1",
+          "b8c6",
+          "e2e3",
+          "c8d7",
+          "d1e2"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-slav-defense",
+    "family": "Slav Defense",
+    "eco": "D17",
+    "idea": "Black keeps the light-squared bishop free before ...e6. White often plays a4 to stop ...b5 from holding c4.",
+    "structure": "The c6–d5 chain is solid, but c6 can become a target if Black falls behind.",
+    "white": [
+      "Recover the c4 pawn with development",
+      "use e4 for central space",
+      "stop ...b5 when it would secure the extra pawn."
+    ],
+    "black": [
+      "Develop Bf5 or Bg4 before ...e6",
+      "time ...c5",
+      "avoid moving the same bishop repeatedly without cause."
+    ],
+    "breaks": [
+      "e4",
+      "...c5"
+    ],
+    "avoid": "Playing ...Bf5 too early in some move orders allows Qb3 pressure on b7.",
+    "quiz": {
+      "question": "What is the point of a4 in this line?",
+      "answers": [
+        "Discourage ...b5 from holding c4",
+        "Force checkmate",
+        "Make a rook lift immediately"
+      ],
+      "correct": 0,
+      "explanation": "Black keeps the light-squared bishop free before ...e6. White often plays a4 to stop ...b5 from holding c4."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "c7c6",
+          "g1f3",
+          "g8f6",
+          "b1c3",
+          "d5c4",
+          "a2a4",
+          "c8f5",
+          "e2e3",
+          "e7e6",
+          "f1c4",
+          "f8b4",
+          "e1g1",
+          "b8d7",
+          "d1e2",
+          "f5g6",
+          "e3e4",
+          "e8g8",
+          "e4e5",
+          "f6d5"
+        ]
+      },
+      {
+        "name": "Quiet Slav",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "c7c6",
+          "g1f3",
+          "g8f6",
+          "e2e3",
+          "c8f5",
+          "b1c3",
+          "e7e6",
+          "f1d3",
+          "f5d3",
+          "d1d3",
+          "b8d7",
+          "e1g1"
+        ]
+      },
+      {
+        "name": "Exchange",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "c7c6",
+          "c4d5",
+          "c6d5",
+          "b1c3",
+          "g8f6",
+          "g1f3",
+          "b8c6",
+          "c1f4",
+          "c8f5",
+          "e2e3",
+          "e7e6"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-semi-slav-defense",
+    "family": "Semi-Slav Defense",
+    "eco": "D46",
+    "idea": "Black combines a solid triangle with a prepared ...c5 break. White can use the center before Black’s queenside develops fully.",
+    "structure": "After ...dxc4 and ...b5, the c8 bishop finds b7 and Black hits the center with ...c5.",
+    "white": [
+      "Decide whether e4 is safe",
+      "calculate central breaks before retreating",
+      "avoid opening lines toward an uncastled king."
+    ],
+    "black": [
+      "Prepare ...c5 with development",
+      "use the b7 bishop actively",
+      "return material if it frees the position."
+    ],
+    "breaks": [
+      "e4",
+      "e5",
+      "...c5"
+    ],
+    "avoid": "The apparently quiet pawn triangle can lead to forcing tactics; do not treat the Meran as a setup to copy blindly.",
+    "quiz": {
+      "question": "Why does Black play ...b5?",
+      "answers": [
+        "Gain time on the bishop and prepare ...Bb7",
+        "Trap White’s queen",
+        "Prevent all central breaks"
+      ],
+      "correct": 0,
+      "explanation": "Black combines a solid triangle with a prepared ...c5 break. White can use the center before Black’s queenside develops fully."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "c7c6",
+          "g1f3",
+          "g8f6",
+          "b1c3",
+          "e7e6",
+          "e2e3",
+          "b8d7",
+          "f1d3",
+          "d5c4",
+          "d3c4",
+          "b7b5",
+          "c4d3",
+          "c8b7",
+          "e1g1",
+          "a7a6",
+          "e3e4",
+          "c6c5",
+          "e4e5",
+          "c5d4",
+          "c3b5",
+          "a6b5"
+        ]
+      },
+      {
+        "name": "Anti-Meran",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "c7c6",
+          "g1f3",
+          "g8f6",
+          "b1c3",
+          "e7e6",
+          "e2e3",
+          "b8d7",
+          "d1c2",
+          "f8d6",
+          "b2b3",
+          "e8g8",
+          "c1b2"
+        ]
+      },
+      {
+        "name": "Early bishop",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "c7c6",
+          "g1f3",
+          "g8f6",
+          "b1c3",
+          "e7e6",
+          "c1g5",
+          "h7h6",
+          "g5h4",
+          "d5c4",
+          "e2e4",
+          "g7g5",
+          "h4g3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-english-opening",
+    "family": "English Opening",
+    "eco": "A25",
+    "idea": "Use c4 to control d5 and choose a central structure later. The first move does not commit White to a single pawn formation.",
+    "structure": "A Botvinnik structure with c4–d3–e4 grips d5 but leaves d4 as a square to watch.",
+    "white": [
+      "Control d5",
+      "develop the g2 bishop",
+      "choose d4 or f4 according to Black’s setup."
+    ],
+    "black": [
+      "Challenge the center with ...d5 or ...f5",
+      "use d4 if White fixes e4",
+      "complete development before expanding."
+    ],
+    "breaks": [
+      "d4",
+      "f4",
+      "...d5"
+    ],
+    "avoid": "A symmetrical position is not automatically quiet: one central break can create an isolated pawn or open diagonal.",
+    "quiz": {
+      "question": "Which square does c4 immediately control?",
+      "answers": [
+        "d5",
+        "f7",
+        "h8"
+      ],
+      "correct": 0,
+      "explanation": "Use c4 to control d5 and choose a central structure later. The first move does not commit White to a single pawn formation."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "c2c4",
+          "e7e5",
+          "b1c3",
+          "b8c6",
+          "g2g3",
+          "g7g6",
+          "f1g2",
+          "f8g7",
+          "d2d3",
+          "d7d6",
+          "e2e4",
+          "f7f5",
+          "g1e2",
+          "g8f6",
+          "e1g1",
+          "e8g8",
+          "c3d5",
+          "f6d5",
+          "c4d5",
+          "c6e7",
+          "c1e3",
+          "c7c6",
+          "d5c6",
+          "b7c6"
+        ]
+      },
+      {
+        "name": "Symmetrical",
+        "moves": [
+          "c2c4",
+          "c7c5",
+          "g1f3",
+          "g8f6",
+          "b1c3",
+          "b8c6",
+          "g2g3",
+          "g7g6",
+          "f1g2",
+          "f8g7",
+          "e1g1",
+          "e8g8",
+          "d2d4",
+          "c5d4",
+          "f3d4"
+        ]
+      },
+      {
+        "name": "Reversed Sicilian",
+        "moves": [
+          "c2c4",
+          "e7e5",
+          "b1c3",
+          "g8f6",
+          "g1f3",
+          "b8c6",
+          "g2g3",
+          "d7d5",
+          "c4d5",
+          "f6d5",
+          "f1g2",
+          "d5b6",
+          "e1g1",
+          "f8e7"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-scotch-game",
+    "family": "Scotch Game",
+    "eco": "C45",
+    "idea": "Open the center early and develop with tempo. The d4 knight is active but can become a target.",
+    "structure": "With both central d-pawns exchanged or challenged, piece activity matters more than a closed pawn chain.",
+    "white": [
+      "Develop the queen’s bishop",
+      "meet pressure on d4 accurately",
+      "use central files after castling."
+    ],
+    "black": [
+      "Hit d4 with pieces",
+      "develop quickly rather than cling to d4",
+      "use ...d5 when it gains time."
+    ],
+    "breaks": [
+      "...d5",
+      "f4"
+    ],
+    "avoid": "Moving the queen too early can invite developing attacks against it.",
+    "quiz": {
+      "question": "What changes after 3.d4?",
+      "answers": [
+        "The center opens early",
+        "The position is permanently locked",
+        "Black cannot develop a bishop"
+      ],
+      "correct": 0,
+      "explanation": "Open the center early and develop with tempo. The d4 knight is active but can become a target."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "d2d4",
+          "e5d4",
+          "f3d4",
+          "f8c5",
+          "c1e3",
+          "d8f6",
+          "c2c3",
+          "g8e7",
+          "f1c4",
+          "c6e5",
+          "c4e2",
+          "f6g6",
+          "e1g1",
+          "d7d6",
+          "b1d2",
+          "e8g8",
+          "f2f4",
+          "e5c6"
+        ]
+      },
+      {
+        "name": "Four knights",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "b1c3",
+          "g8f6",
+          "d2d4",
+          "e5d4",
+          "f3d4",
+          "f8b4",
+          "d4c6",
+          "b7c6",
+          "f1d3",
+          "d7d5"
+        ]
+      },
+      {
+        "name": "Mieses",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "d2d4",
+          "e5d4",
+          "f3d4",
+          "g8f6",
+          "d4c6",
+          "b7c6",
+          "e4e5",
+          "d8e7",
+          "d1e2",
+          "f6d5"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-london-system",
+    "family": "London System",
+    "eco": "D02",
+    "idea": "Develop the bishop before closing the e-pawn chain, but adapt to Black’s central and queenside pressure.",
+    "structure": "The d4–e3–c3 triangle supports e5 and keeps the center stable.",
+    "white": [
+      "Support Ne5",
+      "use e4 if prepared",
+      "answer ...Qb6 without losing b2 or d4."
+    ],
+    "black": [
+      "Challenge d4 with ...c5",
+      "exchange the f4 bishop when useful",
+      "use ...Qb6 to make White solve concrete problems."
+    ],
+    "breaks": [
+      "e4",
+      "...c5"
+    ],
+    "avoid": "The London is not an autopilot setup: early ...Qb6 and ...Nh5 require specific replies.",
+    "quiz": {
+      "question": "Why develop Bf4 before e3?",
+      "answers": [
+        "Keep it outside the pawn chain",
+        "Win a rook immediately",
+        "Stop ...c5 by force"
+      ],
+      "correct": 0,
+      "explanation": "Develop the bishop before closing the e-pawn chain, but adapt to Black’s central and queenside pressure."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "g1f3",
+          "g8f6",
+          "c1f4",
+          "e7e6",
+          "e2e3",
+          "c7c5",
+          "c2c3",
+          "b8c6",
+          "b1d2",
+          "f8d6",
+          "f4g3",
+          "e8g8",
+          "f1d3",
+          "b7b6",
+          "e1g1",
+          "c8b7",
+          "f3e5",
+          "c6e7",
+          "d1e2"
+        ]
+      },
+      {
+        "name": "Early c5",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c1f4",
+          "c7c5",
+          "e2e3",
+          "d8b6",
+          "b1c3",
+          "b6b2",
+          "c3b5",
+          "f6d5",
+          "a1b1",
+          "b2a2"
+        ]
+      },
+      {
+        "name": "Quiet setup",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c1f4",
+          "g8f6",
+          "e2e3",
+          "e7e6",
+          "g1f3",
+          "f8d6",
+          "f4d6",
+          "d8d6",
+          "c2c4",
+          "e8g8",
+          "b1c3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-scandinavian-defense",
+    "family": "Scandinavian Defense",
+    "eco": "B01",
+    "idea": "Black trades the d-pawn and develops the queen early. White gains time by attacking it while developing.",
+    "structure": "The c6–e6 structure supports d5; White has more space but must turn it into active pieces.",
+    "white": [
+      "Develop with tempo",
+      "use central space",
+      "avoid queen chases that leave your own pieces undeveloped."
+    ],
+    "black": [
+      "Find a safe queen square",
+      "develop Bf5 or Bg4 before ...e6",
+      "prepare ...c5."
+    ],
+    "breaks": [
+      "d5",
+      "...c5"
+    ],
+    "avoid": "A queen attack is only useful if the developing move also improves your position.",
+    "quiz": {
+      "question": "What makes 3.Nc3 useful?",
+      "answers": [
+        "Development with an attack on the queen",
+        "It wins the queen by force",
+        "It prevents castling permanently"
+      ],
+      "correct": 0,
+      "explanation": "Black trades the d-pawn and develops the queen early. White gains time by attacking it while developing."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "e2e4",
+          "d7d5",
+          "e4d5",
+          "d8d5",
+          "b1c3",
+          "d5a5",
+          "d2d4",
+          "g8f6",
+          "g1f3",
+          "c7c6",
+          "f1c4",
+          "c8f5",
+          "c1d2",
+          "e7e6",
+          "c3d5",
+          "a5d8",
+          "d5f6",
+          "g7f6",
+          "d1e2",
+          "b8d7",
+          "e1c1"
+        ]
+      },
+      {
+        "name": "Queen retreat",
+        "moves": [
+          "e2e4",
+          "d7d5",
+          "e4d5",
+          "d8d5",
+          "b1c3",
+          "d5d8",
+          "d2d4",
+          "g8f6",
+          "g1f3",
+          "c8g4",
+          "f1e2",
+          "e7e6",
+          "e1g1"
+        ]
+      },
+      {
+        "name": "Knight recapture",
+        "moves": [
+          "e2e4",
+          "d7d5",
+          "e4d5",
+          "g8f6",
+          "d2d4",
+          "f6d5",
+          "g1f3",
+          "g7g6",
+          "c2c4",
+          "d5b6",
+          "b1c3",
+          "f8g7"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foundation-modern-defense",
+    "family": "Modern Defense",
+    "eco": "B06",
+    "idea": "Black delays the king’s knight and invites a broad center. Flexibility is valuable only if the center is challenged in time.",
+    "structure": "White has a d4–e4 center; Black’s ...c5 or ...e5 break determines the middlegame.",
+    "white": [
+      "Develop before launching pawns",
+      "keep d4 supported",
+      "open the center if Black’s king is unsafe."
+    ],
+    "black": [
+      "Choose the right central break",
+      "use the g7 diagonal",
+      "do not let White expand for free."
+    ],
+    "breaks": [
+      "...c5",
+      "...e5"
+    ],
+    "avoid": "Queenside expansion without central pressure can leave Black strategically squeezed.",
+    "quiz": {
+      "question": "What must Black eventually challenge?",
+      "answers": [
+        "White’s central pawns",
+        "Only the a-file",
+        "The opponent’s clock"
+      ],
+      "correct": 0,
+      "explanation": "Black delays the king’s knight and invites a broad center. Flexibility is valuable only if the center is challenged in time."
+    },
+    "lines": [
+      {
+        "name": "Main line",
+        "moves": [
+          "e2e4",
+          "g7g6",
+          "d2d4",
+          "f8g7",
+          "b1c3",
+          "d7d6",
+          "c1e3",
+          "a7a6",
+          "d1d2",
+          "b7b5",
+          "f2f3",
+          "b8d7",
+          "g1h3",
+          "c8b7",
+          "h3f2",
+          "c7c5",
+          "d4d5",
+          "g8f6",
+          "f1e2",
+          "e8g8",
+          "e1g1"
+        ]
+      },
+      {
+        "name": "Classical",
+        "moves": [
+          "e2e4",
+          "g7g6",
+          "d2d4",
+          "f8g7",
+          "g1f3",
+          "d7d6",
+          "f1e2",
+          "g8f6",
+          "b1c3",
+          "e8g8",
+          "e1g1",
+          "b8c6"
+        ]
+      },
+      {
+        "name": "Austrian center",
+        "moves": [
+          "e2e4",
+          "g7g6",
+          "d2d4",
+          "f8g7",
+          "b1c3",
+          "d7d6",
+          "f2f4",
+          "a7a6",
+          "g1f3",
+          "b7b5",
+          "f1d3",
+          "c8b7"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "A95-7f3c9783a510",
+    "family": "Dutch Defense",
+    "eco": "A95",
+    "idea": "Black uses ...f5 to control e4, accepting a king-side weakness. Stonewall and fluid-center structures require different plans.",
+    "structure": "In a Stonewall, the d5–e6–f5 chain grips e4 but leaves e5 weak.",
+    "white": [
+      "Occupy e5",
+      "exchange the dark-squared bishops when favorable",
+      "break with cxd5 or e4 when supported."
+    ],
+    "black": [
+      "Activate the c8 bishop via b7 or d7–e8–h5",
+      "use ...Ne4",
+      "open the f-file only when the king is safe."
+    ],
+    "breaks": [
+      "e4",
+      "...c5"
+    ],
+    "avoid": "Do not ignore e5 merely because e4 looks secure.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Occupy e5",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "In a Stonewall, the d5–e6–f5 chain grips e4 but leaves e5 weak."
+    },
+    "lines": [
+      {
+        "name": "Stonewall Variation, Chekhover Variation",
+        "moves": [
+          "d2d4",
+          "f7f5",
+          "c2c4",
+          "g8f6",
+          "g2g3",
+          "e7e6",
+          "f1g2",
+          "f8e7",
+          "g1f3",
+          "e8g8",
+          "e1g1",
+          "d7d5",
+          "b1c3",
+          "c7c6",
+          "d1c2",
+          "d8e8",
+          "c1g5"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B03-c44ee6399fca",
+    "family": "Alekhine Defense",
+    "eco": "B03",
+    "idea": "Black provokes advancing pawns and then attacks them. White must avoid confusing space with secure control.",
+    "structure": "An e5 pawn gains a tempo against the knight but can become a target of ...d6.",
+    "white": [
+      "Support the pawn center with pieces",
+      "develop before another pawn advance",
+      "open lines if Black falls behind."
+    ],
+    "black": [
+      "Attack the center with ...d6 and ...c5",
+      "keep the knights coordinated",
+      "develop before taking a poisoned pawn."
+    ],
+    "breaks": [
+      "...d6",
+      "...c5"
+    ],
+    "avoid": "A large unsupported pawn center can collapse after one exchange.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Support the pawn center with pieces",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "An e5 pawn gains a tempo against the knight but can become a target of ...d6."
+    },
+    "lines": [
+      {
+        "name": "Four Pawns Attack, Tartakower Variation",
+        "moves": [
+          "e2e4",
+          "g8f6",
+          "e4e5",
+          "f6d5",
+          "d2d4",
+          "d7d6",
+          "c2c4",
+          "d5b6",
+          "f2f4",
+          "d6e5",
+          "f4e5",
+          "b8c6",
+          "c1e3",
+          "c8f5",
+          "b1c3",
+          "e7e6",
+          "g1f3",
+          "d8d7",
+          "f1e2",
+          "e8c8",
+          "e1g1",
+          "f8e7"
+        ]
+      },
+      {
+        "name": "Exchange Variation, Karpov Variation",
+        "moves": [
+          "e2e4",
+          "g8f6",
+          "e4e5",
+          "f6d5",
+          "d2d4",
+          "d7d6",
+          "c2c4",
+          "d5b6",
+          "e5d6",
+          "c7d6",
+          "b1c3",
+          "g7g6",
+          "h2h3",
+          "f8g7",
+          "g1f3",
+          "e8g8",
+          "f1e2",
+          "b8c6",
+          "e1g1",
+          "c8f5",
+          "c1f4"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "C42-8530e15ef326",
+    "family": "Petrov's Defense",
+    "eco": "C42",
+    "idea": "Black counterattacks e4 instead of immediately defending e5. Accurate timing prevents a tactical loss in the center.",
+    "structure": "Early central exchanges often lead to symmetrical pawns, but open files reward the better-developed side.",
+    "white": [
+      "Develop with threats",
+      "compare central pawn recaptures",
+      "use the open e-file carefully."
+    ],
+    "black": [
+      "Recover e4 with sound timing",
+      "finish development before queen activity",
+      "use ...d5 for central space."
+    ],
+    "breaks": [
+      "d4",
+      "...d5"
+    ],
+    "avoid": "After Nxe5, immediate ...Nxe4 can allow Qe2 tactics; know when ...d6 is needed.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Develop with threats",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "Early central exchanges often lead to symmetrical pawns, but open files reward the better-developed side."
+    },
+    "lines": [
+      {
+        "name": "Classical Attack, Maróczy Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "g8f6",
+          "f3e5",
+          "d7d6",
+          "e5f3",
+          "f6e4",
+          "d2d4",
+          "d6d5",
+          "f1d3",
+          "f8e7",
+          "e1g1",
+          "b8c6",
+          "f1e1",
+          "c8g4",
+          "c2c3",
+          "f7f5",
+          "c3c4",
+          "e7h4"
+        ]
+      },
+      {
+        "name": "Classical Attack, Marshall Trap",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "g8f6",
+          "f3e5",
+          "d7d6",
+          "e5f3",
+          "f6e4",
+          "d2d4",
+          "d6d5",
+          "f1d3",
+          "f8d6",
+          "e1g1",
+          "e8g8",
+          "c2c4",
+          "c8g4",
+          "c4d5",
+          "f7f5",
+          "f1e1",
+          "d6h2"
+        ]
+      },
+      {
+        "name": "Classical Attack, Krause Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "g8f6",
+          "f3e5",
+          "d7d6",
+          "e5f3",
+          "f6e4",
+          "d2d4",
+          "d6d5",
+          "f1d3",
+          "b8c6",
+          "e1g1",
+          "f8e7",
+          "f1e1",
+          "c8g4",
+          "c2c3",
+          "f7f5",
+          "c3c4"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "C27-9fb7cc130368",
+    "family": "Vienna Game",
+    "eco": "C27",
+    "idea": "White keeps the f-pawn free by developing Nc3 first. A later f4 must be timed against Black’s central counterplay.",
+    "structure": "The e4 pawn can be reinforced with d3 or paired with d4; f4 changes king safety.",
+    "white": [
+      "Decide whether to play f4 or develop quietly",
+      "meet ...d5 concretely",
+      "castle before opening too many lines."
+    ],
+    "black": [
+      "Challenge with ...d5",
+      "develop without chasing pawns",
+      "consider exchanging the e4 pawn to free the center."
+    ],
+    "breaks": [
+      "f4",
+      "d4",
+      "...d5"
+    ],
+    "avoid": "A Vienna pawn sacrifice is not the same as an automatically sound kingside attack.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Decide whether to play f4 or develop quietly",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "The e4 pawn can be reinforced with d3 or paired with d4; f4 changes king safety."
+    },
+    "lines": [
+      {
+        "name": "Stanley Variation, Frankenstein-Dracula Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "b1c3",
+          "g8f6",
+          "f1c4",
+          "f6e4",
+          "d1h5",
+          "e4d6",
+          "c4b3",
+          "b8c6",
+          "c3b5",
+          "g7g6",
+          "h5f3",
+          "f7f5",
+          "f3d5",
+          "d8e7",
+          "b5c7",
+          "e8d8",
+          "c7a8",
+          "b7b6"
+        ]
+      },
+      {
+        "name": "Pierce Gambit, Rushmere Attack",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "b1c3",
+          "b8c6",
+          "f2f4",
+          "e5f4",
+          "g1f3",
+          "g7g5",
+          "d2d4",
+          "g5g4",
+          "f1c4",
+          "g4f3",
+          "e1g1",
+          "d7d5",
+          "e4d5",
+          "c8g4",
+          "d5c6"
+        ]
+      },
+      {
+        "name": "Hamppe-Muzio, Dubois Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "b1c3",
+          "b8c6",
+          "f2f4",
+          "e5f4",
+          "g1f3",
+          "g7g5",
+          "f1c4",
+          "g5g4",
+          "e1g1",
+          "g4f3",
+          "d1f3",
+          "c6e5",
+          "f3f4",
+          "d8f6"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "C47-fa0423586895",
+    "family": "Four Knights Game",
+    "eco": "C47",
+    "idea": "Fast symmetrical development brings both sides close to castling. The first central break decides the structure.",
+    "structure": "The center can become open after d4 or stay restrained with d3.",
+    "white": [
+      "Prepare d4",
+      "develop the f1 bishop actively",
+      "avoid trading away every source of pressure."
+    ],
+    "black": [
+      "Meet d4 with active piece play",
+      "compare ...Bb4 and ...Bc5",
+      "castle before initiating central tactics."
+    ],
+    "breaks": [
+      "d4",
+      "...d5"
+    ],
+    "avoid": "The Halloween knight sacrifice is speculative and should be studied as a gamble, not a forced win.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Prepare d4",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "The center can become open after d4 or stay restrained with d3."
+    },
+    "lines": [
+      {
+        "name": "Halloween Gambit, Plasma Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "b1c3",
+          "g8f6",
+          "f3e5",
+          "c6e5",
+          "d2d4",
+          "e5c6",
+          "d4d5",
+          "c6e5",
+          "f2f4",
+          "e5g6",
+          "e4e5",
+          "f6g8",
+          "d5d6",
+          "c7d6",
+          "e5d6",
+          "d8f6",
+          "c3b5",
+          "a8b8"
+        ]
+      },
+      {
+        "name": "Spanish Variation, Spielmann Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "b1c3",
+          "g8f6",
+          "f1b5",
+          "a7a6",
+          "b5c6",
+          "d7c6",
+          "f3e5",
+          "f6e4",
+          "c3e4",
+          "d8d4",
+          "e1g1",
+          "d4e5",
+          "f1e1",
+          "c8e6",
+          "d2d4",
+          "e5d5"
+        ]
+      },
+      {
+        "name": "Spanish Variation, Symmetrical Variation, Blake Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "b1c3",
+          "g8f6",
+          "f1b5",
+          "f8b4",
+          "e1g1",
+          "e8g8",
+          "d2d3",
+          "d7d6",
+          "c1g5",
+          "c6e7",
+          "f3h4",
+          "c7c6",
+          "b5c4",
+          "d6d5",
+          "c4b3",
+          "d8d6"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "D34-3ab2638c1b58",
+    "family": "Tarrasch Defense",
+    "eco": "D34",
+    "idea": "Black accepts an isolated d-pawn in exchange for active bishops and central space. Exchanges can change the balance.",
+    "structure": "The isolated d5 pawn controls c4 and e4 but cannot be defended by another pawn.",
+    "white": [
+      "Blockade d5",
+      "exchange attacking pieces",
+      "target the pawn only after development."
+    ],
+    "black": [
+      "Keep pieces active",
+      "prepare ...d4",
+      "use open c- and e-files to compensate for the pawn weakness."
+    ],
+    "breaks": [
+      "...d4",
+      "e4"
+    ],
+    "avoid": "Trading every piece without winning something leaves Black defending the isolated pawn.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Blockade d5",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "The isolated d5 pawn controls c4 and e4 but cannot be defended by another pawn."
+    },
+    "lines": [
+      {
+        "name": "Classical Variation, Réti Variation",
+        "moves": [
+          "d2d4",
+          "d7d5",
+          "c2c4",
+          "e7e6",
+          "b1c3",
+          "c7c5",
+          "c4d5",
+          "e6d5",
+          "g1f3",
+          "b8c6",
+          "g2g3",
+          "g8f6",
+          "f1g2",
+          "f8e7",
+          "e1g1",
+          "e8g8",
+          "d4c5",
+          "e7c5",
+          "c3a4"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "C37-94b44cb69d3b",
+    "family": "King's Gambit Accepted",
+    "eco": "C37",
+    "idea": "White gives a pawn for rapid development and open lines. Black can return material to complete development safely.",
+    "structure": "The f-file opens for White, but f2 no longer shields the king.",
+    "white": [
+      "Develop before recovering f4",
+      "castle if possible",
+      "calculate every queen check near the exposed king."
+    ],
+    "black": [
+      "Strike with ...d5",
+      "return f4 if it gains development",
+      "resist unnecessary pawn grabbing."
+    ],
+    "breaks": [
+      "d4",
+      "...d5"
+    ],
+    "avoid": "Pushing g-pawns to hold f4 can win material but creates tactical targets and costs development.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Develop before recovering f4",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "The f-file opens for White, but f2 no longer shields the king."
+    },
+    "lines": [
+      {
+        "name": "Double Muzio Gambit, Paulsen Defense",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "f2f4",
+          "e5f4",
+          "g1f3",
+          "g7g5",
+          "f1c4",
+          "g5g4",
+          "e1g1",
+          "g4f3",
+          "d1f3",
+          "d8f6",
+          "e4e5",
+          "f6e5",
+          "d2d3",
+          "f8h6",
+          "b1c3",
+          "g8e7",
+          "c1d2",
+          "b8c6",
+          "a1e1"
+        ]
+      },
+      {
+        "name": "Lolli Gambit, Young Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "f2f4",
+          "e5f4",
+          "g1f3",
+          "g7g5",
+          "f1c4",
+          "g5g4",
+          "c4f7",
+          "e8f7",
+          "e1g1",
+          "g4f3",
+          "d1f3",
+          "d8f6",
+          "d2d4",
+          "f6d4",
+          "c1e3",
+          "d4f6",
+          "b1c3"
+        ]
+      },
+      {
+        "name": "Greco Gambit",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "f2f4",
+          "e5f4",
+          "g1f3",
+          "g7g5",
+          "f1c4",
+          "f8g7",
+          "h2h4",
+          "h7h6",
+          "d2d4",
+          "d7d6",
+          "b1c3",
+          "c7c6",
+          "h4g5",
+          "h6g5",
+          "h1h8",
+          "g7h8",
+          "f3e5"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "E14-0d328e42016d",
+    "family": "Queen's Indian Defense",
+    "eco": "E14",
+    "idea": "Black controls e4 with pieces and the b7 bishop rather than an early central occupation. White tries to make that bishop ineffective.",
+    "structure": "A d4–c4 center can be challenged by ...d5 or ...c5; e3 changes the g1 knight’s options.",
+    "white": [
+      "Prepare e4",
+      "use the g2 bishop in fianchetto lines",
+      "watch pressure on the long diagonal."
+    ],
+    "black": [
+      "Coordinate ...Bb7 and ...Nf6 against e4",
+      "choose a central break",
+      "develop the king’s bishop without blocking key lines."
+    ],
+    "breaks": [
+      "e4",
+      "...d5",
+      "...c5"
+    ],
+    "avoid": "A fianchettoed bishop is not active if its own central pawns permanently block it.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Prepare e4",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "A d4–c4 center can be challenged by ...d5 or ...c5; e3 changes the g1 knight’s options."
+    },
+    "lines": [
+      {
+        "name": "Spassky System3",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g1f3",
+          "b7b6",
+          "e2e3",
+          "c8b7",
+          "f1d3",
+          "c7c5",
+          "b1c3",
+          "c5d4",
+          "e3d4",
+          "f8e7",
+          "e1g1",
+          "d7d5",
+          "c4d5",
+          "f6d5"
+        ]
+      },
+      {
+        "name": "Averbakh Variation",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g1f3",
+          "b7b6",
+          "e2e3",
+          "c8b7",
+          "f1d3",
+          "c7c5",
+          "e1g1",
+          "f8e7",
+          "b2b3",
+          "e8g8",
+          "c1b2",
+          "c5d4",
+          "f3d4"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "E11-fb6e0df2bec2",
+    "family": "Bogo-Indian Defense",
+    "eco": "E11",
+    "idea": "The early ...Bb4+ makes White choose a block before Black commits the center. The bishop may trade or retreat.",
+    "structure": "The structure depends on whether White blocks with Bd2, Nd2 or Nc3.",
+    "white": [
+      "Meet the check with development",
+      "preserve useful bishops",
+      "prepare e4 without weakening d4."
+    ],
+    "black": [
+      "Use the check to influence development",
+      "choose ...d5 or ...d6",
+      "avoid losing tempos with repeated bishop retreats."
+    ],
+    "breaks": [
+      "e4",
+      "...d5"
+    ],
+    "avoid": "An early bishop check is only useful if the follow-up fits the central structure.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Meet the check with development",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "The structure depends on whether White blocks with Bd2, Nd2 or Nc3."
+    },
+    "lines": [
+      {
+        "name": "Retreat Variation",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g1f3",
+          "d7d5",
+          "g2g3",
+          "f8b4",
+          "c1d2",
+          "b4e7",
+          "f1g2",
+          "e8g8",
+          "e1g1",
+          "c7c6",
+          "d1c2",
+          "b8d7",
+          "d2f4",
+          "b7b6",
+          "b1d2",
+          "c8a6"
+        ]
+      },
+      {
+        "name": "Monticelli Trap",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g1f3",
+          "b7b6",
+          "g2g3",
+          "c8b7",
+          "f1g2",
+          "f8b4",
+          "c1d2",
+          "b4d2",
+          "d1d2",
+          "e8g8",
+          "b1c3",
+          "f6e4",
+          "d2c2",
+          "e4c3",
+          "f3g5"
+        ]
+      },
+      {
+        "name": "Retreat Variation",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g2g3",
+          "f8b4",
+          "c1d2",
+          "b4e7",
+          "f1g2",
+          "d7d5",
+          "g1f3",
+          "b8d7",
+          "e1g1",
+          "e8g8",
+          "d1c2",
+          "c7c6",
+          "f1d1",
+          "h7h6"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "A64-2e2e4aeb8d43",
+    "family": "Benoni Defense",
+    "eco": "A64",
+    "idea": "Black concedes a space advantage to create asymmetric counterplay. The d6 pawn is a weakness, while the queenside majority can move.",
+    "structure": "White has d5 and e4 against Black’s d6 and c5; the g7 bishop pressures the queenside.",
+    "white": [
+      "Support e4",
+      "target d6",
+      "prepare e5 before Black’s queenside play arrives."
+    ],
+    "black": [
+      "Prepare ...b5 or ...f5",
+      "use the e5 square",
+      "keep the g7 bishop active."
+    ],
+    "breaks": [
+      "e5",
+      "...b5",
+      "...f5"
+    ],
+    "avoid": "Passive defense leaves Black with less space and a backward d6 pawn.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Support e4",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "White has d5 and e4 against Black’s d6 and c5; the g7 bishop pressures the queenside."
+    },
+    "lines": [
+      {
+        "name": "Fianchetto Variation, Hastings Defense, Main Line",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g2g3",
+          "c7c5",
+          "d4d5",
+          "e6d5",
+          "c4d5",
+          "d7d6",
+          "b1c3",
+          "g7g6",
+          "f1g2",
+          "f8g7",
+          "g1f3",
+          "e8g8",
+          "e1g1",
+          "a7a6",
+          "a2a4",
+          "b8d7",
+          "f3d2",
+          "f8e8"
+        ]
+      },
+      {
+        "name": "Four Pawns Attack, Main Line",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "c7c5",
+          "d4d5",
+          "e7e6",
+          "b1c3",
+          "e6d5",
+          "c4d5",
+          "d7d6",
+          "e2e4",
+          "g7g6",
+          "f2f4",
+          "f8g7",
+          "g1f3",
+          "e8g8",
+          "f1e2",
+          "b8d7",
+          "e1g1",
+          "f8e8",
+          "f3d2"
+        ]
+      },
+      {
+        "name": "Classical Variation, Argentine Counterattack",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "e7e6",
+          "g1f3",
+          "c7c5",
+          "d4d5",
+          "e6d5",
+          "c4d5",
+          "d7d6",
+          "b1c3",
+          "g7g6",
+          "e2e4",
+          "f8g7",
+          "f1e2",
+          "e8g8",
+          "e1g1",
+          "a7a6",
+          "a2a4",
+          "c8g4"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "A59-47e1bf3cff7b",
+    "family": "Benko Gambit Accepted",
+    "eco": "A59",
+    "idea": "Black sacrifices a queenside pawn for lasting pressure on the a- and b-files. The compensation may survive queen exchanges.",
+    "structure": "After the a- and b-pawns open files, Black’s rooks and g7 bishop target White’s queenside.",
+    "white": [
+      "Complete development before holding every pawn",
+      "consider returning material",
+      "neutralize the open files."
+    ],
+    "black": [
+      "Double rooks on the queenside",
+      "keep the g7 bishop",
+      "build pressure rather than search only for immediate tactics."
+    ],
+    "breaks": [
+      "e4",
+      "...c4"
+    ],
+    "avoid": "The extra pawn is not easy to convert if White’s pieces remain tied to a2 and b2.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Complete development before holding every pawn",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "After the a- and b-pawns open files, Black’s rooks and g7 bishop target White’s queenside."
+    },
+    "lines": [
+      {
+        "name": "King Walk Variation",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "c7c5",
+          "d4d5",
+          "b7b5",
+          "c4b5",
+          "a7a6",
+          "b5a6",
+          "g7g6",
+          "b1c3",
+          "c8a6",
+          "g1f3",
+          "d7d6",
+          "e2e4",
+          "a6f1",
+          "e1f1",
+          "f8g7",
+          "g2g3",
+          "e8g8",
+          "f1g2"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "C41-d0e4794ab12b",
+    "family": "Philidor Defense",
+    "eco": "C41",
+    "idea": "Black supports e5 with d6 and builds a compact position. The central break must arrive before the pieces become cramped.",
+    "structure": "The d6–e5 chain is stable, but the dark-squared bishop needs a route into the game.",
+    "white": [
+      "Use the space advantage",
+      "develop before opening the center",
+      "watch tactical pins on the d-file."
+    ],
+    "black": [
+      "Prepare ...exd4 or ...d5",
+      "develop behind the pawn chain",
+      "avoid passive piece placement with no break."
+    ],
+    "breaks": [
+      "dxe5",
+      "...d5"
+    ],
+    "avoid": "A solid pawn chain does not compensate for a permanent development deficit.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Use the space advantage",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "The d6–e5 chain is stable, but the dark-squared bishop needs a route into the game."
+    },
+    "lines": [
+      {
+        "name": "Berger Variation",
+        "moves": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "d7d6",
+          "d2d4",
+          "e5d4",
+          "f3d4",
+          "g8f6",
+          "b1c3",
+          "f8e7",
+          "f1e2",
+          "e8g8",
+          "e1g1",
+          "c7c5",
+          "d4f3",
+          "b8c6",
+          "c1g5",
+          "c8e6",
+          "f1e1"
+        ]
+      },
+      {
+        "name": "Lion Variation, Sozin Variation",
+        "moves": [
+          "e2e4",
+          "d7d6",
+          "d2d4",
+          "g8f6",
+          "b1c3",
+          "e7e5",
+          "g1f3",
+          "b8d7",
+          "f1c4",
+          "f8e7",
+          "e1g1",
+          "e8g8",
+          "d1e2",
+          "c7c6",
+          "a2a4",
+          "e5d4"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "D05-ebe9999fd5de",
+    "family": "Queen's Pawn Game",
+    "eco": "D05",
+    "idea": "The Colle uses a compact center to prepare e4. Its central break is more important than mechanically repeating a setup.",
+    "structure": "The d4–e3–c3 triangle supports a future e4 but limits the c1 bishop until the center changes.",
+    "white": [
+      "Prepare e4 with Bd3 and Re1",
+      "develop the queen’s knight to d2",
+      "activate the c1 bishop when the center opens."
+    ],
+    "black": [
+      "Challenge d4 with ...c5",
+      "develop the c8 bishop actively",
+      "do not allow a free e4 break."
+    ],
+    "breaks": [
+      "e4",
+      "...c5"
+    ],
+    "avoid": "A quiet setup can become too slow if Black gets ...e5 first.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Prepare e4 with Bd3 and Re1",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "The d4–e3–c3 triangle supports a future e4 but limits the c1 bishop until the center changes."
+    },
+    "lines": [
+      {
+        "name": "Colle System",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "g1f3",
+          "e7e6",
+          "e2e3",
+          "b7b6",
+          "f1d3",
+          "c8b7",
+          "e1g1",
+          "c7c5",
+          "b2b3",
+          "f8e7",
+          "c1b2",
+          "e8g8",
+          "b1d2",
+          "d7d5"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "D79-075034655d83",
+    "family": "Neo-Grünfeld Defense",
+    "eco": "D79",
+    "idea": "White delays Nc3 and fianchettoes, avoiding some Exchange Grünfeld structures. Black still seeks pressure against the center.",
+    "structure": "The g2 bishop influences d5; the structure changes sharply after cxd5 or ...dxc4.",
+    "white": [
+      "Keep central flexibility",
+      "coordinate the g2 bishop with e4",
+      "develop before recovering a pawn."
+    ],
+    "black": [
+      "Use ...d5 to contest the center",
+      "prepare ...c5",
+      "calculate long-diagonal tactics."
+    ],
+    "breaks": [
+      "e4",
+      "...c5"
+    ],
+    "avoid": "Delaying Nc3 changes tactics: do not copy an Exchange Grünfeld line without checking the move order.",
+    "quiz": {
+      "question": "Which plan fits this structure?",
+      "answers": [
+        "Keep central flexibility",
+        "Ignore development and chase the queen",
+        "Trade every active piece immediately"
+      ],
+      "correct": 0,
+      "explanation": "The g2 bishop influences d5; the structure changes sharply after cxd5 or ...dxc4."
+    },
+    "lines": [
+      {
+        "name": "Ultra-Delayed Exchange Variation",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "g7g6",
+          "g1f3",
+          "f8g7",
+          "g2g3",
+          "e8g8",
+          "f1g2",
+          "c7c6",
+          "e1g1",
+          "d7d5",
+          "c4d5",
+          "c6d5",
+          "b1c3",
+          "b8c6",
+          "c1f4"
+        ]
+      },
+      {
+        "name": "Ultra-Delayed Exchange Variation",
+        "moves": [
+          "d2d4",
+          "g8f6",
+          "c2c4",
+          "g7g6",
+          "g2g3",
+          "d7d5",
+          "f1g2",
+          "f8g7",
+          "g1f3",
+          "e8g8",
+          "e1g1",
+          "c7c6",
+          "c4d5",
+          "c6d5",
+          "f3e5",
+          "e7e6",
+          "b1c3"
+        ]
+      }
+    ]
+  }
+]

@@ -4,7 +4,6 @@ import {
   Plus,
   Trash2,
   GraduationCap,
-  Upload,
   RotateCcw,
   Save,
   Lightbulb,
@@ -34,8 +33,6 @@ export default function Repertoire() {
     [side, setSide] = useState<"w" | "b">("w"),
     [moves, setMoves] = useState<string[]>([]),
     [initial, setInitial] = useState(initialFen),
-    [pgn, setPgn] = useState(""),
-    [importing, setImporting] = useState(false),
     [error, setError] = useState("");
   const c = new Chess(initial);
   for (const m of moves) c.move(m);
@@ -45,7 +42,6 @@ export default function Repertoire() {
     setSide(line?.side || "w");
     setMoves(line?.moves || []);
     setInitial(line?.initial || initialFen);
-    setPgn("");
     setError("");
   }
   function save() {
@@ -93,7 +89,7 @@ export default function Repertoire() {
           <Empty
             icon={<GraduationCap size={35} />}
             title="No saved lines"
-            description="Play a line or import PGN. Train either color with spaced review."
+            description="Build a line and train either color with spaced review."
           >
             <Button onClick={() => edit(null)}>Build repertoire</Button>
           </Empty>
@@ -194,48 +190,7 @@ export default function Repertoire() {
                   <RotateCcw size={15} />
                   Undo
                 </Button>
-                <Button
-                  className="secondary"
-                  onClick={() => setImporting(!importing)}
-                >
-                  <Upload size={15} />
-                  Import PGN
-                </Button>
               </div>
-              {importing && (
-                <>
-                  <textarea
-                    aria-label="Repertoire PGN"
-                    value={pgn}
-                    onChange={(e) => setPgn(e.target.value)}
-                    rows={5}
-                    placeholder="Paste PGN or algebraic moves"
-                  />
-                  <Button
-                    className="secondary"
-                    onClick={() => {
-                      try {
-                        const ch = new Chess();
-                        ch.loadPgn(pgn);
-                        const history = ch.history({ verbose: true });
-                        if (!history.length) throw new Error("No moves found.");
-                        setInitial(history[0].before);
-                        setMoves(
-                          history.map(
-                            (m) => m.from + m.to + (m.promotion || ""),
-                          ),
-                        );
-                        setImporting(false);
-                        setError("");
-                      } catch (e) {
-                        setError((e as Error).message);
-                      }
-                    }}
-                  >
-                    Use PGN
-                  </Button>
-                </>
-              )}
             </div>
             <div>
               <Field label="Line name">

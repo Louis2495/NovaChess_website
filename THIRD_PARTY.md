@@ -49,3 +49,14 @@ DM Sans (Colophon Foundry / DM Sans authors) and Manrope (Mikhail Sharanda / Man
 React / React DOM (MIT), Vite (MIT), TypeScript (Apache-2.0), chess.js (BSD-2-Clause), Lucide (ISC), gifenc by Matt DesLauriers (MIT), Playwright (Apache-2.0), axe-core (MPL-2.0), and Fontsource packages (font-specific OFL-1.1). Installed package distributions retain their notices. Exact dependency versions/integrity are recorded in the lockfile.
 
 The website source is AGPL-3.0-or-later. The music and individual third-party components retain their respective licenses.
+
+## Country flags
+
+Country-flag SVGs in `public/flags/` come from [lipis/flag-icons](https://github.com/lipis/flag-icons), commit `ac7e0eb3259eb62aa6100c435607e2fe03896a97`. MIT license: [public/licenses/flag-icons-LICENSE.txt](public/licenses/flag-icons-LICENSE.txt).
+
+The new master-game introductions/annotations, opening-family instructional text, trivia wording and meme captions are original. Historical game scores are factual records; the game archive and knowledge entries include external reference links. No Disney artwork is bundled; the named personality quiz is an unofficial entertainment quiz.
+
+## Online client and database tests
+
+- Supabase JavaScript client: MIT, [license](public/licenses/supabase-js-LICENSE.txt).
+- PGlite (development/test dependency): Apache-2.0, [license](public/licenses/pglite-LICENSE.txt). Used to exercise the SQL migration and Edge Function behavior locally; it is not part of the browser application.

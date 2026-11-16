@@ -5,9 +5,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  FlipVertical2,
   SlidersHorizontal,
-  Upload,
   Download,
   Copy,
   Share2,
@@ -25,6 +23,7 @@ import { initialFen, uid, download, copyText } from "../lib/store";
 import { useEngine, sanLine, scoreLabel } from "../lib/engine";
 import { exportGIF, exportPNG } from "../lib/export";
 import type { SavedGame } from "../lib/types";
+import { useControl } from "../lib/controls";
 import { Board } from "../components/Board";
 import PositionEditor from "../components/PositionEditor";
 import {
@@ -76,10 +75,6 @@ export default function Analysis() {
     [flipped, setFlipped] = useState(false),
     [enabled, setEnabled] = useState(true),
     [insights, setInsights] = useState(false),
-    [importing, setImporting] = useState(false),
-    [importType, setImportType] = useState("FEN"),
-    [input, setInput] = useState(""),
-    [error, setError] = useState(""),
     [editing, setEditing] = useState(false),
     [branches, setBranches] = useState<Line[]>(source?.branches || []),
     [name, setName] = useState(source?.title || "Analysis"),
@@ -108,6 +103,12 @@ export default function Analysis() {
       },
     }));
   }, [initial, moves, notation, positions, name, branches]);
+  useControl("next", () =>
+    setCursor((n) => Math.min(positions.length - 1, n + 1)),
+  );
+  useControl("previous", () => setCursor((n) => Math.max(0, n - 1)));
+  useControl("first", () => setCursor(0));
+  useControl("last", () => setCursor(positions.length - 1));
   function play(from: string, to: string, promotion?: string) {
     try {
       const ch = new Chess(fen),
@@ -142,30 +143,6 @@ export default function Analysis() {
     setNotation([]);
     setCursor(0);
     setBranches([]);
-  }
-  function importPosition() {
-    try {
-      if (importType === "FEN") {
-        const ch = new Chess(input.trim());
-        reset(ch.fen());
-      } else {
-        const ch = new Chess();
-        ch.loadPgn(input.trim());
-        const h = ch.history({ verbose: true });
-        const initial = h[0]?.before || ch.fen();
-        setInitial(initial);
-        setPositions([initial, ...h.map((m) => m.after)]);
-        setMoves(h.map((m) => m.from + m.to + (m.promotion || "")));
-        setNotation(h.map((m) => m.san));
-        setCursor(h.length);
-        setBranches([]);
-      }
-      setImporting(false);
-      setError("");
-      notify(`${importType} imported.`);
-    } catch (e) {
-      setError((e as Error).message);
-    }
   }
   function pgn() {
     const ch = new Chess(initial);
@@ -218,12 +195,6 @@ export default function Analysis() {
             </span>
             <div className="button-row">
               <IconButton
-                label="Flip board"
-                onClick={() => setFlipped(!flipped)}
-              >
-                <FlipVertical2 size={17} />
-              </IconButton>
-              <IconButton
                 label="Edit position"
                 onClick={() => setEditing(true)}
               >
@@ -249,6 +220,7 @@ export default function Analysis() {
               fen={fen}
               onMove={play}
               flipped={flipped}
+              onFlip={() => setFlipped((v) => !v)}
               highlights={
                 cursor
                   ? [
@@ -314,17 +286,6 @@ export default function Analysis() {
             <Button disabled={!moveInput.trim()}>Play</Button>
           </form>
           <div className="button-row board-actions">
-            <Button
-              className="secondary"
-              onClick={() => {
-                setInput(fen);
-                setImportType("FEN");
-                setImporting(true);
-              }}
-            >
-              <Upload size={15} />
-              FEN / PGN
-            </Button>
             <Button
               className="secondary"
               onClick={() =>
@@ -519,57 +480,7 @@ export default function Analysis() {
           }}
         />
       )}
-      {importing && (
-        <Modal
-          title="Import position or game"
-          onClose={() => setImporting(false)}
-        >
-          <div className="segmented">
-            {["FEN", "PGN"].map((type) => (
-              <button
-                className={importType === type ? "active" : ""}
-                onClick={() => {
-                  setImportType(type);
-                  setError("");
-                }}
-                key={type}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-          <textarea
-            aria-label={`${importType} input`}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            rows={7}
-            placeholder={`Paste ${importType}`}
-          />
-          <label className="file-link">
-            Choose a text / PGN file
-            <input
-              type="file"
-              accept=".pgn,.fen,.txt"
-              onChange={async (e) => {
-                const f = e.target.files?.[0];
-                if (f) {
-                  if (f.size > 2e6) {
-                    setError("File is too large.");
-                    return;
-                  }
-                  setInput(await f.text());
-                }
-              }}
-            />
-          </label>
-          {error && (
-            <p className="error" role="alert">
-              {error}
-            </p>
-          )}
-          <Button onClick={importPosition}>Import {importType}</Button>
-        </Modal>
-      )}
+
       {sharing && (
         <Modal title="Share position" onClose={() => setSharing(false)}>
           <div className="share-grid">
@@ -638,8 +549,7 @@ export default function Analysis() {
             <textarea readOnly value={fen} rows={3} />
           </Field>
           <p className="caption">
-            Position links include the FEN. GIF export includes up to 160
-            positions.
+            Position links include the FEN. GIF export includes all positions.
           </p>
         </Modal>
       )}

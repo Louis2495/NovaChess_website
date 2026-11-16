@@ -23,46 +23,133 @@ type Country = { code: string; polygons: number[][][] };
 export default function Stats() {
   const { library } = useApp();
   const [tab, setTab] = useState("Overview");
-  const games = library.games.filter((g) => g.result !== "*"),
+  const games = library.games.filter(
+      (g) => g.result !== "*" && g.folder !== "Studies",
+    ),
     wins = games.filter(
       (g) => g.result === (g.human === "w" ? "1-0" : "0-1"),
     ).length,
     draws = games.filter((g) => g.result === "1/2-1/2").length,
     losses = games.length - wins - draws;
-  const variants = new Set(games.map((g) => g.variant));
-  let promoted = false,
-    pawnMate = false,
-    knightMate = false;
-  for (const g of games) {
-    if (!["chess", "blind", "blindtext"].includes(g.variant)) continue;
+  const winsByVariant = new Map<string, number>();
+  for (const g of games.filter(
+    (g) => g.result === (g.human === "w" ? "1-0" : "0-1"),
+  ))
+    winsByVariant.set(g.variant, (winsByVariant.get(g.variant) || 0) + 1);
+  let run = 0,
+    bestRun = 0;
+  for (const g of [...games].sort((a, b) => a.created - b.created)) {
+    run = g.result === (g.human === "w" ? "1-0" : "0-1") ? run + 1 : 0;
+    bestRun = Math.max(bestRun, run);
+  }
+  let underpromotionMates = 0;
+  for (const g of games.filter(
+    (g) =>
+      g.result === (g.human === "w" ? "1-0" : "0-1") &&
+      ["chess", "blind", "blindtext"].includes(g.variant),
+  )) {
     try {
       const c = new Chess(g.initial);
       for (const m of g.moves) {
         const move = c.move(m);
-        if (move.color === g.human && move.promotion) promoted = true;
-        if (c.isCheckmate() && move.color === g.human) {
-          if (move.piece === "p" && !move.promotion) pawnMate = true;
-          if (move.piece === "n") knightMate = true;
-        }
+        if (
+          move.color === g.human &&
+          move.promotion &&
+          move.promotion !== "q" &&
+          c.isCheckmate()
+        )
+          underpromotionMates++;
       }
     } catch {}
   }
+  const days = Object.entries(library.progress.daily)
+    .filter(([, v]) => v.correct)
+    .map(([d]) => d)
+    .sort();
+  let dailyRun = 0,
+    bestDaily = 0,
+    previous = 0;
+  for (const day of days) {
+    const time = Date.parse(day + "T12:00:00Z");
+    dailyRun = previous && time - previous === 86400000 ? dailyRun + 1 : 1;
+    bestDaily = Math.max(bestDaily, dailyRun);
+    previous = time;
+  }
   const badges = [
-    ["First game", games.length, 1],
-    ["Ten games", games.length, 10],
-    ["Fifty games", games.length, 50],
-    ["100 games", games.length, 100],
-    ["500 games", games.length, 500],
-    ["1,000 games", games.length, 1000],
-    ["10,000 games", games.length, 10000],
-    ["First win", wins, 1],
-    ["100 wins", wins, 100],
-    ["1,000 wins", wins, 1000],
-    ["Pawn checkmate", Number(pawnMate), 1],
-    ["Knight checkmate", Number(knightMate), 1],
-    ["Promotion", Number(promoted), 1],
-    ["Eight variants", variants.size, 8],
+    ["Marathon", games.length, 1000],
+    ["Five thousand", games.length, 5000],
+    ["Victory archive", wins, 500],
+    ["Unbroken twenty", bestRun, 20],
+    ["Tactical endurance", library.progress.solved, 1000],
+    ["No room for error", library.progress.streak, 100],
+    ["Daily discipline", bestDaily, 90],
+    ["Opening specialist", (library.progress.mastered || []).length, 60],
+    ["Complete curriculum", library.progress.learned.length, 129],
+    ["Endgame mastery", library.progress.endgames.length, 17],
+    [
+      "Deep repertoire",
+      library.repertoire.filter((r) => r.successes >= 10).length,
+      25,
+    ],
+    [
+      "Across the board",
+      [...winsByVariant.values()].filter((n) => n >= 10).length,
+      12,
+    ],
+    [
+      "Engine challenger",
+      games.filter(
+        (g) =>
+          g.rated &&
+          (g.botRating || 0) >= 2000 &&
+          g.result === (g.human === "w" ? "1-0" : "0-1"),
+      ).length,
+      50,
+    ],
+    [
+      "Blindfold hundred",
+      games.filter(
+        (g) =>
+          ["blind", "blindtext"].includes(g.variant) &&
+          g.result === (g.human === "w" ? "1-0" : "0-1"),
+      ).length,
+      100,
+    ],
+    ["Underpromotion artist", underpromotionMates, 5],
+    [
+      "Study the evidence",
+      library.games.filter(
+        (g) =>
+          g.review && g.review.length >= g.moves.length && g.moves.length >= 40,
+      ).length,
+      100,
+    ],
+    ["Trivia scholar", library.progress.triviaCorrect || 0, 500],
+    ["Evaluation instinct", library.progress.evalPerfect || 0, 100],
   ] as const;
+  const requirements: Record<string, string> = {
+    Marathon: "Finish 1,000 games",
+    "Five thousand": "Finish 5,000 games",
+    "Victory archive": "Win 500 games",
+    "Unbroken twenty": "Win 20 consecutive finished games",
+    "Tactical endurance": "Solve 1,000 puzzles without assistance",
+    "No room for error": "Reach a 100-puzzle correct streak",
+    "Daily discipline":
+      "Solve the daily puzzle first try for 90 consecutive days",
+    "Opening specialist":
+      "Recall 60 lesson variations without hints or mistakes",
+    "Complete curriculum": "Complete all 129 curated opening lessons",
+    "Endgame mastery": "Complete all 17 Endgame Lessons",
+    "Deep repertoire":
+      "Train 25 repertoire lines correctly at least 10 times each",
+    "Across the board": "Win 10 games in each of 12 variants",
+    "Engine challenger": "Win 50 locally rated games against 2000+ bots",
+    "Blindfold hundred": "Win 100 blindfold games",
+    "Underpromotion artist": "Deliver checkmate by underpromotion five times",
+    "Study the evidence": "Fully review 100 games of at least 40 plies",
+    "Trivia scholar": "Answer 500 trivia questions correctly",
+    "Evaluation instinct": "Guess 100 engine evaluations within 0.25 pawns",
+  };
   const concepts = new Map<string, number>();
   let reviewed = 0;
   for (const g of library.games) {
@@ -107,6 +194,7 @@ export default function Stats() {
                 {value >= goal ? <Trophy size={25} /> : <Lock size={23} />}
               </span>
               <h3>{name}</h3>
+              <p className="caption">{requirements[name]}</p>
               <p>
                 {Math.min(value, goal)} / {goal}
               </p>
@@ -274,7 +362,7 @@ function StatsOverview({
             total={111}
           />
           <Bar
-            label="Endgames"
+            label="Endgame Lessons"
             value={library.progress.endgames.length}
             total={17}
           />
