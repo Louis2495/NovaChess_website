@@ -5,7 +5,7 @@ export default defineConfig({
   testMatch: "**/*.spec.ts",
   fullyParallel: true,
   workers: 2,
-  reporter: "list",
+  reporter: process.env.CI ? [["list"], ["github"]] : "list",
   use: {
     baseURL: "http://127.0.0.1:4173",
     launchOptions: {
