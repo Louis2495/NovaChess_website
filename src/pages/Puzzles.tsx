@@ -265,16 +265,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
         }
       >
         <div className="board-column">
-          <div className="board-topline">
-            <span className="turn-indicator">
-              <i className={learner === "w" ? "white-piece" : "black-piece"} />
-              {done
-                ? "Completed"
-                : c.turn() !== learner
-                  ? "Playing reply…"
-                  : `${learner === "w" ? "White" : "Black"} to move`}
-            </span>
-          </div>
           <div
             ref={puzzleBoardRef}
             className={`puzzle-board ${wrong ? "wrong" : ""} ${done ? "solved" : ""}`}
@@ -400,17 +390,18 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               </Field>
             </Card>
           )}
-          <Card>
-            <div className="card-heading">
-              <h2>Moves</h2>
-              <span className="pill">{done ? "Complete" : "In progress"}</span>
-            </div>
-            <div className="move-chips">
-              {played.map((m, i) => (
-                <span key={i}>{m}</span>
-              ))}
-            </div>
-          </Card>
+          {played.length > 0 && (
+            <Card className="puzzle-moves">
+              <div className="card-heading">
+                <h2>Moves</h2>
+              </div>
+              <div className="move-chips">
+                {played.map((m, i) => (
+                  <span key={i}>{m}</span>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
       </div>
     </>

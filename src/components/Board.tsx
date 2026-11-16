@@ -43,7 +43,7 @@ export function Board({
   onMove,
   onSquare,
   legalMoves,
-  flipped: initialFlip = false,
+  flipped: preferredFlip,
   disabled = false,
   hidden = false,
   visible,
@@ -113,6 +113,9 @@ export function Board({
       pointerId: number;
     } | null>(null),
     suppressClick = useRef(false);
+  const [startingFlip] = useState(() => fen.split(" ")[1] === "b");
+  const initialFlip =
+    preferredFlip ?? (disabled ? fen.split(" ")[1] === "b" : startingFlip);
   const flipped = initialFlip !== flipOffset,
     cells = squares(fen),
     turn = fen.split(" ")[1],

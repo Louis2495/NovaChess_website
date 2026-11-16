@@ -3852,3 +3852,33 @@ select.theme-select {
 .game-settings-card .opponent-choices label:has(input:checked) small {
   color: var(--text);
 }
+@media (min-width: 1001px) {
+  .puzzle-layout.chess-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 310px);
+    max-width: calc(var(--board-max) * 1.16 + 337px);
+    margin-inline: auto;
+  }
+  .puzzle-layout > .board-column {
+    max-width: none;
+  }
+}
+.quiz-picture {
+  display: block;
+  width: min(100%, 240px);
+  aspect-ratio: 1;
+  align-self: center;
+  flex: none;
+  background-size: 400% 200%;
+  background-repeat: no-repeat;
+  border-radius: 18px;
+}
+.quiz-result .quiz-picture-result,
+.trivia-game .quiz-picture-result {
+  width: min(100%, 290px);
+}
+.quiz-selection > button {
+  gap: 16px;
+}
+.quiz-result .quiz-picture-result {
+  align-self: center;
+}

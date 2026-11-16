@@ -666,7 +666,9 @@ function LessonWorkspace({
                       .forEach((m) => b.move(m));
                     return b.turn() === "b";
                   })()
-                : practice && side === "b"
+                : practice
+                  ? side === "b"
+                  : c.turn() === "b"
             }
             highlights={
               step

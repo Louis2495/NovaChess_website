@@ -71,7 +71,13 @@ export default function Analysis() {
     [cursor, setCursor] = useState(
       detail.startsWith("fen:") ? 0 : (source?.positions.length || 1) - 1,
     ),
-    [flipped, setFlipped] = useState(false),
+    [flipped, setFlipped] = useState(
+      () =>
+        (detail.startsWith("fen:")
+          ? defaultFen
+          : source?.positions.at(-1) || defaultFen
+        ).split(" ")[1] === "b",
+    ),
     [editing, setEditing] = useState(false),
     [branches, setBranches] = useState<Line[]>(source?.branches || []),
     [name, setName] = useState(source?.title || "Analysis"),
@@ -153,6 +159,7 @@ export default function Analysis() {
   function reset(fen: string) {
     setInitial(fen);
     setPositions([fen]);
+    setFlipped(fen.split(" ")[1] === "b");
     setMoves([]);
     setNotation([]);
     setCursor(0);

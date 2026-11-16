@@ -238,7 +238,7 @@ function GameViewer({
     [reviewing, setReviewing] = useState(false),
     [budget, setBudget] = useState(500),
     [status, setStatus] = useState(""),
-    [flipped, setFlipped] = useState(game.human === "b"),
+    [flipped, setFlipped] = useState(game.initial.split(" ")[1] === "b"),
     [title, setTitle] = useState(game.title);
   useControl("next", () =>
     setCursor((n) => Math.min(game.moves.length, n + 1)),

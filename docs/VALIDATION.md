@@ -1,8 +1,9 @@
 # Validation
 
-- TypeScript and Vite production build: passed. The offline cache contains 428 local assets.
-- Full desktop/mobile Chromium suite: 137 scenarios passed in one run; one desktop-only layout check is intentionally skipped on mobile.
+- TypeScript and Vite production build: passed. The offline cache contains 430 local assets.
+- Full desktop/mobile Chromium suite: 143 scenarios passed in one run; one desktop-only layout check is intentionally skipped on mobile.
 - Node rules/content/database/federation suite: all 34 tests passed.
+- Puzzle/quiz refinements check hidden empty move history, removed turn/status text, narrower aligned panels, side-to-move orientation across every quiz scenario plus Analysis, Guess the Eval and saved-game previews, and bundled introduction/result illustrations. Production desktop/mobile puzzle, quiz selection and quiz result screens passed accessibility checks without horizontal overflow.
 - Setup refinements check immediate center-grab dragging and edge drops, centered purple resume actions, compact strength choices, rated defaults, opening search, equal-height homepage cards and the larger Analysis board.
 - New coverage checks notation following/manual override, large evaluation and turn dots, concise position-specific insights, the homepage meme placement, retained puzzle input focus, rating-card alignment, configurable Stats periods, nested Rankings and federation profile input/lookup.
 - Positional explanations were checked against legal positions with real pins, passed pawns, open files, supported outposts, mating nets and engine-line pawn-structure changes. Federation parsing and the actual read-only Edge handler were checked with documented/representative responses, cache reuse and rejected arbitrary/private URLs.

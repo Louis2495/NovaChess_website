@@ -1,17 +1,27 @@
 import { useState } from "react";
-import {
-  ArrowRight,
-  RotateCcw,
-  Check,
-  ArrowUpRight,
-  Brain,
-  Castle,
-  Sparkles,
-} from "lucide-react";
-import { useData } from "../../lib/store";
+import { ArrowRight, RotateCcw, Check, ArrowUpRight } from "lucide-react";
+import { base, useData } from "../../lib/store";
 import { useApp } from "../../lib/context";
 import { Board } from "../../components/Board";
 import { Button, Card, Loading } from "../../components/UI";
+function QuizPicture({
+  tile,
+  result = false,
+}: {
+  tile: number;
+  result?: boolean;
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`quiz-picture${result ? " quiz-picture-result" : ""}`}
+      style={{
+        backgroundImage: `url("${base}quizzes/illustrations.webp")`,
+        backgroundPosition: `${((tile % 4) * 100) / 3}% ${Math.floor(tile / 4) * 100}%`,
+      }}
+    />
+  );
+}
 type Question = {
   id: string;
   prompt: string;
@@ -70,7 +80,7 @@ function Trivia({ questions }: { questions: Question[] }) {
     <Card className="trivia-game">
       {done ? (
         <>
-          <Brain size={50} />
+          <QuizPicture tile={7} result />
           <h2>{score} points</h2>
           <p className="caption">Best: {library.progress.triviaBest || 0}</p>
           <Button
@@ -160,9 +170,9 @@ function Trivia({ questions }: { questions: Question[] }) {
   );
 }
 const quizzes = [
-  { id: "style", title: "Your chess style", icon: Brain },
-  { id: "princess", title: "Which Disney princess?", icon: Castle },
-  { id: "alter", title: "Your chess alter ego", icon: Sparkles },
+  { id: "style", title: "Your chess style", art: 0 },
+  { id: "princess", title: "Which Disney princess?", art: 1 },
+  { id: "alter", title: "Your chess alter ego", art: 2 },
 ];
 const results = {
   style: [
@@ -221,7 +231,7 @@ function Personality({ scenarios }: { scenarios: Scenario[] }) {
             key={q.id}
             onClick={() => setQuiz(q.id as keyof typeof results)}
           >
-            <q.icon size={40} />
+            <QuizPicture tile={q.art} />
             <h2>{q.title}</h2>
             <span className="caption">6 chess choices</span>
             <ArrowRight size={20} />
@@ -234,7 +244,7 @@ function Personality({ scenarios }: { scenarios: Scenario[] }) {
       [title, text] = results[quiz][index];
     return (
       <Card className="quiz-result">
-        <Sparkles size={48} />
+        <QuizPicture tile={[3, 4, 5, 6][index]} result />
         <span className="pill">For fun</span>
         <h2>{title}</h2>
         <p>{text}</p>
@@ -255,7 +265,7 @@ function Personality({ scenarios }: { scenarios: Scenario[] }) {
   return (
     <div className="chess-layout">
       <div className="board-column">
-        <Board fen={scenario.fen} disabled />
+        <Board key={scenario.fen} fen={scenario.fen} disabled />
       </div>
       <Card className="personality-question">
         <div className="game-score-row">
