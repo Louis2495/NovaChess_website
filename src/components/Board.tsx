@@ -107,8 +107,6 @@ export function Board({
       from: string;
       startX: number;
       startY: number;
-      offsetX: number;
-      offsetY: number;
       right: boolean;
       color: string;
       moving: boolean;
@@ -292,8 +290,8 @@ export function Board({
             setDrag({
               from: g.from,
               symbol: cells[g.from],
-              x: e.clientX - g.offsetX,
-              y: e.clientY - g.offsetY,
+              x: e.clientX,
+              y: e.clientY,
               size: boardRef.current!.clientWidth / 8,
             });
         }}
@@ -309,7 +307,7 @@ export function Board({
           }
           if (g.moving) {
             suppressClick.current = true;
-            const to = squareAt(e.clientX - g.offsetX, e.clientY - g.offsetY);
+            const to = squareAt(e.clientX, e.clientY);
             if (to && to !== g.from) choose(g.from, to);
           }
         }}
@@ -371,8 +369,6 @@ export function Board({
                       from: square,
                       startX: e.clientX,
                       startY: e.clientY,
-                      offsetX: 0,
-                      offsetY: 0,
                       right: true,
                       color: colors[key as keyof typeof colors] || colors.mark,
                       moving: false,
@@ -390,18 +386,22 @@ export function Board({
                     blocked.includes(square)
                   )
                     return;
-                  const box = e.currentTarget.getBoundingClientRect();
                   gesture.current = {
                     from: square,
                     startX: e.clientX,
                     startY: e.clientY,
-                    offsetX: e.clientX - box.left - box.width / 2,
-                    offsetY: e.clientY - box.top - box.height / 2,
                     right: false,
                     color: "",
                     moving: false,
                     pointerId: e.pointerId,
                   };
+                  setDrag({
+                    from: square,
+                    symbol: piece,
+                    x: e.clientX,
+                    y: e.clientY,
+                    size: boardRef.current!.clientWidth / 8,
+                  });
                   e.currentTarget.setPointerCapture(e.pointerId);
                 }}
                 onKeyDown={(e) => {

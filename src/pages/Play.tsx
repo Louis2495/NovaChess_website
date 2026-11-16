@@ -2,7 +2,6 @@ import { previewPremoves } from "../lib/premoves";
 import { usePremoves } from "../lib/usePremoves";
 import { matchTypedMove } from "../lib/moves";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Chess } from "chess.js";
 import type { FairyStockfish } from "ffish-es6";
 import {
   Play as PlayIcon,
@@ -125,9 +124,10 @@ export default function Play() {
     ),
     [dropCount, setDropCount] = useState(2),
     [human, setHuman] = useState<"w" | "b">("w"),
-    [choice, setChoice] = useState("Current Rating"),
+    [choice, setChoice] = useState("Current rating"),
+    [openingSearch, setOpeningSearch] = useState(""),
     [rating, setRating] = useState(1200),
-    [rated, setRated] = useState(false),
+    [rated, setRated] = useState(true),
     [openingId, setOpeningId] = useState(""),
     [options, setOptions] = useState(false),
     [paused, setPaused] = useState(false),
@@ -142,8 +142,6 @@ export default function Play() {
     [confirm, setConfirm] = useState(false),
     [busy, setBusy] = useState(false);
   const { data: openings } = useData<Opening[]>("openings");
-  const { data: developer } =
-    useData<{ name: string; side: string; moves: string[] }[]>("developer");
   const game = library.activeGame;
   const live = useRef(game);
   live.current = game;
@@ -261,17 +259,10 @@ export default function Play() {
       result: "*",
       human,
       folder: "Games",
-      opponent: choice === "Play the Developer" ? "Developer" : "Computer",
+      opponent: "Computer",
       opponentChoice: choice,
-      botRating:
-        choice === "Current Rating"
-          ? library.localRating
-          : choice === "Adaptive"
-            ? library.localRating
-            : choice === "Play the Developer"
-              ? 2407
-              : rating,
-      rated: rated && choice !== "Adaptive" && variant === "chess",
+      botRating: choice === "Current rating" ? library.localRating : rating,
+      rated: rated && variant === "chess",
       requestedOpening: openingId,
     };
     if (variant === "bughouse") {
@@ -493,26 +484,6 @@ export default function Play() {
         const selected = openings?.find((o) => o.id === game!.requestedOpening);
         if (selected && game!.moves.every((m, i) => m === selected.moves[i]))
           book = selected.moves[game!.moves.length] || "";
-        if (
-          !book &&
-          game!.opponentChoice === "Play the Developer" &&
-          developer
-        ) {
-          for (const line of developer.filter((d) => d.side !== game!.human)) {
-            const c = new Chess();
-            for (const uci of line.moves) {
-              if (
-                c.fen().split(" ").slice(0, 4).join(" ") ===
-                valid!.fen.split(" ").slice(0, 4).join(" ")
-              ) {
-                book = uci;
-                break;
-              }
-              c.move(uci);
-            }
-            if (book) break;
-          }
-        }
         if (book && valid!.legal.includes(book)) {
           await new Promise((r) => setTimeout(r, 350));
           if (!controller.signal.aborted) apply(book, id, ply);
@@ -529,30 +500,6 @@ export default function Play() {
             signal: controller.signal,
           });
           move = result.best;
-          if (
-            game!.opponentChoice === "Adaptive" &&
-            !controller.signal.aborted
-          ) {
-            const advantage =
-              (result.lines[0]?.score || 0) * (game!.human === "w" ? 1 : -1);
-            setLibrary((l) => ({
-              ...l,
-              activeGame:
-                l.activeGame?.id === id
-                  ? {
-                      ...l.activeGame,
-                      botRating: Math.max(
-                        100,
-                        Math.min(
-                          3190,
-                          (l.activeGame.botRating || 1000) +
-                            (advantage > 100 ? 75 : advantage < -100 ? -75 : 0),
-                        ),
-                      ),
-                    }
-                  : l.activeGame,
-            }));
-          }
         } else
           move = await variantMove(
             game!.variant,
@@ -573,7 +520,7 @@ export default function Play() {
       controller.abort();
       setBusy(false);
     };
-  }, [ff, game?.id, game?.moves.length, playing, paused, openings, developer]);
+  }, [ff, game?.id, game?.moves.length, playing, paused, openings]);
   useEffect(() => {
     if (!ff || !game?.partner || !playing || paused || game.result !== "*")
       return;
@@ -779,12 +726,7 @@ export default function Play() {
                 {!["dropping", "chaos", "random"].includes(variant) && (
                   <>
                     <div className="opponent-choices">
-                      {[
-                        "Current Rating",
-                        "Adaptive",
-                        "Play the Developer",
-                        "Custom",
-                      ].map((v) => (
+                      {["Current rating", "Custom"].map((v) => (
                         <label key={v}>
                           <input
                             type="radio"
@@ -794,7 +736,7 @@ export default function Play() {
                           />
                           <span>
                             {v}
-                            {v === "Current Rating" && (
+                            {v === "Current rating" && (
                               <small>{Math.round(library.localRating)}</small>
                             )}
                           </span>
@@ -820,31 +762,44 @@ export default function Play() {
                       </Field>
                     )}
                     <Toggle
-                      label="Rated locally"
-                      description="Local estimate, not an official rating."
-                      checked={
-                        rated && choice !== "Adaptive" && variant === "chess"
-                      }
-                      onChange={(v) =>
-                        setRated(
-                          v && choice !== "Adaptive" && variant === "chess",
-                        )
-                      }
+                      label="Rated"
+                      checked={rated && variant === "chess"}
+                      onChange={(v) => setRated(v && variant === "chess")}
                     />
                     {variant === "chess" && (
-                      <Field label="Request an opening">
-                        <select
-                          value={openingId}
-                          onChange={(e) => setOpeningId(e.target.value)}
-                        >
-                          <option value="">Any opening</option>
-                          {openings?.map((o) => (
-                            <option key={o.id} value={o.id}>
-                              {o.eco} · {o.name}
-                            </option>
-                          ))}
-                        </select>
-                      </Field>
+                      <div className="opening-request">
+                        <Field label="Search openings">
+                          <input
+                            type="search"
+                            value={openingSearch}
+                            placeholder="Name or ECO code"
+                            onChange={(e) => setOpeningSearch(e.target.value)}
+                          />
+                        </Field>
+                        <Field label="Request an opening">
+                          <select
+                            value={openingId}
+                            onChange={(e) => setOpeningId(e.target.value)}
+                          >
+                            <option value="">Any opening</option>
+                            {openings
+                              ?.filter(
+                                (o) =>
+                                  o.id === openingId ||
+                                  `${o.eco} ${o.name}`
+                                    .toLowerCase()
+                                    .includes(
+                                      openingSearch.trim().toLowerCase(),
+                                    ),
+                              )
+                              .map((o) => (
+                                <option key={o.id} value={o.id}>
+                                  {o.eco} · {o.name}
+                                </option>
+                              ))}
+                          </select>
+                        </Field>
+                      </div>
                     )}
                   </>
                 )}
@@ -1179,8 +1134,7 @@ export default function Play() {
                   <p className="caption">{variantInfo.description}</p>
                 )}
                 <p className="caption">
-                  {game.rated ? "Rated locally" : "Unrated"} ·{" "}
-                  {game.opponentChoice}
+                  {game.rated ? "Rated" : "Unrated"} · {game.opponentChoice}
                 </p>
                 {game.requestedOpening && (
                   <p className="caption">

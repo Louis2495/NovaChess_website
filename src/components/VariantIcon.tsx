@@ -36,8 +36,12 @@ export default function VariantIcon({
       style={
         {
           "--variant-size": `${size}px`,
-          backgroundImage: `url("${base}variants/illustrations.webp")`,
-          backgroundPosition: `${(index % 6) * 20}% ${Math.floor(index / 6) * 50}%`,
+          backgroundImage: `url("${base}variants/${id === "horde" ? "horde.webp" : "illustrations.webp"}")`,
+          backgroundSize: id === "horde" ? "100% 100%" : undefined,
+          backgroundPosition:
+            id === "horde"
+              ? "center"
+              : `${(index % 6) * 20}% ${Math.floor(index / 6) * 50}%`,
         } as CSSProperties
       }
     />

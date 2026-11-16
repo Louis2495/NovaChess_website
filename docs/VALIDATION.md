@@ -1,8 +1,9 @@
 # Validation
 
-- TypeScript and Vite production build: passed. The offline cache contains 427 local assets.
-- Full desktop/mobile Chromium suite: all 132 scenarios passed in one run.
+- TypeScript and Vite production build: passed. The offline cache contains 428 local assets.
+- Full desktop/mobile Chromium suite: 137 scenarios passed in one run; one desktop-only layout check is intentionally skipped on mobile.
 - Node rules/content/database/federation suite: all 34 tests passed.
+- Setup refinements check immediate center-grab dragging and edge drops, centered purple resume actions, compact strength choices, rated defaults, opening search, equal-height homepage cards and the larger Analysis board.
 - New coverage checks notation following/manual override, large evaluation and turn dots, concise position-specific insights, the homepage meme placement, retained puzzle input focus, rating-card alignment, configurable Stats periods, nested Rankings and federation profile input/lookup.
 - Positional explanations were checked against legal positions with real pins, passed pawns, open files, supported outposts, mating nets and engine-line pawn-structure changes. Federation parsing and the actual read-only Edge handler were checked with documented/representative responses, cache reuse and rejected arbitrary/private URLs.
 - New rules: ordinary positions were cross-checked against chess.js; dropped-square timing/caps/path blocking, extended pawn moves, freeze expiration, swap king safety, Random selection, castling, en passant, underpromotion and actual bot replies were checked.

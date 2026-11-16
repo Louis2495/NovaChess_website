@@ -203,7 +203,7 @@ export default function Analysis() {
           {engine.error}
         </p>
       )}
-      <div className="chess-layout">
+      <div className="chess-layout analysis-layout">
         <div className="board-column">
           <div className="board-topline">
             <div className="analysis-position-meta">

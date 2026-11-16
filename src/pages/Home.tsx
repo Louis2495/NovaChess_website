@@ -37,7 +37,7 @@ export default function HomePage() {
         </Button>
         {resumable && (
           <button
-            className="resume-link"
+            className="resume-link resume-game-button"
             onClick={() => navigate("play", "resume")}
           >
             <RotateCcw size={15} />

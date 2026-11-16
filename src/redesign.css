@@ -3473,14 +3473,6 @@ select {
   border-radius: 8px;
   flex-shrink: 0;
 }
-.setup-launch {
-  min-height: 150px !important;
-  background: linear-gradient(
-    125deg,
-    var(--accent-soft),
-    transparent
-  ) !important;
-}
 .setup-launch .new-game-primary {
   width: 100%;
   justify-content: center;
@@ -3633,20 +3625,6 @@ select.theme-select {
   min-height: 32px;
   height: 32px;
 }
-.game-setup-page .resume-game-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  align-self: center;
-  margin: 20px auto 0;
-  padding: 13px 24px;
-  background: #c1adef;
-  color: #271d3d;
-  border: 1px solid #c1adef;
-  border-radius: var(--radius);
-  font-weight: 600;
-  text-align: center;
-}
 .puzzle-layout .side-panels {
   padding-top: var(--puzzle-rating-offset, 47px);
 }
@@ -3751,4 +3729,126 @@ select.theme-select {
   max-width: 65%;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+/* Keep every resume action separate from the primary game button. */
+.setup-launch {
+  background: none !important;
+  min-height: 0 !important;
+}
+.resume-link.resume-game-button {
+  display: flex;
+  width: fit-content;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto 0;
+  padding: 13px 24px;
+  border: 1px solid #c1adef;
+  border-radius: var(--radius);
+  background: #c1adef;
+  color: #271d3d;
+  font-weight: 600;
+  text-align: center;
+}
+.resume-link.resume-game-button:hover {
+  background: #cfbef5;
+  color: #271d3d;
+}
+.home-practice-grid {
+  align-items: stretch;
+}
+.home-practice-grid .home-puzzle {
+  display: flex;
+  flex-direction: column;
+}
+.home-practice-grid .home-puzzle-content {
+  flex: 1;
+}
+.home-practice-grid .daily-meme {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+}
+.home-practice-grid .daily-meme-image {
+  display: block;
+  height: 100%;
+  object-fit: contain;
+}
+.home-puzzle-content > .daily-board-preview {
+  width: min(100%, 360px);
+}
+.game-settings-card {
+  width: min(100%, 540px);
+  margin: 22px auto 0;
+}
+.game-settings-card .game-options {
+  grid-template-columns: minmax(0, 1fr);
+}
+.game-settings-card .opponent-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-solid);
+}
+.game-settings-card .opponent-choices label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.game-settings-card .opponent-choices input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.game-settings-card .opponent-choices label:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.game-settings-card .opponent-choices label:has(input:checked) {
+  background: var(--accent-soft);
+  color: var(--text);
+  box-shadow: 0 2px 8px #0002;
+}
+.opening-request {
+  display: grid;
+  gap: 12px;
+}
+@media (min-width: 1001px) {
+  .analysis-layout.chess-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+    max-width: calc(var(--board-max) * 1.3 + 367px);
+  }
+  .analysis-layout > .board-column {
+    max-width: none;
+  }
+}
+@media (max-width: 800px) {
+  .home-practice-grid .daily-meme-image {
+    height: auto;
+  }
+}
+.home-practice-grid .home-puzzle {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 22px;
+}
+.home-practice-grid .home-puzzle .home-section-heading {
+  margin-bottom: 16px;
+}
+.home-practice-grid .home-puzzle-content {
+  border: 0;
+  background: none;
+  padding: 0;
+}
+.game-settings-card .opponent-choices label:has(input:checked) small {
+  color: var(--text);
 }
