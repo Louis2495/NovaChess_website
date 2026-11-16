@@ -16,3 +16,5 @@
 Live Supabase credentials were not supplied, so no live project, email delivery, deployed Realtime connection or public deployment is claimed. The remaining owner setup and smoke test are in [ONLINE_SETUP.md](ONLINE_SETUP.md).
 
 Public Chess.com/Lichess access is subject to the source’s CORS/rate limits and this environment’s outbound proxy. Research parsing and frequency calculations were tested using representative API-response fixtures. Federation lookup links to official records; it does not claim to ingest verified FIDE/US Chess statistics. Arbitrary user-selected appearance colors remain under the user’s control.
+
+CI crash regression: custom variants skip Fairy-Stockfish snapshots. The native board factory rejects unregistered variants before calling WASM. Desktop/mobile custom-game tests instrument the native constructor to catch accidental engine calls safely, and check start, computer reply, resume and resignation. GitHub Actions now annotates individual test failures.

@@ -10,6 +10,44 @@ async function move(p: Page, m: string) {
   await square(p, m.slice(0, 2)).click();
   await square(p, m.slice(2, 4)).click();
 }
+// Record unsupported calls before native WASM can terminate the renderer.
+async function protectNativeEngine(page: Page) {
+  const rejected = await page.evaluate(async () => {
+    const load = new Function('return import("/src/lib/variants.ts")');
+    const { fairy, makeBoard } = await load();
+    const ff = await fairy();
+    const key = "novachess-test-native-variant-calls";
+    if (!localStorage.getItem(key)) localStorage.setItem(key, "[]");
+    ff.Board = new Proxy(ff.Board, {
+      construct(target, args, newTarget) {
+        if (["dropping", "chaos", "random"].includes(args[0])) {
+          localStorage.setItem(
+            key,
+            JSON.stringify([
+              ...JSON.parse(localStorage.getItem(key)!),
+              args[0],
+            ]),
+          );
+          throw new Error("Unsupported variant reached the native engine.");
+        }
+        return Reflect.construct(target, args, newTarget);
+      },
+    });
+    return ["dropping", "chaos", "random"].map((variant) => {
+      try {
+        makeBoard(ff, variant);
+        return "not rejected";
+      } catch (error) {
+        return (error as Error).message;
+      }
+    });
+  });
+  expect(rejected).toEqual(
+    ["dropping", "chaos", "random"].map(
+      (variant) => `The local engine does not support variant: ${variant}`,
+    ),
+  );
+}
 test("the entire daily puzzle card opens the daily puzzle and has no small action", async ({
   page,
 }) => {
@@ -292,6 +330,7 @@ for (const variant of ["dropping", "chaos", "random"])
     page,
   }) => {
     await page.goto("/#play");
+    await protectNativeEngine(page);
     await page
       .getByRole("button", { name: "Game options", exact: true })
       .click();
@@ -325,6 +364,7 @@ for (const variant of ["dropping", "chaos", "random"])
       )
       .toBeGreaterThanOrEqual(2);
     await page.goto("/");
+    await protectNativeEngine(page);
     await page
       .getByRole("button", { name: "Resume saved game", exact: true })
       .click();
@@ -351,6 +391,15 @@ for (const variant of ["dropping", "chaos", "random"])
     }
     await page.getByRole("button", { name: "Resign", exact: true }).click();
     await expect(page.getByText("Black wins", { exact: true })).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          JSON.parse(
+            localStorage.getItem("novachess-test-native-variant-calls")!,
+          ),
+        ),
+      )
+      .toEqual([]);
     if (variant === "dropping") {
       await page.getByRole("button", { name: "Games", exact: true }).click();
       await page

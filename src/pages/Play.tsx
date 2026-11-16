@@ -159,7 +159,8 @@ export default function Play() {
     };
   }, []);
   const snap = useMemo(() => {
-    if (!ff || !game) return null;
+    if (!ff || !game || ["dropping", "chaos", "random"].includes(game.variant))
+      return null;
     try {
       return snapshot(ff, game);
     } catch (e) {

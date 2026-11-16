@@ -138,6 +138,10 @@ export function makeBoard(
   const id = ["blind", "blindtext", "chess960"].includes(variant)
     ? "chess"
     : variant;
+  // Reject unsupported rules before entering the native WASM constructor.
+  if (!ff.variants().split(/\s+/).includes(id)) {
+    throw new Error(`The local engine does not support variant: ${variant}`);
+  }
   const b = new ff.Board(id, initial || undefined, variant === "chess960");
   for (const move of moves) {
     if (!b.push(move)) {
