@@ -2,7 +2,7 @@ import test, { before, after } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import ts from "typescript";
 let handler,
@@ -28,12 +28,19 @@ before(async () => {
         );
   };
   const source = readFileSync(
-    "supabase/functions/federation-records/index.ts",
+    "supabase/federation-records-dashboard.ts",
     "utf8",
-  ).replace(
-    /["']\.\.\/\.\.\/\.\.\/src\/lib\/federations.ts["']/,
-    JSON.stringify(pathToFileURL(resolve("src/lib/federations.ts")).href),
   );
+  assert.ok(source.includes(readFileSync("src/lib/federations.ts", "utf8")));
+  assert.ok(
+    source.includes(
+      readFileSync(
+        "supabase/functions/federation-records/index.ts",
+        "utf8",
+      ).replace(/^import\s*\{[\s\S]*?\}\s*from\s*["'][^"']+["'];\s*/, ""),
+    ),
+  );
+  assert.doesNotMatch(source, /^import /m);
   temp = mkdtempSync(join(tmpdir(), "nova-federation-"));
   const file = join(temp, "handler.mjs");
   writeFileSync(

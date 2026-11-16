@@ -1,8 +1,9 @@
 # Validation
 
 - Theme refresh: 12 targeted desktop/mobile checks passed, including returning-user palette migration, preserved custom colors/backgrounds, reset behavior and accessibility. Production Home, Play, Analysis, Puzzles, Learn, Stats and Profile also passed desktop/mobile accessibility and overflow checks.
-- TypeScript and Vite production build: passed. The offline cache contains 430 local assets.
+- TypeScript and Vite production build: passed. The offline cache contains 431 local assets.
 - Full desktop/mobile Chromium suite: 143 scenarios passed in one run; one desktop-only layout check is intentionally skipped on mobile.
+- Federation connection repair: six desktop/mobile browser checks passed for server-first USCF requests without an online account, saved profile/rating updates, clear unconfigured-server errors and retained direct FIDE lookup. The standalone dashboard deployment file is exercised by the 34-test suite and checked against the source parser/handler. No live Supabase deployment is claimed.
 - Node rules/content/database/federation suite: all 34 tests passed.
 - Puzzle/quiz refinements check hidden empty move history, removed turn/status text, narrower aligned panels, side-to-move orientation across every quiz scenario plus Analysis, Guess the Eval and saved-game previews, and bundled introduction/result illustrations. Production desktop/mobile puzzle, quiz selection and quiz result screens passed accessibility checks without horizontal overflow.
 - Setup refinements check immediate center-grab dragging and edge drops, centered purple resume actions, compact strength choices, rated defaults, opening search, equal-height homepage cards and the larger Analysis board.
@@ -20,6 +21,6 @@
 
 Live Supabase credentials were not supplied, so no live Supabase project, email delivery or deployed Realtime connection is claimed. The remaining owner setup and smoke test are in [ONLINE_SETUP.md](ONLINE_SETUP.md).
 
-Public Chess.com/Lichess access is subject to the source’s CORS/rate limits and this environment’s outbound proxy. Research parsing and frequency calculations were tested using representative API-response fixtures. FIDE lookup follows the documented Lichess FIDE response schema; USCF parsing and the optional federation proxy were tested with fixtures because this environment could not reach the live upstreams. The proxy still requires owner deployment, and manually entered ratings are explicitly labelled. Arbitrary user-selected appearance colors remain under the user’s control.
+Public Chess.com/Lichess access is subject to the source’s CORS/rate limits and this environment’s outbound proxy. Research parsing and frequency calculations were tested using representative API-response fixtures. FIDE lookup follows the documented Lichess FIDE response schema; USCF parsing and the federation server required for USCF lookup were tested with fixtures because this environment could not reach the live upstreams. The proxy still requires owner deployment, and manually entered ratings are explicitly labelled. Arbitrary user-selected appearance colors remain under the user’s control.
 
 CI crash regression: custom variants skip Fairy-Stockfish snapshots. The native board factory rejects unregistered variants before calling WASM. Desktop/mobile custom-game tests instrument the native constructor to catch accidental engine calls safely, and check start, computer reply, resume and resignation. GitHub Actions now annotates individual test failures.

@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "npm run test:unit && playwright test",
     "postinstall": "node scripts/prepare-assets.mjs",
-    "test:unit": "node --test tests/unit/*.test.mjs"
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "prepare:federations": "node scripts/prepare-federation-function.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",

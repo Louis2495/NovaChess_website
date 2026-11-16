@@ -73,14 +73,24 @@ select cron.schedule('novachess-chat-retention', '30 3 * * *',
 
 Attach official profile URLs or IDs in **Profile → Federation profiles**. The records and any manually entered ratings are saved with the browser profile and shown in **Stats → Rankings**. Manually entered values are labelled separately from fetched records.
 
-FIDE lookup uses the documented public [Lichess FIDE API](https://lichess.org/api#tag/FIDE/operation/fidePlayerGet), which mirrors FIDE’s public data. US Chess’s public record can be read directly when its browser-access policy permits it. For browsers blocked by federation CORS policies, deploy the optional read-only proxy into the same Supabase project:
+FIDE lookup uses the documented public [Lichess FIDE API](https://lichess.org/api#tag/FIDE/operation/fidePlayerGet). **USCF lookup requires a server:** US Chess blocks the browser request from GitHub Pages. It does not require user sign-in, an anon key, a database migration or a paid plan.
+
+### Set up USCF lookup without installing anything
+
+1. Create a free project at [Supabase](https://supabase.com/dashboard). Keep the database password private.
+2. In the project, open **Edge Functions → Deploy a new function → Via Editor**. Name it `federation-records`.
+3. Replace the example code with the entire contents of [federation-records-dashboard.ts](../supabase/federation-records-dashboard.ts), then deploy it.
+4. In the function's settings, turn **Verify JWT** off. This endpoint reads only public federation records and accepts only validated IDs and fixed federation sources.
+5. Copy the function URL, such as `https://PROJECT.supabase.co/functions/v1/federation-records`. Set that URL in the `url` field of [public/federation-lookup.json](../public/federation-lookup.json) and push. Alternatively, configure `VITE_FEDERATION_LOOKUP_URL` as a GitHub Actions repository variable; the deploy workflow passes it to Vite.
+6. In NovaChess, enter a real USCF ID in Profile and click Load. Verify the returned name and ratings against the official record. An invalid ID or an unavailable upstream must show an error rather than an empty successful result.
+
+You can share the **public function URL** with the site maintainer to finish step 5. Do not share your database password, service-role key or access token.
+
+For CLI users:
 
 ```sh
-npx supabase functions deploy federation-records --no-verify-jwt
+npx supabase login
+npx supabase functions deploy federation-records --project-ref YOUR_PROJECT_REF --no-verify-jwt
 ```
 
-The function needs no database migration or service-role secret. It accepts only validated federation IDs and fixed public upstreams, caches records for six hours, and makes no changes to federation accounts. USCF parsing rejects unreadable rating responses; manual entry remains available if the source changes or is unavailable. Lookup cannot run through this proxy until the function and public Vite Supabase configuration are deployed.
-
-## Validation scope
-
-The migration, permissions, vote scheduler, queue transitions, ratings and Edge Function handler are tested against embedded PostgreSQL using PGlite. Browser tests cover the disconnected state. A live Supabase project, email delivery, deployed Realtime connections and public deployment still require the steps above and the two-session smoke test.
+The function caches records for six hours. Rebuild the standalone editor file after changing the parser or handler with `npm run prepare:federations`. The public record's live availability still depends on US Chess; the parser must be checked against a live member after deployment. Manual entry remains available during outages.

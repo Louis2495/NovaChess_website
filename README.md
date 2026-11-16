@@ -59,3 +59,5 @@ For GitHub Pages, select **Settings → Pages → Source → GitHub Actions**, t
 There are no analytics, ads or advertising cookies. Local games, profiles, backgrounds, presets and progress use browser storage. With Supabase connected, accounts, public profiles, multiplayer games, votes, chat and rankings use that project’s database. Service-worker caches hold static application assets. Static hosts and Supabase may retain request logs.
 
 [THIRD_PARTY.md](THIRD_PARTY.md) records artwork, data, fonts, engine source references and music attribution. The source is AGPL-3.0-or-later; see [LICENSE](LICENSE). Piano has its separate CC BY-SA 4.0 license. Full third-party license texts are under `public/licenses/`.
+
+USCF lookup requires the free read-only federation function. Follow the [browser-only setup](docs/ONLINE_SETUP.md#set-up-uscf-lookup-without-installing-anything); it works independently of account sign-in and needs no private keys in the website.
