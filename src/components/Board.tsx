@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { useApp } from "../lib/context";
-import { base, pieceUrl, boardSizeKey } from "../lib/store";
+import { base, pieceUrl, boardSizeKey, annotationColors } from "../lib/store";
 import { squares } from "../lib/variants";
 import { defaultControls, useControl } from "../lib/controls";
 export function Piece({ symbol, style }: { symbol: string; style?: string }) {
@@ -449,10 +449,10 @@ export function Board({
                         ([k, v]) => k.startsWith("mark") && v === modifier,
                       )?.[0] || "mark";
                     const colors = {
-                      mark: appearance.markColors?.green || "#63d6a1",
-                      markBlue: appearance.markColors?.blue || "#67b8ff",
-                      markRed: appearance.markColors?.red || "#ff7b92",
-                      markGold: appearance.markColors?.gold || "#ffd071",
+                      mark: appearance.markColors?.green || annotationColors.green,
+                      markBlue: appearance.markColors?.blue || annotationColors.blue,
+                      markRed: appearance.markColors?.red || annotationColors.red,
+                      markGold: appearance.markColors?.gold || annotationColors.gold,
                     };
                     gesture.current = {
                       from: square,
@@ -540,7 +540,7 @@ export function Board({
                   width={12.5}
                   height={12.5}
                   fill={m.color}
-                  opacity=".45"
+                  opacity=".6"
                 />
               );
             const dx = Math.abs(b.x - a.x),

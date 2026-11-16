@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RotateCcw, Keyboard } from "lucide-react";
+import { annotationColors } from "../lib/store";
 import { useApp } from "../lib/context";
 import { defaultControls, resolveControls } from "../lib/controls";
 import { ChoiceSelect, Button, Card, PageTitle } from "../components/UI";
@@ -95,21 +96,13 @@ export default function Controls({ embedded = false }: { embedded?: boolean }) {
                 type="color"
                 value={
                   appearance.markColors?.[color as "green"] ||
-                  {
-                    green: "#63d6a1",
-                    blue: "#67b8ff",
-                    red: "#ff7b92",
-                    gold: "#ffd071",
-                  }[color]!
+                  annotationColors[color as keyof typeof annotationColors]
                 }
                 onChange={(e) =>
                   setAppearance((a) => ({
                     ...a,
                     markColors: {
-                      green: "#63d6a1",
-                      blue: "#67b8ff",
-                      red: "#ff7b92",
-                      gold: "#ffd071",
+                      ...annotationColors,
                       ...a.markColors,
                       [color]: e.target.value,
                     },

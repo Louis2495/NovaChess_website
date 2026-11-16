@@ -28,6 +28,7 @@ import {
   defaults,
   emptyLibrary,
   usePersistent,
+  annotationColors,
   base,
   APP_SOURCE,
   contrast,
@@ -110,6 +111,31 @@ function App() {
     [command, setCommand] = useState(false),
     [query, setQuery] = useState(""),
     [info, setInfo] = useState(false);
+  useEffect(() => {
+    // Refresh only the previous default board/colors, preserving custom choices.
+    setAppearance((a) => {
+      const oldMarks = {
+        green: "#63d6a1", blue: "#67b8ff", red: "#ff7b92", gold: "#ffd071",
+      };
+      const newMarks = annotationColors;
+      const marks = a.markColors ? { ...a.markColors } : undefined;
+      let changed = false;
+      for (const key of Object.keys(oldMarks) as (keyof typeof oldMarks)[]) {
+        if (marks?.[key] === oldMarks[key]) {
+          marks[key] = newMarks[key];
+          changed = true;
+        }
+      }
+      const board = a.board === "Classic" && a.dark.toLowerCase() === "#5c7866";
+      return board || changed
+        ? {
+            ...a,
+            ...(board ? { dark: defaults.dark } : {}),
+            ...(changed ? { markColors: marks } : {}),
+          }
+        : a;
+    });
+  }, []);
   useEffect(() => {
     if (locationState.tab === "research") setResearchVisited(true);
   }, [locationState.tab]);

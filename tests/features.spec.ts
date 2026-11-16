@@ -157,12 +157,12 @@ test("right click creates colored square marks and arrows, and controls change t
   await square(page, "e4").click({ button: "right" });
   await expect(page.locator(".board-marks rect")).toHaveAttribute(
     "fill",
-    "#63d6a1",
+    "#187b46",
   );
   await square(page, "d4").click({ button: "right", modifiers: ["Shift"] });
   await expect(page.locator(".board-marks rect").nth(1)).toHaveAttribute(
     "fill",
-    "#67b8ff",
+    "#205eab",
   );
   const a = (await square(page, "a1").boundingBox())!,
     b = (await square(page, "a4").boundingBox())!;

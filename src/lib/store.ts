@@ -18,7 +18,7 @@ export const themes: Record<string, string> = {
   Graphite: "#a5b4c7",
 };
 export const boards: Record<string, [string, string]> = {
-  Classic: ["#e8e3d1", "#5c7866"],
+  Classic: ["#e8e3d1", "#7b997f"],
   Walnut: ["#ead7b7", "#6e4730"],
   Slate: ["#dfe6ee", "#526680"],
   Ocean: ["#deeaf2", "#376e99"],
@@ -55,6 +55,12 @@ export const backgrounds = [
   "Custom",
   "Flag",
 ];
+export const annotationColors = {
+  green: "#187b46",
+  blue: "#205eab",
+  red: "#b3334a",
+  gold: "#b76808",
+};
 export const defaults: Appearance = {
   theme: "Steel",
   background: "Default",
