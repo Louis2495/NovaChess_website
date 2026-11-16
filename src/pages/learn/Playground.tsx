@@ -15,6 +15,7 @@ import { Button, Card, Loading } from "../../components/UI";
 type Question = {
   id: string;
   prompt: string;
+  clue?: string;
   category: string;
   answers: string[];
   correct: number;
@@ -95,7 +96,10 @@ function Trivia({ questions }: { questions: Question[] }) {
             <b>{score} pts</b>
           </div>
           <span className="pill">{q.category}</span>
-          <h2>{q.prompt}</h2>
+          <div className="trivia-question">
+            <h2>{q.prompt}</h2>
+            {q.clue && <p className="trivia-clue">{q.clue}</p>}
+          </div>
           <div className="trivia-options">
             {answers.map((a) => (
               <button
@@ -119,8 +123,10 @@ function Trivia({ questions }: { questions: Question[] }) {
           </div>
           {choice && (
             <>
-              <p role="status">{q.explanation}</p>
-              <div className="button-row">
+              <p role="status" className="trivia-explanation">
+                {q.explanation}
+              </p>
+              <div className="button-row trivia-next">
                 <Button
                   onClick={() => {
                     if (round % 10 === 9) {

@@ -1,7 +1,10 @@
+import { usePremoves } from "../lib/usePremoves";
+import PremoveQueue from "../components/PremoveQueue";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Flag,
+  Handshake,
   RotateCcw,
   Snowflake,
   ArrowLeftRight,
@@ -33,7 +36,7 @@ export default function SpecialPlay({
   dropCount: number;
   onBack: () => void;
 }) {
-  const { library, setLibrary, notify } = useApp();
+  const { library, setLibrary, notify, appearance } = useApp();
   const [saved, setSaved] = usePersistent<{
     id: string;
     state: SpecialState;
@@ -136,6 +139,16 @@ export default function SpecialPlay({
           else apply({ type: "swap", from: first, to: square });
         }
       : undefined;
+  const premove = usePremoves({
+    fen: state.fen,
+    side,
+    legal,
+    active: state.result === "*",
+    identity: saved.id,
+    execute: (move) => apply({ type: "move", move }),
+    chaos: variant === "chaos",
+    blocked: state.blocked,
+  });
   return (
     <>
       <PageTitle title={names[variant]}>
@@ -148,14 +161,19 @@ export default function SpecialPlay({
         <div className="board-column">
           <GameResult result={state.result} />
           <Board
-            fen={state.fen}
+            fen={premove.preview}
+            materialFen={state.fen}
             flipped={side === "b"}
-            legalMoves={legal}
+            legalMoves={turn === side ? legal : premove.options}
             blocked={state.blocked}
             selected={first || state.randomFrom || undefined}
-            disabled={busy || turn !== side || state.result !== "*"}
+            disabled={
+              (turn !== side && !appearance.premoves) || state.result !== "*"
+            }
             onMove={(from, to, promotion) =>
-              apply({ type: "move", move: from + to + (promotion || "") })
+              turn === side
+                ? apply({ type: "move", move: from + to + (promotion || "") })
+                : premove.enqueue(from + to + (promotion || ""))
             }
             onSquare={onSquare}
             onCancel={
@@ -166,6 +184,11 @@ export default function SpecialPlay({
                   }
                 : undefined
             }
+          />
+          <PremoveQueue
+            moves={premove.queue}
+            undo={() => premove.setQueue((q) => q.slice(0, -1))}
+            clear={premove.clear}
           />
           <div className="button-row">
             {variant === "chaos" && state.result === "*" && (
@@ -199,7 +222,7 @@ export default function SpecialPlay({
               </>
             )}
             <Button
-              className="secondary"
+              className="resign-button"
               disabled={state.result !== "*"}
               onClick={() =>
                 setSaved((s) => ({
@@ -210,6 +233,19 @@ export default function SpecialPlay({
             >
               <Flag size={16} />
               Resign
+            </Button>
+            <Button
+              className="draw-button"
+              disabled={state.result !== "*"}
+              onClick={() =>
+                setSaved((s) => ({
+                  ...s,
+                  state: { ...s.state, result: "1/2-1/2" },
+                }))
+              }
+            >
+              <Handshake size={16} />
+              Draw
             </Button>
             <GameGIFButton
               positions={state.positions}

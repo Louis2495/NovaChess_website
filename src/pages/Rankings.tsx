@@ -158,10 +158,6 @@ export default function Rankings() {
             <Button disabled>Official record</Button>
           )}
         </div>
-        <p className="caption">
-          Federation records open at the official source. NovaChess ratings are
-          separate.
-        </p>
       </Card>
     </>
   );

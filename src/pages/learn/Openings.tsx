@@ -1,3 +1,5 @@
+import { usePremoves } from "../../lib/usePremoves";
+import PremoveQueue from "../../components/PremoveQueue";
 import { useEffect, useMemo, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -44,6 +46,16 @@ type Guide = {
   };
   lines: { name: string; moves: string[] }[];
 };
+type Workbook = {
+  family: string;
+  title: string;
+  summary: string;
+  question: string;
+  moves: string[];
+  notes: { ply: number; san: string; text: string }[];
+  challenge: number;
+  answers: { uci: string; san: string }[];
+};
 export default function Openings({
   mode,
   query = "",
@@ -55,18 +67,22 @@ export default function Openings({
 }) {
   const { data: lessons, error } = useData<Opening[]>("lessons"),
     { data: all, error: allError } = useData<Opening[]>("openings"),
-    { data: guides } = useData<Guide[]>("opening-guides");
+    { data: guides } = useData<Guide[]>("opening-guides"),
+    { data: workbooks, error: workbookError } =
+      useData<Workbook[]>("opening-workbooks");
   if (
     !lessons ||
     !guides ||
+    !workbooks ||
     (selectedId && !lessons.some((l) => l.id === selectedId) && !all)
   )
-    return <Loading error={error || allError} />;
+    return <Loading error={error || allError || workbookError} />;
   return (
     <LessonWorkspace
       lessons={lessons}
       all={all || lessons}
       guides={guides}
+      workbooks={workbooks}
       mode={mode}
       query={query}
       selectedId={selectedId}
@@ -77,6 +93,7 @@ function LessonWorkspace({
   lessons,
   all,
   guides,
+  workbooks,
   mode,
   query,
   selectedId,
@@ -84,11 +101,12 @@ function LessonWorkspace({
   lessons: Opening[];
   all: Opening[];
   guides: Guide[];
+  workbooks: Workbook[];
   mode: "train" | "lesson";
   query: string;
   selectedId?: string;
 }) {
-  const { library, setLibrary, notify } = useApp();
+  const { library, setLibrary, notify, appearance } = useApp();
   const [search, setSearch] = useState(query),
     [selected, setSelected] = useState(
       lessons.find((l) => l.id === selectedId) ||
@@ -106,13 +124,15 @@ function LessonWorkspace({
     [limit, setLimit] = useState(80),
     [saving, setSaving] = useState(false),
     [name, setName] = useState(""),
-    [info, setInfo] = useState("Plan"),
+    [info, setInfo] = useState("Study"),
+    [decisionActive, setDecisionActive] = useState(false),
     [answer, setAnswer] = useState<number | null>(null),
     [autoplay, setAutoplay] = useState(false);
   const family = selected.name.split(":")[0],
     guide =
       guides.find((g) => g.family === family) ||
       guides.find((g) => selected.name.startsWith(g.family))!;
+  const workbook = workbooks.find((w) => w.family === guide?.family);
   const lines = useMemo(
     () => [
       {
@@ -124,8 +144,11 @@ function LessonWorkspace({
       ...(guide?.lines || []).filter(
         (l) => l.moves.join(" ") !== selected.moves.join(" "),
       ),
+      ...(workbook
+        ? [{ name: "Study: " + workbook.title, moves: workbook.moves }]
+        : []),
     ],
-    [guide, selected],
+    [guide, selected, workbook],
   );
   const moves = lines[branch]?.moves || selected.moves,
     c = new Chess();
@@ -141,10 +164,26 @@ function LessonWorkspace({
         : lessons,
     [all, lessons, search],
   );
+  function studyPosition(ply: number, decision = false) {
+    const index = lines.findIndex(
+      (l) => l.name === "Study: " + workbook?.title,
+    );
+    if (index < 0) return;
+    setBranch(index);
+    setStep(ply);
+    setCatalog(false);
+    setPractice(false);
+    setAutoplay(false);
+    setDecisionActive(decision);
+    setMessage("");
+    setHint(false);
+    setInfo(decision ? "Decisions" : "Study");
+  }
   function show(n: number) {
     setStep(Math.max(0, Math.min(moves.length, n)));
     setHint(false);
     setMessage("");
+    setDecisionActive(false);
   }
   useEffect(() => {
     if (step !== moves.length) return;
@@ -176,6 +215,13 @@ function LessonWorkspace({
     const t = setTimeout(() => show(step + 1), 1500);
     return () => clearTimeout(t);
   }, [autoplay, practice, step, branch]);
+  useControl("catalog", () => setCatalog((v) => !v));
+  useControl("practice", () => {
+    setPractice((v) => !v);
+    show(0);
+    setPerfect(true);
+    setAutoplay(false);
+  });
   useControl("next", () => {
     if (!practice) show(step + 1);
   });
@@ -199,6 +245,21 @@ function LessonWorkspace({
   function play(from: string, to: string, promotion?: string) {
     try {
       const m = new Chess(fen).move({ from, to, promotion: promotion || "q" });
+      if (decisionActive && workbook) {
+        if (m.from + m.to + (m.promotion || "") !== workbook.answers[0].uci) {
+          setMessage(
+            "That is legal, but this exercise asks for a different plan. " +
+              workbook.question,
+          );
+          return;
+        }
+        show(step + 1);
+        setMessage(
+          "Correct. " +
+            workbook.notes.find((n) => n.ply === workbook.challenge + 1)?.text,
+        );
+        return;
+      }
       if (m.from + m.to + (m.promotion || "") !== moves[step]) {
         setPerfect(false);
         setMessage("Try another move, or use Hint.");
@@ -209,9 +270,23 @@ function LessonWorkspace({
       notify("Illegal move.");
     }
   }
-  const explanation = expected
-    ? moveNote(c, expected, guide)
-    : guide?.structure;
+  const premove = usePremoves({
+    fen,
+    side,
+    legal: c
+      .moves({ verbose: true })
+      .map((m) => m.from + m.to + (m.promotion || "")),
+    active: practice && !!expected && !decisionActive,
+    identity: selected.id + ":" + branch,
+    execute: (move) => play(move.slice(0, 2), move.slice(2, 4), move[4]),
+  });
+  const lessonNote =
+    workbook &&
+    moves.slice(0, step + 1).every((m, i) => m === workbook.moves[i])
+      ? workbook.notes.find((n) => n.ply === step + 1)?.text
+      : undefined;
+  const explanation =
+    lessonNote || (expected ? moveNote(c, expected, guide) : guide?.structure);
   const shift = selected.id.length % 3,
     answers =
       guide?.quiz.answers.map((_, i) => guide.quiz.answers[(i + shift) % 3]) ||
@@ -329,7 +404,7 @@ function LessonWorkspace({
             <Card className="lesson-desk">
               <div className="lesson-next">
                 <span className="eyebrow">
-                  {step} / {moves.length}
+                  {Math.ceil(step / 2)} / {Math.ceil(moves.length / 2)}
                 </span>
                 <h3>
                   {expected
@@ -347,15 +422,17 @@ function LessonWorkspace({
               </div>
               {navigation}
               <div className="segmented">
-                {["Plan", "Structure", "Review"].map((v) => (
-                  <button
-                    key={v}
-                    className={info === v ? "active" : ""}
-                    onClick={() => setInfo(v)}
-                  >
-                    {v}
-                  </button>
-                ))}
+                {["Study", "Plan", "Structure", "Decisions", "Review"].map(
+                  (v) => (
+                    <button
+                      key={v}
+                      className={info === v ? "active" : ""}
+                      onClick={() => setInfo(v)}
+                    >
+                      {v}
+                    </button>
+                  ),
+                )}
               </div>
               <div
                 className="lesson-info-scroll"
@@ -363,7 +440,83 @@ function LessonWorkspace({
                 aria-label="Lesson notes"
               >
                 {guide ? (
-                  info === "Plan" ? (
+                  info === "Study" && workbook ? (
+                    <div className="opening-study">
+                      <h3>{workbook.title}</h3>
+                      <p>{workbook.summary}</p>
+                      <Button
+                        className="secondary"
+                        onClick={() => studyPosition(workbook.notes[0].ply)}
+                      >
+                        Study the position
+                      </Button>
+                      <div className="study-checkpoints">
+                        {workbook.notes.map((n) => (
+                          <button
+                            key={n.ply}
+                            onClick={() => studyPosition(n.ply)}
+                          >
+                            <b>
+                              {Math.ceil(n.ply / 2)}
+                              {n.ply % 2 ? "." : "…"} {n.san}
+                            </b>
+                            <span>{n.text}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : info === "Decisions" && workbook ? (
+                    <div className="opening-decision">
+                      <h3>{workbook.question}</h3>
+                      <p className="caption">
+                        Find the move that fits this lesson’s plan.
+                      </p>
+                      <Button
+                        onClick={() => studyPosition(workbook.challenge, true)}
+                      >
+                        Try the position
+                      </Button>
+                      {lines[branch].name === "Study: " + workbook.title && (
+                        <>
+                          <div className="lesson-quiz">
+                            {[...workbook.answers]
+                              .sort((a, b) => a.san.localeCompare(b.san))
+                              .map((a) => (
+                                <button
+                                  key={a.uci}
+                                  disabled={!decisionActive}
+                                  onClick={() =>
+                                    play(
+                                      a.uci.slice(0, 2),
+                                      a.uci.slice(2, 4),
+                                      a.uci[4],
+                                    )
+                                  }
+                                >
+                                  {a.san}
+                                </button>
+                              ))}
+                          </div>
+                          {decisionActive && (
+                            <Button
+                              className="text-button"
+                              onClick={() => {
+                                studyPosition(workbook.challenge + 1);
+                                setInfo("Decisions");
+                                setMessage(
+                                  workbook.notes.find(
+                                    (n) => n.ply === workbook.challenge + 1,
+                                  )?.text || "",
+                                );
+                              }}
+                            >
+                              Show answer
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  ) : info === "Plan" ? (
                     <>
                       <p>{guide.idea}</p>
                       <h3>White’s plan</h3>
@@ -470,10 +623,16 @@ function LessonWorkspace({
               <h2>{selected.name}</h2>
             </div>
           </div>
+          <PremoveQueue
+            moves={premove.queue}
+            undo={() => premove.setQueue((q) => q.slice(0, -1))}
+            clear={premove.clear}
+          />
           <select
             aria-label="Lesson variation"
             value={branch}
             onChange={(e) => {
+              setDecisionActive(false);
               setBranch(+e.target.value);
               setStep(0);
               setHint(false);
@@ -488,10 +647,33 @@ function LessonWorkspace({
             ))}
           </select>
           <Board
-            fen={fen}
-            onMove={play}
-            disabled={!practice || !expected || c.turn() !== side}
-            flipped={practice && side === "b"}
+            fen={premove.preview}
+            materialFen={fen}
+            legalMoves={
+              practice && c.turn() !== side ? premove.options : undefined
+            }
+            onMove={(from, to, promotion) =>
+              practice && c.turn() !== side
+                ? premove.enqueue(from + to + (promotion || ""))
+                : play(from, to, promotion)
+            }
+            disabled={
+              !decisionActive &&
+              (!practice ||
+                !expected ||
+                (c.turn() !== side && !appearance.premoves))
+            }
+            flipped={
+              info === "Decisions" && workbook
+                ? (() => {
+                    const b = new Chess();
+                    workbook.moves
+                      .slice(0, workbook.challenge)
+                      .forEach((m) => b.move(m));
+                    return b.turn() === "b";
+                  })()
+                : practice && side === "b"
+            }
             highlights={
               step
                 ? [moves[step - 1].slice(0, 2), moves[step - 1].slice(2, 4)]

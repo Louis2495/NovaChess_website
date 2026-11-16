@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   RotateCcw,
   Download,
+  LoaderCircle,
 } from "lucide-react";
 import { useApp } from "../../lib/context";
 import { initialFen, download } from "../../lib/store";
@@ -41,7 +42,7 @@ function parsePGN(text: string, username = ""): PublicGame | null {
   }
 }
 export default function Research() {
-  const { notify } = useApp();
+  const { notify, appearance } = useApp();
   const [site, setSite] = useState("Chess.com"),
     [username, setUsername] = useState(""),
     [identity, setIdentity] = useState(""),
@@ -99,7 +100,7 @@ export default function Research() {
     if (!username.trim()) return;
     setBusy(true);
     setError("");
-    setStatus("Connecting…");
+    setStatus("0 games loaded");
     const ctrl = new AbortController();
     controller.current = ctrl;
     const loaded: PublicGame[] = [];
@@ -120,15 +121,14 @@ export default function Research() {
           `https://api.chess.com/pub/player/${encodeURIComponent(name)}/games/archives`,
         );
         for (let i = 0; i < archives.archives.length; i++) {
-          setStatus(
-            `Archive ${i + 1} / ${archives.archives.length} · ${loaded.length} games`,
-          );
+          setStatus(`${loaded.length} games loaded`);
           const archive = await json(archives.archives[i]);
           for (const game of archive.games || []) {
             if (game.rules && game.rules !== "chess") continue;
             const parsed = parsePGN(game.pgn || "", name);
             if (parsed) loaded.push(parsed);
           }
+          setStatus(`${loaded.length} games loaded`);
         }
       } else {
         const r = await fetch(
@@ -177,7 +177,7 @@ export default function Research() {
           const lines = buffer.split("\n");
           buffer = lines.pop() || "";
           lines.forEach(add);
-          setStatus(`${loaded.length} games received`);
+          setStatus(`${loaded.length} games loaded`);
         }
         buffer += decoder.decode();
         if (buffer.trim()) add(buffer);
@@ -185,7 +185,7 @@ export default function Research() {
       setGames(loaded);
       setIdentity(`${site} · ${name}`);
       setPath([]);
-      setStatus(`${loaded.length} games imported.`);
+      setStatus(`${loaded.length} games loaded`);
     } catch (e) {
       setError(
         (e as Error).name === "AbortError"
@@ -232,12 +232,16 @@ export default function Research() {
             </Button>
           )}
         </div>
-        <p className="caption">
-          Explore available public standard games. Trees cover the first 40
-          half-moves. Service availability and rate limits apply.
-        </p>
+
         {status && (
-          <p role="status" className="feedback">
+          <p role="status" className="feedback research-loading">
+            {busy && (
+              <LoaderCircle
+                className="spin"
+                size={16}
+                aria-label="Loading games"
+              />
+            )}
             {status}
           </p>
         )}
@@ -251,6 +255,15 @@ export default function Research() {
         <div className="board-column">
           <Board
             fen={c.fen()}
+            guides={branches.map((b) => ({
+              from: b.move.slice(0, 2),
+              to: b.move.slice(2, 4),
+              color: appearance.accent,
+              weight:
+                0.8 +
+                (3.2 * b.count) / Math.max(1, ...branches.map((m) => m.count)),
+              label: `${Math.round((100 * b.count) / Math.max(1, matching.length))}%`,
+            }))}
             onMove={(from, to, promotion) => {
               try {
                 const m = new Chess(c.fen()).move({

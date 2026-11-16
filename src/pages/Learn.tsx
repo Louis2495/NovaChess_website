@@ -9,11 +9,13 @@ import {
   Brain,
   Sparkles,
   BookMarked,
+  ShieldCheck,
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import { PageTitle, Button } from "../components/UI";
+import OpeningTraps from "./learn/OpeningTraps";
 import Openings from "./learn/Openings";
 import Repertoire from "./learn/Repertoire";
 import FamousGames from "./learn/FamousGames";
@@ -28,6 +30,7 @@ export default function Learn() {
     repertoire: "Your repertoire",
     train: "Train an opening",
     lessons: "Opening lessons",
+    traps: "Opening traps",
     search: "Opening library",
     famous: "Famous games",
     endgames: "Endgame Lessons",
@@ -50,7 +53,9 @@ export default function Learn() {
           </Button>
           <PageTitle title={labels[section] || "Learn"}></PageTitle>
         </div>
-        {section === "encyclopedia" ? (
+        {section === "traps" ? (
+          <OpeningTraps />
+        ) : section === "encyclopedia" ? (
           <Encyclopedia />
         ) : section === "trivia" ? (
           <Playground trivia />
@@ -81,6 +86,13 @@ export default function Learn() {
       />
       <div className="learn-hub">
         {[
+          {
+            id: "traps",
+            title: "Opening traps",
+            text: "20 traps · defenses & practice",
+            icon: ShieldCheck,
+            color: "orange",
+          },
           {
             id: "encyclopedia",
             title: "Encyclopedia",

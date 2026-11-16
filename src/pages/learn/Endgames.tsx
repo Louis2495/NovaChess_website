@@ -1,3 +1,5 @@
+import { usePremoves } from "../../lib/usePremoves";
+import PremoveQueue from "../../components/PremoveQueue";
 import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { Flag, Check, RotateCcw, Lightbulb, ChevronDown } from "lucide-react";
@@ -13,7 +15,7 @@ export default function Endgames() {
   return <EndgameTrainer exercises={data} />;
 }
 function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
-  const { library, setLibrary, notify } = useApp();
+  const { library, setLibrary, notify, appearance } = useApp();
   const [exercise, setExercise] = useState(exercises[0]),
     [moves, setMoves] = useState<string[]>([]),
     [message, setMessage] = useState(""),
@@ -110,6 +112,16 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
     setHint("");
     setTip(false);
   }
+  const premove = usePremoves({
+    fen,
+    side: exercise.side,
+    legal: c
+      .moves({ verbose: true })
+      .map((m) => m.from + m.to + (m.promotion || "")),
+    active: !outcome,
+    identity: exercise.id,
+    execute: playMove,
+  });
   return (
     <div className="learning-layout">
       <Card className="opening-list">
@@ -146,11 +158,19 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
           </span>
         </div>
         <Board
-          fen={fen}
+          fen={premove.preview}
+          materialFen={fen}
+          legalMoves={c.turn() === exercise.side ? undefined : premove.options}
           flipped={exercise.side === "b"}
-          disabled={!!outcome || busy || c.turn() !== exercise.side}
+          disabled={
+            !!outcome || (c.turn() !== exercise.side && !appearance.premoves)
+          }
           hint={hint}
           onMove={(from, to, promotion) => {
+            if (c.turn() !== exercise.side) {
+              premove.enqueue(from + to + (promotion || ""));
+              return;
+            }
             try {
               const m = new Chess(fen).move({
                 from,
@@ -162,6 +182,11 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
               notify("Illegal move.");
             }
           }}
+        />
+        <PremoveQueue
+          moves={premove.queue}
+          undo={() => premove.setQueue((q) => q.slice(0, -1))}
+          clear={premove.clear}
         />
         <Card className="lesson-controls">
           <div className="card-heading">
@@ -175,7 +200,7 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
                       ? "Promote a pawn"
                       : "Hold the draw")}
             </h3>
-            <span className="caption">{moves.length} half-moves</span>
+            <span className="caption">{Math.ceil(moves.length / 2)} moves</span>
           </div>
           {message && (
             <p className="feedback" role="status">

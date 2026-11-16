@@ -1,0 +1,2522 @@
+[
+  {
+    "family": "Italian Game",
+    "title": "Opening the center at the right moment",
+    "summary": "Compare the quiet maneuvering phase with the position after ...d5. The same bishop on c2 becomes more useful when central exchanges uncover its diagonal. White accepts an isolated d-pawn in exchange for active pieces; exchanging everything without a plan would help Black.",
+    "question": "Black has completed development. Find the central break that challenges e4.",
+    "moves": [
+      "e2e4",
+      "e7e5",
+      "g1f3",
+      "b8c6",
+      "f1c4",
+      "f8c5",
+      "c2c3",
+      "g8f6",
+      "d2d3",
+      "d7d6",
+      "e1g1",
+      "e8g8",
+      "f1e1",
+      "a7a6",
+      "c4b3",
+      "c5a7",
+      "b1d2",
+      "h7h6",
+      "d2f1",
+      "f8e8",
+      "f1g3",
+      "c8e6",
+      "b3c2",
+      "d6d5",
+      "e4d5",
+      "f6d5",
+      "d3d4",
+      "e5d4",
+      "c3d4",
+      "d5f6",
+      "c1e3",
+      "d8d7",
+      "a2a3",
+      "a8d8",
+      "a1c1",
+      "e6d5"
+    ],
+    "notes": [
+      {
+        "ply": 24,
+        "san": "d5",
+        "text": "...d5 uses the rook on e8 and developed pieces to challenge e4. Playing this break before preparing it could leave e5 loose."
+      },
+      {
+        "ply": 25,
+        "san": "exd5",
+        "text": "exd5 removes the e-pawn from the e-file. The file is not fully open yet: Black still has an e5 pawn, so calculate the next central exchanges."
+      },
+      {
+        "ply": 27,
+        "san": "d4",
+        "text": "d4 spends the tempo gained by the exchanges on central activity. White is not trying to keep the position closed forever."
+      },
+      {
+        "ply": 29,
+        "san": "cxd4",
+        "text": "cxd4 leaves an isolated d-pawn. It controls c5/e5, but no neighboring pawn can support it; activity must justify that weakness."
+      },
+      {
+        "ply": 31,
+        "san": "Be3",
+        "text": "Be3 develops the remaining bishop and brings another piece to the defense of d4. Passive protection alone would waste White’s activity."
+      },
+      {
+        "ply": 34,
+        "san": "Rad8",
+        "text": "...Rad8 immediately targets the isolated pawn. White’s next task is piece activity and a possible d5 break, not passive pawn defense."
+      }
+    ],
+    "challenge": 23,
+    "answers": [
+      {
+        "uci": "d6d5",
+        "san": "d5"
+      },
+      {
+        "uci": "a7f2",
+        "san": "Bxf2+"
+      },
+      {
+        "uci": "e6a2",
+        "san": "Bxa2"
+      }
+    ]
+  },
+  {
+    "family": "Ruy Lopez",
+    "title": "A closed center and two different wings",
+    "summary": "The center locks after d5. White can use the kingside space and reroute a knight to g3, while Black gains queenside space and a useful c5 square. An attack should follow this structure, not the name of the opening.",
+    "question": "White’s queen’s knight has finished supporting e4 from d2. Reroute it toward the kingside.",
+    "moves": [
+      "e2e4",
+      "e7e5",
+      "g1f3",
+      "b8c6",
+      "f1b5",
+      "a7a6",
+      "b5a4",
+      "g8f6",
+      "e1g1",
+      "f8e7",
+      "f1e1",
+      "b7b5",
+      "a4b3",
+      "d7d6",
+      "c2c3",
+      "e8g8",
+      "h2h3",
+      "c6b8",
+      "d2d4",
+      "b8d7",
+      "b1d2",
+      "c8b7",
+      "b3c2",
+      "f8e8",
+      "d2f1",
+      "c7c5",
+      "d4d5",
+      "c5c4",
+      "f1g3",
+      "d7c5",
+      "c1e3",
+      "e7f8"
+    ],
+    "notes": [
+      {
+        "ply": 25,
+        "san": "Nf1",
+        "text": "Nf1 clears d2 and prepares Ng3 without committing another pawn. The rook’s earlier move from f1 to e1 made this route possible."
+      },
+      {
+        "ply": 26,
+        "san": "c5",
+        "text": "...c5 fights for central and queenside space. Black is not obliged to wait for a kingside attack."
+      },
+      {
+        "ply": 27,
+        "san": "d5",
+        "text": "d5 closes the center and takes c6 away from a knight. It also makes a later e4–e5 break a serious commitment."
+      },
+      {
+        "ply": 28,
+        "san": "c4",
+        "text": "...c4 fixes space on the queenside and limits White’s d3 options. This is a structural gain, not a direct attack on the c2 bishop."
+      },
+      {
+        "ply": 29,
+        "san": "Ng3",
+        "text": "Ng3 eyes f5 and h5. Before jumping there, check whether Black can exchange the knight or open the center."
+      },
+      {
+        "ply": 31,
+        "san": "Be3",
+        "text": "Be3 brings the undeveloped bishop into play. Even in a closed position, an attack needs more than the queen and one knight."
+      }
+    ],
+    "challenge": 24,
+    "answers": [
+      {
+        "uci": "d2f1",
+        "san": "Nf1"
+      },
+      {
+        "uci": "d4e5",
+        "san": "dxe5"
+      },
+      {
+        "uci": "f3e5",
+        "san": "Nxe5"
+      }
+    ]
+  },
+  {
+    "family": "Queen's Gambit Declined",
+    "title": "The minority attack, step by step",
+    "summary": "The Exchange structure creates a practical target on c6. White’s b-pawn advance is meant to create a weakness after b5, not win a pawn immediately. Black should seek active central or kingside play rather than defend the queenside forever.",
+    "question": "White wants to prepare b4–b5. Which rook move supports that plan?",
+    "moves": [
+      "d2d4",
+      "d7d5",
+      "c2c4",
+      "e7e6",
+      "b1c3",
+      "g8f6",
+      "c4d5",
+      "e6d5",
+      "c1g5",
+      "f8e7",
+      "e2e3",
+      "e8g8",
+      "f1d3",
+      "b8d7",
+      "d1c2",
+      "f8e8",
+      "g1e2",
+      "d7f8",
+      "e1g1",
+      "c7c6",
+      "a1b1",
+      "a7a5",
+      "a2a3",
+      "e7d6",
+      "b2b4",
+      "a5b4",
+      "a3b4"
+    ],
+    "notes": [
+      {
+        "ply": 21,
+        "san": "Rab1",
+        "text": "Rab1 puts the rook behind the intended b-pawn advance. Moving this rook is safe because White’s king has already castled."
+      },
+      {
+        "ply": 22,
+        "san": "a5",
+        "text": "...a5 tries to stop b4 or change the queenside structure. White must now prepare the break instead of pushing it automatically."
+      },
+      {
+        "ply": 23,
+        "san": "a3",
+        "text": "a3 supports b4. It is useful here because it answers a concrete obstacle created by ...a5."
+      },
+      {
+        "ply": 25,
+        "san": "b4",
+        "text": "b4 begins the minority attack. Calculate the pawn exchanges before deciding which file should open for the rooks."
+      },
+      {
+        "ply": 27,
+        "san": "axb4",
+        "text": "axb4 restores a b-pawn after the exchanges. The next b5 break can leave c6 backward or isolated; that is the long-term target."
+      }
+    ],
+    "challenge": 20,
+    "answers": [
+      {
+        "uci": "a1b1",
+        "san": "Rab1"
+      },
+      {
+        "uci": "g5f6",
+        "san": "Bxf6"
+      },
+      {
+        "uci": "c3d5",
+        "san": "Nxd5"
+      }
+    ]
+  },
+  {
+    "family": "Queen's Gambit Accepted",
+    "title": "Making central space useful",
+    "summary": "Black returns the c4 pawn for development and queenside play. White’s e4–e5 advance gains a tempo, but also fixes squares that Black can occupy. Keep asking whether the center is mobile, defended and supported by developed pieces.",
+    "question": "White has prepared a broad center with Qe2 and Nbd2. Find the central expansion.",
+    "moves": [
+      "d2d4",
+      "d7d5",
+      "c2c4",
+      "d5c4",
+      "g1f3",
+      "g8f6",
+      "e2e3",
+      "e7e6",
+      "f1c4",
+      "c7c5",
+      "e1g1",
+      "a7a6",
+      "d1e2",
+      "b7b5",
+      "c4b3",
+      "c8b7",
+      "a2a4",
+      "b5b4",
+      "b1d2",
+      "b8d7",
+      "e3e4",
+      "c5d4",
+      "e4e5",
+      "f6d5",
+      "d2e4",
+      "f8e7"
+    ],
+    "notes": [
+      {
+        "ply": 21,
+        "san": "e4",
+        "text": "e4 uses the queen’s support on the e-file. Advancing it before development would offer Black easier targets."
+      },
+      {
+        "ply": 22,
+        "san": "cxd4",
+        "text": "...cxd4 attacks the base of the center instead of retreating passively. Black wants White’s central pawns to separate."
+      },
+      {
+        "ply": 23,
+        "san": "e5",
+        "text": "e5 gains time against the f6 knight. The move also abandons control of d5, which Black uses immediately."
+      },
+      {
+        "ply": 24,
+        "san": "Nd5",
+        "text": "...Nd5 blocks the d4 pawn and occupies a central square. A space advantage does not stop the opponent from finding an outpost."
+      },
+      {
+        "ply": 25,
+        "san": "Ne4",
+        "text": "Ne4 develops the d2 knight into the space vacated by the e-pawn. White’s pieces must now support the advanced center."
+      }
+    ],
+    "challenge": 20,
+    "answers": [
+      {
+        "uci": "e3e4",
+        "san": "e4"
+      },
+      {
+        "uci": "d4c5",
+        "san": "dxc5"
+      },
+      {
+        "uci": "b3e6",
+        "san": "Bxe6"
+      }
+    ]
+  },
+  {
+    "family": "Sicilian Defense",
+    "title": "Opposite-side castling is a race",
+    "summary": "The English Attack combines long castling with a kingside pawn advance. Black counters against the c3 knight and the queenside king. Treat every pawn push as part of a race: a threat that arrives a move late may not matter.",
+    "question": "White has castled long and supported e4 with f3. Start the kingside pawn expansion.",
+    "moves": [
+      "e2e4",
+      "c7c5",
+      "g1f3",
+      "d7d6",
+      "d2d4",
+      "c5d4",
+      "f3d4",
+      "g8f6",
+      "b1c3",
+      "a7a6",
+      "c1e3",
+      "e7e5",
+      "d4b3",
+      "c8e6",
+      "f2f3",
+      "f8e7",
+      "d1d2",
+      "e8g8",
+      "e1c1",
+      "b8d7",
+      "g2g4",
+      "b7b5",
+      "g4g5",
+      "b5b4",
+      "c3d5",
+      "f6d5",
+      "e4d5",
+      "e6f5",
+      "f1d3",
+      "f5d3",
+      "d2d3",
+      "a6a5"
+    ],
+    "notes": [
+      {
+        "ply": 21,
+        "san": "g4",
+        "text": "g4 gains space and prepares g5 with tempo against the f6 knight. This makes sense because White’s king is on the other wing."
+      },
+      {
+        "ply": 22,
+        "san": "b5",
+        "text": "...b5 is Black’s counterplay, not a waiting move. It prepares ...b4 against a knight that helps defend the king."
+      },
+      {
+        "ply": 23,
+        "san": "g5",
+        "text": "g5 attacks the knight, but White must notice that Black can make a threat of equal urgency."
+      },
+      {
+        "ply": 24,
+        "san": "b4",
+        "text": "...b4 attacks c3 before resolving the knight attack. Calculate both sides’ forcing moves rather than assuming a retreat."
+      },
+      {
+        "ply": 25,
+        "san": "Nd5",
+        "text": "Nd5 uses the weak d5 square and offers a structural exchange. The c-file is not the only important feature of the Sicilian."
+      },
+      {
+        "ply": 27,
+        "san": "exd5",
+        "text": "exd5 opens the e-file and changes the center. White’s former space advantage has turned into lines for the pieces."
+      }
+    ],
+    "challenge": 20,
+    "answers": [
+      {
+        "uci": "g2g4",
+        "san": "g4"
+      },
+      {
+        "uci": "d2d6",
+        "san": "Qxd6"
+      },
+      {
+        "uci": "f1a6",
+        "san": "Bxa6"
+      }
+    ]
+  },
+  {
+    "family": "Caro-Kann Defense",
+    "title": "Develop the bishop, then attack the chain",
+    "summary": "Black’s light-squared bishop gets outside the pawn chain before ...e6. The next task is to attack d4 with ...c5, rather than remain a tempo behind a French-style setup. White uses e5 as space and as a potential anchor for piece play.",
+    "question": "Black’s bishop is already developed. Which pawn break attacks the base of White’s center?",
+    "moves": [
+      "e2e4",
+      "c7c6",
+      "d2d4",
+      "d7d5",
+      "e4e5",
+      "c8f5",
+      "g1f3",
+      "e7e6",
+      "f1e2",
+      "c6c5",
+      "e1g1",
+      "b8c6",
+      "c1e3",
+      "c5d4",
+      "f3d4",
+      "g8e7",
+      "f2f4",
+      "c6d4",
+      "e3d4",
+      "e7c6",
+      "d4f2",
+      "f8e7",
+      "b1d2",
+      "e8g8",
+      "c2c3"
+    ],
+    "notes": [
+      {
+        "ply": 10,
+        "san": "c5",
+        "text": "...c5 challenges d4. The c-pawn has moved twice, so Black needs the bishop’s freedom and sound structure to justify the time spent."
+      },
+      {
+        "ply": 14,
+        "san": "cxd4",
+        "text": "...cxd4 removes the supporting d-pawn and changes the job of White’s pieces. Compare a pawn recapture with a knight recapture."
+      },
+      {
+        "ply": 15,
+        "san": "Nxd4",
+        "text": "Nxd4 puts a piece in the center while keeping e5 fixed. The knight can become a target of exchanges, as the next moves show."
+      },
+      {
+        "ply": 17,
+        "san": "f4",
+        "text": "f4 supports e5, but also commits another kingside pawn. White should not make this move without checking king safety."
+      },
+      {
+        "ply": 19,
+        "san": "Bxd4",
+        "text": "Bxd4 replaces the exchanged knight with an active bishop. White gains activity rather than trying to preserve every minor piece."
+      },
+      {
+        "ply": 21,
+        "san": "Bf2",
+        "text": "Bf2 preserves the bishop after ...Nc6. It keeps a useful diagonal while letting the other pieces finish development."
+      }
+    ],
+    "challenge": 9,
+    "answers": [
+      {
+        "uci": "c6c5",
+        "san": "c5"
+      },
+      {
+        "uci": "f5c2",
+        "san": "Bxc2"
+      },
+      {
+        "uci": "b8d7",
+        "san": "Nd7"
+      }
+    ]
+  },
+  {
+    "family": "French Defense",
+    "title": "Attack the base, then the head",
+    "summary": "The French pawn chain points in different directions for each side. Black attacks d4 with ...c5 and ...Qb6, then challenges e5 with ...f6. White should connect the pieces to the pawn chain before committing to a kingside attack.",
+    "question": "Black has castled and is ready to challenge the advanced e5 pawn. Find the second central lever.",
+    "moves": [
+      "e2e4",
+      "e7e6",
+      "d2d4",
+      "d7d5",
+      "e4e5",
+      "c7c5",
+      "c2c3",
+      "b8c6",
+      "g1f3",
+      "d8b6",
+      "a2a3",
+      "g8h6",
+      "b2b4",
+      "c5d4",
+      "c3d4",
+      "h6f5",
+      "c1b2",
+      "f8e7",
+      "f1d3",
+      "e8g8",
+      "e1g1",
+      "f7f6",
+      "e5f6",
+      "e7f6"
+    ],
+    "notes": [
+      {
+        "ply": 10,
+        "san": "Qb6",
+        "text": "...Qb6 adds pressure to d4 and b2. White’s next moves must account for both targets."
+      },
+      {
+        "ply": 14,
+        "san": "cxd4",
+        "text": "...cxd4 releases central tension at a chosen moment. Black should know which piece or pawn will occupy d4 afterward."
+      },
+      {
+        "ply": 16,
+        "san": "Nf5",
+        "text": "...Nf5 brings the h6 knight toward the central target d4. The edge route had a concrete destination."
+      },
+      {
+        "ply": 17,
+        "san": "Bb2",
+        "text": "Bb2 develops the bishop along a diagonal opened by b4. The b-pawn advance had a development purpose as well as gaining space."
+      },
+      {
+        "ply": 22,
+        "san": "f6",
+        "text": "...f6 attacks the head of the chain. Black uses this break after arranging development and king safety, not as an automatic first move."
+      },
+      {
+        "ply": 23,
+        "san": "exf6",
+        "text": "exf6 opens the center. White must compare the newly active black bishop with the time spent preserving the pawn chain."
+      }
+    ],
+    "challenge": 21,
+    "answers": [
+      {
+        "uci": "f7f6",
+        "san": "f6"
+      },
+      {
+        "uci": "e7b4",
+        "san": "Bxb4"
+      },
+      {
+        "uci": "b6d4",
+        "san": "Qxd4"
+      }
+    ]
+  },
+  {
+    "family": "Nimzo-Indian Defense",
+    "title": "The bishop pair versus structural targets",
+    "summary": "Black exchanges the b4 bishop only when it changes the structure. White receives the bishop pair and a mobile center. The doubled pawns are not necessarily permanent: Black’s next central exchange removes one of them.",
+    "question": "White wants to ask Black’s bishop to decide whether to exchange. Find the useful pawn challenge.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "e7e6",
+      "b1c3",
+      "f8b4",
+      "e2e3",
+      "e8g8",
+      "f1d3",
+      "d7d5",
+      "g1f3",
+      "c7c5",
+      "e1g1",
+      "b8c6",
+      "a2a3",
+      "b4c3",
+      "b2c3",
+      "d5c4",
+      "d3c4",
+      "d8c7",
+      "c4d3",
+      "e6e5",
+      "d1c2",
+      "f8e8"
+    ],
+    "notes": [
+      {
+        "ply": 15,
+        "san": "a3",
+        "text": "a3 asks the b4 bishop a concrete question. It is not a free tempo: White must be willing to accept the resulting pawn structure."
+      },
+      {
+        "ply": 16,
+        "san": "Bxc3",
+        "text": "...Bxc3 gives up the bishop pair in return for structural change and control of the center."
+      },
+      {
+        "ply": 17,
+        "san": "bxc3",
+        "text": "bxc3 creates doubled c-pawns for the moment and supports d4. Do not evaluate the structure without looking at the coming exchanges."
+      },
+      {
+        "ply": 18,
+        "san": "dxc4",
+        "text": "...dxc4 removes the forward c-pawn. Black changes a static weakness into open lines and a new central target."
+      },
+      {
+        "ply": 19,
+        "san": "Bxc4",
+        "text": "Bxc4 restores material and activates the bishop. White’s compensation is now visible in the pieces, not just the pawn count."
+      },
+      {
+        "ply": 22,
+        "san": "e5",
+        "text": "...e5 challenges d4 before the bishops become dominant. Black needs central activity to justify the earlier exchange."
+      }
+    ],
+    "challenge": 14,
+    "answers": [
+      {
+        "uci": "a2a3",
+        "san": "a3"
+      },
+      {
+        "uci": "c4d5",
+        "san": "cxd5"
+      },
+      {
+        "uci": "d4c5",
+        "san": "dxc5"
+      }
+    ]
+  },
+  {
+    "family": "King's Indian Defense",
+    "title": "Which attack arrives first?",
+    "summary": "The locked d5/e4 center makes a queenside plan for White and a kingside plan for Black natural. White cannot spend every move defending, and Black cannot attack forever without checking c5. The race is governed by the pawn structure, not by a universal rule to attack the king.",
+    "question": "White needs counterplay while Black’s pawns advance toward the king. Find the queenside break.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "g7g6",
+      "b1c3",
+      "f8g7",
+      "e2e4",
+      "d7d6",
+      "g1f3",
+      "e8g8",
+      "f1e2",
+      "e7e5",
+      "e1g1",
+      "b8c6",
+      "d4d5",
+      "c6e7",
+      "f3e1",
+      "f6d7",
+      "c1e3",
+      "f7f5",
+      "f2f3",
+      "f5f4",
+      "e3f2",
+      "g6g5",
+      "e1d3",
+      "d7f6",
+      "a1c1",
+      "e7g6",
+      "c4c5",
+      "f8f7",
+      "c5d6",
+      "c7d6",
+      "c3b5",
+      "g7f8"
+    ],
+    "notes": [
+      {
+        "ply": 22,
+        "san": "f4",
+        "text": "...f4 fixes the kingside structure and gains space. It also removes the immediate possibility of exchanging on e4 with this pawn."
+      },
+      {
+        "ply": 25,
+        "san": "Nd3",
+        "text": "Nd3 reroutes the e1 knight toward the queenside. Piece placement should follow the wing where your play will occur."
+      },
+      {
+        "ply": 27,
+        "san": "Rc1",
+        "text": "Rc1 puts a rook behind the coming c5 break. A pawn lever is stronger when a piece is ready to use the file."
+      },
+      {
+        "ply": 29,
+        "san": "c5",
+        "text": "c5 attacks d6 and starts opening queenside lines. White uses the c-file before Black’s attack becomes decisive."
+      },
+      {
+        "ply": 31,
+        "san": "cxd6",
+        "text": "cxd6 changes the target from the original d6 pawn to the pawn that recaptures on d6. White wants entry squares as well as captures."
+      },
+      {
+        "ply": 33,
+        "san": "Nb5",
+        "text": "Nb5 attacks d6 and pressures the queenside. The knight becomes useful because the central structure gave it a stable route."
+      }
+    ],
+    "challenge": 28,
+    "answers": [
+      {
+        "uci": "c4c5",
+        "san": "c5"
+      },
+      {
+        "uci": "d3e5",
+        "san": "Nxe5"
+      },
+      {
+        "uci": "d3f4",
+        "san": "Nxf4"
+      }
+    ]
+  },
+  {
+    "family": "Grünfeld Defense",
+    "title": "A mobile center can attack pieces",
+    "summary": "White’s center is both an asset and a target. The d5 push is strongest when it gains a tempo against a piece, not merely because White has extra space. Black’s pressure from g7 and the c-file makes slow central play risky.",
+    "question": "White can advance the center with an attack on the e6 bishop. Find that tempo-gaining push.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "g7g6",
+      "b1c3",
+      "d7d5",
+      "c4d5",
+      "f6d5",
+      "e2e4",
+      "d5c3",
+      "b2c3",
+      "f8g7",
+      "f1c4",
+      "c7c5",
+      "g1e2",
+      "e8g8",
+      "e1g1",
+      "b8c6",
+      "c1e3",
+      "c8g4",
+      "f2f3",
+      "c6a5",
+      "c4d3",
+      "c5d4",
+      "c3d4",
+      "g4e6",
+      "d4d5",
+      "e6d7"
+    ],
+    "notes": [
+      {
+        "ply": 14,
+        "san": "c5",
+        "text": "...c5 is the main pressure against d4. Black must challenge the center before it simply rolls forward."
+      },
+      {
+        "ply": 15,
+        "san": "Ne2",
+        "text": "Ne2 keeps the c4 bishop’s diagonal open and helps support d4. Development choices are linked to the pawn center."
+      },
+      {
+        "ply": 21,
+        "san": "f3",
+        "text": "f3 supports e4 but weakens dark squares. White uses it to sustain the center, not as a move to repeat in every opening."
+      },
+      {
+        "ply": 25,
+        "san": "cxd4",
+        "text": "cxd4 rebuilds the central duo after Black’s exchange. Now the advanced pawns must be coordinated with the pieces."
+      },
+      {
+        "ply": 27,
+        "san": "d5",
+        "text": "d5 attacks the e6 bishop and makes the center mobile. The point is the tempo gained while gaining space."
+      },
+      {
+        "ply": 28,
+        "san": "Bd7",
+        "text": "...Bd7 preserves the bishop. White has gained space, but the d-pawn may still become a target if it advances without support."
+      }
+    ],
+    "challenge": 26,
+    "answers": [
+      {
+        "uci": "d4d5",
+        "san": "d5"
+      },
+      {
+        "uci": "e4e5",
+        "san": "e5"
+      },
+      {
+        "uci": "d3c4",
+        "san": "Bc4"
+      }
+    ]
+  },
+  {
+    "family": "Catalan Opening",
+    "title": "The long diagonal survives a queen trade",
+    "summary": "The Catalan bishop can create pressure even when queens disappear. White’s opening choices aim at activity and long-term squares, not a forced mating attack. Black should use a central break before the diagonal becomes too uncomfortable.",
+    "question": "Black should challenge the center before White establishes a free e4 advance. Find the freeing break.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "e7e6",
+      "g2g3",
+      "d7d5",
+      "f1g2",
+      "f8e7",
+      "g1f3",
+      "e8g8",
+      "e1g1",
+      "d5c4",
+      "d1c2",
+      "a7a6",
+      "a2a4",
+      "c8d7",
+      "c2c4",
+      "d7c6",
+      "c1g5",
+      "c6d5",
+      "c4d3",
+      "d5e4",
+      "d3d2",
+      "c7c5",
+      "d4c5",
+      "d8d2",
+      "b1d2",
+      "e7c5"
+    ],
+    "notes": [
+      {
+        "ply": 15,
+        "san": "a4",
+        "text": "a4 discourages ...b5 from supporting the extra c4 pawn. White is preparing an efficient recovery, not rushing the queen blindly."
+      },
+      {
+        "ply": 17,
+        "san": "Qxc4",
+        "text": "Qxc4 recovers the pawn after the preparatory moves. Notice which bishop gained time from the queen’s journey."
+      },
+      {
+        "ply": 24,
+        "san": "c5",
+        "text": "...c5 challenges d4 and offers a route toward exchanges. Black addresses the center instead of only defending b7."
+      },
+      {
+        "ply": 25,
+        "san": "dxc5",
+        "text": "dxc5 changes the central structure and opens the d-file. White must be ready for the queen trade that follows."
+      },
+      {
+        "ply": 27,
+        "san": "Nbxd2",
+        "text": "Nbxd2 develops the queen’s knight while recapturing. An exchange can improve an undeveloped piece instead of making the position passive."
+      },
+      {
+        "ply": 28,
+        "san": "Bxc5",
+        "text": "...Bxc5 restores the pawn and develops the bishop actively. Both sides now judge piece activity rather than an early pawn count."
+      }
+    ],
+    "challenge": 23,
+    "answers": [
+      {
+        "uci": "c7c5",
+        "san": "c5"
+      },
+      {
+        "uci": "d8d4",
+        "san": "Qxd4"
+      },
+      {
+        "uci": "e4f3",
+        "san": "Bxf3"
+      }
+    ]
+  },
+  {
+    "family": "Slav Defense",
+    "title": "Freeing the bishop without neglecting the center",
+    "summary": "The Slav bishop escapes before ...e6, but that does not solve the whole opening. White gains central space with e4–e5, and Black must return to the d4 target with ...c5. Compare the value of the active bishop with the time needed to keep it safe.",
+    "question": "White should stop ...b5 from securing the captured c4 pawn. Find the useful queenside pawn move.",
+    "moves": [
+      "d2d4",
+      "d7d5",
+      "c2c4",
+      "c7c6",
+      "g1f3",
+      "g8f6",
+      "b1c3",
+      "d5c4",
+      "a2a4",
+      "c8f5",
+      "e2e3",
+      "e7e6",
+      "f1c4",
+      "f8b4",
+      "e1g1",
+      "b8d7",
+      "d1e2",
+      "f5g6",
+      "e3e4",
+      "e8g8",
+      "e4e5",
+      "f6d5",
+      "c4d3",
+      "g6d3",
+      "e2d3",
+      "c6c5"
+    ],
+    "notes": [
+      {
+        "ply": 9,
+        "san": "a4",
+        "text": "a4 makes ...b5 harder to sustain and prepares recovery of c4. The move answers Black’s extra-pawn plan."
+      },
+      {
+        "ply": 10,
+        "san": "Bf5",
+        "text": "...Bf5 develops the bishop before ...e6 closes its diagonal. This is a central reason to choose the Slav structure."
+      },
+      {
+        "ply": 18,
+        "san": "Bg6",
+        "text": "...Bg6 preserves the bishop before White expands with e4. Retreating is useful only if the rest of the development can catch up."
+      },
+      {
+        "ply": 21,
+        "san": "e5",
+        "text": "e5 attacks the f6 knight and gains space. It also gives Black the d5 square, so White cannot treat space as a free advantage."
+      },
+      {
+        "ply": 25,
+        "san": "Qxd3",
+        "text": "Qxd3 recaptures with development and central influence. White’s queen now joins the central plan after the bishop exchange."
+      },
+      {
+        "ply": 26,
+        "san": "c5",
+        "text": "...c5 challenges the base on d4. Black’s freeing break matters more than preserving the original c6–d5 triangle forever."
+      }
+    ],
+    "challenge": 8,
+    "answers": [
+      {
+        "uci": "a2a4",
+        "san": "a4"
+      },
+      {
+        "uci": "d4d5",
+        "san": "d5"
+      },
+      {
+        "uci": "c3a4",
+        "san": "Na4"
+      }
+    ]
+  },
+  {
+    "family": "Semi-Slav Defense",
+    "title": "Calculate before choosing a central pawn break",
+    "summary": "The Meran is concrete. White’s e4–e5 advance and Black’s ...c5 break can create a tactical exchange sequence rather than a simple space advantage. Follow every capture before counting the material; intermediate attacks on the king change the order.",
+    "question": "Black has prepared the central counterstrike with ...b5, ...Bb7 and ...a6. Find it.",
+    "moves": [
+      "d2d4",
+      "d7d5",
+      "c2c4",
+      "c7c6",
+      "g1f3",
+      "g8f6",
+      "b1c3",
+      "e7e6",
+      "e2e3",
+      "b8d7",
+      "f1d3",
+      "d5c4",
+      "d3c4",
+      "b7b5",
+      "c4d3",
+      "c8b7",
+      "e1g1",
+      "a7a6",
+      "e3e4",
+      "c6c5",
+      "e4e5",
+      "c5d4",
+      "c3b5",
+      "a6b5",
+      "e5f6",
+      "d7f6",
+      "d3b5",
+      "f6d7",
+      "f3d4",
+      "f8c5",
+      "f1e1",
+      "e8g8"
+    ],
+    "notes": [
+      {
+        "ply": 20,
+        "san": "c5",
+        "text": "...c5 hits d4 as White takes central space. Black uses prepared development to create active play."
+      },
+      {
+        "ply": 21,
+        "san": "e5",
+        "text": "e5 attacks the f6 knight, but Black has a forcing counter in the center. Always look at captures before assuming the knight must retreat."
+      },
+      {
+        "ply": 23,
+        "san": "Nxb5",
+        "text": "Nxb5 begins a concrete tactical line. Do not copy this sacrifice without calculating the recaptures and checks."
+      },
+      {
+        "ply": 25,
+        "san": "exf6",
+        "text": "exf6 removes a knight before the attacking bishop captures on b5. The move order is essential to the material balance."
+      },
+      {
+        "ply": 27,
+        "san": "Bxb5+",
+        "text": "Bxb5+ regains the queenside pawn with check. The check buys a tempo to settle the d4 square."
+      },
+      {
+        "ply": 29,
+        "san": "Nxd4",
+        "text": "Nxd4 removes the advanced pawn and places the remaining knight actively. The opening has transformed into a piece-activity contest."
+      }
+    ],
+    "challenge": 19,
+    "answers": [
+      {
+        "uci": "c6c5",
+        "san": "c5"
+      },
+      {
+        "uci": "f6e4",
+        "san": "Nxe4"
+      },
+      {
+        "uci": "a8b8",
+        "san": "Rb8"
+      }
+    ]
+  },
+  {
+    "family": "English Opening",
+    "title": "The d5 clamp and a change of center",
+    "summary": "The Botvinnik structure controls d5 but leaves d4 as an important break square. When the center opens, White must switch from maneuvering to using files. The g2 bishop changes its strength each time a central pawn moves.",
+    "question": "Black wants to challenge White’s center immediately after developing the queen. Find the central break.",
+    "moves": [
+      "c2c4",
+      "e7e5",
+      "b1c3",
+      "b8c6",
+      "g2g3",
+      "g7g6",
+      "f1g2",
+      "f8g7",
+      "d2d3",
+      "d7d6",
+      "e2e4",
+      "f7f5",
+      "g1e2",
+      "g8f6",
+      "e1g1",
+      "e8g8",
+      "c3d5",
+      "f6d5",
+      "c4d5",
+      "c6e7",
+      "c1e3",
+      "c7c6",
+      "d5c6",
+      "b7c6",
+      "d1d2",
+      "d6d5",
+      "e4d5",
+      "c6d5",
+      "d3d4",
+      "e5e4",
+      "f1c1",
+      "c8e6"
+    ],
+    "notes": [
+      {
+        "ply": 19,
+        "san": "cxd5",
+        "text": "cxd5 recaptures toward the center and establishes space. White should consider how Black can undermine this pawn later."
+      },
+      {
+        "ply": 23,
+        "san": "dxc6",
+        "text": "dxc6 releases the d5 clamp in exchange for a new pawn structure. Keeping the advanced pawn forever is not mandatory."
+      },
+      {
+        "ply": 26,
+        "san": "d5",
+        "text": "...d5 changes the center before White can improve every piece. Black uses the central pawn majority rather than only mirroring moves."
+      },
+      {
+        "ply": 29,
+        "san": "d4",
+        "text": "d4 challenges Black’s center at its base. The move is timely because White has castled and developed the queen."
+      },
+      {
+        "ply": 30,
+        "san": "e4",
+        "text": "...e4 gains space and fixes squares. White should now look for active files rather than trying to restore the old structure."
+      },
+      {
+        "ply": 31,
+        "san": "Rfc1",
+        "text": "Rfc1 uses the newly open c-file. The correct rook is chosen with the other rook’s future queenside duties in mind."
+      }
+    ],
+    "challenge": 25,
+    "answers": [
+      {
+        "uci": "d6d5",
+        "san": "d5"
+      },
+      {
+        "uci": "f5e4",
+        "san": "fxe4"
+      },
+      {
+        "uci": "a8b8",
+        "san": "Rb8"
+      }
+    ]
+  },
+  {
+    "family": "Scotch Game",
+    "title": "An active knight still needs support",
+    "summary": "Opening the center does not finish development. The active d4 knight can be challenged, while the queen’s knight still needs a route into play. Notice how development and the choice of minor-piece exchange prepare a middlegame plan.",
+    "question": "White’s d2 knight should join the center now. Find its developing move.",
+    "moves": [
+      "e2e4",
+      "e7e5",
+      "g1f3",
+      "b8c6",
+      "d2d4",
+      "e5d4",
+      "f3d4",
+      "f8c5",
+      "c1e3",
+      "d8f6",
+      "c2c3",
+      "g8e7",
+      "f1c4",
+      "c6e5",
+      "c4e2",
+      "f6g6",
+      "e1g1",
+      "d7d6",
+      "b1d2",
+      "e8g8",
+      "f2f4",
+      "e5c6",
+      "d2f3",
+      "c8g4",
+      "h2h3",
+      "g4f3",
+      "e2f3",
+      "g6h6",
+      "d1d2"
+    ],
+    "notes": [
+      {
+        "ply": 7,
+        "san": "Nxd4",
+        "text": "Nxd4 places a knight in the center and opens lines for both bishops. Black can attack it with ...Bc5 and ...Qf6."
+      },
+      {
+        "ply": 11,
+        "san": "c3",
+        "text": "c3 supports d4 and provides a future central pawn advance. It temporarily removes c3 as a knight square."
+      },
+      {
+        "ply": 21,
+        "san": "f4",
+        "text": "f4 claims space, but also changes the king’s shelter. It is justified by White’s completed castling and central pieces."
+      },
+      {
+        "ply": 23,
+        "san": "N2f3",
+        "text": "N2f3 brings the d2 knight into play. White does not need another pawn move before improving this piece."
+      },
+      {
+        "ply": 25,
+        "san": "h3",
+        "text": "h3 asks the g4 bishop to decide whether the pin is worth preserving. Check the resulting f-file and bishop diagonals before inviting the exchange."
+      },
+      {
+        "ply": 27,
+        "san": "Bxf3",
+        "text": "Bxf3 keeps a bishop active on the kingside after the knight exchange. The bishop can now support central and attacking plans."
+      }
+    ],
+    "challenge": 22,
+    "answers": [
+      {
+        "uci": "d2f3",
+        "san": "N2f3"
+      },
+      {
+        "uci": "d4c6",
+        "san": "Nxc6"
+      },
+      {
+        "uci": "d4b5",
+        "san": "Nb5"
+      }
+    ]
+  },
+  {
+    "family": "London System",
+    "title": "Trade a bishop for a useful structure, not by habit",
+    "summary": "The London’s familiar setup should lead to a concrete decision. Ne5 invites exchanges that can change Black’s kingside pawns. White must decide whether that structure, the bishop exchange and a later f4 plan justify giving up the knight.",
+    "question": "White’s pieces support a central outpost. Occupy it with the knight.",
+    "moves": [
+      "d2d4",
+      "d7d5",
+      "g1f3",
+      "g8f6",
+      "c1f4",
+      "e7e6",
+      "e2e3",
+      "c7c5",
+      "c2c3",
+      "b8c6",
+      "b1d2",
+      "f8d6",
+      "f4g3",
+      "e8g8",
+      "f1d3",
+      "b7b6",
+      "e1g1",
+      "c8b7",
+      "f3e5",
+      "c6e7",
+      "d1e2",
+      "e7g6",
+      "e5g6",
+      "h7g6",
+      "g3d6",
+      "d8d6",
+      "f2f4"
+    ],
+    "notes": [
+      {
+        "ply": 13,
+        "san": "Bg3",
+        "text": "Bg3 preserves the bishop against the d6 bishop. Exchanging immediately is possible, but White chooses to keep a future option."
+      },
+      {
+        "ply": 19,
+        "san": "Ne5",
+        "text": "Ne5 occupies the square supported by d4. The knight is useful because the pawn structure and pieces support it."
+      },
+      {
+        "ply": 21,
+        "san": "Qe2",
+        "text": "Qe2 joins the central plan and connects the pieces. It is not a substitute for checking Black’s ...Ng6 idea."
+      },
+      {
+        "ply": 23,
+        "san": "Nxg6",
+        "text": "Nxg6 changes Black’s pawn structure after ...hxg6. White voluntarily gives up the e5 knight to gain a different type of target."
+      },
+      {
+        "ply": 25,
+        "san": "Bxd6",
+        "text": "Bxd6 removes the active dark-squared bishop. The choice should be judged together with the knight exchange, not in isolation."
+      },
+      {
+        "ply": 27,
+        "san": "f4",
+        "text": "f4 supports e5 for the remaining knight. White has converted a setup into a specific central plan."
+      }
+    ],
+    "challenge": 18,
+    "answers": [
+      {
+        "uci": "f3e5",
+        "san": "Ne5"
+      },
+      {
+        "uci": "d4c5",
+        "san": "dxc5"
+      },
+      {
+        "uci": "d3h7",
+        "san": "Bxh7+"
+      }
+    ]
+  },
+  {
+    "family": "Scandinavian Defense",
+    "title": "Turn queen tempi into real development",
+    "summary": "White’s attacks on the queen should improve development, not become an endless chase. The illustrative exchanges give Black doubled f-pawns and both sides active pieces. Once the queens retreat, plans concern files, pawn breaks and king safety.",
+    "question": "White can develop and attack the exposed queen in one move. Find it.",
+    "moves": [
+      "e2e4",
+      "d7d5",
+      "e4d5",
+      "d8d5",
+      "b1c3",
+      "d5a5",
+      "d2d4",
+      "g8f6",
+      "g1f3",
+      "c7c6",
+      "f1c4",
+      "c8f5",
+      "c1d2",
+      "e7e6",
+      "c3d5",
+      "a5d8",
+      "d5f6",
+      "g7f6",
+      "d1e2",
+      "b8d7",
+      "e1c1",
+      "d7b6",
+      "c4d3",
+      "f5g6",
+      "c1b1",
+      "d8c7",
+      "c2c4",
+      "e8c8"
+    ],
+    "notes": [
+      {
+        "ply": 5,
+        "san": "Nc3",
+        "text": "Nc3 develops with a threat against the queen. This is a useful tempo because the knight wants c3 anyway."
+      },
+      {
+        "ply": 13,
+        "san": "Bd2",
+        "text": "Bd2 develops the remaining bishop before deciding where to castle. White is preparing a coordinated position, not just another queen attack."
+      },
+      {
+        "ply": 15,
+        "san": "Nd5",
+        "text": "Nd5 attacks the queen and offers a structural exchange. Check whether the knight can be captured before using this pattern in another position."
+      },
+      {
+        "ply": 19,
+        "san": "Qe2",
+        "text": "Qe2 develops with central influence and prepares long castling. The queen’s move has a specific follow-up."
+      },
+      {
+        "ply": 25,
+        "san": "Kb1",
+        "text": "Kb1 improves king safety before the center changes. A quiet king move can be useful when a rook already occupies the d-file."
+      },
+      {
+        "ply": 27,
+        "san": "c4",
+        "text": "c4 challenges the central squares and changes the c-file. Black’s long castling shows why pawn breaks must be judged together with king placement."
+      }
+    ],
+    "challenge": 4,
+    "answers": [
+      {
+        "uci": "b1c3",
+        "san": "Nc3"
+      },
+      {
+        "uci": "a2a3",
+        "san": "a3"
+      },
+      {
+        "uci": "a2a4",
+        "san": "a4"
+      }
+    ]
+  },
+  {
+    "family": "Modern Defense",
+    "title": "A broad center must survive a counterstrike",
+    "summary": "The Austrian-style center offers space and attacking chances, but Black’s ...c5 can force a structural decision. White cannot assume that advancing more pawns automatically improves the position. Watch how the g7 bishop and central knights gain scope after exchanges.",
+    "question": "Black must challenge the broad pawn center. Find the timely pawn break.",
+    "moves": [
+      "e2e4",
+      "g7g6",
+      "d2d4",
+      "f8g7",
+      "b1c3",
+      "d7d6",
+      "f2f4",
+      "a7a6",
+      "g1f3",
+      "b7b5",
+      "f1d3",
+      "c8b7",
+      "e1g1",
+      "b8d7",
+      "e4e5",
+      "c7c5",
+      "e5d6",
+      "c5d4",
+      "d6e7",
+      "g8e7",
+      "c3e4",
+      "e8g8"
+    ],
+    "notes": [
+      {
+        "ply": 7,
+        "san": "f4",
+        "text": "f4 builds a large center but commits a pawn that also shelters the king. Development and castling must follow."
+      },
+      {
+        "ply": 15,
+        "san": "e5",
+        "text": "e5 gains space and opens questions about d6. The move is a commitment because the pawn can no longer defend d5 from e4."
+      },
+      {
+        "ply": 16,
+        "san": "c5",
+        "text": "...c5 attacks d4 before White can stabilize every advanced pawn. It is the concrete response to the space disadvantage."
+      },
+      {
+        "ply": 18,
+        "san": "cxd4",
+        "text": "...cxd4 answers a flank capture with a central capture. Black should compare both pawn exchanges before recapturing automatically."
+      },
+      {
+        "ply": 19,
+        "san": "dxe7",
+        "text": "dxe7 removes Black’s e-pawn, but also leaves White’s advanced pawn open to recapture. Count the resulting open diagonals."
+      },
+      {
+        "ply": 21,
+        "san": "Ne4",
+        "text": "Ne4 uses a square vacated by the e-pawn. White’s central pieces, rather than the original pawn wall, must now provide control."
+      }
+    ],
+    "challenge": 15,
+    "answers": [
+      {
+        "uci": "c7c5",
+        "san": "c5"
+      },
+      {
+        "uci": "b7f3",
+        "san": "Bxf3"
+      },
+      {
+        "uci": "d7e5",
+        "san": "Nxe5"
+      }
+    ]
+  },
+  {
+    "family": "Dutch Defense",
+    "title": "Playing around the Stonewall outpost",
+    "summary": "The Stonewall grips e4 while conceding e5. White can occupy that hole, but must judge the bishop exchange and the doubled f-pawns together. Black needs an active role for the c8 bishop.",
+    "question": "White has a stable square in front of the pawn chain. Find the knight outpost.",
+    "moves": [
+      "d2d4",
+      "f7f5",
+      "g2g3",
+      "g8f6",
+      "f1g2",
+      "e7e6",
+      "g1f3",
+      "d7d5",
+      "e1g1",
+      "f8d6",
+      "c2c4",
+      "c7c6",
+      "b1c3",
+      "e8g8",
+      "d1c2",
+      "d8e8",
+      "c1f4",
+      "d6f4",
+      "g3f4",
+      "e8h5",
+      "f3e5",
+      "b8d7",
+      "e2e3"
+    ],
+    "notes": [
+      {
+        "ply": 11,
+        "san": "c4",
+        "text": "c4 challenges d5 instead of allowing the Stonewall to remain untouched."
+      },
+      {
+        "ply": 17,
+        "san": "Bf4",
+        "text": "Bf4 asks Black whether to preserve the attacking bishop. The trade changes which side benefits from opening the center."
+      },
+      {
+        "ply": 19,
+        "san": "gxf4",
+        "text": "gxf4 accepts doubled f-pawns to open a file and support e5. A damaged structure can have useful dynamic features."
+      },
+      {
+        "ply": 21,
+        "san": "Ne5",
+        "text": "Ne5 occupies a square no black d- or f-pawn can attack. Check whether a minor-piece exchange can remove the knight before calling the outpost permanent."
+      },
+      {
+        "ply": 23,
+        "san": "e3",
+        "text": "e3 supports d4 and frees the f1 rook’s second-rank options. White develops around the outpost rather than rushing an unsupported attack."
+      }
+    ],
+    "challenge": 20,
+    "answers": [
+      {
+        "uci": "f3e5",
+        "san": "Ne5"
+      },
+      {
+        "uci": "c4d5",
+        "san": "cxd5"
+      },
+      {
+        "uci": "c3d5",
+        "san": "Nxd5"
+      }
+    ]
+  },
+  {
+    "family": "Alekhine Defense",
+    "title": "When space turns into targets",
+    "summary": "Black invites central advances, then attacks their support. White should make the pieces support the pawns before assuming the extra space is a lasting advantage.",
+    "question": "White can gain space while developing with a direct threat against the d5 knight.",
+    "moves": [
+      "e2e4",
+      "g8f6",
+      "e4e5",
+      "f6d5",
+      "d2d4",
+      "d7d6",
+      "g1f3",
+      "c8g4",
+      "f1e2",
+      "e7e6",
+      "e1g1",
+      "f8e7",
+      "c2c4",
+      "d5b6",
+      "e5d6",
+      "c7d6",
+      "b1c3",
+      "e8g8",
+      "c1e3",
+      "d6d5",
+      "c4c5",
+      "g4f3",
+      "e2f3",
+      "b6c4"
+    ],
+    "notes": [
+      {
+        "ply": 13,
+        "san": "c4",
+        "text": "c4 attacks the knight and expands the center. Every tempo gained by a pawn also fixes squares the pawn can no longer defend."
+      },
+      {
+        "ply": 15,
+        "san": "exd6",
+        "text": "exd6 changes the center rather than trying to keep every advanced pawn."
+      },
+      {
+        "ply": 17,
+        "san": "Nc3",
+        "text": "Nc3 develops behind the pawn front. Unsupported space would be a target rather than an advantage."
+      },
+      {
+        "ply": 20,
+        "san": "d5",
+        "text": "...d5 challenges the center after castling. Black has waited until development makes the break active."
+      },
+      {
+        "ply": 24,
+        "san": "Nc4",
+        "text": "...Nc4 finds a forward square created by White’s c-pawn advance. Calculate captures before treating the outpost as safe."
+      }
+    ],
+    "challenge": 12,
+    "answers": [
+      {
+        "uci": "c2c4",
+        "san": "c4"
+      },
+      {
+        "uci": "e5d6",
+        "san": "exd6"
+      },
+      {
+        "uci": "f3g5",
+        "san": "Ng5"
+      }
+    ]
+  },
+  {
+    "family": "Petrov's Defense",
+    "title": "Symmetry does not mean inactivity",
+    "summary": "Early exchanges produce a balanced center, but open files and development still create plans. White challenges d5 and activates a rook; Black exchanges a central knight and completes development.",
+    "question": "White can increase pressure on d5 with a pawn break.",
+    "moves": [
+      "e2e4",
+      "e7e5",
+      "g1f3",
+      "g8f6",
+      "f3e5",
+      "d7d6",
+      "e5f3",
+      "f6e4",
+      "d2d4",
+      "d6d5",
+      "f1d3",
+      "f8d6",
+      "e1g1",
+      "e8g8",
+      "c2c4",
+      "c7c6",
+      "b1c3",
+      "e4c3",
+      "b2c3",
+      "d5c4",
+      "d3c4",
+      "b8d7",
+      "f1e1",
+      "d7f6"
+    ],
+    "notes": [
+      {
+        "ply": 15,
+        "san": "c4",
+        "text": "c4 puts immediate pressure on d5. A symmetrical opening can still require concrete central decisions."
+      },
+      {
+        "ply": 17,
+        "san": "Nc3",
+        "text": "Nc3 develops with pressure against the e4 knight. White wants piece activity to support the pawn challenge."
+      },
+      {
+        "ply": 19,
+        "san": "bxc3",
+        "text": "bxc3 changes the structure and reinforces d4. Do not judge doubled pawns without considering their central role."
+      },
+      {
+        "ply": 21,
+        "san": "Bxc4",
+        "text": "Bxc4 restores the pawn while activating a bishop. Development is part of the recapture choice."
+      },
+      {
+        "ply": 23,
+        "san": "Re1",
+        "text": "Re1 uses the open e-file. An active file gives the rook a job even when the material is equal."
+      }
+    ],
+    "challenge": 14,
+    "answers": [
+      {
+        "uci": "c2c4",
+        "san": "c4"
+      },
+      {
+        "uci": "d3e4",
+        "san": "Bxe4"
+      },
+      {
+        "uci": "d3c4",
+        "san": "Bc4"
+      }
+    ]
+  },
+  {
+    "family": "Vienna Game",
+    "title": "Meet a flank gambit with a central break",
+    "summary": "The f-pawn advance increases attacking space but gives Black a central counterstrike. This example shows why ...d5 should be calculated before Black tries to hold the e5 pawn.",
+    "question": "Black can strike in the center immediately after f4.",
+    "moves": [
+      "e2e4",
+      "e7e5",
+      "b1c3",
+      "g8f6",
+      "f2f4",
+      "d7d5",
+      "f4e5",
+      "f6e4",
+      "g1f3",
+      "f8e7",
+      "d2d3",
+      "e4c3",
+      "b2c3",
+      "e8g8",
+      "f1e2",
+      "c7c5",
+      "e1g1",
+      "b8c6",
+      "d1e1",
+      "c8e6",
+      "e1g3",
+      "g8h8"
+    ],
+    "notes": [
+      {
+        "ply": 6,
+        "san": "d5",
+        "text": "...d5 challenges e4 before White organizes a kingside attack. The counterstrike addresses the opening’s central tension."
+      },
+      {
+        "ply": 7,
+        "san": "fxe5",
+        "text": "fxe5 gains a pawn for the moment, but Black can use the exposed center instead of recapturing immediately."
+      },
+      {
+        "ply": 9,
+        "san": "Nf3",
+        "text": "Nf3 develops and contests e5. White needs pieces to support the advanced pawn."
+      },
+      {
+        "ply": 13,
+        "san": "bxc3",
+        "text": "bxc3 restores material after the knight exchange and opens the b-file. The pawn structure now shapes the middlegame."
+      },
+      {
+        "ply": 19,
+        "san": "Qe1",
+        "text": "Qe1 prepares a kingside queen route, but White should verify the center and king safety before committing to an attack."
+      }
+    ],
+    "challenge": 5,
+    "answers": [
+      {
+        "uci": "d7d5",
+        "san": "d5"
+      },
+      {
+        "uci": "f6e4",
+        "san": "Nxe4"
+      },
+      {
+        "uci": "e5f4",
+        "san": "exf4"
+      }
+    ]
+  },
+  {
+    "family": "Four Knights Game",
+    "title": "A developing move can be a central tactic",
+    "summary": "The Scotch structure opens the center early. Black uses ...d5 to challenge a developing bishop, and both sides must settle the pawn structure before maneuvering.",
+    "question": "Black can challenge White’s center after Bd3. Find the freeing pawn move.",
+    "moves": [
+      "e2e4",
+      "e7e5",
+      "g1f3",
+      "b8c6",
+      "b1c3",
+      "g8f6",
+      "d2d4",
+      "e5d4",
+      "f3d4",
+      "f8b4",
+      "d4c6",
+      "b7c6",
+      "f1d3",
+      "d7d5",
+      "e4d5",
+      "c6d5",
+      "e1g1",
+      "e8g8",
+      "c1g5",
+      "c7c6",
+      "d1f3",
+      "b4e7"
+    ],
+    "notes": [
+      {
+        "ply": 9,
+        "san": "Nxd4",
+        "text": "Nxd4 develops actively, but the knight can be exchanged before it becomes a permanent outpost."
+      },
+      {
+        "ply": 11,
+        "san": "Nxc6",
+        "text": "Nxc6 changes Black’s pawn structure. The resulting c-pawn can later recapture toward the center."
+      },
+      {
+        "ply": 14,
+        "san": "d5",
+        "text": "...d5 challenges e4 and opens lines for the c8 bishop. Black should not drift passively in a symmetrical setup."
+      },
+      {
+        "ply": 15,
+        "san": "exd5",
+        "text": "exd5 releases central tension. White should compare the isolated-pawn and hanging-pawn possibilities after the recapture."
+      },
+      {
+        "ply": 19,
+        "san": "Bg5",
+        "text": "Bg5 develops with pressure. A pin is useful when it supports a plan, not simply because it can be made."
+      }
+    ],
+    "challenge": 13,
+    "answers": [
+      {
+        "uci": "d7d5",
+        "san": "d5"
+      },
+      {
+        "uci": "f6e4",
+        "san": "Nxe4"
+      },
+      {
+        "uci": "b4c3",
+        "san": "Bxc3+"
+      }
+    ]
+  },
+  {
+    "family": "Tarrasch Defense",
+    "title": "How to use an isolated d-pawn",
+    "summary": "The isolated d5 pawn gives Black space and open files. White tries to blockade and exchange active pieces; Black should develop threats or prepare ...d4 before the position becomes a passive ending.",
+    "question": "White can blockade the isolated pawn while recapturing centrally.",
+    "moves": [
+      "d2d4",
+      "d7d5",
+      "c2c4",
+      "e7e6",
+      "b1c3",
+      "c7c5",
+      "c4d5",
+      "e6d5",
+      "g1f3",
+      "b8c6",
+      "g2g3",
+      "g8f6",
+      "f1g2",
+      "f8e7",
+      "e1g1",
+      "e8g8",
+      "c1g5",
+      "c5d4",
+      "f3d4",
+      "h7h6",
+      "g5e3",
+      "f8e8",
+      "a1c1",
+      "e7f8"
+    ],
+    "notes": [
+      {
+        "ply": 8,
+        "san": "exd5",
+        "text": "...exd5 accepts a structure that can become isolated after the c-pawn exchange. Black is choosing activity in return."
+      },
+      {
+        "ply": 11,
+        "san": "g3",
+        "text": "g3 prepares the bishop to add pressure on d5 from g2. The fianchetto has a concrete target."
+      },
+      {
+        "ply": 19,
+        "san": "Nxd4",
+        "text": "Nxd4 places the knight directly in front of d5. This is a blockade and an active developing square at once."
+      },
+      {
+        "ply": 21,
+        "san": "Be3",
+        "text": "Be3 preserves the bishop after ...h6. White should keep control of the blockade square while deciding which exchanges favor the structure."
+      },
+      {
+        "ply": 24,
+        "san": "Bf8",
+        "text": "...Bf8 preserves the bishop and supports the king. Black must still seek active files or the ...d4 break rather than just defend the pawn."
+      }
+    ],
+    "challenge": 18,
+    "answers": [
+      {
+        "uci": "f3d4",
+        "san": "Nxd4"
+      },
+      {
+        "uci": "g5f6",
+        "san": "Bxf6"
+      },
+      {
+        "uci": "c3d5",
+        "san": "Nxd5"
+      }
+    ]
+  },
+  {
+    "family": "King's Gambit Accepted",
+    "title": "Development before recovering the pawn",
+    "summary": "The Fischer Defense makes holding f4 a concrete choice. White spends time with the king’s knight but tries to open lines and castle long; Black develops to use the central and kingside weaknesses.",
+    "question": "White wants a broad center before trying to recover f4.",
+    "moves": [
+      "e2e4",
+      "e7e5",
+      "f2f4",
+      "e5f4",
+      "g1f3",
+      "d7d6",
+      "d2d4",
+      "g7g5",
+      "h2h4",
+      "g5g4",
+      "f3g1",
+      "f8h6",
+      "b1c3",
+      "g8f6",
+      "g1e2",
+      "f6h5",
+      "d1d3",
+      "b8c6",
+      "c1d2",
+      "e8g8",
+      "e1c1"
+    ],
+    "notes": [
+      {
+        "ply": 7,
+        "san": "d4",
+        "text": "d4 claims space and frees the c1 bishop. White should develop before spending several queen moves on the extra pawn."
+      },
+      {
+        "ply": 9,
+        "san": "h4",
+        "text": "h4 attacks Black’s supporting g-pawn. It can open lines toward either king, so the follow-up must be calculated."
+      },
+      {
+        "ply": 11,
+        "san": "Ng1",
+        "text": "Ng1 is a real retreat, not a model developing move. White accepts that cost to avoid losing the knight after ...g4."
+      },
+      {
+        "ply": 15,
+        "san": "Nge2",
+        "text": "Nge2 brings the knight back into play and keeps castling long possible."
+      },
+      {
+        "ply": 21,
+        "san": "O-O-O",
+        "text": "O-O-O finally connects the rooks. The opening’s material investment must now become activity."
+      }
+    ],
+    "challenge": 6,
+    "answers": [
+      {
+        "uci": "d2d4",
+        "san": "d4"
+      },
+      {
+        "uci": "e4e5",
+        "san": "e5"
+      },
+      {
+        "uci": "f3d4",
+        "san": "Nd4"
+      }
+    ]
+  },
+  {
+    "family": "Queen's Indian Defense",
+    "title": "Contesting e4 with pieces",
+    "summary": "Black controls e4 with the knight and b7 bishop instead of occupying it with a pawn. White’s development and central exchanges decide whether the long diagonals will favor one bishop or the other.",
+    "question": "Black can occupy the square the b7 bishop and f6 knight have been contesting.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "e7e6",
+      "g1f3",
+      "b7b6",
+      "g2g3",
+      "c8b7",
+      "f1g2",
+      "f8e7",
+      "e1g1",
+      "e8g8",
+      "b1c3",
+      "f6e4",
+      "d1c2",
+      "e4c3",
+      "c2c3",
+      "d7d5",
+      "c4d5",
+      "e6d5",
+      "c1f4",
+      "c7c6",
+      "a1c1"
+    ],
+    "notes": [
+      {
+        "ply": 14,
+        "san": "Ne4",
+        "text": "...Ne4 occupies the central square before White plays e4. Check whether the knight has support and a useful retreat before using the same idea elsewhere."
+      },
+      {
+        "ply": 15,
+        "san": "Qc2",
+        "text": "Qc2 attacks e4 and helps organize the central plan. The queen move should improve more than one piece’s coordination."
+      },
+      {
+        "ply": 17,
+        "san": "Qxc3",
+        "text": "Qxc3 recaptures without doubled pawns and keeps the queen active. It also gives Black a target for developing moves."
+      },
+      {
+        "ply": 19,
+        "san": "cxd5",
+        "text": "cxd5 changes which diagonals are open. White should compare the recapturing pawn’s squares before exchanging."
+      },
+      {
+        "ply": 23,
+        "san": "Rac1",
+        "text": "Rac1 uses the file opened by the c-pawn exchanges. Development should adapt to the new structure."
+      }
+    ],
+    "challenge": 13,
+    "answers": [
+      {
+        "uci": "f6e4",
+        "san": "Ne4"
+      },
+      {
+        "uci": "b7f3",
+        "san": "Bxf3"
+      },
+      {
+        "uci": "b8c6",
+        "san": "Nc6"
+      }
+    ]
+  },
+  {
+    "family": "Bogo-Indian Defense",
+    "title": "A bishop check changes the development choice",
+    "summary": "Black’s check leads to a bishop exchange rather than a direct attack. White gains a clear developing scheme, while Black prepares a central break and a long diagonal for the remaining bishop.",
+    "question": "White should answer the check with a useful developing block.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "e7e6",
+      "g1f3",
+      "f8b4",
+      "c1d2",
+      "b4d2",
+      "d1d2",
+      "e8g8",
+      "b1c3",
+      "d7d5",
+      "e2e3",
+      "b7b6",
+      "f1d3",
+      "c8b7",
+      "e1g1",
+      "b8d7",
+      "a1c1",
+      "c7c5",
+      "c4d5",
+      "e6d5"
+    ],
+    "notes": [
+      {
+        "ply": 7,
+        "san": "Bd2",
+        "text": "Bd2 blocks the check and offers a trade. It avoids committing the queen’s knight to a particular blocking square."
+      },
+      {
+        "ply": 9,
+        "san": "Qxd2",
+        "text": "Qxd2 recaptures without moving the king. White’s next task is to develop the knights and castle."
+      },
+      {
+        "ply": 14,
+        "san": "b6",
+        "text": "...b6 opens a route for the c8 bishop. Black must give the remaining bishop an active job after exchanging the other one."
+      },
+      {
+        "ply": 19,
+        "san": "Rac1",
+        "text": "Rac1 prepares for central exchanges and the c-file. The rook move has a target structure in mind."
+      },
+      {
+        "ply": 20,
+        "san": "c5",
+        "text": "...c5 challenges d4 and begins active play. A sound opening is not permission to keep every pawn fixed."
+      }
+    ],
+    "challenge": 6,
+    "answers": [
+      {
+        "uci": "c1d2",
+        "san": "Bd2"
+      },
+      {
+        "uci": "f3d2",
+        "san": "Nfd2"
+      },
+      {
+        "uci": "b1c3",
+        "san": "Nc3"
+      }
+    ]
+  },
+  {
+    "family": "Benoni Defense",
+    "title": "A backward pawn and active counterplay",
+    "summary": "White’s center gives space, while Black’s d6 pawn can become backward. Black uses queenside squares and the g7 bishop to create counterplay before the weakness can simply be attacked.",
+    "question": "White wants to support e4 and move the f3 knight to c4. Start the rerouting plan.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "c7c5",
+      "d4d5",
+      "e7e6",
+      "b1c3",
+      "e6d5",
+      "c4d5",
+      "d7d6",
+      "e2e4",
+      "g7g6",
+      "g1f3",
+      "f8g7",
+      "f1e2",
+      "e8g8",
+      "e1g1",
+      "f8e8",
+      "f3d2",
+      "b8a6",
+      "f2f3",
+      "a6c7",
+      "a2a4",
+      "b7b6",
+      "d2c4",
+      "c8a6"
+    ],
+    "notes": [
+      {
+        "ply": 9,
+        "san": "cxd5",
+        "text": "cxd5 creates the characteristic space advantage. The d5 pawn also leaves e5 and c5 as important squares to monitor."
+      },
+      {
+        "ply": 18,
+        "san": "Re8",
+        "text": "...Re8 uses a semi-open file and adds pressure to e4. Black’s compensation is active piece play."
+      },
+      {
+        "ply": 19,
+        "san": "Nd2",
+        "text": "Nd2 supports e4 and prepares a route to c4. White uses the space advantage to improve a piece before advancing more pawns."
+      },
+      {
+        "ply": 23,
+        "san": "a4",
+        "text": "a4 restrains ...b5. This matters because Black’s queenside pawn break is a main source of counterplay."
+      },
+      {
+        "ply": 25,
+        "san": "Nc4",
+        "text": "Nc4 reaches a square that pressures d6. White’s earlier maneuver now has a clear target."
+      }
+    ],
+    "challenge": 18,
+    "answers": [
+      {
+        "uci": "f3d2",
+        "san": "Nd2"
+      },
+      {
+        "uci": "e4e5",
+        "san": "e5"
+      },
+      {
+        "uci": "c3a4",
+        "san": "Na4"
+      }
+    ]
+  },
+  {
+    "family": "Benko Gambit Accepted",
+    "title": "The extra pawn comes with defensive duties",
+    "summary": "White keeps an extra pawn while Black obtains lasting pressure on the a- and b-files. Queen exchanges do not automatically remove the compensation; the rooks and g7 bishop can keep the queenside tied down.",
+    "question": "White needs to defend the queenside against the rook on b8. Put a rook behind b2.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "c7c5",
+      "d4d5",
+      "b7b5",
+      "c4b5",
+      "a7a6",
+      "b5a6",
+      "g7g6",
+      "b1c3",
+      "c8a6",
+      "g2g3",
+      "d7d6",
+      "f1g2",
+      "f8g7",
+      "g1f3",
+      "e8g8",
+      "e1g1",
+      "b8d7",
+      "d1c2",
+      "d8a5",
+      "f1d1",
+      "f8b8",
+      "a1b1"
+    ],
+    "notes": [
+      {
+        "ply": 7,
+        "san": "cxb5",
+        "text": "cxb5 accepts the gambit. White should understand the resulting open files before deciding the pawn can be kept comfortably."
+      },
+      {
+        "ply": 13,
+        "san": "g3",
+        "text": "g3 prepares king safety and a bishop that can contest long-diagonal pressure."
+      },
+      {
+        "ply": 22,
+        "san": "Qa5",
+        "text": "...Qa5 creates concrete queenside targets. Black is building pressure rather than looking only for immediate material recovery."
+      },
+      {
+        "ply": 24,
+        "san": "Rfb8",
+        "text": "...Rfb8 brings another heavy piece to the queenside. Black’s rooks need the open files to justify the pawn investment."
+      },
+      {
+        "ply": 25,
+        "san": "Rb1",
+        "text": "Rb1 defends b2 and prepares to meet pressure on the b-file. The extra pawn requires active defensive coordination."
+      }
+    ],
+    "challenge": 24,
+    "answers": [
+      {
+        "uci": "a1b1",
+        "san": "Rb1"
+      },
+      {
+        "uci": "c2g6",
+        "san": "Qxg6"
+      },
+      {
+        "uci": "c3a4",
+        "san": "Na4"
+      }
+    ]
+  },
+  {
+    "family": "Philidor Defense",
+    "title": "Prepare the break before releasing tension",
+    "summary": "Black’s compact center gives few weaknesses but less room. The pieces must be ready to use a central exchange; otherwise White can keep improving behind a stable space advantage.",
+    "question": "Black has developed and prepared the center. Release the tension on d4.",
+    "moves": [
+      "e2e4",
+      "e7e5",
+      "g1f3",
+      "d7d6",
+      "d2d4",
+      "g8f6",
+      "b1c3",
+      "b8d7",
+      "f1c4",
+      "f8e7",
+      "e1g1",
+      "e8g8",
+      "f1e1",
+      "c7c6",
+      "a2a4",
+      "d8c7",
+      "h2h3",
+      "h7h6",
+      "c1e3",
+      "f8e8",
+      "d1d2",
+      "e7f8",
+      "a1d1",
+      "e5d4",
+      "f3d4",
+      "d7c5"
+    ],
+    "notes": [
+      {
+        "ply": 13,
+        "san": "Re1",
+        "text": "Re1 supports e4 and prepares central play. White develops a rook before making additional pawn commitments."
+      },
+      {
+        "ply": 16,
+        "san": "Qc7",
+        "text": "...Qc7 reinforces e5 and connects the queenside plan. Black is preparing to improve the cramped pieces."
+      },
+      {
+        "ply": 19,
+        "san": "Be3",
+        "text": "Be3 develops with central influence rather than an immediate speculative attack."
+      },
+      {
+        "ply": 24,
+        "san": "exd4",
+        "text": "...exd4 opens the e-file only after Black’s rook is ready on e8. The timing matters more than keeping the original pawn chain."
+      },
+      {
+        "ply": 26,
+        "san": "Nc5",
+        "text": "...Nc5 finds an active square for the d7 knight after the exchanges. A freeing break should improve the pieces as well as the pawns."
+      }
+    ],
+    "challenge": 23,
+    "answers": [
+      {
+        "uci": "e5d4",
+        "san": "exd4"
+      },
+      {
+        "uci": "f6e4",
+        "san": "Nxe4"
+      },
+      {
+        "uci": "a8b8",
+        "san": "Rb8"
+      }
+    ]
+  },
+  {
+    "family": "Queen's Pawn Game",
+    "title": "The Colle only makes sense if e4 arrives",
+    "summary": "The Colle’s triangle is preparation for e4, not an end in itself. Black can play ...e5 first, so White must calculate the exchanges and use the rook’s support rather than repeat a setup mechanically.",
+    "question": "White has prepared the e-file and exchanged central pieces. Play the thematic break.",
+    "moves": [
+      "d2d4",
+      "d7d5",
+      "g1f3",
+      "g8f6",
+      "e2e3",
+      "e7e6",
+      "f1d3",
+      "c7c5",
+      "c2c3",
+      "b8c6",
+      "b1d2",
+      "f8d6",
+      "e1g1",
+      "e8g8",
+      "f1e1",
+      "e6e5",
+      "d4e5",
+      "c6e5",
+      "f3e5",
+      "d6e5",
+      "e3e4",
+      "d5e4",
+      "d2e4"
+    ],
+    "notes": [
+      {
+        "ply": 11,
+        "san": "Nbd2",
+        "text": "Nbd2 supports e4 without blocking the c-pawn. The knight’s placement follows the intended break."
+      },
+      {
+        "ply": 15,
+        "san": "Re1",
+        "text": "Re1 adds support to e4 before the center opens. The move is useful because a concrete pawn break follows."
+      },
+      {
+        "ply": 17,
+        "san": "dxe5",
+        "text": "dxe5 answers Black’s central expansion by exchanging before advancing. White must see where the pieces will recapture."
+      },
+      {
+        "ply": 21,
+        "san": "e4",
+        "text": "e4 opens lines for the bishops and rook. This is the purpose of the earlier compact setup."
+      },
+      {
+        "ply": 23,
+        "san": "Nxe4",
+        "text": "Nxe4 recaptures actively and centralizes the remaining knight. The original triangle has transformed into piece activity."
+      }
+    ],
+    "challenge": 20,
+    "answers": [
+      {
+        "uci": "e3e4",
+        "san": "e4"
+      },
+      {
+        "uci": "d3h7",
+        "san": "Bxh7+"
+      },
+      {
+        "uci": "c3c4",
+        "san": "c4"
+      }
+    ]
+  },
+  {
+    "family": "Neo-Grünfeld Defense",
+    "title": "Delay the knight, keep the center flexible",
+    "summary": "White delays Nc3 and chooses a fianchetto structure. This avoids some Exchange Grünfeld positions, but Black still challenges the center with ...d5 and ...c5. Development must fit the actual move order.",
+    "question": "Black should challenge the center after the queenside pawn exchanges. Find the main pawn break.",
+    "moves": [
+      "d2d4",
+      "g8f6",
+      "c2c4",
+      "g7g6",
+      "g1f3",
+      "f8g7",
+      "g2g3",
+      "d7d5",
+      "f1g2",
+      "e8g8",
+      "e1g1",
+      "d5c4",
+      "b1a3",
+      "c4c3",
+      "b2c3",
+      "c7c5",
+      "e2e3",
+      "b8c6",
+      "d1e2",
+      "d8a5",
+      "c1b2",
+      "c5d4",
+      "c3d4"
+    ],
+    "notes": [
+      {
+        "ply": 13,
+        "san": "Na3",
+        "text": "Na3 develops while keeping c3 available for a pawn recapture. This is a move-order choice, not a general claim that edge knights are best."
+      },
+      {
+        "ply": 15,
+        "san": "bxc3",
+        "text": "bxc3 restores material and supports d4. White accepts a changed queenside structure for central control."
+      },
+      {
+        "ply": 16,
+        "san": "c5",
+        "text": "...c5 attacks d4 and gives the pieces central targets. The delayed white knight changes tactics but not the need for counterplay."
+      },
+      {
+        "ply": 19,
+        "san": "Qe2",
+        "text": "Qe2 supports the center and develops the queen before the pawn structure settles."
+      },
+      {
+        "ply": 23,
+        "san": "cxd4",
+        "text": "cxd4 rebuilds the center after Black’s exchange. White should now compare the bishop diagonals and the isolated central targets."
+      }
+    ],
+    "challenge": 15,
+    "answers": [
+      {
+        "uci": "c7c5",
+        "san": "c5"
+      },
+      {
+        "uci": "d8d4",
+        "san": "Qxd4"
+      },
+      {
+        "uci": "b8d7",
+        "san": "Nbd7"
+      }
+    ]
+  }
+]

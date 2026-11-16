@@ -1,3 +1,5 @@
+import { usePremoves } from "../lib/usePremoves";
+import PremoveQueue from "../components/PremoveQueue";
 import { useEffect, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -8,6 +10,7 @@ import {
   Copy,
   Send,
   Flag,
+  Handshake,
   MessageCircle,
   Snowflake,
   ArrowLeftRight,
@@ -45,7 +48,7 @@ type Message = {
 };
 export default function Community() {
   const { session } = useOnlineSession(),
-    { detail, navigate, notify } = useApp();
+    { detail, navigate, notify, appearance } = useApp();
   const [rooms, setRooms] = useState<Room[]>([]),
     [room, setRoom] = useState<Room | null>(null),
     [profiles, setProfiles] = useState<Profile[]>([]),
@@ -148,7 +151,11 @@ export default function Community() {
       void online?.removeChannel(ch);
     };
   }, [room?.id, room?.revision]);
-  async function act(action: string, extra: Record<string, unknown> = {}) {
+  async function act(
+    action: string,
+    extra: Record<string, unknown> = {},
+    rethrow = false,
+  ) {
     setBusy(true);
     setError("");
     try {
@@ -167,6 +174,7 @@ export default function Community() {
       setFirst("");
     } catch (e) {
       setError((e as Error).message);
+      if (rethrow) throw e;
     } finally {
       setBusy(false);
     }
@@ -184,6 +192,18 @@ export default function Community() {
               .map((m) => m.from + m.to + (m.promotion || ""))
           : specialLegal(room.state);
     } catch {}
+  const premove = usePremoves({
+    fen: room?.state.fen || "8/8/8/8/8/8/8/8 w - - 0 1",
+    side: me?.team || "w",
+    legal,
+    enabled: !!me?.team,
+    active: room?.status === "playing" && room.state.result === "*",
+    identity: room?.id,
+    execute: (move) =>
+      act(room?.mode === "vote" ? "vote" : "move", { move }, true),
+    chaos: room?.variant === "chaos",
+    blocked: room?.state.blocked || [],
+  });
   const totals = Object.entries(
     votes.reduce(
       (acc, v) => ({ ...acc, [v.move]: (acc[v.move] || 0) + 1 }),
@@ -230,10 +250,16 @@ export default function Community() {
                   </p>
                 )}
                 <Board
-                  fen={room.state.fen}
+                  fen={premove.preview}
+                  materialFen={room.state.fen}
                   flipped={me?.team === "b"}
-                  disabled={!canMove || busy}
-                  legalMoves={legal}
+                  disabled={
+                    busy ||
+                    room.status !== "playing" ||
+                    !me?.team ||
+                    (!canMove && !appearance.premoves)
+                  }
+                  legalMoves={canMove ? legal : premove.options}
                   blocked={room.state.blocked || []}
                   marks={room.mode === "team" ? room.marks : undefined}
                   onMarksChange={
@@ -242,9 +268,11 @@ export default function Community() {
                       : undefined
                   }
                   onMove={(from, to, promotion) =>
-                    void act(room.mode === "vote" ? "vote" : "move", {
-                      move: from + to + (promotion || ""),
-                    })
+                    !canMove
+                      ? premove.enqueue(from + to + (promotion || ""))
+                      : void act(room.mode === "vote" ? "vote" : "move", {
+                          move: from + to + (promotion || ""),
+                        })
                   }
                   onSquare={
                     armed
@@ -302,9 +330,24 @@ export default function Community() {
                       </Button>
                     </>
                   )}
+                  <PremoveQueue
+                    moves={premove.queue}
+                    undo={() => premove.setQueue((q) => q.slice(0, -1))}
+                    clear={premove.clear}
+                  />
+                  {me?.team && room.settings.bot && (
+                    <Button
+                      className="draw-button"
+                      disabled={busy || room.state.result !== "*"}
+                      onClick={() => void act("draw")}
+                    >
+                      <Handshake size={16} />
+                      Draw
+                    </Button>
+                  )}
                   {me?.team && room.mode !== "vote" && (
                     <Button
-                      className="secondary"
+                      className="resign-button"
                       disabled={busy || room.state.result !== "*"}
                       onClick={() => void act("resign")}
                     >

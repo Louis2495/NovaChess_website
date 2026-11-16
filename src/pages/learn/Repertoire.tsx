@@ -1,3 +1,5 @@
+import { usePremoves } from "../../lib/usePremoves";
+import PremoveQueue from "../../components/PremoveQueue";
 import { useEffect, useMemo, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -237,7 +239,7 @@ function RepertoireTrainer({
   line: Line;
   onClose: () => void;
 }) {
-  const { library, setLibrary } = useApp();
+  const { library, setLibrary, appearance } = useApp();
   const [fen, setFen] = useState(line.initial),
     [active, setActive] = useState(line),
     [cursor, setCursor] = useState(0),
@@ -298,6 +300,29 @@ function RepertoireTrainer({
     const t = setTimeout(() => apply(move), 400);
     return () => clearTimeout(t);
   }, [fen, done]);
+  function attempt(uci: string) {
+    const match =
+      choices.find((v) => v.move === uci && v.line.id === active.id) ||
+      choices.find((v) => v.move === uci);
+    if (!match) {
+      setAssisted(true);
+      setMessage("Not a saved continuation. Try again.");
+      return;
+    }
+    setActive(match.line);
+    setMessage("Correct.");
+    apply(uci, match.line, match.index);
+  }
+  const premove = usePremoves({
+    fen,
+    side: line.side,
+    legal: c
+      .moves({ verbose: true })
+      .map((m) => m.from + m.to + (m.promotion || "")),
+    active: !done,
+    identity: line.id,
+    execute: attempt,
+  });
   function restart() {
     setFen(line.initial);
     setActive(line);
@@ -318,24 +343,22 @@ function RepertoireTrainer({
           </Button>
         </div>
         <Board
-          fen={fen}
-          disabled={done || c.turn() !== line.side}
+          fen={premove.preview}
+          materialFen={fen}
+          disabled={done || (c.turn() !== line.side && !appearance.premoves)}
+          legalMoves={c.turn() === line.side ? undefined : premove.options}
           flipped={line.side === "b"}
           hint={hint}
-          onMove={(from, to, promotion) => {
-            const uci = from + to + (promotion || "");
-            const match =
-              choices.find((v) => v.move === uci && v.line.id === active.id) ||
-              choices.find((v) => v.move === uci);
-            if (!match) {
-              setAssisted(true);
-              setMessage("Not a saved continuation. Try again.");
-              return;
-            }
-            setActive(match.line);
-            setMessage("Correct.");
-            apply(uci, match.line, match.index);
-          }}
+          onMove={(from, to, promotion) =>
+            c.turn() === line.side
+              ? attempt(from + to + (promotion || ""))
+              : premove.enqueue(from + to + (promotion || ""))
+          }
+        />
+        <PremoveQueue
+          moves={premove.queue}
+          undo={() => premove.setQueue((q) => q.slice(0, -1))}
+          clear={premove.clear}
         />
         <p className="feedback" role="status">
           {message ||
@@ -345,7 +368,7 @@ function RepertoireTrainer({
         </p>
         <div className="button-row">
           <Button
-            disabled={done || c.turn() !== line.side}
+            disabled={done || (c.turn() !== line.side && !appearance.premoves)}
             onClick={() => {
               const expected =
                 choices.find((v) => v.line.id === active.id) || choices[0];
@@ -369,8 +392,8 @@ function RepertoireTrainer({
       <Card>
         <h2>Training</h2>
         <p className="caption">
-          {line.side === "w" ? "White" : "Black"} · {cursor} /{" "}
-          {active.moves.length} half-moves
+          {line.side === "w" ? "White" : "Black"} · {Math.ceil(cursor / 2)} /{" "}
+          {Math.ceil(active.moves.length / 2)} moves
         </p>
         <p className="muted">{active.name}</p>
         <p className="caption">

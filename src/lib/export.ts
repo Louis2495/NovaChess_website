@@ -37,16 +37,8 @@ export async function renderBoard(
       ctx.fillStyle = (file + 8 - rank) % 2 ? a.dark : a.light;
       ctx.fillRect(x * cell, y * cell, cell, cell);
       if (blocked.includes(sq)) {
-        ctx.fillStyle = a.backgroundColor;
+        ctx.fillStyle = "#000";
         ctx.fillRect(x * cell, y * cell, cell, cell);
-        ctx.strokeStyle = a.mutedColor;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x * cell + cell * 0.35, y * cell + cell * 0.35);
-        ctx.lineTo(x * cell + cell * 0.65, y * cell + cell * 0.65);
-        ctx.moveTo(x * cell + cell * 0.65, y * cell + cell * 0.35);
-        ctx.lineTo(x * cell + cell * 0.35, y * cell + cell * 0.65);
-        ctx.stroke();
         continue;
       }
       const piece = p[sq];

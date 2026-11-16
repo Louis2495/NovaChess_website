@@ -31,7 +31,13 @@ const names: Record<string, string> = {
   k: "king",
   "*": "duck",
 };
-export type BoardMark = { from: string; to: string; color: string };
+export type BoardMark = {
+  from: string;
+  to: string;
+  color: string;
+  weight?: number;
+  label?: string;
+};
 export function Board({
   fen,
   onMove,
@@ -50,6 +56,8 @@ export function Board({
   marks: externalMarks,
   onCancel,
   onFlip,
+  materialFen,
+  guides = [],
 }: {
   fen: string;
   onMove?: (from: string, to: string, promotion?: string) => void;
@@ -68,6 +76,8 @@ export function Board({
   onMarksChange?: (marks: BoardMark[]) => void;
   onCancel?: () => void;
   onFlip?: () => void;
+  materialFen?: string;
+  guides?: BoardMark[];
 }) {
   const { appearance, notify } = useApp();
   const boardRef = useRef<HTMLDivElement>(null),
@@ -109,7 +119,7 @@ export function Board({
     files = flipped ? "hgfedcba" : "abcdefgh",
     ranks = flipped ? "12345678" : "87654321";
   useControl("flip", () => {
-    if (!compact) {
+    if (!compact && !boardRef.current?.closest("[hidden]")) {
       if (onFlip) onFlip();
       else setFlipOffset((v) => !v);
     }
@@ -124,7 +134,7 @@ export function Board({
     setSelected(null);
     setPromotion(null);
     setDrag(null);
-    updateMarks([]);
+    setMarks([]);
   }, [fen]);
   let moves = legalMoves;
   if (!moves)
@@ -230,8 +240,8 @@ export function Board({
   }
   const values: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9 },
     pieces =
-      Object.values(cells).join("") +
-      (fen.split(" ")[0].match(/\[([^\]]*)\]/)?.[1] || ""),
+      Object.values(squares(materialFen || fen)).join("") +
+      ((materialFen || fen).split(" ")[0].match(/\[([^\]]*)\]/)?.[1] || ""),
     imbalance =
       [...pieces].reduce(
         (s, p) =>
@@ -246,6 +256,14 @@ export function Board({
   }
   return (
     <div className={`board-frame ${compact ? "compact-frame" : ""}`}>
+      {imbalance < 0 && (
+        <div
+          className="material-advantage material-top"
+          aria-label={`Material advantage for ${flipped ? "White" : "Black"}: +${Math.abs(imbalance)}`}
+        >
+          <b>+{Math.abs(imbalance)}</b>
+        </div>
+      )}
       <div
         ref={boardRef}
         className={`board ${compact ? "compact-board" : ""}`}
@@ -414,18 +432,19 @@ export function Board({
           }),
         )}
         <svg className="board-marks" viewBox="0 0 100 100" aria-hidden="true">
-          {currentMarks.map((m, i) => {
+          {[...guides, ...currentMarks].map((m, i) => {
             const a = coord(m.from),
               b = coord(m.to);
             if (m.from === m.to)
               return (
-                <circle
+                <rect
                   key={i}
-                  cx={a.x}
-                  cy={a.y}
-                  r={5.3}
+                  x={a.x - 6.25}
+                  y={a.y - 6.25}
+                  width={12.5}
+                  height={12.5}
                   fill={m.color}
-                  opacity=".5"
+                  opacity=".45"
                 />
               );
             const angle = Math.atan2(b.y - a.y, b.x - a.x),
@@ -440,12 +459,27 @@ export function Board({
                   y1={a.y}
                   x2={end.x}
                   y2={end.y}
-                  strokeWidth="2.3"
+                  strokeWidth={Math.max(0.7, Math.min(4, m.weight || 2.3))}
                   strokeLinecap="round"
                 />
                 <path
                   d={`M ${b.x} ${b.y} L ${b.x - Math.cos(angle - 0.55) * 5} ${b.y - Math.sin(angle - 0.55) * 5} L ${b.x - Math.cos(angle + 0.55) * 5} ${b.y - Math.sin(angle + 0.55) * 5} Z`}
                 />
+                {m.label && (
+                  <text
+                    x={(a.x + b.x) / 2}
+                    y={(a.y + b.y) / 2 - 1.7}
+                    textAnchor="middle"
+                    fill="var(--text)"
+                    stroke="var(--base)"
+                    strokeWidth=".8"
+                    paintOrder="stroke"
+                    fontSize="3.3"
+                    fontWeight="700"
+                  >
+                    {m.label}
+                  </text>
+                )}
               </g>
             );
           })}
@@ -453,16 +487,15 @@ export function Board({
       </div>
       <div
         className={`material-imbalance ${compact ? "compact-material" : ""}`}
-        aria-label={`Material imbalance for ${flipped ? "Black" : "White"}: ${imbalance > 0 ? "+" : ""}${imbalance}`}
+        aria-label={
+          imbalance > 0
+            ? `Material advantage for ${flipped ? "Black" : "White"}: +${imbalance}`
+            : imbalance === 0
+              ? "Material is equal"
+              : undefined
+        }
       >
-        <span
-          className={flipped ? "black-piece" : "white-piece"}
-          aria-hidden="true"
-        />
-        <b>
-          {imbalance > 0 ? "+" : ""}
-          {imbalance}
-        </b>
+        <b>{imbalance > 0 ? `+${imbalance}` : imbalance === 0 ? "0" : ""}</b>
       </div>
       {drag && (
         <div

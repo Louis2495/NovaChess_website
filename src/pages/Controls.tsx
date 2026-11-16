@@ -1,10 +1,22 @@
 import { useState } from "react";
 import { RotateCcw, Keyboard } from "lucide-react";
 import { useApp } from "../lib/context";
-import { defaultControls } from "../lib/controls";
+import { defaultControls, resolveControls } from "../lib/controls";
 import { Button, Card, PageTitle } from "../components/UI";
 const labels: Record<string, string> = {
   flip: "Flip board",
+  focusMode: "Board-only focus mode",
+  newGame: "New game setup",
+  analysis: "Open analysis",
+  puzzles: "Open puzzles",
+  learn: "Open Learn",
+  home: "Go Home",
+  search: "Search",
+  legalHints: "Toggle move hints",
+  coordinates: "Toggle coordinates",
+  sound: "Toggle move sounds",
+  catalog: "Browse opening lessons",
+  practice: "Practice lesson moves",
   previous: "Previous move",
   next: "Next move",
   first: "First move",
@@ -12,13 +24,13 @@ const labels: Record<string, string> = {
   autoplay: "Play / pause",
   clearMarks: "Clear annotations / cancel",
 };
-export default function Controls() {
+export default function Controls({ embedded = false }: { embedded?: boolean }) {
   const { appearance, setAppearance, notify } = useApp();
   const [capture, setCapture] = useState("");
-  const keys = { ...defaultControls, ...appearance.controls };
+  const keys = resolveControls(appearance.controls);
   return (
     <>
-      <PageTitle title="Controls" />
+      {!embedded && <PageTitle title="Controls" />}
       <Card className="controls-card">
         <div className="card-heading">
           <h2>Keyboard</h2>
@@ -34,6 +46,14 @@ export default function Controls() {
                 if (capture !== key) return;
                 e.preventDefault();
                 e.stopPropagation();
+                if (e.key === "Backspace" || e.key === "Delete") {
+                  setAppearance((a) => ({
+                    ...a,
+                    controls: { ...keys, [key]: "" },
+                  }));
+                  setCapture("");
+                  return;
+                }
                 if (["Control", "Shift", "Alt", "Meta", "Tab"].includes(e.key))
                   return;
                 if (
@@ -58,7 +78,7 @@ export default function Controls() {
                 ? "Press a key"
                 : keys[key as keyof typeof keys] === " "
                   ? "Space"
-                  : keys[key as keyof typeof keys]}
+                  : keys[key as keyof typeof keys] || "Unassigned"}
             </button>
           </div>
         ))}

@@ -1,3 +1,4 @@
+import { parseTypedMove } from "../lib/moves";
 import { useEffect, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -247,7 +248,7 @@ export default function Analysis() {
               <ChevronLeft size={20} />
             </IconButton>
             <span>
-              {cursor} / {moves.length}
+              {Math.ceil(cursor / 2)} / {Math.ceil(moves.length / 2)}
             </span>
             <IconButton
               label="Next position"
@@ -269,7 +270,7 @@ export default function Analysis() {
             onSubmit={(e) => {
               e.preventDefault();
               try {
-                const m = new Chess(fen).move(moveInput.trim());
+                const m = parseTypedMove(new Chess(fen), moveInput);
                 play(m.from, m.to, m.promotion);
                 setMoveInput("");
               } catch {

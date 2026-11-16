@@ -2,6 +2,18 @@ import { useEffect, useRef } from "react";
 import { useApp } from "./context";
 export const defaultControls = {
   flip: "f",
+  focusMode: "z",
+  newGame: "n",
+  analysis: "a",
+  puzzles: "p",
+  learn: "l",
+  home: "h",
+  search: "/",
+  legalHints: "i",
+  coordinates: "k",
+  sound: "m",
+  catalog: "o",
+  practice: "t",
   previous: "ArrowLeft",
   next: "ArrowRight",
   first: "Home",
@@ -14,6 +26,22 @@ export const defaultControls = {
   markGold: "ctrl",
 };
 export type ControlAction = keyof typeof defaultControls;
+export function resolveControls(overrides: Record<string, string> = {}) {
+  const result: Record<string, string> = { ...defaultControls, ...overrides };
+  for (const key of Object.keys(defaultControls)) {
+    if (key in overrides || key.startsWith("mark")) continue;
+    if (
+      Object.entries(overrides).some(
+        ([k, v]) =>
+          !k.startsWith("mark") &&
+          v &&
+          v.toLowerCase() === result[key].toLowerCase(),
+      )
+    )
+      result[key] = "";
+  }
+  return result;
+}
 export function useControl(action: ControlAction, fn: () => void) {
   const { appearance } = useApp();
   const ref = useRef(fn);
@@ -27,8 +55,9 @@ export function useControl(action: ControlAction, fn: () => void) {
         )
       )
         return;
-      const key = appearance.controls?.[action] ?? defaultControls[action];
+      const key = resolveControls(appearance.controls)[action];
       if (
+        key &&
         e.key.toLowerCase() === key.toLowerCase() &&
         !e.ctrlKey &&
         !e.metaKey &&

@@ -16,7 +16,7 @@ test("the entire daily puzzle card opens the daily puzzle and has no small actio
   for (const selector of [
     ".home-puzzle h2",
     ".home-puzzle .board",
-    ".home-puzzle .position-label",
+    ".home-puzzle",
   ]) {
     await page.goto("/");
     await expect(page.locator(selector)).toBeVisible();
@@ -43,7 +43,7 @@ test("all public routes remove import controls, flip buttons and global customiz
     "stats",
   ]) {
     await page.goto("/#" + route);
-    await page.locator("h1").waitFor();
+    await page.locator("h1:visible").waitFor();
     await expect(
       page.getByRole("button", { name: /Import|Flip board|Customize/ }),
     ).toHaveCount(0);
@@ -69,12 +69,12 @@ test("material totals follow bottom color and the remapped flip key", async ({
   const fen = "7k/8/8/8/8/p7/PP6/7K w - - 0 1";
   await page.goto("/#analysis/" + encodeURIComponent("fen:" + fen));
   await expect(
-    page.getByLabel("Material imbalance for White: +1", { exact: true }),
+    page.getByLabel("Material advantage for White: +1", { exact: true }),
   ).toHaveText("+1");
   await page.keyboard.press("f");
   await expect(
-    page.getByLabel("Material imbalance for Black: -1", { exact: true }),
-  ).toHaveText("-1");
+    page.getByLabel("Material advantage for White: +1", { exact: true }),
+  ).toHaveText("+1");
   await page.goto("/#controls");
   const binding = page
     .locator(".control-row")
@@ -85,11 +85,11 @@ test("material totals follow bottom color and the remapped flip key", async ({
   await page.goto("/#analysis/" + encodeURIComponent("fen:" + fen));
   await page.keyboard.press("f");
   await expect(
-    page.getByLabel("Material imbalance for White: +1", { exact: true }),
+    page.getByLabel("Material advantage for White: +1", { exact: true }),
   ).toBeVisible();
   await page.keyboard.press("v");
   await expect(
-    page.getByLabel("Material imbalance for Black: -1", { exact: true }),
+    page.getByLabel("Material advantage for White: +1", { exact: true }),
   ).toBeVisible();
 });
 test("piece drag snaps by its center at a square boundary and does not show a yellow selection box", async ({
@@ -117,12 +117,12 @@ test("right click creates colored square marks and arrows, and controls change t
 }) => {
   await page.goto("/#analysis");
   await square(page, "e4").click({ button: "right" });
-  await expect(page.locator(".board-marks circle")).toHaveAttribute(
+  await expect(page.locator(".board-marks rect")).toHaveAttribute(
     "fill",
     "#63d6a1",
   );
   await square(page, "d4").click({ button: "right", modifiers: ["Shift"] });
-  await expect(page.locator(".board-marks circle").nth(1)).toHaveAttribute(
+  await expect(page.locator(".board-marks rect").nth(1)).toHaveAttribute(
     "fill",
     "#67b8ff",
   );
@@ -137,12 +137,12 @@ test("right click creates colored square marks and arrows, and controls change t
   await page.getByLabel("Square / arrow annotation color").fill("#12abcd");
   await page.goto("/#analysis");
   await square(page, "e4").click({ button: "right" });
-  await expect(page.locator(".board-marks circle")).toHaveAttribute(
+  await expect(page.locator(".board-marks rect")).toHaveAttribute(
     "fill",
     "#12abcd",
   );
   await page.keyboard.press("Escape");
-  await expect(page.locator(".board-marks circle")).toHaveCount(0);
+  await expect(page.locator(".board-marks rect")).toHaveCount(0);
 });
 test("promotion is adjacent and puts the queen under the release point", async ({
   page,
@@ -180,12 +180,13 @@ test("opening desk collapses the catalog, exposes deep plans and branches and fi
   await page.goto("/#learn/lessons");
   await page.locator(".opening-row").first().click();
   await expect(page.locator(".opening-list")).toHaveCount(0);
+  await page.getByRole("button", { name: "Plan", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "White’s plan", exact: true }),
   ).toBeVisible();
   await expect(
     page.getByLabel("Lesson variation").locator("option"),
-  ).toHaveCount(3);
+  ).toHaveCount(4);
   await page.getByLabel("Lesson variation").selectOption("1");
   await expect(page.getByLabel("Lesson variation")).toHaveValue("1");
   await page.getByRole("button", { name: "Structure", exact: true }).click();

@@ -146,7 +146,7 @@ export default function Stats() {
     "Engine challenger": "Win 50 locally rated games against 2000+ bots",
     "Blindfold hundred": "Win 100 blindfold games",
     "Underpromotion artist": "Deliver checkmate by underpromotion five times",
-    "Study the evidence": "Fully review 100 games of at least 40 plies",
+    "Study the evidence": "Fully review 100 games of at least 20 moves",
     "Trivia scholar": "Answer 500 trivia questions correctly",
     "Evaluation instinct": "Guess 100 engine evaluations within 0.25 pawns",
   };

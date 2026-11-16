@@ -12,11 +12,8 @@ import {
   Search,
   ChevronRight,
   X,
-  Command,
   ShieldCheck,
   Menu,
-  UserRound,
-  Keyboard,
   Trophy,
 } from "lucide-react";
 import "@fontsource/dm-sans/latin-400.css";
@@ -35,9 +32,11 @@ import {
   base,
   APP_SOURCE,
   contrast,
+  pieceUrl,
 } from "./lib/store";
 import type { Appearance as AppearanceType, Library, Tab } from "./lib/types";
 import { IconButton, Modal, Loading, External } from "./components/UI";
+import WorkspaceShortcuts from "./components/WorkspaceShortcuts";
 import Appearance from "./components/Appearance";
 import HomePage from "./pages/Home";
 import "./styles.css";
@@ -46,7 +45,6 @@ const Analysis = lazy(() => import("./pages/Analysis")),
   Play = lazy(() => import("./pages/Play")),
   Puzzles = lazy(() => import("./pages/Puzzles")),
   Research = lazy(() => import("./pages/Research")),
-  Controls = lazy(() => import("./pages/Controls")),
   Rankings = lazy(() => import("./pages/Rankings")),
   ProfilePage = lazy(() => import("./pages/Profile")),
   Learn = lazy(() => import("./pages/Learn")),
@@ -63,13 +61,15 @@ const mainNav = [
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
 ] as const;
 const secondaryNav = [
-  { id: "controls", label: "Controls", icon: Keyboard },
   { id: "rankings", label: "Rankings", icon: Trophy },
-  { id: "profile", label: "Profile", icon: UserRound },
   { id: "library", label: "Saved games", icon: FolderOpen },
   { id: "community", label: "Multiplayer", icon: Users },
 ] as const;
-const validTabs = new Set([...mainNav, ...secondaryNav].map((v) => v.id));
+const validTabs = new Set<string>([
+  "profile",
+  "controls",
+  ...[...mainNav, ...secondaryNav].map((v) => v.id),
+]);
 function route() {
   const [tab, ...rest] = location.hash.slice(1).split("/");
   let detail = "";
@@ -77,8 +77,13 @@ function route() {
     detail = decodeURIComponent(rest.join("/"));
   } catch {}
   return {
-    tab: validTabs.has(tab as Tab) ? (tab as Tab) : ("home" as Tab),
-    detail,
+    tab:
+      tab === "controls"
+        ? ("profile" as Tab)
+        : validTabs.has(tab)
+          ? (tab as Tab)
+          : ("home" as Tab),
+    detail: tab === "controls" ? "controls" : detail,
   };
 }
 function App() {
@@ -92,11 +97,55 @@ function App() {
     ),
     [locationState, setLocation] = useState(route),
     [showAppearance, setShowAppearance] = useState(false),
+    [researchVisited, setResearchVisited] = useState(
+      () => route().tab === "research",
+    ),
+    [focusMode, setFocusMode] = useState(false),
     [message, setMessage] = useState(""),
     [showMenu, setShowMenu] = useState(false),
     [command, setCommand] = useState(false),
     [query, setQuery] = useState(""),
     [info, setInfo] = useState(false);
+  useEffect(() => {
+    if (locationState.tab === "research") setResearchVisited(true);
+  }, [locationState.tab]);
+  function toggleFocus() {
+    if (focusMode) {
+      setFocusMode(false);
+      return;
+    }
+    const active = document.activeElement?.closest<HTMLElement>(
+      ".board-frame:not(.compact-frame)",
+    );
+    const frame =
+      active ||
+      Array.from(
+        document.querySelectorAll<HTMLElement>(
+          "#workspace .board-frame:not(.compact-frame)",
+        ),
+      ).find((e) => !e.closest("[hidden]"));
+    if (!frame) {
+      setMessage("Open a board to use focus mode.");
+      return;
+    }
+    frame.dataset.focusBoard = "true";
+    setFocusMode(true);
+  }
+  useEffect(() => {
+    if (!focusMode)
+      document
+        .querySelectorAll("[data-focus-board]")
+        .forEach((e) => e.removeAttribute("data-focus-board"));
+    const previous = document.body.style.overflow;
+    if (focusMode) document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [focusMode]);
+  useEffect(
+    () => setFocusMode(false),
+    [locationState.tab, locationState.detail],
+  );
   const audio = useRef<HTMLAudioElement | null>(null);
   const musicReady = useRef<Promise<void> | null>(null);
   const { tab, detail } = locationState;
@@ -205,10 +254,10 @@ function App() {
   }, [appearance.sound, appearance.volume]);
   useEffect(() => {
     setAppearance((a) =>
-      ["#101418", "#101612"].includes(a.backgroundColor) &&
-      ["#1b2126", "#1c271f"].includes(a.panelColor) &&
-      ["#f0f3f1", "#eef4ed"].includes(a.textColor) &&
-      ["#a6b0aa", "#abb8aa"].includes(a.mutedColor)
+      ["#101418", "#101612", "#19262e"].includes(a.backgroundColor) &&
+      ["#1b2126", "#1c271f", "#263840"].includes(a.panelColor) &&
+      ["#f0f3f1", "#eef4ed", "#f4f8f5"].includes(a.textColor) &&
+      ["#a6b0aa", "#abb8aa", "#b5c8c5"].includes(a.mutedColor)
         ? {
             ...a,
             backgroundColor: defaults.backgroundColor,
@@ -289,11 +338,7 @@ function App() {
       <Puzzles />
     ) : tab === "learn" ? (
       <Learn />
-    ) : tab === "research" ? (
-      <Research />
-    ) : tab === "controls" ? (
-      <Controls />
-    ) : tab === "rankings" ? (
+    ) : tab === "research" ? null : tab === "rankings" ? (
       <Rankings />
     ) : tab === "profile" ? (
       <ProfilePage />
@@ -321,9 +366,23 @@ function App() {
       }}
     >
       <div
-        className={`app ${appearance.animation ? "" : "no-motion"} bg-${appearance.background.toLowerCase()}`}
+        className={`app ${focusMode ? "focus-mode" : ""} ${appearance.animation ? "" : "no-motion"} bg-${appearance.background.toLowerCase()}`}
         style={style}
       >
+        <WorkspaceShortcuts
+          toggleFocus={toggleFocus}
+          exitFocus={() => setFocusMode(false)}
+          openSearch={() => setCommand(true)}
+        />
+        {focusMode && (
+          <button
+            className="exit-focus icon-btn"
+            aria-label="Exit focus mode"
+            onClick={() => setFocusMode(false)}
+          >
+            <X size={20} />
+          </button>
+        )}
         <div className="site-background" aria-hidden="true" />
         <a className="skip-link" href="#workspace">
           Skip to workspace
@@ -375,7 +434,11 @@ function App() {
                 {library.profile.avatar ? (
                   <img src={library.profile.avatar} alt="" />
                 ) : (
-                  library.profile.name.slice(0, 1).toUpperCase()
+                  <img
+                    src={pieceUrl("wP", "Merida")}
+                    className="default-avatar"
+                    alt=""
+                  />
                 )}
               </span>
               <span>{library.profile.name}</span>
@@ -405,23 +468,21 @@ function App() {
               <Menu size={21} />
             </IconButton>
             <span className="mobile-wordmark">NovaChess</span>
-            <button
-              className="global-search"
-              aria-label="Search tools and openings"
-              onClick={() => setCommand(true)}
-            >
-              <Search size={16} />
-              <span>Search</span>
-              <kbd>
-                <Command size={10} /> K
-              </kbd>
-            </button>
             <div className="topbar-right"></div>
           </header>
           <main id="workspace" tabIndex={-1} className="workspace">
-            <Suspense fallback={<Loading />}>
-              <div key={`${tab}:${detail}`}>{page}</div>
-            </Suspense>
+            <div key="page-view">
+              <Suspense fallback={<Loading />}>
+                <div key={`${tab}:${detail}`}>{page}</div>
+              </Suspense>
+            </div>
+            {(researchVisited || tab === "research") && (
+              <div key="research-view" hidden={tab !== "research"}>
+                <Suspense fallback={<Loading />}>
+                  <Research />
+                </Suspense>
+              </div>
+            )}
           </main>
         </div>
         <nav className="mobile-tabs" aria-label="App tabs">

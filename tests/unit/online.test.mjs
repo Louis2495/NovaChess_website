@@ -269,6 +269,17 @@ test("Team chess lets teammates move and draw shared arrows, and the server play
   const c = new Chess();
   for (const move of r.data.state.moves) c.move(move);
 });
+test("only computer team games accept a draw, and draws finish the game", async () => {
+  const computer = await room("team", { bot: true });
+  let result = await command(users[0], computer, "draw");
+  assert.equal(result.status, 200, JSON.stringify(result.data));
+  assert.equal(result.data.state.result, "1/2-1/2");
+  assert.equal(result.data.status, "finished");
+  const humans = await room();
+  const joined = await command(users[1], humans, "join");
+  result = await command(users[0], joined.data, "draw");
+  assert.notEqual(result.status, 200);
+});
 test("ratings count each validated game once and expose country/global percentiles after five games", async () => {
   const game = await room();
   for (let i = 0; i < 5; i++) {

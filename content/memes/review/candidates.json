@@ -1,0 +1,86 @@
+[
+  {
+    "id": "01",
+    "image": "01.svg",
+    "top": "I studied 14 moves of theory.",
+    "bottom": "Opponent: 1. d4",
+    "status": "unreviewed"
+  },
+  {
+    "id": "02",
+    "image": "02.svg",
+    "top": "My opponent offered a draw.",
+    "bottom": "I spent 20 moves proving they were right.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "03",
+    "image": "03.svg",
+    "top": "A queen up. No need to calculate.",
+    "bottom": "½–½",
+    "status": "unreviewed"
+  },
+  {
+    "id": "04",
+    "image": "04.svg",
+    "top": "Me: brilliant sacrifice.",
+    "bottom": "Engine: missing rook.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "05",
+    "image": "05.svg",
+    "top": "Finally found a plan.",
+    "bottom": "It was my opponent’s.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "06",
+    "image": "06.svg",
+    "top": "The opening book ends here.",
+    "bottom": "Unfortunately, so does my chess.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "07",
+    "image": "07.svg",
+    "top": "I saw the fork.",
+    "bottom": "After submitting my resignation.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "08",
+    "image": "08.svg",
+    "top": "Calculated six moves ahead.",
+    "bottom": "Forgot they get turns too.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "09",
+    "image": "09.svg",
+    "top": "My king is perfectly safe.",
+    "bottom": "According to my opponent.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "10",
+    "image": "10.svg",
+    "top": "I have a winning position.",
+    "bottom": "Now comes the difficult part: playing chess.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "11",
+    "image": "11.svg",
+    "top": "One last game.",
+    "bottom": "A statement, not a timestamp.",
+    "status": "unreviewed"
+  },
+  {
+    "id": "12",
+    "image": "12.svg",
+    "top": "The engine says it’s equal.",
+    "bottom": "We are both offended.",
+    "status": "unreviewed"
+  }
+]

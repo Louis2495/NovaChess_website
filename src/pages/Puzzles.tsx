@@ -1,14 +1,9 @@
+import { usePremoves } from "../lib/usePremoves";
+import PremoveQueue from "../components/PremoveQueue";
+import { parseTypedMove, humanTheme } from "../lib/moves";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
-import {
-  Flame,
-  Lightbulb,
-  ArrowRight,
-  RotateCcw,
-  Target,
-  ExternalLink,
-  Calendar,
-} from "lucide-react";
+import { Lightbulb, ArrowRight, RotateCcw, Calendar } from "lucide-react";
 import { useApp } from "../lib/context";
 import { useData, today } from "../lib/store";
 import type { PuzzleData } from "../lib/types";
@@ -40,7 +35,8 @@ function ClassicPuzzles() {
   return <PuzzleTrainer puzzles={data} />;
 }
 function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
-  const { library, setLibrary, detail, notify, navigate } = useApp();
+  const { library, setLibrary, detail, notify, navigate, appearance } =
+    useApp();
   const daily = detail === "daily";
   const [theme, setTheme] = useState("All themes");
   const pool = useMemo(
@@ -203,6 +199,16 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     }, 400);
     return () => clearTimeout(timer);
   }, [fen, cursor, puzzle, done]);
+  const premove = usePremoves({
+    fen,
+    side: learner,
+    legal: c
+      .moves({ verbose: true })
+      .map((m) => m.from + m.to + (m.promotion || "")),
+    active: !done,
+    identity: puzzle.id,
+    execute: (move) => attempt(move.slice(0, 2), move.slice(2, 4), move[4]),
+  });
   const themes = useMemo(
     () => [...new Set(puzzles.flatMap((p) => p.themes))].sort(),
     [puzzles],
@@ -211,11 +217,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     <>
       <PageTitle
         title={daily ? "Daily puzzle" : "Puzzles"}
-        subtitle={
-          daily
-            ? new Date().toLocaleDateString()
-            : "Adaptive training · 4,000 offline positions"
-        }
+        subtitle={daily ? new Date().toLocaleDateString() : undefined}
       >
         <Button
           className="secondary"
@@ -224,13 +226,13 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           <Calendar size={16} />
           {daily ? "Adaptive practice" : "Daily puzzle"}
         </Button>
+        <Button
+          className="secondary"
+          onClick={() => navigate("puzzles", "eval")}
+        >
+          Guess the eval
+        </Button>
       </PageTitle>
-      <Button
-        className="eval-tab secondary"
-        onClick={() => navigate("puzzles", "eval")}
-      >
-        Guess the eval
-      </Button>
       <div className="chess-layout">
         <div className="board-column">
           <div className="board-topline">
@@ -242,19 +244,30 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
                   ? "Playing reply…"
                   : `${learner === "w" ? "White" : "Black"} to move`}
             </span>
-            <span className="muted">{played.length} half-moves</span>
+            <span className="muted">{Math.ceil(played.length / 2)} moves</span>
           </div>
           <div
             className={`puzzle-board ${wrong ? "wrong" : ""} ${done ? "solved" : ""}`}
           >
             <Board
-              fen={fen}
-              onMove={attempt}
-              disabled={done || c.turn() !== learner}
+              fen={premove.preview}
+              materialFen={fen}
+              legalMoves={c.turn() === learner ? undefined : premove.options}
+              onMove={(from, to, promotion) =>
+                c.turn() === learner
+                  ? attempt(from, to, promotion)
+                  : premove.enqueue(from + to + (promotion || ""))
+              }
+              disabled={done || (c.turn() !== learner && !appearance.premoves)}
               flipped={learner === "b"}
               hint={hint}
             />
           </div>
+          <PremoveQueue
+            moves={premove.queue}
+            undo={() => premove.setQueue((q) => q.slice(0, -1))}
+            clear={premove.clear}
+          />
           <div className="puzzle-feedback" role="status">
             {message || "Find the best continuation."}
           </div>
@@ -291,7 +304,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             onSubmit={(e) => {
               e.preventDefault();
               try {
-                const m = new Chess(fen).move(moveInput);
+                const m = parseTypedMove(new Chess(fen), moveInput);
                 attempt(m.from, m.to, m.promotion);
                 setMoveInput("");
               } catch {
@@ -313,37 +326,16 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
         </div>
         <div className="side-panels">
           <Card>
-            <div className="card-heading">
-              <h2>Your training</h2>
-              <Target size={19} />
-            </div>
-            <div className="large-metric">
+            <div className="large-metric puzzle-rating">
               {Math.round(library.progress.rating)}
-              <span>Puzzle estimate</span>
             </div>
-            <div className="metric-pair">
-              <div>
-                <b>{library.progress.solved}</b>
-                <span>Solved</span>
-              </div>
-              <div>
-                <b>
-                  <Flame size={19} />
-                  {library.progress.streak}
-                </b>
-                <span>Streak</span>
-              </div>
-            </div>
-            <p className="caption">
-              Local training estimate on the Lichess puzzle scale. Hints,
-              mistakes and skips affect it.
-            </p>
           </Card>
           {!daily && (
             <Card>
               <h2>Practice</h2>
               <Field label="Theme">
                 <select
+                  className="theme-select"
                   value={theme}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -364,7 +356,9 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
                 >
                   <option>All themes</option>
                   {themes.map((t) => (
-                    <option key={t}>{t}</option>
+                    <option key={t} value={t}>
+                      {humanTheme(t)}
+                    </option>
                   ))}
                 </select>
               </Field>
@@ -379,30 +373,10 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               <span className="pill">{done ? "Complete" : "In progress"}</span>
             </div>
             <div className="move-chips">
-              {played.length ? (
-                played.map((m, i) => <span key={i}>{m}</span>)
-              ) : (
-                <p className="muted">Your solution appears here.</p>
-              )}
+              {played.map((m, i) => (
+                <span key={i}>{m}</span>
+              ))}
             </div>
-            <a
-              className="external"
-              href={puzzle.gameURL}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Original game
-              <ExternalLink size={14} />
-            </a>
-            {done && (
-              <div className="puzzle-themes">
-                {puzzle.themes.map((t) => (
-                  <span className="pill" key={t}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-            )}
           </Card>
         </div>
       </div>

@@ -5,7 +5,7 @@ export const base = import.meta.env.BASE_URL;
 export const initialFen =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 export const themes: Record<string, string> = {
-  Forest: "#78b58a",
+  Forest: "#96d9b8",
   Pink: "#ef7eb6",
   Ocean: "#72b2ff",
   Plum: "#bd8ae4",
@@ -56,12 +56,12 @@ export const backgrounds = [
 export const defaults: Appearance = {
   theme: "Forest",
   background: "Default",
-  backgroundColor: "#19262e",
-  accent: "#91d7b6",
-  buttonColor: "#91d7b6",
+  backgroundColor: "#20313b",
+  accent: "#96d9b8",
+  buttonColor: "#96d9b8",
   textColor: "#f4f8f5",
   mutedColor: "#b5c8c5",
-  panelColor: "#263840",
+  panelColor: "#304651",
   board: "Classic",
   light: boards.Classic[0],
   dark: boards.Classic[1],

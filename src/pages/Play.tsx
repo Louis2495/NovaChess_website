@@ -1,3 +1,6 @@
+import { previewPremoves } from "../lib/premoves";
+import { usePremoves } from "../lib/usePremoves";
+import { matchTypedMove } from "../lib/moves";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import type { FairyStockfish } from "ffish-es6";
@@ -43,7 +46,7 @@ import SpecialPlay from "./SpecialPlay";
 import GameResult from "../components/GameResult";
 import { newSpecial } from "../lib/specialRules";
 import type { SpecialVariant } from "../lib/specialRules";
-import VariantIcon, { variantSymbols } from "../components/VariantIcon";
+import VariantIcon from "../components/VariantIcon";
 import { buildFen } from "../components/PositionEditor";
 function addPocket(fen: string, piece: string) {
   if (!piece) return fen;
@@ -129,9 +132,12 @@ export default function Play() {
     [options, setOptions] = useState(false),
     [paused, setPaused] = useState(false),
     [flipped, setFlipped] = useState(false),
-    [duck, setDuck] = useState<{ fen: string; options: string[] } | null>(null),
+    [duck, setDuck] = useState<{
+      fen: string;
+      options: string[];
+      queued?: boolean;
+    } | null>(null),
     [pocket, setPocket] = useState(""),
-    [premoves, setPremoves] = useState<string[]>([]),
     [text, setText] = useState(""),
     [confirm, setConfirm] = useState(false),
     [busy, setBusy] = useState(false);
@@ -388,8 +394,40 @@ export default function Play() {
     const prefix = from + to + (promotion || "");
     if (valid.turn !== game.human) {
       if (appearance.premoves) {
-        setPremoves((p) => [...p, prefix]);
-        notify("Premove queued.");
+        if (game.variant === "duck") {
+          let b: ReturnType<typeof makeBoard> | undefined;
+          try {
+            b = makeBoard(ff!, game.variant, premove.preview, []);
+            const candidates = legal(b).filter(
+              (m) =>
+                m.split(",")[0] === prefix ||
+                (!promotion && m.split(",")[0] === from + to),
+            );
+            if (!candidates.length) {
+              notify("That premove is unavailable.");
+              return;
+            }
+            if (candidates[0].includes(",")) {
+              const preview = previewPremoves(
+                premove.preview,
+                [candidates[0]],
+                game.human,
+              );
+              const p = squares(preview);
+              for (const sq of Object.keys(p)) if (p[sq] === "*") delete p[sq];
+              setDuck({
+                fen: buildFen(p, game.human, "", ""),
+                options: candidates,
+                queued: true,
+              });
+            } else premove.enqueue(candidates[0]);
+          } finally {
+            b?.delete();
+          }
+        } else {
+          premove.enqueue(prefix);
+          notify("Premove queued.");
+        }
       }
       return;
     }
@@ -536,27 +574,6 @@ export default function Play() {
     };
   }, [ff, game?.id, game?.moves.length, playing, paused, openings, developer]);
   useEffect(() => {
-    if (
-      !game ||
-      !valid ||
-      !playing ||
-      paused ||
-      valid.turn !== game.human ||
-      !premoves.length ||
-      game.result !== "*"
-    )
-      return;
-    const move = premoves[0];
-    const found = valid.legal.find((m) => m === move || m === move + "q");
-    if (found) {
-      setPremoves((p) => p.slice(1));
-      apply(found);
-    } else {
-      setPremoves([]);
-      notify("Illegal premove. Queue cleared.");
-    }
-  }, [game?.moves.length, premoves, playing, paused]);
-  useEffect(() => {
     if (!ff || !game?.partner || !playing || paused || game.result !== "*")
       return;
     const controller = new AbortController();
@@ -586,24 +603,17 @@ export default function Play() {
       controller.abort();
     };
   }, [ff, game?.partner?.positions, playing, paused, game?.result]);
-  const premoveLegal = useMemo(() => {
-    if (!game || !valid || valid.turn === game.human) return valid?.legal || [];
-    const p = squares(valid.fen),
-      out: string[] = [];
-    for (const [from, piece] of Object.entries(p)) {
-      if (
-        (piece === piece.toUpperCase() ? "w" : "b") !== game.human ||
-        piece === "*"
-      )
-        continue;
-      for (const f of "abcdefgh")
-        for (const r of "12345678") {
-          const to = f + r;
-          if (to !== from) out.push(from + to);
-        }
-    }
-    return out;
-  }, [game?.moves.length, valid?.turn]);
+  const premove = usePremoves({
+    fen: valid?.fen || "8/8/8/8/8/8/8/8 w - - 0 1",
+    side: game?.human || "w",
+    legal: valid?.legal || [],
+    active: !!game && playing && !paused && game.result === "*",
+    identity: game?.id,
+    execute: (move) => apply(move),
+  });
+  const { queue: premoves, setQueue: setPremoves } = premove;
+  const premoveLegal =
+    valid?.turn === game?.human ? valid?.legal || [] : premove.options;
   function resign() {
     if (!game) return;
     const next = { ...game, result: game.human === "w" ? "0-1" : "1-0" };
@@ -696,6 +706,22 @@ export default function Play() {
               )}
             </div>
           </section>
+          <div
+            className="variant-gallery"
+            role="group"
+            aria-label="Choose variant"
+          >
+            {variantList.map((v) => (
+              <button
+                key={v.id}
+                aria-pressed={variant === v.id}
+                onClick={() => setVariant(v.id)}
+              >
+                <VariantIcon id={v.id} size={100} />
+                <span>{v.name}</span>
+              </button>
+            ))}
+          </div>
           <Card className="game-settings-card">
             <button
               className="options-toggle"
@@ -714,7 +740,7 @@ export default function Play() {
                   >
                     {variantList.map((v) => (
                       <option key={v.id} value={v.id}>
-                        {variantSymbols[v.id]} {v.name}
+                        {v.name}
                       </option>
                     ))}
                   </select>
@@ -872,7 +898,8 @@ export default function Play() {
                   onSelect={() => {}}
                 />
                 <Board
-                  fen={duck?.fen || valid.fen}
+                  fen={duck?.fen || premove.preview}
+                  materialFen={valid.fen}
                   onMove={play}
                   legalMoves={premoveLegal}
                   onSquare={
@@ -881,8 +908,11 @@ export default function Play() {
                           const move = duck.options.find(
                             (m) => m.slice(-2) === square,
                           );
-                          if (move) apply(move);
-                          else
+                          if (move) {
+                            if (duck.queued) premove.enqueue(move);
+                            else apply(move);
+                            setDuck(null);
+                          } else
                             notify(
                               "Place the duck on an available empty square.",
                             );
@@ -890,7 +920,13 @@ export default function Play() {
                       : pocket
                         ? (square) => {
                             const move = `${pocket.toUpperCase()}@${square}`;
-                            if (valid.legal.includes(move)) apply(move);
+                            if (
+                              valid.turn !== game.human &&
+                              appearance.premoves &&
+                              !squares(premove.preview)[square]
+                            )
+                              premove.enqueue(move);
+                            else if (valid.legal.includes(move)) apply(move);
                             else notify("That drop is not legal.");
                             setPocket("");
                           }
@@ -923,7 +959,9 @@ export default function Play() {
                     game.human === "w" ? valid.whitePocket : valid.blackPocket
                   }
                   enabled={
-                    valid.turn === game.human && !paused && game.result === "*"
+                    (valid.turn === game.human || appearance.premoves) &&
+                    !paused &&
+                    game.result === "*"
                   }
                   selected={pocket}
                   onSelect={setPocket}
@@ -973,19 +1011,10 @@ export default function Play() {
                     game.variant === "bughouse" ? valid.fen : game.initial,
                     game.variant === "bughouse" ? [] : game.moves,
                   );
-                  let move = valid.legal.find(
-                    (m) => m.toLowerCase() === text.trim().toLowerCase(),
+                  const move = matchTypedMove(
+                    text,
+                    valid.legal.map((uci) => ({ uci, san: b.sanMove(uci) })),
                   );
-                  if (!move) {
-                    for (const m of valid.legal)
-                      if (
-                        b.sanMove(m).replace(/[+#]/g, "").toLowerCase() ===
-                        text.replace(/[+#]/g, "").trim().toLowerCase()
-                      ) {
-                        move = m;
-                        break;
-                      }
-                  }
                   b.delete();
                   if (move && valid.turn === game.human) {
                     apply(move);
@@ -1102,7 +1131,7 @@ export default function Play() {
                   Take back
                 </Button>
                 <Button
-                  className="danger"
+                  className="resign-button"
                   onClick={() =>
                     appearance.confirmResign ? setConfirm(true) : resign()
                   }

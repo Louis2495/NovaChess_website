@@ -393,5 +393,8 @@ const cards = lines
     };
   });
 if (cards.some((c) => !c.bottom)) throw new Error("Missing caption");
-writeFileSync("public/data/memes.json", JSON.stringify(cards, null, 2) + "\n");
+writeFileSync(
+  "content/memes/previous-candidates.json",
+  JSON.stringify(cards, null, 2) + "\n",
+);
 console.log(cards.length, "original chess memes");

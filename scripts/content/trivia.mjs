@@ -19,7 +19,16 @@ const questions = entries
     ].slice(0, 3);
     return {
       id: e.id,
-      prompt: e.body.split(/(?<=\.)\s/)[0],
+      prompt:
+        {
+          Players: "Which player is described here?",
+          "Events & history":
+            "Which answer matches this moment in chess history?",
+          Strategy: "Which strategic idea does this describe?",
+          History: "Which part of chess history does this describe?",
+          Tactics: "Which tactical idea does this describe?",
+        }[e.category] || "Which chess concept does this describe?",
+      clue: e.body.split(/(?<=\.)\s/)[0],
       category: e.category,
       answers: [e.title, ...wrong],
       correct: 0,

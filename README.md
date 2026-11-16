@@ -2,7 +2,7 @@
 
 A dark, customizable chess workspace following the iPhone app’s **Home, Analysis, Play, Puzzles and Learn** structure, with a dedicated **Stats** page. Clock and camera features are intentionally omitted.
 
-![Desktop workspace](docs/preview-desktop.jpg)
+![Desktop workspace](docs/preview-home-desktop.jpg)
 
 ## Use
 
@@ -27,15 +27,15 @@ Set `CHROMIUM_PATH` to use another Chromium binary. The build creates static fil
 
 ## Features
 
-- **Home:** one large New Game action, a fully clickable daily puzzle, opening suggestions, and one of 380 original daily chess memes.
-- **Boards:** forgiving piece-centered dragging, material imbalance beneath every board, cursor-positioned promotion, configurable right-click marks/arrows, and keyboard controls (`f` flips by default).
-- **Play:** all 15 original app modes plus Dropping Squares, Chaos chess and Random. Games include persistent state, legal moves, local opponents and a large result banner.
+- **Home:** one large New Game action, a fully clickable daily puzzle, opening suggestions and recent games. Meme candidates live in [a separate review folder](content/memes/README.md); none are published yet.
+- **Boards:** forgiving piece-centered dragging, positive material surplus on the leading side, cursor-positioned promotion, configurable right-click marks/arrows, and keyboard controls (`f` flips; `z` enters board-only focus mode). Consecutive premoves preview future piece positions and are checked for legality before execution.
+- **Play:** all 15 original app modes plus Dropping Squares, Chaos chess and Random. Illustrated variant cards lead to a prominent Start game button. Games include persistent state, legal moves, local opponents and a large result banner.
 - **Puzzles:** 4,000 adaptive positions and Guess the Eval, a five-round game scored against an actual local Stockfish search.
-- **Learn:** 129 opening lessons, 32 family guides and 84 playable branches; plans, pawn structures, mistakes, review questions and unassisted recall. The catalog collapses into a compact lesson desk beside the board.
+- **Learn:** 129 opening lessons, 32 family guides and 84 playable branches; plans, pawn structures, mistakes, review questions and unassisted recall. The catalog collapses into a compact lesson desk beside the board. Another 32 middlegame workbooks add 176 position-specific annotations and 32 decision exercises. Opening traps has 20 playable trap/refutation pairs and defense exercises.
 - **Knowledge:** 75 selected facts, an era-based historical explorer, championship timelines with dated ratings, 3,330 searchable encyclopedia entries, 125 trivia questions, and chess-choice personality quizzes.
 - **Famous games:** 12 complete annotated master games, key-moment jumps, move-by-move replay, adjustable autoplay, analysis links, saving and full-game GIF export. Saved games also export GIFs.
-- **Analysis / Research:** browser Stockfish, branches, studies, position editor, exports, a dedicated public-game research tab and opening-frequency trees.
-- **Profile / Controls:** username, bio, uploaded or chess-piece avatar, country, personal settings, configurable shortcuts and annotation colors. Auto-queen defaults off; premoves default on. Customize is available only from Profile.
+- **Analysis / Research:** browser Stockfish, branches, studies, position editor, exports, a dedicated public-game research tab with frequency-weighted arrows. Loading continues when you switch sections; progress and results remain intact.
+- **Profile / Controls:** username, bio, default pawn or uploaded avatar, country, personal settings, configurable shortcuts and annotation colors. Auto-queen defaults off; premoves default on. Profile opens from the bottom account button; Controls and Customize are inside it.
 - **Appearance:** nine themes, 12 palettes, six piece sets, custom colors/background images, bundled country flags, typography, layout, audio and personal presets. Defaults use brighter dark surfaces and mint accents.
 - **Stats:** results, activity, training, 18 harder achievements, a country map and improvement patterns. Endgame Lessons use the same name throughout the site.
 - **Online, when connected:** Supabase accounts, persistent Throne queues, one-day Vote Chess, team rooms versus friends/bots, shared annotations, global chat, and real global/country rankings and percentiles.

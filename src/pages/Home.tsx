@@ -4,7 +4,6 @@ import { useApp } from "../lib/context";
 import { useData, today, dateLabel } from "../lib/store";
 import type { Opening, PuzzleData } from "../lib/types";
 import { Chess } from "chess.js";
-import DailyMeme from "../components/DailyMeme";
 import { Board, Piece } from "../components/Board";
 import { Button, PageTitle } from "../components/UI";
 export function dailyPuzzle(puzzles: PuzzleData[]) {
@@ -86,23 +85,16 @@ export default function HomePage() {
           <div className="home-puzzle-content">
             {fen ? (
               <div className="daily-board-preview" inert>
-                <Board fen={fen} disabled compact />
+                <Board
+                  fen={fen}
+                  flipped={fen.split(" ")[1] === "b"}
+                  disabled
+                  compact
+                />
               </div>
             ) : (
               <div className="daily-board-placeholder" />
             )}
-            <div>
-              <span className="position-label">
-                <i
-                  className={
-                    fen.split(" ")[1] === "b" ? "black-piece" : "white-piece"
-                  }
-                />
-                {fen
-                  ? `${fen.split(" ")[1] === "w" ? "White" : "Black"} to move`
-                  : "Loading…"}
-              </span>
-            </div>
           </div>
         </section>
         <section className="home-lessons" aria-labelledby="lessons-title">
@@ -142,7 +134,6 @@ export default function HomePage() {
           </div>
         </section>
       </div>
-      <DailyMeme />
       {library.games.length > 0 && (
         <section className="home-recent">
           <div className="home-section-heading">

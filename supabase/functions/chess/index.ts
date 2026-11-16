@@ -246,13 +246,13 @@ Deno.serve(async (req) => {
     }
     if (
       !me.team ||
-      (action !== "resign" && me.team !== turn) ||
+      (!["resign", "draw"].includes(action) && me.team !== turn) ||
       status !== "playing" ||
       state.result !== "*"
     )
       throw Error("It is not your team’s turn.");
     if (
-      ["move", "vote", "resign"].includes(action) &&
+      ["move", "vote", "resign", "draw"].includes(action) &&
       body.revision !== r.revision
     )
       throw Error("Position changed. Try again.");
@@ -279,6 +279,10 @@ Deno.serve(async (req) => {
       }
       state = next;
       marks = [];
+    } else if (action === "draw") {
+      if (!r.settings.bot || r.mode !== "team")
+        throw Error("Draw offers are available against the computer.");
+      state = { ...state, result: "1/2-1/2" };
     } else if (action === "resign") {
       state = { ...state, result: me.team === "w" ? "0-1" : "1-0" };
     } else throw Error("Unknown action.");

@@ -36,7 +36,7 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
   await expect(page.getByRole("link", { name: /Daily puzzle/ })).toBeVisible();
   await expect(page.locator(".app")).toHaveCSS(
     "background-color",
-    "rgb(25, 38, 46)",
+    "rgb(32, 49, 59)",
   );
   await expect(
     page.getByRole("heading", { name: /Your next move|A little brighter/ }),
@@ -110,7 +110,7 @@ test("appearance themes, custom colors, board/pieces/layout persist and presets 
     .getByRole("dialog", { name: "Appearance" })
     .getByRole("button", { name: "Reset appearance", exact: true })
     .click();
-  await expect(page.locator(".app")).toHaveCSS("--accent", "#91d7b6");
+  await expect(page.locator(".app")).toHaveCSS("--accent", "#96d9b8");
 });
 
 test("uploaded backgrounds stay local and can be removed", async ({ page }) => {
@@ -381,8 +381,14 @@ test("Profile saves username, bio and avatar; defaults are auto-queen off and pr
     .fill("Rook endings and coffee.");
   await page.getByLabel("Country (optional)").selectOption("US");
   await page
-    .getByRole("button", { name: "Use wN avatar", exact: true })
-    .click();
+    .locator("input[type=file]")
+    .first()
+    .setInputFiles({
+      name: "avatar.webp",
+      mimeType: "image/webp",
+      buffer: fs.readFileSync("public/duck.webp"),
+    });
+  await expect(page.getByAltText("Your profile picture")).toBeVisible();
   await page.getByRole("button", { name: "Save profile", exact: true }).click();
   await expect.poll(async () => (await stored(page)).profile.name).toBe("Alex");
   await expect(
@@ -649,9 +655,7 @@ test("mobile navigation and search lead to working app tools", async ({
       page.getByRole("heading", { name: "Saved games", exact: true }),
     ).toBeVisible();
   }
-  await page
-    .getByRole("button", { name: "Search tools and openings", exact: true })
-    .click();
+  await page.keyboard.press("/");
   await page.getByLabel("Search tools and openings").last().fill("Sicilian");
   await page
     .getByRole("button", { name: "Search opening library", exact: true })
