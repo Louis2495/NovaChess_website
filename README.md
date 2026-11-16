@@ -36,7 +36,7 @@ Set `CHROMIUM_PATH` to use another Chromium binary. The build creates static fil
 - **Famous games:** 12 complete annotated master games, key-moment jumps, move-by-move replay, adjustable autoplay, analysis links, saving and full-game GIF export. Saved games also export GIFs.
 - **Analysis / Research:** browser Stockfish, branches, studies, position editor, exports, a dedicated public-game research tab with frequency-weighted arrows. Loading continues when you switch sections; progress and results remain intact.
 - **Profile / Controls:** username, bio, default pawn or uploaded avatar, country, personal settings, configurable shortcuts and annotation colors. Auto-queen defaults off; premoves default on. Profile opens from the bottom account button; Controls and Customize are inside it.
-- **Appearance:** nine themes, 12 palettes, six piece sets, custom colors/background images, bundled country flags, typography, layout, audio and personal presets. Defaults use brighter dark surfaces and mint accents.
+- **Appearance:** nine themes, 12 palettes, six piece sets, custom colors/background images, bundled country flags, typography, layout, audio and personal presets. Defaults use a burnt-orange background, dark panels and mint accents.
 - **Stats:** results, activity, training, 18 harder achievements, a country map and improvement patterns. Endgame Lessons use the same name throughout the site.
 - **Online, when connected:** Supabase accounts, persistent Throne queues, one-day Vote Chess, team rooms versus friends/bots, shared annotations, global chat, and real global/country rankings and percentiles.
 
