@@ -135,9 +135,9 @@ test("right click cancels premoves before highlighting and the next right click 
     "aria-label",
     /white knight/,
   );
-  await expect(page.locator(".board-marks rect")).toHaveCount(0);
+  await expect(page.locator(".board-square[data-annotation]")).toHaveCount(0);
   await square(page, "e6").click({ button: "right" });
-  await expect(page.locator(".board-marks rect")).toHaveCount(1);
+  await expect(page.locator(".board-square[data-annotation]")).toHaveCount(1);
   await expect
     .poll(
       () =>

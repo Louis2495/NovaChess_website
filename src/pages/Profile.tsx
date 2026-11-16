@@ -216,6 +216,11 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
                 }
               />
               <Toggle
+                label="Show legal moves"
+                checked={appearance.legalMoves}
+                onChange={(legalMoves) => setAppearance(a => ({ ...a, legalMoves }))}
+              />
+              <Toggle
                 label="Confirm resign"
                 checked={appearance.confirmResign}
                 onChange={(confirmResign) =>

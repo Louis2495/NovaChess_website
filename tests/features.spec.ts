@@ -155,14 +155,14 @@ test("right click creates colored square marks and arrows, and controls change t
 }) => {
   await page.goto("/#analysis");
   await square(page, "e4").click({ button: "right" });
-  await expect(page.locator(".board-marks rect")).toHaveAttribute(
-    "fill",
-    "#187b46",
+  await expect(page.locator(".board-square[data-annotation]")).toHaveAttribute(
+    "data-annotation",
+    "#1fba62",
   );
   await square(page, "d4").click({ button: "right", modifiers: ["Shift"] });
-  await expect(page.locator(".board-marks rect").nth(1)).toHaveAttribute(
-    "fill",
-    "#205eab",
+  await expect(square(page, "d4")).toHaveAttribute(
+    "data-annotation",
+    "#2684ff",
   );
   const a = (await square(page, "a1").boundingBox())!,
     b = (await square(page, "a4").boundingBox())!;
@@ -175,12 +175,12 @@ test("right click creates colored square marks and arrows, and controls change t
   await page.getByLabel("Square / arrow annotation color").fill("#12abcd");
   await page.goto("/#analysis");
   await square(page, "e4").click({ button: "right" });
-  await expect(page.locator(".board-marks rect")).toHaveAttribute(
-    "fill",
+  await expect(page.locator(".board-square[data-annotation]")).toHaveAttribute(
+    "data-annotation",
     "#12abcd",
   );
   await page.keyboard.press("Escape");
-  await expect(page.locator(".board-marks rect")).toHaveCount(0);
+  await expect(page.locator(".board-square[data-annotation]")).toHaveCount(0);
 });
 test("promotion is adjacent and puts the queen under the release point", async ({
   page,

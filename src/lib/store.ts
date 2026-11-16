@@ -56,10 +56,10 @@ export const backgrounds = [
   "Flag",
 ];
 export const annotationColors = {
-  green: "#187b46",
-  blue: "#205eab",
-  red: "#b3334a",
-  gold: "#b76808",
+  green: "#1fba62",
+  blue: "#2684ff",
+  red: "#f04461",
+  gold: "#ff9c16",
 };
 export const defaults: Appearance = {
   theme: "Steel",

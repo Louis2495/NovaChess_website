@@ -115,13 +115,14 @@ function App() {
     // Refresh only the previous default board/colors, preserving custom choices.
     setAppearance((a) => {
       const oldMarks = {
-        green: "#63d6a1", blue: "#67b8ff", red: "#ff7b92", gold: "#ffd071",
+        green: ["#63d6a1", "#187b46"], blue: ["#67b8ff", "#205eab"],
+        red: ["#ff7b92", "#b3334a"], gold: ["#ffd071", "#b76808"],
       };
       const newMarks = annotationColors;
       const marks = a.markColors ? { ...a.markColors } : undefined;
       let changed = false;
       for (const key of Object.keys(oldMarks) as (keyof typeof oldMarks)[]) {
-        if (marks?.[key] === oldMarks[key]) {
+        if (marks?.[key] && oldMarks[key].includes(marks[key])) {
           marks[key] = newMarks[key];
           changed = true;
         }

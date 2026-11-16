@@ -224,6 +224,19 @@ export function Board({
       row = Math.max(0, Math.min(7, Math.floor((y - box.top) / size)));
     return files[col] + ranks[row];
   }
+  function dropSquare(from: string, x: number, y: number) {
+    const direct = squareAt(x, y);
+    if (direct === from || moves!.some(m => m.startsWith(from + direct))) return direct;
+    const box = boardRef.current!.getBoundingClientRect(), size = box.width / 8;
+    const candidates = [...new Set(moves!.filter(m => m.startsWith(from)).map(m => m.slice(2, 4)))];
+    const nearby = candidates.map(to => {
+      const cx = box.left + (files.indexOf(to[0]) + .5) * size;
+      const cy = box.top + (ranks.indexOf(to[1]) + .5) * size;
+      const edgeDistance = Math.hypot(Math.max(0, Math.abs(x-cx)-size/2), Math.max(0, Math.abs(y-cy)-size/2));
+      return { to, edgeDistance, distance: Math.hypot(x-cx, y-cy) };
+    }).filter(t => t.edgeDistance <= size * .49).sort((a,b) => a.distance-b.distance);
+    return nearby[0]?.to ?? direct;
+  }
   function choose(from: string, to: string) {
     setSelected(from);
     const options = moves!.filter((m) => m.startsWith(from + to));
@@ -304,7 +317,7 @@ export function Board({
     const measure = () => {
       const rect = el.getBoundingClientRect();
       setMeasuredSize(Math.round(rect.width));
-      el.closest<HTMLElement>(".analysis-layout > .board-column")
+      el.closest<HTMLElement>(".board-column")
         ?.style.setProperty("--actual-board-width", `${rect.width}px`);
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
@@ -393,7 +406,7 @@ export function Board({
           }
           if (g.moving) {
             suppressClick.current = true;
-            const to = squareAt(e.clientX, e.clientY);
+            const to = dropSquare(g.from, e.clientX, e.clientY);
             if (to && to !== g.from) choose(g.from, to);
             else setSelected(g.from);
           }
@@ -411,12 +424,15 @@ export function Board({
               piece = cells[square],
               fogged = visible && !visible.has(square),
               concealed = hidden || fogged,
+              squareMark = [...guides, ...currentMarks].reverse().find(m => m.from === square && m.to === square),
               isDark = (file.charCodeAt(0) - 97 + 8 - Number(rank)) % 2 === 1;
             return (
               <button
                 key={square}
                 className={`board-square ${isDark ? "dark" : "light"} ${active === square ? "selected" : ""} ${hint === square ? "hinted" : ""} ${appearance.lastMove && highlights.includes(square) ? "last-move" : ""} ${fogged ? "fogged" : ""} ${blocked.includes(square) ? "dropped-square" : ""} ${drag?.from === square ? "drag-origin" : ""}`}
                 aria-label={`${square}${blocked.includes(square) ? ", unavailable" : !concealed && piece ? `, ${piece === "*" ? "duck" : `${piece === piece.toUpperCase() ? "white" : "black"} ${names[piece.toLowerCase()] || piece}`}` : ", empty"}`}
+                data-annotation={squareMark?.color}
+                style={squareMark && !fogged && !blocked.includes(square) ? { background: squareMark.color } : undefined}
                 aria-pressed={active === square}
                 aria-disabled={
                   blocked.includes(square) || (disabled && !onSquare)
@@ -533,18 +549,7 @@ export function Board({
           {[...guides, ...currentMarks].map((m, i) => {
             const a = coord(m.from),
               b = coord(m.to);
-            if (m.from === m.to)
-              return (
-                <rect
-                  key={i}
-                  x={a.x - 6.25}
-                  y={a.y - 6.25}
-                  width={12.5}
-                  height={12.5}
-                  fill={m.color}
-                  opacity=".6"
-                />
-              );
+            if (m.from === m.to) return null;
             const dx = Math.abs(b.x - a.x),
               dy = Math.abs(b.y - a.y);
             const knight =

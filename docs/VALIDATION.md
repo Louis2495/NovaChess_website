@@ -1,5 +1,7 @@
 # Validation
 
+- Bold highlights/drop update: square annotations replace the square background with a solid bright color while pieces remain visible. Near-miss drops snap to nearby legal destinations; distant invalid drops and canceled drags retain prior behavior. Player bars follow actual board width, and account settings expose the persistent legal-move toggle. 71 targeted desktop/mobile checks passed (one desktop-only layout scenario skipped on mobile); production Analysis/Profile passed accessibility and overflow checks.
+
 - Analysis toolbar update: all four labeled tools remain visible; top lines are limited to a 1/2/3 toggle and separated into bordered panels. Desktop positional insights align with the board, and replay width follows the actual board size when viewport limits shrink it. Desktop/mobile production checks verify all three line counts, accessibility and overflow.
 
 - Board/tools/choice refresh: manually resized boards persist per section, follow the global width setting, and cap their size to available viewport height. Analysis defaults smaller, has one four-action tools menu and separate White/Black tables for each principal line. Typed moves exist only in Blindfold text; returned/canceled pieces stay selected. Puzzle ratings are centered and completion uses only the outline. Research uses aligned source/color toggles and uniform-width frequency arrows with variable opacity and no board percentages. All actual two/three-option choices use toggle bars. Neutral slate defaults migrate previous defaults while preserving custom colors.

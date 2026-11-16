@@ -4212,3 +4212,7 @@ select.theme-select {
   .home-recent { margin-top: 18px; padding-top: 14px; }
   .home-practice-grid { max-width: 740px; margin-inline: auto; }
 }
+
+/* Player bars follow the rendered board, including manual and viewport resizing. */
+.play-match .board-column > .player-strip { width:var(--actual-board-width,100%); max-width:100%; box-sizing:border-box; }
+.board-square[data-annotation]::after { display:none; }

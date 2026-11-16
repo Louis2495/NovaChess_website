@@ -63,7 +63,7 @@ test("right click cancels a held piece without moving or marking, and a differen
     "e2, white pawn",
   );
   await expect(
-    page.locator(".board-marks rect,.board-marks line,.board-marks polyline"),
+    page.locator(".board-square[data-annotation],.board-marks line,.board-marks polyline"),
   ).toHaveCount(0);
   const c = (await square(page, "d2").boundingBox())!,
     d = (await square(page, "d4").boundingBox())!;
