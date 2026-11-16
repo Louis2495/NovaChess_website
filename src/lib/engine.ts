@@ -17,7 +17,11 @@ export function search(
     elo = 3190,
     signal,
     onInfo,
+    worker: reusableWorker,
+    depth,
   }: {
+    worker?: Worker;
+    depth?: number;
     time?: number;
     infinite?: boolean;
     multiPV?: number;
@@ -31,7 +35,7 @@ export function search(
       reject(new DOMException("Canceled", "AbortError"));
       return;
     }
-    const worker = new Worker(
+    const worker = reusableWorker || new Worker(
       new URL(`${base}engine/stockfish-19-lite-single.js`, document.baseURI),
     );
     const lines: EngineLine[] = [];
@@ -40,7 +44,7 @@ export function search(
       if (finished) return;
       finished = true;
       clearTimeout(timeout);
-      worker.terminate();
+      if (!reusableWorker || error) worker.terminate();
       signal?.removeEventListener("abort", abort);
       error ? reject(error) : resolve({ best, lines: lines.filter(Boolean) });
     };
@@ -59,13 +63,13 @@ export function search(
     worker.onmessage = (e) => {
       const text = String(e.data);
       if (text === "uciok") {
-        worker.postMessage("setoption name Hash value 32");
+        if (!reusableWorker) worker.postMessage("setoption name Hash value 32");
         worker.postMessage(`setoption name MultiPV value ${multiPV}`);
+        worker.postMessage("setoption name Skill Level value 20");
+        worker.postMessage("setoption name UCI_LimitStrength value false");
         if (elo < 1320) {
           worker.postMessage("setoption name UCI_LimitStrength value false");
-          worker.postMessage(
-            `setoption name Skill Level value ${Math.max(0, Math.min(20, Math.round(elo / 100) - 3))}`,
-          );
+          worker.postMessage("setoption name Skill Level value 0");
         } else if (elo < 3190) {
           worker.postMessage("setoption name UCI_LimitStrength value true");
           worker.postMessage(
@@ -76,7 +80,7 @@ export function search(
       } else if (text === "readyok") {
         worker.postMessage(`position fen ${fen}`);
         if (infinite) clearTimeout(timeout);
-        worker.postMessage(infinite ? "go infinite" : `go movetime ${time}`);
+        worker.postMessage(infinite ? "go infinite" : `go ${depth ? `depth ${depth} ` : ""}movetime ${time}`);
       } else if (text.startsWith("info ") && text.includes(" pv ")) {
         const depth = Number(text.match(/depth (\d+)/)?.[1] || 0),
           rank = Number(text.match(/multipv (\d+)/)?.[1] || 1);

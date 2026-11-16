@@ -119,11 +119,13 @@ test("puzzle rating is centered in its card and completion uses only the board o
   const m = c.move(puzzle.moves[1]);
   for (const s of [m.from, m.to]) await square(page, s).click();
   await expect(page.locator(".puzzle-board")).toHaveClass(/solved/);
+  await expect(page.locator(".puzzle-board .board")).toHaveCSS("outline-color", "rgb(248, 217, 83)");
+  await expect(page.locator(".puzzle-board")).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
   await expect(
     page.getByText(/Solved\.|Completed\. Earlier hints/),
   ).toHaveCount(0);
 });
-test("a dragged piece that returns stays selected, including invalid, same-square and right-click returns", async ({
+test("returned drops stay selected while right-click cancellation clears selection", async ({
   page,
 }) => {
   await page.goto("/#analysis");
@@ -143,12 +145,13 @@ test("a dragged piece that returns stays selected, including invalid, same-squar
       await page.mouse.up({ button: "right" });
     }
     await page.mouse.up();
-    await expect(square(page, "e2")).toHaveAttribute("aria-pressed", "true");
+    await expect(square(page, "e2")).toHaveAttribute("aria-pressed", cancel === "right" ? "false" : "true");
     await expect(square(page, "e2")).toHaveAttribute(
       "aria-label",
       "e2, white pawn",
     );
   }
+  await square(page, "e2").click();
   await square(page, "e4").click();
   await expect(square(page, "e4")).toHaveAttribute(
     "aria-label",

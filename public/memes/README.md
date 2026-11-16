@@ -1,12 +1,7 @@
 # Homepage memes
 
-This is the folder used by the homepage. Open `index.html` to review all 12 images, or open the individual SVGs.
+All 22 original images from the owner’s `Chess_Memes.zip` are stored here with their original filenames and bytes. The previous memes have been removed.
 
-Edit `candidates.json` to curate the rotation:
+Open `index.html` to vet the whole collection. `candidates.json` controls the order and image descriptions. Set an entry’s `status` to `rejected` to remove it from rotation.
 
-- Set `status` to `rejected` to hide a meme.
-- Use `approved` or `unreviewed` to include it.
-- Remove its JSON entry before deleting its image.
-- Keep captions in the JSON aligned with the text inside the SVG so the image description stays accurate.
-
-The homepage selects one eligible image per day. Changes are published by rebuilding/deploying the site. Candidate 03 uses a legal stalemate position.
+One image appears per local calendar day, including when Home stays open overnight. Each eligible image appears once before the cycle repeats (22 days with the full collection). Rebuild/deploy after changing the files.

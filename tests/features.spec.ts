@@ -486,7 +486,7 @@ test("flags can be selected as backgrounds and persist; harder achievements star
 }) => {
   await page.goto("/#profile");
   await page.getByRole("button", { name: "Customize", exact: true }).click();
-  const d = page.getByRole("dialog", { name: "Appearance" });
+  const d = page.getByRole("region", { name: "Appearance" });
   await d.getByRole("tab", { name: "Background", exact: true }).click();
   await d.getByLabel("Background", { exact: true }).selectOption("Flag");
   await d.getByLabel("Country flag", { exact: true }).selectOption("JP");
@@ -494,7 +494,7 @@ test("flags can be selected as backgrounds and persist; harder achievements star
     "--background-image",
     /flags\/jp\.svg/,
   );
-  await d.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Account", exact: true }).click();
   await page.reload();
   await expect(page.locator(".app")).toHaveClass(/bg-flag/);
   const response = await page.request.get("/flags/jp.svg");

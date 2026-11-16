@@ -13,7 +13,7 @@ import {
 import { useApp } from "../../lib/context";
 import { initialFen, download } from "../../lib/store";
 import { Board } from "../../components/Board";
-import { Card, Field, Button } from "../../components/UI";
+import { Card, Button } from "../../components/UI";
 type PublicGame = {
   moves: string[];
   result: string;
@@ -249,14 +249,14 @@ export default function Research() {
               ))}
             </div>
           </div>
-          <Field label="Public username">
-            <input
+          <div className="research-username field"><span>Public username</span>
+            <input aria-label="Public username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
               maxLength={50}
             />
-          </Field>
+          </div>
           <div className="research-color field">
             <span>Color</span>
             <div

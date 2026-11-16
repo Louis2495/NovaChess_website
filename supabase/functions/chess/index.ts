@@ -187,7 +187,9 @@ Deno.serve(async (req) => {
           if (members.length >= 32) throw Error("This team room is full.");
           team = r.settings.bot
             ? "w"
-            : members.filter((m) => m.team === "w").length <=
+            : r.mode === "team" && (body.team === "w" || body.team === "b")
+              ? body.team
+              : members.filter((m) => m.team === "w").length <=
                 members.filter((m) => m.team === "b").length
               ? "w"
               : "b";

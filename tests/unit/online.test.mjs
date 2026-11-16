@@ -423,3 +423,22 @@ test("chat moderation is server-enforced, audited, and cannot be granted by a re
     await pg.exec("reset role");
   }
 });
+
+test("Team invitations join the requested side while Vote Chess always balances teams", async () => {
+  const created = await call(users[3], {action:"create",mode:"team"});
+  assert.equal(created.status,200,JSON.stringify(created.data));
+  let game = created.data;
+  const joined = await command(users[0], game, "join", {team:"w"});
+  assert.equal(joined.status,200,JSON.stringify(joined.data));
+  game = joined.data;
+  assert.equal(game.members.find(m=>m.id===users[0]).team,"w");
+  game = (await command(users[2], game, "join", {team:"b"})).data;
+  assert.equal(game.members.find(m=>m.id===users[2]).team,"b");
+  const moved = await command(users[0], game, "move", {move:"e2e4"});
+  assert.equal(moved.status,200);
+  const createdVote = await call(users[3], {action:"create",mode:"vote"});
+  assert.equal(createdVote.status,200,JSON.stringify(createdVote.data));
+  let vote = createdVote.data;
+  vote = (await command(users[0],vote,"join",{team:"w"})).data;
+  assert.equal(vote.members.find(m=>m.id===users[0]).team,"b");
+});

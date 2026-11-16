@@ -3,6 +3,7 @@ import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Home,
+  Users,
   ScanLine,
   MonitorPlay,
   Puzzle,
@@ -19,6 +20,10 @@ import "@fontsource/dm-sans/latin-400.css";
 import "@fontsource/dm-sans/latin-500.css";
 import "@fontsource/dm-sans/latin-600.css";
 import "@fontsource/dm-sans/latin-700.css";
+import "@fontsource/nunito-sans/latin-400.css";
+import "@fontsource/nunito-sans/latin-500.css";
+import "@fontsource/nunito-sans/latin-600.css";
+import "@fontsource/nunito-sans/latin-700.css";
 import "@fontsource/manrope/latin-400.css";
 import "@fontsource/manrope/latin-500.css";
 import "@fontsource/manrope/latin-600.css";
@@ -58,6 +63,7 @@ const mainNav = [
   { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
   { id: "research", label: "Research", icon: Search },
+  { id: "community", label: "Multiplayer", icon: Users },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
   { id: "library", label: "Library", icon: FolderOpen },
 ] as const;
@@ -128,10 +134,12 @@ function App() {
         }
       }
       const board = a.board === "Classic" && a.dark.toLowerCase() === "#5c7866";
-      return board || changed
+      const font = a.font === "Manrope" && !a.fontCustomized;
+      return board || changed || font
         ? {
             ...a,
             ...(board ? { dark: defaults.dark } : {}),
+            ...(font ? { font: defaults.font } : {}),
             ...(changed ? { markColors: marks } : {}),
           }
         : a;
@@ -263,9 +271,11 @@ function App() {
   }, [appearance.music, appearance.volume]);
   useEffect(() => {
     let ctx: AudioContext | null = null;
+    const custom = appearance.customMoveSound ? new Audio(appearance.customMoveSound) : null;
     const sound = () => {
       if (!appearance.sound || !appearance.volume) return;
       try {
+        if (custom) { custom.volume = appearance.volume; custom.currentTime = 0; void custom.play().catch(() => {}); return; }
         ctx = ctx || new AudioContext();
         void ctx.resume();
         const oscillator = ctx.createOscillator(),
@@ -287,9 +297,10 @@ function App() {
     window.addEventListener("chess-move", sound);
     return () => {
       window.removeEventListener("chess-move", sound);
+      custom?.pause();
       void ctx?.close();
     };
-  }, [appearance.sound, appearance.volume]);
+  }, [appearance.sound, appearance.volume, appearance.customMoveSound]);
   useEffect(() => {
     setAppearance((a) =>
       a.background === "Default" &&
@@ -503,6 +514,7 @@ function App() {
                 {tab === id && <span className="nav-dot" />}
               </button>
             ))}
+            <div id="sidebar-chat" />
           </nav>
           <div className="sidebar-bottom">
             <button
@@ -566,7 +578,7 @@ function App() {
           </main>
         </div>
         <nav className="mobile-tabs" aria-label="App tabs">
-          {mainNav.map(({ id, label, icon: Icon }) => (
+          {mainNav.filter(v => v.id !== "community").map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               className={tab === id ? "active" : ""}

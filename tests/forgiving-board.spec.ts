@@ -16,7 +16,7 @@ test("nearby illegal squares and slightly off-board drops snap to the intended l
 test("account legal-move preference persists and removes move dots everywhere", async ({ page }) => {
   await page.goto("/#profile");
   const setting = page.getByRole("checkbox", {name:"Show legal moves",exact:true});
-  await expect(setting).toBeChecked(); await setting.uncheck();
+  await expect(setting).not.toBeChecked(); await setting.check(); await setting.uncheck();
   await page.goto("/#analysis"); await square(page,"e2").click();
   await expect(page.locator(".legal-dot,.legal-capture")).toHaveCount(0);
   await page.goto("/#profile"); await expect(setting).not.toBeChecked(); await setting.check();

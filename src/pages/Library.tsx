@@ -1,3 +1,5 @@
+import { classifyMove, performanceRating } from "../lib/gameReview";
+import { MoveBadge, EvaluationGraph } from "../components/ReviewVisuals";
 import { isStudy, libraryKind } from "../lib/library";
 import { RepertoireTrainer } from "./learn/Repertoire";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -14,13 +16,13 @@ import {
   Play,
   Square,
   ScanLine,
-  Star,
-  ChartNoAxesCombined,
+  Share2,
+  LoaderCircle,
   Save,
   GitBranch,
 } from "lucide-react";
 import { useApp } from "../lib/context";
-import { uid, download, dateLabel } from "../lib/store";
+import { uid, download, dateLabel, base, loadData, initialFen } from "../lib/store";
 import { search, useEngine, scoreLabel } from "../lib/engine";
 import { fairy, legal, squares } from "../lib/variants";
 import type {
@@ -378,9 +380,9 @@ function GameViewer({
   const { library, setLibrary, navigate, notify } = useApp();
   const [cursor, setCursor] = useState(0),
     [playing, setPlaying] = useState(false),
-    [replaySpeed, setReplaySpeed] = useState(650),
+    [sharing, setSharing] = useState(false),
     [reviewing, setReviewing] = useState(false),
-    [budget, setBudget] = useState(500),
+
     [status, setStatus] = useState(""),
     [flipped, setFlipped] = useState(game.initial.split(" ")[1] === "b"),
     [title, setTitle] = useState(game.title);
@@ -399,7 +401,7 @@ function GameViewer({
     rows = game.review || [];
   const liveEngine = useEngine(
     game.positions[cursor] || game.initial,
-    standard,
+    standard && !reviewing,
   );
   useEffect(() => () => controller.current?.abort(), []);
   useEffect(() => {
@@ -408,16 +410,18 @@ function GameViewer({
       setPlaying(false);
       return;
     }
-    const t = setTimeout(() => setCursor((v) => v + 1), replaySpeed);
+    const t = setTimeout(() => setCursor((v) => v + 1), 650);
     return () => clearTimeout(t);
-  }, [playing, cursor, replaySpeed]);
+  }, [playing, cursor]);
   async function review() {
     setReviewing(true);
     const ctrl = new AbortController();
     controller.current = ctrl;
+    const worker = standard ? new Worker(new URL(`${base}engine/stockfish-19-lite-single.js`, document.baseURI)) : undefined;
+    const openings = standard ? await loadData<import("../lib/types").Opening[]>("openings").catch(() => []) : [];
     const cache = new Map<string, Awaited<ReturnType<typeof search>>>();
-    const evaluate = async (fen: string) => {
-      if (cache.has(fen)) return cache.get(fen)!;
+    const evaluate = async (fen: string, deeper = false) => {
+      if (!deeper && cache.has(fen)) return cache.get(fen)!;
       const c = new Chess(fen);
       if (c.isCheckmate())
         return {
@@ -437,13 +441,17 @@ function GameViewer({
           best: "",
           lines: [{ score: 0, depth: 0, mate: null, moves: [], rank: 1 }],
         };
-      const result = await search(fen, { time: budget, signal: ctrl.signal });
+      const result = await search(fen, {
+        time: deeper ? 1200 : c.isCheck() ? 800 : 500,
+        depth: deeper ? 22 : 20, worker, signal: ctrl.signal,
+      });
       cache.set(fen, result);
       return result;
     };
     try {
-      const collected = [...rows];
-      for (let i = rows.length; i < game.moves.length; i++) {
+      const currentRows = rows.every(r => r.afterScore !== undefined) ? rows : [];
+      const collected = [...currentRows];
+      for (let i = currentRows.length; i < game.moves.length; i++) {
         if (ctrl.signal.aborted) break;
         setStatus(`Reviewing move ${Math.floor(i / 2) + 1}`);
         const before = game.positions[i],
@@ -452,30 +460,22 @@ function GameViewer({
           score = 0,
           loss = 0,
           concept = "Piece activity",
-          label = "Alternative";
+          label = "Alternative",
+          afterScore = 0, depth = 0;
         if (standard) {
-          const baseline = await evaluate(before),
-            outcome = await evaluate(after);
-          const side = before.split(" ")[1];
+          let baseline = await evaluate(before), outcome = await evaluate(after);
+          const sign = before.split(" ")[1] === "w" ? 1 : -1;
+          if (baseline.best !== game.moves[i] && ((baseline.lines[0]?.score || 0)-(outcome.lines[0]?.score || 0))*sign >= 80) {
+            baseline = await evaluate(before, true);
+            outcome = await evaluate(after, true);
+          }
           score = baseline.lines[0]?.score || 0;
+          afterScore = outcome.lines[0]?.score || 0;
+          depth = Math.min(baseline.lines[0]?.depth || 0, outcome.lines[0]?.depth || 0);
           best = baseline.best;
-          loss = Math.max(
-            0,
-            Math.round(
-              (score - (outcome.lines[0]?.score || 0)) *
-                (side === "w" ? 1 : -1),
-            ),
-          );
-          label =
-            best === game.moves[i]
-              ? "Top move"
-              : loss < 30
-                ? "Good"
-                : loss < 100
-                  ? "Inaccuracy"
-                  : loss < 250
-                    ? "Mistake"
-                    : "Blunder";
+          loss = best === game.moves[i] ? 0 : Math.max(0, Math.round((score-afterScore)*sign));
+          const book = game.initial === initialFen && openings.some(o => o.moves.length > i && game.moves.slice(0,i+1).every((m,n)=>m===o.moves[n]));
+          label = classifyMove(best === game.moves[i], loss, book);
           concept =
             loss >= 250
               ? "Tactics / material"
@@ -506,6 +506,7 @@ function GameViewer({
               }
             }
             score = material(before);
+            afterScore = material(after);
             loss = Math.max(0, bestValue - material(after) * sign);
             label = best === game.moves[i] ? "Material choice" : "Review";
             concept = "Variant goals";
@@ -524,10 +525,12 @@ function GameViewer({
               .map((x) => new Chess(before).move(x.move).san)
               .join(" / ");
             concept = "Repertoire recall";
-            label = "Opening recall";
+
           }
         }
         const row: ReviewRow = {
+          afterScore,
+          depth,
           ply: i,
           move: game.notation[i],
           best,
@@ -553,6 +556,7 @@ function GameViewer({
         notify((e as Error).message);
       }
     } finally {
+      worker?.terminate();
       setReviewing(false);
       controller.current = null;
     }
@@ -569,38 +573,24 @@ function GameViewer({
       : null;
   };
   const selected = rows.find((r) => r.ply === Math.max(0, cursor - 1));
-  let bestSAN = "";
-  if (selected?.best) {
-    try {
-      bestSAN = standard
-        ? new Chess(game.positions[selected.ply]).move(selected.best).san
-        : selected.best;
-    } catch {
-      bestSAN = selected.best;
-    }
-  }
+  const sideRows = (side: string) => rows.filter(r => game.positions[r.ply]?.split(" ")[1] === side);
+  const rating = (side: string) => performanceRating(sideRows(side));
+  const evaluation = liveEngine.lines[0]?.score ?? (cursor ? rows.find(r=>r.ply===cursor-1)?.afterScore : rows[0]?.score) ?? 0;
+  const selectedMove = cursor ? game.moves[cursor-1]?.split(",")[0].slice(2,4) : "";
   return (
     <>
       <PageTitle
         title="Game review"
-        subtitle={`${game.variant} · ${game.result}`}
+        subtitle={`${game.title} · ${game.result}`}
       >
         <Button className="secondary" onClick={onClose}>
           Back to Library
         </Button>
-        <Button
-          className="secondary"
-          onClick={() =>
-            download(
-              "novachess-game.pgn",
-              gamePGN(game),
-              "application/x-chess-pgn",
-            )
-          }
-        >
-          <Download size={15} />
-          PGN
-        </Button>
+        <Button className="secondary" onClick={() => setSharing(true)}><Share2 size={16}/>Share</Button>
+        {!game.special && <Button disabled={reviewing || rows.length >= game.moves.length && rows.every(r=>r.afterScore!==undefined)} onClick={() => void review()}>
+          {reviewing ? <LoaderCircle className="spin" size={16}/> : <ScanLine size={16}/>}
+          {reviewing ? `${rows.length} / ${game.moves.length}` : rows.length && rows.length<game.moves.length ? "Resume review" : "Review game"}
+        </Button>}
         <Button
           onClick={() => navigate("analysis", "game:" + game.id)}
           disabled={!standard}
@@ -609,14 +599,18 @@ function GameViewer({
           Analyze
         </Button>
       </PageTitle>
-      <div className="chess-layout">
+      {sharing && <Modal title="Share game" onClose={()=>setSharing(false)}>
+        <div className="button-row"><Button onClick={()=>download("novachess-game.pgn",gamePGN(game),"application/x-chess-pgn")}><Download size={16}/>Download PGN</Button>
+        <GameGIFButton positions={game.positions} blocked={game.special?.blocked} flipped={flipped}/></div>
+      </Modal>}
+      <div className="chess-layout game-review-layout">
         <div className="board-column">
           {standard && (
             <div className="live-game-evaluation">
               <span>
-                Stockfish 19 Lite · Depth {liveEngine.lines[0]?.depth ?? 0}
+                Stockfish 19 Lite · Depth {liveEngine.lines[0]?.depth ?? selected?.depth ?? 0}
               </span>
-              <strong>{scoreLabel(liveEngine.lines[0])}</strong>
+              <strong>{liveEngine.lines[0] ? scoreLabel(liveEngine.lines[0]) : `${evaluation>=0?"+":""}${(evaluation/100).toFixed(2)}`}</strong>
             </div>
           )}
           {liveEngine.error && (
@@ -624,12 +618,17 @@ function GameViewer({
               {liveEngine.error}
             </p>
           )}
+          <div className={`review-board-eval ${standard ? "has-eval" : ""}`}>
+            {standard && <div className="eval-meter" style={{justifyContent:flipped?"flex-start":"flex-end"}} role="img" aria-label={`Evaluation ${(evaluation/100).toFixed(2)}`}>
+              <div style={{height:`${50+Math.tanh(evaluation/450)*46}%`}}/>
+            </div>}
           <Board
             fen={game.positions[cursor] || game.initial}
             blocked={
               game.special?.blocked.slice(0, Math.floor(cursor / 10)) || []
             }
             disabled
+            badge={selected && selectedMove ? {square:selectedMove, content:<MoveBadge label={selected.label}/>} : undefined}
             flipped={flipped}
             onFlip={() => setFlipped((v) => !v)}
             highlights={
@@ -641,6 +640,7 @@ function GameViewer({
                 : []
             }
           />
+          </div>
           <div className="board-navigation">
             <IconButton
               label="First move"
@@ -677,63 +677,7 @@ function GameViewer({
               <ChevronsRight size={18} />
             </IconButton>
           </div>
-          <div className="replay-speed">
-            <label>
-              Speed
-              <ChoiceSelect
-                aria-label="Replay speed"
-                value={replaySpeed}
-                onChange={(e) => setReplaySpeed(+e.target.value)}
-              >
-                <option value={2000}>2s / move</option>
-                <option value={1000}>1s / move</option>
-                <option value={650}>0.65s / move</option>
-                <option value={250}>0.25s / move</option>
-              </ChoiceSelect>
-            </label>
-            <GameGIFButton
-              positions={game.positions}
-              blocked={game.special?.blocked}
-              flipped={flipped}
-              delay={replaySpeed}
-            />
-          </div>
-          <input
-            className="replay-slider"
-            aria-label="Replay position"
-            type="range"
-            min={0}
-            max={game.moves.length}
-            value={cursor}
-            onChange={(e) => setCursor(Number(e.target.value))}
-          />
-          {selected && (
-            <Card className="review-suggestion">
-              <div className="card-heading">
-                <b>
-                  {selected.move} · {selected.label}
-                </b>
-                <span>
-                  {standard ? `${selected.loss} cp` : "Local heuristic"}
-                </span>
-              </div>
-              <p>
-                <Star size={16} />
-                {selected.expected
-                  ? `Repertoire: ${selected.expected}`
-                  : `Top: ${bestSAN}`}
-              </p>
-              <p className="caption">{selected.concept}</p>
-              {selected.expected && (
-                <Button
-                  className="text-button"
-                  onClick={() => navigate("learn", "repertoire")}
-                >
-                  Train repertoire
-                </Button>
-              )}
-            </Card>
-          )}
+          <details className="review-game-details"><summary>Game details</summary>
           <Card>
             <div className="inline-form">
               <input
@@ -775,111 +719,31 @@ function GameViewer({
               </ChoiceSelect>
             </Field>
           </Card>
+          </details>
         </div>
         <div className="side-panels">
-          {!game.special && (
-            <Card>
-              <div className="card-heading">
-                <h2>{standard ? "Engine review" : "Variant review"}</h2>
-                <span className="pill">
-                  {rows.length} / {game.moves.length}
-                </span>
-              </div>
-              <p className="caption">
-                {standard
-                  ? "Stockfish 19 Lite. Scores depend on search time."
-                  : "Legal replay and local material alternatives, not a full-strength engine verdict."}
-              </p>
-              {standard && (
-                <Field label="Time per position">
-                  <ChoiceSelect
-                    disabled={reviewing}
-                    value={budget}
-                    onChange={(e) => setBudget(Number(e.target.value))}
-                  >
-                    <option value={300}>0.3 seconds</option>
-                    <option value={500}>0.5 seconds</option>
-                    <option value={1000}>1 second</option>
-                    <option value={3000}>3 seconds</option>
-                  </ChoiceSelect>
-                </Field>
-              )}
-              <Button
-                disabled={rows.length >= game.moves.length}
-                onClick={() =>
-                  reviewing ? controller.current?.abort() : void review()
-                }
-              >
-                {reviewing ? <Square size={15} /> : <Play size={15} />}{" "}
-                {reviewing
-                  ? "Stop"
-                  : rows.length
-                    ? "Resume review"
-                    : "Review game"}
-              </Button>
-              {status && (
-                <p role="status" className="feedback">
-                  {status}
-                </p>
-              )}
-              {rows.length > 0 && !reviewing && (
-                <Button
-                  className="text-button"
-                  onClick={() => {
-                    setLibrary((l) => ({
-                      ...l,
-                      games: l.games.map((g) =>
-                        g.id === game.id ? { ...g, review: [] } : g,
-                      ),
-                    }));
-                    setStatus("");
-                  }}
-                >
-                  Reset review
-                </Button>
-              )}
-              {standard && (
-                <div className="metric-pair">
-                  <div>
-                    <b>{average("w") ?? "—"}</b>
-                    <span>White avg. cp loss</span>
-                  </div>
-                  <div>
-                    <b>{average("b") ?? "—"}</b>
-                    <span>Black avg. cp loss</span>
-                  </div>
-                </div>
-              )}
-              <Button className="text-button" onClick={() => navigate("stats")}>
-                <ChartNoAxesCombined size={15} />
-                Improvement patterns
-              </Button>
-            </Card>
-          )}
-          <Card>
+          {standard && <Card className="review-summary">
+            <div className="card-heading"><h2>Centipawn loss</h2></div>
+            <div className="metric-pair"><div><b>{average("w") ?? "—"}</b><span>White</span></div><div><b>{average("b") ?? "—"}</b><span>Black</span></div></div>
+          </Card>}
+          {standard && <Card className="review-performance">
+            <h2>Estimated rating</h2>
+            <div className="metric-pair">{["w","b"].map(side=><div key={side} title="Game performance estimate; available after eight analyzed non-book moves per side."><b>{rating(side) ?? "—"}</b><span>{side==="w"?"White":"Black"}</span></div>)}</div>
+            {(rating("w")===null || rating("b")===null) && <p className="caption">Needs 8 non-book moves per side.</p>}
+          </Card>}
+          {standard && <Card className="review-graph-card"><h2>Evaluation</h2><EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor}/></Card>}
+          {status && <p role="status" className="review-status">{status}</p>}
+          <Card className="review-notation-card">
             <h2>Moves</h2>
-            <div className="review-moves">
-              {game.notation.map((m, i) => {
-                const r = rows[i];
-                return (
-                  <button
-                    key={i}
-                    className={`${cursor === i + 1 ? "current" : ""} review-${r?.label.toLowerCase().replace(" ", "-") || "pending"}`}
-                    onClick={() => setCursor(i + 1)}
-                  >
-                    <span>
-                      {Math.floor(i / 2) + 1}
-                      {i % 2 ? "…" : "."} {m}
-                    </span>
-                    {r && (
-                      <small>
-                        {r.label === "Top move" ? <Star size={13} /> : r.label}
-                      </small>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            <table className="review-notation"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead>
+              <tbody>{Array.from({length:Math.ceil((game.moves.length+(game.initial.split(" ")[1]==="b"?1:0))/2)},(_,i)=>{
+                const blackStart=game.initial.split(" ")[1]==="b"?1:0;
+                return <tr key={i}><td>{Number(game.initial.split(" ")[5]||1)+i}</td>{[0,1].map(side=>{
+                  const index=i*2+side-blackStart, row=rows.find(r=>r.ply===index);
+                  return <td key={side}>{index>=0 && index<game.moves.length && <button className={cursor===index+1?"current":""} onClick={()=>setCursor(index+1)}><span>{game.notation[index]}</span>{row && <MoveBadge label={row.label}/>}</button>}</td>;
+                })}</tr>;
+              })}</tbody>
+            </table>
           </Card>
           {isStudy(game) && !!game.branches?.length && (
             <Card>

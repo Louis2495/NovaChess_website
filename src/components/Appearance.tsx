@@ -35,7 +35,7 @@ const sections = [
   ["Audio", Volume2],
   ["Moves", Move],
 ] as const;
-export default function Appearance({ onClose }: { onClose: () => void }) {
+export default function Appearance({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
   const { appearance: a, setAppearance: set, notify } = useApp();
   const [tab, setTab] = useState("Colors"),
     [presets, setPresets] = usePersistent<
@@ -45,7 +45,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
   const change = <K extends keyof AppearanceType>(
     key: K,
     value: AppearanceType[K],
-  ) => set((v) => ({ ...v, [key]: value }));
+  ) => set((v) => ({ ...v, [key]: value, ...(key === "font" ? { fontCustomized: true } : {}) }));
   function color(
     label: string,
     key:
@@ -111,8 +111,8 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
       </label>
     );
   }
-  return (
-    <Modal title="Appearance" onClose={onClose} wide>
+  const content = (
+    <>
       <div className="appearance-layout">
         <div
           className="appearance-sections"
@@ -322,7 +322,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                 >
                   {[
                     "DM Sans",
-                    "Manrope",
+                    "Nunito Sans", "Manrope",
                     "Georgia",
                     "system-ui",
                     "monospace",
@@ -409,17 +409,6 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
                   <option value={3}>Three lines</option>
                 </ChoiceSelect>
               </Field>
-              <Field label="Analysis time per position">
-                <ChoiceSelect
-                  value={a.searchTime}
-                  onChange={(e) => change("searchTime", Number(e.target.value))}
-                >
-                  <option value={500}>0.5 seconds</option>
-                  <option value={1200}>1.2 seconds</option>
-                  <option value={3000}>3 seconds</option>
-                  <option value={8000}>8 seconds</option>
-                </ChoiceSelect>
-              </Field>
             </>
           )}
           <div className="preset-section">
@@ -488,6 +477,7 @@ export default function Appearance({ onClose }: { onClose: () => void }) {
           </div>
         </div>
       </div>
-    </Modal>
+    </>
   );
+  return embedded ? <section className="appearance-inline" aria-label="Appearance">{content}</section> : <Modal title="Appearance" onClose={onClose} wide>{content}</Modal>;
 }

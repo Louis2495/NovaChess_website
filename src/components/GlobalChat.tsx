@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, X, Flag, Trash2, ShieldBan } from "lucide-react";
 import { online, useOnlineSession } from "../lib/online";
@@ -14,6 +15,8 @@ type Person = { id: string; username: string; avatar: string };
 export default function GlobalChat() {
   const { library, navigate } = useApp(),
     { session } = useOnlineSession();
+  const [host, setHost] = useState<HTMLElement | null>(null);
+  useEffect(() => setHost(document.getElementById("sidebar-chat")), []);
   const [open, setOpen] = useState(false),
     [messages, setMessages] = useState<Message[]>([]),
     [people, setPeople] = useState<Person[]>([]),
@@ -96,14 +99,14 @@ export default function GlobalChat() {
   }
   return (
     <>
-      <button
-        className="chat-launcher"
+      {host && createPortal(<button
+        className={`chat-sidebar-button ${open ? "active" : ""}`}
         aria-label="Open global chat"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        <MessageCircle size={20} />
-      </button>
+        <MessageCircle size={19} /><span>Chat</span>
+      </button>, host)}
       {open && (
         <aside
           className="global-chat-panel"

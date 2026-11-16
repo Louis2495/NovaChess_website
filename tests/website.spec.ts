@@ -64,7 +64,7 @@ test("appearance themes, custom colors, board/pieces/layout persist and presets 
     .getByRole("button", { name: "Customize", exact: true })
     .first()
     .click();
-  const d = page.getByRole("dialog", { name: "Appearance" });
+  const d = page.getByRole("region", { name: "Appearance" });
   await d.getByRole("button", { name: "Pink", exact: true }).click();
   await expect(page.locator(".app")).toHaveCSS("--accent", "#ef7eb6");
   await d
@@ -87,7 +87,7 @@ test("appearance themes, custom colors, board/pieces/layout persist and presets 
   const dl = page.waitForEvent("download");
   await d.getByRole("button", { name: "Export", exact: true }).click();
   expect((await dl).suggestedFilename()).toBe("novachess-appearance.json");
-  await d.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Account", exact: true }).click();
   await page.reload();
   const saved = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("novachess-appearance-v2")!),
@@ -107,7 +107,7 @@ test("appearance themes, custom colors, board/pieces/layout persist and presets 
     .first()
     .click();
   await page
-    .getByRole("dialog", { name: "Appearance" })
+    .getByRole("region", { name: "Appearance" })
     .getByRole("button", { name: "Reset appearance", exact: true })
     .click();
   await expect(page.locator(".app")).toHaveCSS("--accent", "#b2d3e7");
@@ -119,7 +119,7 @@ test("uploaded backgrounds stay local and can be removed", async ({ page }) => {
     .getByRole("button", { name: "Customize", exact: true })
     .first()
     .click();
-  const d = page.getByRole("dialog");
+  const d = page.getByRole("region", { name: "Appearance" });
   await d.getByRole("tab", { name: "Background", exact: true }).click();
   await d.locator(".upload-tile input").setInputFiles({
     name: "background.png",
@@ -469,7 +469,6 @@ test("saved games replay and engine review persist real results", async ({
   await expect(
     page.getByRole("slider", { name: "Replay position" }),
   ).toHaveValue("1");
-  await page.getByLabel("Time per position").selectOption("300");
   await page.getByRole("button", { name: "Review game", exact: true }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "Review complete." }),

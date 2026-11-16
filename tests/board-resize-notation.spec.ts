@@ -16,7 +16,7 @@ test("Analysis starts small enough for the screen and supports dragging, keyboar
   const h = (await handle.boundingBox())!;
   await page.mouse.move(h.x + h.width / 2, h.y + h.height / 2);
   await page.mouse.down();
-  await page.mouse.move(h.x + h.width / 2 - 50, h.y + h.height / 2 - 50, {
+  await page.mouse.move(h.x + h.width / 2 - 50, h.y + h.height / 2 + 50, {
     steps: 6,
   });
   await page.mouse.up();

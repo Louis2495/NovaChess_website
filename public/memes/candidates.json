@@ -1,86 +1,222 @@
 [
   {
-    "id": "01",
-    "image": "01.svg",
-    "top": "I studied 14 moves of theory.",
-    "bottom": "Opponent: 1. d4",
-    "status": "unreviewed"
+    "id": "5542",
+    "image": "IMG_5542.JPG",
+    "alt": "An opponent has one second left, while I blunder all my pieces.",
+    "top": "",
+    "bottom": "",
+    "width": 447,
+    "height": 447,
+    "status": "approved"
   },
   {
-    "id": "02",
-    "image": "02.svg",
-    "top": "My opponent offered a draw.",
-    "bottom": "I spent 20 moves proving they were right.",
-    "status": "unreviewed"
+    "id": "5543",
+    "image": "IMG_5543.WEBP",
+    "alt": "Obvious traps in nature, followed by a free queen on a chessboard.",
+    "top": "",
+    "bottom": "",
+    "width": 612,
+    "height": 612,
+    "status": "approved"
   },
   {
-    "id": "03",
-    "image": "03.svg",
-    "top": "A queen up. No need to calculate.",
-    "bottom": "½–½",
-    "status": "unreviewed"
+    "id": "5544",
+    "image": "IMG_5544.JPG",
+    "alt": "A young Samuel Reshevsky faces chess masters; the caption jokingly claims he lost every game.",
+    "top": "",
+    "bottom": "",
+    "width": 404,
+    "height": 495,
+    "status": "approved"
   },
   {
-    "id": "04",
-    "image": "04.svg",
-    "top": "Me: brilliant sacrifice.",
-    "bottom": "Engine: missing rook.",
-    "status": "unreviewed"
+    "id": "5545",
+    "image": "IMG_5545.WEBP",
+    "alt": "A knight tries to leave its comfort zone on a three-by-three chessboard.",
+    "top": "",
+    "bottom": "",
+    "width": 640,
+    "height": 637,
+    "status": "approved"
   },
   {
-    "id": "05",
-    "image": "05.svg",
-    "top": "Finally found a plan.",
-    "bottom": "It was my opponent’s.",
-    "status": "unreviewed"
+    "id": "5546",
+    "image": "IMG_5546.JPG",
+    "alt": "New chess update: open-world chess on a tiled bathroom floor.",
+    "top": "",
+    "bottom": "",
+    "width": 1000,
+    "height": 1160,
+    "status": "approved"
   },
   {
-    "id": "06",
-    "image": "06.svg",
-    "top": "The opening book ends here.",
-    "bottom": "Unfortunately, so does my chess.",
-    "status": "unreviewed"
+    "id": "5547",
+    "image": "IMG_5547.JPG",
+    "alt": "A chess player and cat react to an opponent who only plays the London.",
+    "top": "",
+    "bottom": "",
+    "width": 387,
+    "height": 516,
+    "status": "approved"
   },
   {
-    "id": "07",
-    "image": "07.svg",
-    "top": "I saw the fork.",
-    "bottom": "After submitting my resignation.",
-    "status": "unreviewed"
+    "id": "5548",
+    "image": "IMG_5548.jpg",
+    "alt": "When you do not hear the checkmate sound: Joey looks worried.",
+    "top": "",
+    "bottom": "",
+    "width": 750,
+    "height": 930,
+    "status": "approved"
   },
   {
-    "id": "08",
-    "image": "08.svg",
-    "top": "Calculated six moves ahead.",
-    "bottom": "Forgot they get turns too.",
-    "status": "unreviewed"
+    "id": "5549",
+    "image": "IMG_5549.JPG",
+    "alt": "A police officer asks a chess knight to walk in a straight line.",
+    "top": "",
+    "bottom": "",
+    "width": 460,
+    "height": 474,
+    "status": "approved"
   },
   {
-    "id": "09",
-    "image": "09.svg",
-    "top": "My king is perfectly safe.",
-    "bottom": "According to my opponent.",
-    "status": "unreviewed"
+    "id": "5550",
+    "image": "IMG_5550.JPG",
+    "alt": "What people think a chess player is calculating versus what they are actually thinking.",
+    "top": "",
+    "bottom": "",
+    "width": 248,
+    "height": 202,
+    "status": "approved"
   },
   {
-    "id": "10",
-    "image": "10.svg",
-    "top": "I have a winning position.",
-    "bottom": "Now comes the difficult part: playing chess.",
-    "status": "unreviewed"
+    "id": "5551",
+    "image": "IMG_5551.JPG",
+    "alt": "Your first opponent is just a kid: most games versus chess.",
+    "top": "",
+    "bottom": "",
+    "width": 480,
+    "height": 360,
+    "status": "approved"
   },
   {
-    "id": "11",
-    "image": "11.svg",
-    "top": "One last game.",
-    "bottom": "A statement, not a timestamp.",
-    "status": "unreviewed"
+    "id": "5552",
+    "image": "IMG_5552.JPG",
+    "alt": "A bishop and the Queen meet in the Vatican, described as a chess position.",
+    "top": "",
+    "bottom": "",
+    "width": 800,
+    "height": 860,
+    "status": "approved"
   },
   {
-    "id": "12",
-    "image": "12.svg",
-    "top": "The engine says it’s equal.",
-    "bottom": "We are both offended.",
-    "status": "unreviewed"
+    "id": "5553",
+    "image": "IMG_5553.JPG",
+    "alt": "A queen walks confidently toward an early attack on the chessboard.",
+    "top": "",
+    "bottom": "",
+    "width": 335,
+    "height": 597,
+    "status": "approved"
+  },
+  {
+    "id": "5554",
+    "image": "IMG_5554.JPG",
+    "alt": "Black has an easy win, followed by a surprising stalemate.",
+    "top": "",
+    "bottom": "",
+    "width": 735,
+    "height": 725,
+    "status": "approved"
+  },
+  {
+    "id": "5555",
+    "image": "IMG_5555.JPG",
+    "alt": "A rook walks on a treadmill while a knight struggles to go straight.",
+    "top": "",
+    "bottom": "",
+    "width": 531,
+    "height": 500,
+    "status": "approved"
+  },
+  {
+    "id": "5556",
+    "image": "IMG_5556.JPG",
+    "alt": "The black king faces a crowd of attacking white pieces.",
+    "top": "",
+    "bottom": "",
+    "width": 415,
+    "height": 739,
+    "status": "approved"
+  },
+  {
+    "id": "5557",
+    "image": "IMG_5557.JPG",
+    "alt": "Where can you buy most chess pieces? The pawn shop.",
+    "top": "",
+    "bottom": "",
+    "width": 1000,
+    "height": 1000,
+    "status": "approved"
+  },
+  {
+    "id": "5558",
+    "image": "IMG_5558.JPG",
+    "alt": "A queen blunder looks different against a beginner and a strong player.",
+    "top": "",
+    "bottom": "",
+    "width": 568,
+    "height": 540,
+    "status": "approved"
+  },
+  {
+    "id": "5560",
+    "image": "IMG_5560.WEBP",
+    "alt": "A chess tip suggests using a mirror to see an opponent’s moves.",
+    "top": "",
+    "bottom": "",
+    "width": 1000,
+    "height": 1132,
+    "status": "approved"
+  },
+  {
+    "id": "5561",
+    "image": "IMG_5561.JPG",
+    "alt": "Chess while skydiving: winner gets the parachute.",
+    "top": "",
+    "bottom": "",
+    "width": 556,
+    "height": 551,
+    "status": "approved"
+  },
+  {
+    "id": "5562",
+    "image": "IMG_5562.JPG",
+    "alt": "At 500 rating a player steps on a rake; at 1500 the traps are more elaborate.",
+    "top": "",
+    "bottom": "",
+    "width": 618,
+    "height": 770,
+    "status": "approved"
+  },
+  {
+    "id": "5563",
+    "image": "IMG_5563.JPG",
+    "alt": "A man and a cat play chess beside a blue door.",
+    "top": "",
+    "bottom": "",
+    "width": 236,
+    "height": 274,
+    "status": "approved"
+  },
+  {
+    "id": "5564",
+    "image": "IMG_5564.jpg",
+    "alt": "A fictional millionaire neurosurgeon wife comforts a player who missed checkmate against a child.",
+    "top": "",
+    "bottom": "",
+    "width": 415,
+    "height": 296,
+    "status": "approved"
   }
 ]

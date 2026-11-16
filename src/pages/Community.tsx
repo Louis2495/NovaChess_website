@@ -8,10 +8,8 @@ import {
   Vote,
   ArrowRight,
   Copy,
-  Send,
   Flag,
   Handshake,
-  MessageCircle,
   Snowflake,
   ArrowLeftRight,
   LogOut,
@@ -40,48 +38,38 @@ type Room = {
   settings: { bot: boolean };
 };
 type Profile = { id: string; username: string };
-type Message = {
-  id: number;
-  user_id: string;
-  body: string;
-  created_at: string;
-};
 export default function Community() {
   const { session } = useOnlineSession(),
     { detail, navigate, notify, appearance } = useApp();
   const [rooms, setRooms] = useState<Room[]>([]),
     [room, setRoom] = useState<Room | null>(null),
     [profiles, setProfiles] = useState<Profile[]>([]),
-    [mode, setMode] = useState("standard"),
+    [mode, setMode] = useState("throne"),
     [name, setName] = useState(""),
     [variant, setVariant] = useState("chess"),
     [bot, setBot] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [messages, setMessages] = useState<Message[]>([]),
-    [chat, setChat] = useState(""),
     [votes, setVotes] = useState<
       { move: string; user_id: string; created_at: string }[]
     >([]),
     [armed, setArmed] = useState<"" | "freeze" | "swap">(""),
     [first, setFirst] = useState("");
   const uid = session?.user.id;
+  const [roomId, inviteQuery = ""] = detail.split("?");
+  const inviteTeam = new URLSearchParams(inviteQuery).get("team");
   const username = (id: string) =>
     profiles.find((p) => p.id === id)?.username || "Player";
   async function load() {
     if (!online || !uid) return;
-    const [{ data: r, error }, { data: p }, { data: m }] = await Promise.all([
+    const [{ data: r, error }, { data: p }] = await Promise.all([
       online
         .from("rooms")
         .select("*")
         .order("updated_at", { ascending: false })
         .limit(40),
       online.from("profiles").select("id,username").limit(1000),
-      online
-        .from("messages")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(80),
+
     ]);
     if (error) {
       setError(error.message);
@@ -89,15 +77,14 @@ export default function Community() {
     }
     setRooms(r || []);
     setProfiles(p || []);
-    setMessages((m || []).reverse());
-    if (detail) {
-      const found = (r || []).find((x) => x.id === detail);
+    if (roomId) {
+      const found = (r || []).find((x) => x.id === roomId);
       if (found) setRoom(found);
       else {
         const { data } = await online
           .from("rooms")
           .select("*")
-          .eq("id", detail)
+          .eq("id", roomId)
           .single();
         if (data) setRoom(data);
       }
@@ -111,11 +98,6 @@ export default function Community() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "rooms" },
-        () => void load(),
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "messages" },
         () => void load(),
       )
       .subscribe();
@@ -220,7 +202,20 @@ export default function Community() {
         )}
       </PageTitle>
       {!online || !uid ? (
-        <OnlineAccount />
+        <>
+          <div className="multiplayer-modes" role="group" aria-label="Multiplayer modes">
+            {[["throne","Throne",Crown],["vote","Vote Chess",Vote],["team","Team Chess",Users]].map(([id,title,Icon])=>{
+              const I=Icon as typeof Users; return <button key={id as string} aria-pressed={mode===id} onClick={()=>setMode(id as string)}><I size={28}/>{title as string}</button>;
+            })}
+          </div>
+          <Card className="multiplayer-preview">
+            <h2>{mode === "throne" ? "Throne" : mode === "vote" ? "Vote Chess" : "Team Chess"}</h2>
+            <p>{mode === "throne" ? "Winner stays. Queue to challenge. Finish gives up your seat." : mode === "vote" ? "Even teams. One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>
+            {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>setBot(e.target.value==="bot")}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
+            <Button disabled>Create room</Button>
+          </Card>
+          <OnlineAccount />
+        </>
       ) : (
         <>
           {error && (
@@ -239,7 +234,7 @@ export default function Community() {
                       : room.mode === "vote"
                         ? "Vote Chess"
                         : room.mode === "team"
-                          ? "Team chess"
+                          ? "Team Chess"
                           : "Chess"}
                   </span>
                 </div>
@@ -359,8 +354,10 @@ export default function Community() {
                   <Button
                     className="secondary"
                     onClick={async () => {
-                      const ok = await copyText(location.href);
-                      notify(ok ? "Invite link copied." : location.href);
+                      const invite = new URL(location.href);
+                      invite.hash = "community/"+room.id+(room.mode === "team" && me?.team ? "?team="+me.team : "");
+                      const ok = await copyText(invite.href);
+                      notify(ok ? "Invite link copied." : invite.href);
                     }}
                   >
                     <Copy size={16} />
@@ -375,7 +372,7 @@ export default function Community() {
                       ? "Waiting for players"
                       : room.state.result !== "*"
                         ? "Game finished"
-                        : `${turn === "w" ? "White" : "Black"} to ${room.mode === "vote" ? "vote" : "move"}`}
+                        : room.mode === "vote" ? "Voting open" : "Playing"}
                   </h2>
                   <div className="team-rosters">
                     {["w", "b"].map((team) => (
@@ -396,7 +393,7 @@ export default function Community() {
                     ))}
                   </div>
                   {!me && (
-                    <Button disabled={busy} onClick={() => void act("join")}>
+                    <Button disabled={busy} onClick={() => void act("join", room?.mode === "team" ? { team: inviteTeam } : {})}>
                       Join{room.mode === "throne" ? " the queue" : ""}
                       <ArrowRight size={16} />
                     </Button>
@@ -416,7 +413,7 @@ export default function Community() {
                       {me && !me.team && !room.queue.includes(uid!) && (
                         <Button
                           disabled={busy}
-                          onClick={() => void act("join")}
+                          onClick={() => void act("join", room?.mode === "team" ? { team: inviteTeam } : {})}
                         >
                           Join queue
                         </Button>
@@ -478,7 +475,7 @@ export default function Community() {
                     ["standard", "Chess", Users],
                     ["throne", "Throne", Crown],
                     ["vote", "Vote Chess", Vote],
-                    ["team", "Team chess", Users],
+                    ["team", "Team Chess", Users],
                   ].map(([id, title, Icon]) => {
                     const I = Icon as typeof Users;
                     return (
@@ -531,8 +528,8 @@ export default function Community() {
                     void act("create", {
                       mode,
                       name,
-                      variant: mode === "team" && bot ? "chess" : variant,
-                      bot,
+                      variant: mode === "vote" || mode === "team" && bot ? "chess" : variant,
+                      bot: mode === "team" && bot,
                     })
                   }
                 >
@@ -558,7 +555,7 @@ export default function Community() {
                               : r.mode === "vote"
                                 ? "Vote Chess"
                                 : r.mode === "team"
-                                  ? "Team chess"
+                                  ? "Team Chess"
                                   : "Chess"}{" "}
                             · {r.members.length} players
                           </small>
@@ -571,81 +568,7 @@ export default function Community() {
               </Card>
             </div>
           )}
-          <Card className="global-chat">
-            <div className="card-heading">
-              <h2>Global chat</h2>
-              <MessageCircle size={21} />
-            </div>
-            <div
-              className="chat-messages"
-              role="log"
-              aria-label="Global chat messages"
-            >
-              {messages.map((m) => (
-                <div key={m.id}>
-                  <b>{username(m.user_id)}</b>
-                  <p>{m.body}</p>
-                  <small>
-                    {new Date(m.created_at).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </small>
-                  {m.user_id === uid ? (
-                    <button
-                      aria-label="Delete message"
-                      onClick={async () => {
-                        await online!.from("messages").delete().eq("id", m.id);
-                        void load();
-                      }}
-                    >
-                      Delete
-                    </button>
-                  ) : (
-                    <button
-                      aria-label="Report message"
-                      onClick={async () => {
-                        const { error } = await online!
-                          .from("reports")
-                          .insert({ reporter: uid, message_id: m.id });
-                        notify(
-                          error ? "Report already recorded." : "Reported.",
-                        );
-                      }}
-                    >
-                      Report
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (!chat.trim()) return;
-                const { error } = await online!.rpc("post_message", {
-                  p_body: chat.trim(),
-                });
-                if (error) notify(error.message);
-                else setChat("");
-              }}
-            >
-              <input
-                aria-label="Message global chat"
-                maxLength={600}
-                value={chat}
-                onChange={(e) => setChat(e.target.value)}
-                placeholder="Message"
-              />
-              <Button
-                type="submit"
-                disabled={!chat.trim()}
-                aria-label="Send message"
-              >
-                <Send size={18} />
-              </Button>
-            </form>
-          </Card>
+
         </>
       )}
     </>

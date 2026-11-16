@@ -1,6 +1,7 @@
+import { createHash } from "node:crypto";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { Chess } from "chess.js";
 const read = (n) => JSON.parse(readFileSync("public/data/" + n + ".json"));
 test("every curated lesson, branch and famous-game score replays legally to its stored positions", () => {
@@ -30,13 +31,15 @@ test("every curated lesson, branch and famous-game score replays legally to its 
       assert.ok(+ply > 0 && +ply <= g.moves.length);
   }
 });
-test("daily meme collection stays unique for more than a year and facts omit movement diagrams", () => {
+test("owner-supplied memes form a unique 22-day cycle and facts omit movement diagrams", () => {
   const memes = JSON.parse(
-    readFileSync("content/memes/previous-candidates.json"),
+    readFileSync("public/memes/candidates.json"),
   );
-  assert.ok(memes.length >= 366);
+  assert.equal(memes.length, 22);
+  assert.equal(readdirSync("public/memes").filter(n=>/\.(jpg|webp|png|svg)$/i.test(n)).length,22);
+  assert.ok(memes.every(m=>m.alt && m.width>0 && m.height>0));
   assert.equal(
-    new Set(memes.map((m) => m.top + "|" + m.bottom)).size,
+    new Set(memes.map(m=>createHash("sha256").update(readFileSync("public/memes/"+m.image)).digest("hex"))).size,
     memes.length,
   );
   const facts = read("learning").facts;

@@ -15,7 +15,7 @@ test("two/three option selectors render as working toggle bars, including federa
   ).toHaveAttribute("href", /uschess\.org/);
   await page.goto("/#profile");
   await page.getByRole("button", { name: "Customize", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "Appearance", exact: true });
+  const dialog = page.getByRole("region", { name: "Appearance", exact: true });
   await dialog.getByRole("tab", { name: "Layout", exact: true }).click();
   const spacing = dialog.getByRole("group", { name: "Spacing", exact: true });
   await expect(spacing.getByRole("button")).toHaveCount(3);

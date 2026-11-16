@@ -1,3 +1,4 @@
+import { weakComputerMove } from "../lib/computerStrength";
 import { matchTypedMove } from "../lib/moves";
 import { previewPremoves } from "../lib/premoves";
 import { usePremoves } from "../lib/usePremoves";
@@ -489,11 +490,14 @@ export default function Play() {
         let move = "";
         if (standard) {
           const result = await search(valid!.fen, {
-            time: 700,
-            elo: game!.botRating || 1200,
+            time: (game!.botRating || 1200) < 1320 ? 300 : 700,
+            multiPV: (game!.botRating || 1200) < 1320 ? Math.min(8, valid!.legal.length) : 1,
+            elo: (game!.botRating || 1200) < 1320 ? 1320 : game!.botRating,
             signal: controller.signal,
           });
-          move = result.best;
+          move = (game!.botRating || 1200) < 1320 && result.lines.length
+            ? weakComputerMove(valid!.legal, result.lines, valid!.turn, game!.botRating || 1200, Math.random, result.best)
+            : result.best;
         } else
           move = await variantMove(
             game!.variant,

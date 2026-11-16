@@ -102,14 +102,14 @@ test("profile photo is inside the cover with a small accessible upload icon and 
   ).toHaveCount(1);
   await expect(page.locator(".app")).toHaveCSS("--button", "#a7bfd6");
   await expect(
-    page.getByRole("button", { name: "Multiplayer", exact: true }),
-  ).toHaveCount(0);
+    page.locator(".sidebar nav").getByRole("button", { name: "Multiplayer", exact: true, includeHidden: true }),
+  ).toHaveCount(1);
   const tabs = await page
     .locator(".sidebar nav")
     .first()
     .locator("button")
     .allTextContents();
-  expect(tabs.slice(-2)).toEqual(["Stats", "Library"]);
+  expect(tabs.slice(-3)).toEqual(["Stats", "Library", "Chat"]);
 });
 test("analysis keeps the same engine searching beyond the old time budget and cancels it when leaving", async ({
   page,

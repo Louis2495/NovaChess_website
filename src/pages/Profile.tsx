@@ -1,6 +1,7 @@
+import Appearance from "../components/Appearance";
 import { FederationProfiles } from "../components/FederationProfiles";
 import { useEffect, useState } from "react";
-import { Save, Upload, Trash2, SlidersHorizontal } from "lucide-react";
+import { Save, Upload, Trash2, SlidersHorizontal, Play } from "lucide-react";
 import Controls from "./Controls";
 import OnlineAccount from "../components/OnlineAccount";
 import { online, useOnlineSession } from "../lib/online";
@@ -22,7 +23,6 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
     appearance,
     setAppearance,
     notify,
-    openAppearance,
     detail,
     navigate,
   } = useApp();
@@ -64,7 +64,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
       {!embedded && <PageTitle title="Profile" />}
       <div className="segmented page-segments" aria-label="Profile sections">
         <button
-          className={detail !== "controls" ? "active" : ""}
+          className={!["controls", "customize"].includes(detail) ? "active" : ""}
           onClick={() => navigate("profile")}
         >
           Account
@@ -75,9 +75,12 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
         >
           Controls
         </button>
+        <button className={detail === "customize" ? "active" : ""} onClick={() => navigate("profile", "customize")}>Customize</button>
       </div>
       {detail === "controls" ? (
         <Controls embedded />
+      ) : detail === "customize" ? (
+        <Appearance embedded onClose={() => navigate("profile")} />
       ) : (
         <div className="profile-page-layout">
           <Card className="profile-editor">
@@ -195,7 +198,6 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
             </form>
           </Card>
           <div className="profile-side">
-            <OnlineAccount />
             <Card>
               <div className="card-heading">
                 <h2>Settings</h2>
@@ -232,11 +234,24 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
                 checked={appearance.sound}
                 onChange={(sound) => setAppearance((a) => ({ ...a, sound }))}
               />
-              <Button className="secondary" onClick={openAppearance}>
-                Customize
-              </Button>
+              <div className="move-sound-upload">
+                <label className="file-button">
+                  <Upload size={15}/><span>{appearance.customMoveSound ? "Replace sound" : "Upload sound"}</span>
+                  <input type="file" accept="audio/*" aria-label="Upload move sound" onChange={e => {
+                    const file=e.target.files?.[0]; e.target.value=""; if(!file) return;
+                    if(file.size>1024*1024 || !(file.type.startsWith("audio/") || /\.(mp3|wav|ogg|m4a|aac|flac|webm)$/i.test(file.name))) { notify("Choose an audio file under 1 MB."); return; }
+                    const reader=new FileReader(); reader.onerror=()=>notify("Could not read this sound.");
+                    reader.onload=()=>{ setAppearance(a=>({...a,customMoveSound:String(reader.result),sound:true})); notify("Move sound updated."); }; reader.readAsDataURL(file);
+                  }}/>
+                </label>
+                {appearance.customMoveSound && <>
+                  <button className="icon-btn" aria-label="Preview move sound" onClick={()=>{const audio=new Audio(appearance.customMoveSound); audio.volume=appearance.volume; void audio.play().catch(()=>notify("This audio file could not be played."));}}><Play size={15}/></button>
+                  <button className="icon-btn" aria-label="Use default move sound" onClick={()=>setAppearance(a=>({...a,customMoveSound:undefined}))}><Trash2 size={15}/></button>
+                </>}
+              </div>
             </Card>
           </div>
+          <div className="profile-online"><OnlineAccount /></div>
           <FederationProfiles />
         </div>
       )}

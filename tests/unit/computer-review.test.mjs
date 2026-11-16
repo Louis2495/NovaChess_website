@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import { weakComputerMove } from '../../src/lib/computerStrength.ts';
+import { classifyMove, performanceRating } from '../../src/lib/gameReview.ts';
+const legal=['e2e4','d2d4','g1f3','f2f3'];const lines=legal.map((m,i)=>({moves:[m],score:-i*100,depth:16,rank:i+1,mate:null}));
+function sample(rating,sign=1){let seed=8123;const random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);let total=0;for(let i=0;i<10000;i++){const move=weakComputerMove(legal,lines.map(l=>({...l,score:l.score*sign})),sign===1?'w':'b',rating,random,legal[0]);assert.ok(legal.includes(move));total+=legal.indexOf(move)*100;}return total/10000;}
+test('lower computer targets make progressively larger errors without illegal moves or color bias',()=>{const a=sample(600),b=sample(1000),c=sample(1300);assert.ok(a>b+25);assert.ok(b>c+25);assert.equal(sample(1000,-1),b);assert.equal(weakComputerMove([],lines,'w',1000), '');assert.equal(weakComputerMove(['a7a8q'],[],'w',1000,()=>0),'a7a8q');});
+test('review distinguishes theory from mistakes and requires enough play for performance estimates',()=>{assert.equal(classifyMove(false,0,true),'Book');assert.equal(classifyMove(false,180,true),'Mistake');assert.equal(classifyMove(false,300,false),'Blunder');assert.equal(classifyMove(true,0,false),'Best');const rows=Array.from({length:12},()=>({label:'Good',loss:20}));assert.equal(performanceRating(rows.slice(0,7)),null);assert.equal(performanceRating(rows.map(r=>({...r,label:'Book'}))),null);assert.ok(performanceRating(rows)>performanceRating(rows.map(r=>({...r,loss:160}))));assert.ok(performanceRating(rows)<=3000);});
+
+test('near-minimum targets preserve the native calibrated move rather than jumping to full strength',()=>{assert.equal(weakComputerMove(legal,lines,'w',1319,()=>.5,'d2d4'),'d2d4');assert.equal(weakComputerMove(['a7a8q'],[], 'w',500,()=>0,'a7a8q'),'a7a8q');});

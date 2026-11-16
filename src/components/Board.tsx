@@ -60,7 +60,9 @@ export function Board({
   onFlip,
   materialFen,
   guides = [],
+  badge,
 }: {
+  badge?: { square: string; content: React.ReactNode };
   fen: string;
   onMove?: (from: string, to: string, promotion?: string) => void;
   onSquare?: (square: string) => void;
@@ -83,6 +85,8 @@ export function Board({
   guides?: BoardMark[];
 }) {
   const { appearance, setAppearance, tab, detail } = useApp();
+  const cancelRef = useRef(onCancel);
+  cancelRef.current = onCancel;
   const sizeKey = boardSizeKey(tab, detail);
   const manualBoardSize =
     appearance.boardSizes?.[sizeKey] ?? appearance.globalBoardSize;
@@ -181,7 +185,7 @@ export function Board({
     if (!g || g.right) return false;
     gesture.current = null;
     setDrag(null);
-    setSelected(g.from);
+    setSelected(null);
     suppressClick.current = true;
     canceledRight.current = true;
     boardRef.current
@@ -194,7 +198,12 @@ export function Board({
   }
   useEffect(() => {
     const mouseDown = (event: MouseEvent) => {
-      if (event.button === 2 && cancelDrag()) event.preventDefault();
+      if (event.button === 2) {
+        setSelected(null);
+        setPromotion(null);
+        cancelRef.current?.();
+        if (cancelDrag()) event.preventDefault();
+      }
     };
     const contextMenu = (event: MouseEvent) => {
       if (canceledRight.current) {
@@ -203,10 +212,10 @@ export function Board({
         canceledRight.current = false;
       }
     };
-    window.addEventListener("mousedown", mouseDown, true);
+    window.addEventListener("pointerdown", mouseDown, true);
     window.addEventListener("contextmenu", contextMenu, true);
     return () => {
-      window.removeEventListener("mousedown", mouseDown, true);
+      window.removeEventListener("pointerdown", mouseDown, true);
       window.removeEventListener("contextmenu", contextMenu, true);
     };
   }, []);
@@ -317,6 +326,7 @@ export function Board({
     const measure = () => {
       const rect = el.getBoundingClientRect();
       setMeasuredSize(Math.round(rect.width));
+      el.parentElement?.style.setProperty("--board-top-offset", `${el.offsetTop}px`);
       el.closest<HTMLElement>(".board-column")
         ?.style.setProperty("--actual-board-width", `${rect.width}px`);
       // Leave room for material and replay controls; use document position so
@@ -442,6 +452,7 @@ export function Board({
                   if (e.button === 0) suppressClick.current = false;
                   pointer.current = { x: e.clientX, y: e.clientY };
                   if (e.button === 2) {
+                    setSelected(null);
                     e.preventDefault();
                     if (cancelDrag() || canceledRight.current) return;
                     if (onCancelPremoves?.()) {
@@ -528,6 +539,7 @@ export function Board({
                   }
                 }}
               >
+                {badge?.square === square && <span className="board-move-badge">{badge.content}</span>}
                 {!concealed && piece && <Piece symbol={piece} />}{" "}
                 {!fogged && appearance.coordinates && col === 0 && (
                   <span className="rank">{rank}</span>
@@ -611,6 +623,8 @@ export function Board({
             );
           })}
         </svg>
+
+      </div>
         <div
           className="board-resize-handle"
           role="slider"
@@ -654,7 +668,7 @@ export function Board({
               r.size +
                 (Math.abs(e.clientX - r.x) > Math.abs(e.clientY - r.y)
                   ? e.clientX - r.x
-                  : e.clientY - r.y),
+                  : r.y - e.clientY),
             );
           }}
           onPointerUp={(e) => {
@@ -692,7 +706,6 @@ export function Board({
             />
           </svg>
         </div>
-      </div>
       {imbalance > 0 && (
         <div
           className={`material-imbalance ${compact ? "compact-material" : ""}`}

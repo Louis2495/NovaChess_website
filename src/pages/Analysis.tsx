@@ -208,10 +208,10 @@ export default function Analysis() {
         subtitle={`Stockfish 19 Lite · Depth ${engine.lines[0]?.depth ?? 0}`}
       >
         <div className="analysis-tools-menu" role="group" aria-label="Analysis actions">
-          <button onClick={() => setSaving(true)}><Save size={16} />Save study</button>
-          <button aria-label="Edit position" onClick={() => setEditing(true)}><SlidersHorizontal size={16} />Set up position</button>
-          <button aria-label="Share position" onClick={() => setSharing(true)}><Share2 size={16} />Share</button>
-          <button onClick={() => reset(initialFen)}><RotateCcw size={16} />Reset</button>
+          <button aria-label="Save study" title="Save study" onClick={() => setSaving(true)}><Save size={18} /></button>
+          <button aria-label="Edit position" title="Set up position" onClick={() => setEditing(true)}><SlidersHorizontal size={18} /></button>
+          <button aria-label="Share position" title="Share" onClick={() => setSharing(true)}><Share2 size={18} /></button>
+          <button aria-label="Reset" title="Reset" onClick={() => reset(initialFen)}><RotateCcw size={18} /></button>
         </div>
       </PageTitle>
       {engine.error && (
@@ -293,19 +293,6 @@ export default function Analysis() {
               <ChevronsRight size={18} />
             </IconButton>
           </div>
-        </div>
-        <div className="side-panels">
-          <Card className="positional-insights">
-            <div className="card-heading">
-              <h2>Positional insights</h2>
-              <Lightbulb size={18} />
-            </div>
-            <div className="insights" aria-live="polite">
-              {insights.map((text) => (
-                <p key={text}>{text}</p>
-              ))}
-            </div>
-          </Card>
           <Card className="analysis-notation">
             <div className="card-heading">
               <button
@@ -396,6 +383,19 @@ export default function Analysis() {
               {!moves.length && (
                 <p className="muted">Play a move on the board.</p>
               )}
+            </div>
+          </Card>
+        </div>
+        <div className="side-panels">
+          <Card className="positional-insights">
+            <div className="card-heading">
+              <h2>Positional insights</h2>
+              <Lightbulb size={18} />
+            </div>
+            <div className="insights" aria-live="polite">
+              {insights.map((text) => (
+                <p key={text}>{text}</p>
+              ))}
             </div>
           </Card>
           <Card className="engine-top-lines">

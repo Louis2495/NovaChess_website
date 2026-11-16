@@ -40,7 +40,7 @@ test("games maximize the board, omit typing/pause/game settings, use profile ima
   ).toBeVisible();
 });
 test("illegal drops return silently and global chat supports a draft without pretending to be connected", async ({
-  page,
+  page, isMobile,
 }) => {
   await page.goto("/#analysis");
   const square = (s: string) =>
@@ -55,6 +55,7 @@ test("illegal drops return silently and global chat supports a draft without pre
   await page.mouse.up();
   await expect(square("e2")).toHaveAttribute("aria-label", "e2, white pawn");
   await expect(page.getByText(/illegal move|not legal/i)).toHaveCount(0);
+  if (isMobile) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
   await page
     .getByRole("button", { name: "Open global chat", exact: true })
     .click();

@@ -6,9 +6,19 @@ type Meme = {
   top: string;
   bottom: string;
   status: string;
+  alt?: string;
+  width?: number;
+  height?: number;
 };
 export default function DailyMeme() {
   const [candidates, setCandidates] = useState<Meme[]>([]);
+  const [date, setDate] = useState(today);
+  useEffect(() => {
+    const update = () => setDate(today());
+    const timer = setInterval(update, 30000);
+    window.addEventListener("focus", update);
+    return () => { clearInterval(timer); window.removeEventListener("focus", update); };
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
     void fetch(`${base}memes/candidates.json`, { signal: controller.signal })
@@ -24,7 +34,7 @@ export default function DailyMeme() {
   }, []);
   const eligible = candidates.filter((m) => m.status !== "rejected");
   if (!eligible.length) return null;
-  const day = Math.floor(Date.parse(today() + "T12:00:00Z") / 86400000);
+  const day = Math.floor(Date.parse(date + "T12:00:00Z") / 86400000);
   const meme =
     eligible[((day % eligible.length) + eligible.length) % eligible.length];
   return (
@@ -36,9 +46,9 @@ export default function DailyMeme() {
       <img
         className="daily-meme-image"
         src={`${base}memes/${meme.image}`}
-        alt={`${meme.top} ${meme.bottom}`}
-        width={720}
-        height={600}
+        alt={meme.alt || `${meme.top} ${meme.bottom}`}
+        width={meme.width || 720}
+        height={meme.height || 600}
         loading="lazy"
       />
     </section>

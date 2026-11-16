@@ -57,6 +57,7 @@ export type Appearance = {
   panelOpacity: number;
   radius: number;
   font: string;
+  fontCustomized?: boolean;
   fontSize: number;
   density: string;
   coordinates: boolean;
@@ -64,6 +65,7 @@ export type Appearance = {
   lastMove: boolean;
   animation: boolean;
   sound: boolean;
+  customMoveSound?: string;
   music: boolean;
   volume: number;
   autoQueen: boolean;
@@ -113,6 +115,8 @@ export type SavedGame = {
   review?: ReviewRow[];
 };
 export type ReviewRow = {
+  afterScore?: number;
+  depth?: number;
   ply: number;
   move: string;
   best: string;
