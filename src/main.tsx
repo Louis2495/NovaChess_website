@@ -1,4 +1,4 @@
-import {useOnlineSession} from "./lib/online";
+import {useOnlineSession,useRecoveryState} from "./lib/online";
 import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -102,7 +102,7 @@ function route() {
   };
 }
 function App() {
-  const {session,ready:authReady}=useOnlineSession();
+  const {session,ready:authReady}=useOnlineSession(),recovery=useRecoveryState();
   const appRoot = useRef<HTMLDivElement>(null);
   const [appearance, setAppearance] = usePersistent<AppearanceType>(
       "novachess-appearance-v2",
@@ -216,6 +216,7 @@ function App() {
     setShowMenu(false);
     window.scrollTo({ top: 0, behavior: "instant" });
   }
+  useEffect(()=>{if(recovery.active || recovery.checking || recovery.error)navigate("signin","reset");},[recovery.active,recovery.checking,recovery.error]);
   useEffect(() => {
     const handler = () => setLocation(route());
     window.addEventListener("hashchange", handler);

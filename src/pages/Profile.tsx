@@ -1,10 +1,11 @@
+import AdminAccounts from "../components/AdminAccounts";
 import Appearance from "../components/Appearance";
 import { FederationProfiles } from "../components/FederationProfiles";
 import { useEffect, useState } from "react";
 import { Save, Upload, Trash2, SlidersHorizontal, Play } from "lucide-react";
 import Controls from "./Controls";
 import OnlineAccount from "../components/OnlineAccount";
-import { online, useOnlineSession } from "../lib/online";
+import { online, useOnlineSession, useSiteAdmin } from "../lib/online";
 import { useApp } from "../lib/context";
 import { imageFile, pieceUrl } from "../lib/store";
 import { regions } from "../lib/regions";
@@ -29,7 +30,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
   const [name, setName] = useState(library.profile.name),
     [bio, setBio] = useState(library.profile.bio || ""),
     [country, setCountry] = useState(library.profile.country);
-  const { session } = useOnlineSession();
+  const { session } = useOnlineSession(),{isAdmin}=useSiteAdmin();
   useEffect(() => {
     if (!online || !session) return;
     online
@@ -64,7 +65,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
       {!embedded && <PageTitle title="Profile" />}
       <div className="segmented page-segments" aria-label="Profile sections">
         <button
-          className={!["controls", "customize"].includes(detail) ? "active" : ""}
+          className={!["controls", "customize", "admin"].includes(detail) ? "active" : ""}
           onClick={() => navigate("profile")}
         >
           Account
@@ -76,8 +77,9 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
           Controls
         </button>
         <button className={detail === "customize" ? "active" : ""} onClick={() => navigate("profile", "customize")}>Customize</button>
+      {isAdmin && <button className={detail === "admin" ? "active" : ""} onClick={()=>navigate("profile","admin")}>Admin</button>}
       </div>
-      {detail === "controls" ? (
+      {detail === "admin" ? <AdminAccounts/> : detail === "controls" ? (
         <Controls embedded />
       ) : detail === "customize" ? (
         <Appearance embedded onClose={() => navigate("profile")} />

@@ -9,6 +9,7 @@ on:
       - 'src/lib/variantCatalog.ts'
       - 'src/lib/specialRules.ts'
       - 'scripts/prepare-assets.mjs'
+      - 'scripts/configure-auth-recovery.mjs'
       - '.github/workflows/deploy-backend.yml'
 permissions:
   contents: read
@@ -47,6 +48,8 @@ jobs:
           supabase db push --linked --yes
       - name: Deploy game validation
         run: supabase functions deploy chess --project-ref "$SUPABASE_PROJECT_REF" --use-docker --no-verify-jwt --yes
+      - name: Configure password recovery email
+        run: node scripts/configure-auth-recovery.mjs
       - name: Verify deployed services
         run: node scripts/check-online-backend.mjs
       - name: Deployment summary

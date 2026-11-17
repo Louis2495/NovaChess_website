@@ -4566,3 +4566,17 @@ html { scrollbar-gutter:stable; }
 .floating-sign-in { position:fixed; right:24px; bottom:24px; z-index:35; box-shadow:0 6px 20px #0004; }
 .sign-in-page { width:min(100%,480px); margin:30px auto; }
 @media(max-width:800px){ .floating-sign-in { right:16px; bottom:calc(82px + env(safe-area-inset-bottom)); } }
+.password-input { display:flex; align-items:center; position:relative; }
+.password-input input { width:100%; padding-right:48px; margin:0; font-size:.87rem; color:var(--text); }
+.password-visibility { position:absolute; right:4px; top:4px; bottom:4px; width:40px; display:grid; place-items:center; color:var(--text); border:0; border-radius:8px; }
+.password-visibility:hover { background:var(--accent-soft); }
+.account-form-links { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; margin-top:18px; }
+.auth-error { color:var(--text); border-left:3px solid #ef6d81; padding-left:12px; }
+.admin-account-search { display:flex; align-items:flex-end; gap:12px; margin:18px 0; }
+.admin-account-search .field { flex:1; margin:0; }
+.admin-account-table { max-width:100%; overflow-x:auto; }
+.admin-account-table table { width:100%; border-collapse:collapse; text-align:left; }
+.admin-account-table th,.admin-account-table td { padding:14px 10px; border-bottom:1px solid var(--border); }
+.admin-account-table td small { display:block; color:var(--muted); }
+.admin-account-table .btn { white-space:nowrap; }
+.admin-account-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:20px; }

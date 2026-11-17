@@ -6,10 +6,10 @@ function native(){return ffPromise ||= load({wasmBinary:readFileSync("node_modul
 import {test,expect, type Page} from '@playwright/test';
 import {Chess} from 'chess.js';
 const uid='11111111-1111-4111-8111-111111111111',peer='22222222-2222-4222-8222-222222222222',roomId='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-async function connected(page:Page){
+async function connected(page:Page,signedIn=true){
  const c=new Chess(),initial=c.fen();const room:any={id:roomId,name:'Live room',mode:'standard',variant:'chess',state:{fen:initial,positions:[initial],moves:[],notation:[],result:'*'},members:[{id:uid,team:'w'},{id:peer,team:'b'}],queue:[],settings:{bot:false},status:'playing',revision:0,marks:[],deadline:null};
  const requests:URL[]=[],joins:any[]=[],sockets:any[]=[],actions:any[]=[];
- await page.addInitScript(({uid})=>{const payload=btoa(JSON.stringify({sub:uid,role:'authenticated',exp:Math.floor(Date.now()/1000)+3600}));localStorage.setItem('sb-abcdefghijklmnopqrst-auth-token',JSON.stringify({access_token:`e30.${payload}.test`,refresh_token:'refresh',expires_at:Math.floor(Date.now()/1000)+3600,token_type:'bearer',user:{id:uid,email:'player@example.test',app_metadata:{provider:'email'},user_metadata:{},aud:'authenticated',created_at:new Date().toISOString()}}));},{uid});
+ await page.addInitScript(({uid,signedIn})=>{if(!signedIn)return;const payload=btoa(JSON.stringify({sub:uid,role:'authenticated',exp:Math.floor(Date.now()/1000)+3600}));localStorage.setItem('sb-abcdefghijklmnopqrst-auth-token',JSON.stringify({access_token:`e30.${payload}.test`,refresh_token:'refresh',expires_at:Math.floor(Date.now()/1000)+3600,token_type:'bearer',user:{id:uid,email:'player@example.test',app_metadata:{provider:'email'},user_metadata:{},aud:'authenticated',created_at:new Date().toISOString()}}));},{uid,signedIn});
  await page.route('https://abcdefghijklmnopqrst.supabase.co/**',async route=>{
   const url=new URL(route.request().url());requests.push(url);let data:any=[];
   if(url.pathname.endsWith('/settings'))data={external:{google:true,github:false,email:true}};
@@ -91,4 +91,34 @@ test('online Crazyhouse exposes captured pocket pieces and validates drops',asyn
 test('online blindfold text has a move form instead of a visible board',async({page})=>{
  const env=await connected(page),ff=await native();env.room.variant='blindtext';env.room.state=freshOnline(ff,'blindtext');await page.goto('/#variants/online/'+roomId);
  await expect(page.locator('.chess-layout .board')).toHaveCount(0);const input=page.getByLabel('Blindfold move',{exact:true});await input.fill('e4');await input.press('Enter');await expect.poll(()=>env.room.state.moves.at(-1)).toBe('e2e4');await expect(input).toHaveValue('');
+});
+
+
+test('password visibility and forgotten-password requests work without revealing account existence',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await connected(page,false);await page.goto('/#signin');const password=page.getByLabel('Password',{exact:true});await password.fill('Fake-password-123');await expect(password).toHaveAttribute('type','password');await page.getByRole('button',{name:'Show password',exact:true}).click();await expect(password).toHaveAttribute('type','text');await page.getByRole('button',{name:'Hide password',exact:true}).click();await expect(password).toHaveAttribute('type','password');
+ let sent:any;await page.route('**/auth/v1/recover*',async r=>{sent=r.request().postDataJSON();await r.fulfill({json:{}});});await page.getByRole('button',{name:'Forgot password?',exact:true}).click();await page.getByLabel('Email',{exact:true}).fill('friend@example.test');await page.getByRole('button',{name:'Send reset link',exact:true}).click();await expect(page.getByRole('status')).toContainText('If this email has an account');expect(sent.email).toBe('friend@example.test');await expect(page.getByLabel('Password',{exact:true})).toHaveCount(0);
+});
+
+test('a token-hash email link works in a fresh browser and saves the new password',async({page})=>{
+ await connected(page,false);const user={id:uid,email:'player@example.test',aud:'authenticated',app_metadata:{provider:'email'},user_metadata:{},created_at:new Date().toISOString()};const payload=Buffer.from(JSON.stringify({sub:uid,role:'authenticated',exp:Math.floor(Date.now()/1000)+3600})).toString('base64url');let verification:any,updated:any;
+ await page.route('**/auth/v1/verify',async r=>{verification=r.request().postDataJSON();await r.fulfill({json:{access_token:`e30.${payload}.test`,refresh_token:'test-refresh',token_type:'bearer',expires_in:3600,user}});});
+ await page.route('**/auth/v1/user',async r=>{if(r.request().method()==='PUT')updated=r.request().postDataJSON();await r.fulfill({json:user});});
+ await page.goto('/?token_hash=test-one-time-hash&type=recovery');await expect(page.getByLabel('New password',{exact:true})).toBeVisible();expect(verification).toMatchObject({token_hash:'test-one-time-hash',type:'recovery'});expect(page.url()).not.toContain('token_hash');
+ await page.getByLabel('New password',{exact:true}).fill('Fake-new-password-123');await page.getByLabel('Confirm password',{exact:true}).fill('Different-password-123');await page.getByRole('button',{name:'Save password',exact:true}).click();await expect(page.getByRole('alert')).toHaveText('Passwords do not match.');expect(updated).toBeUndefined();
+ await page.getByLabel('Confirm password',{exact:true}).fill('Fake-new-password-123');await page.getByRole('button',{name:'Save password',exact:true}).click();await expect(page).toHaveURL(/#profile$/);expect(updated.password).toBe('Fake-new-password-123');expect(await page.evaluate(()=>JSON.stringify(localStorage))).not.toContain('Fake-new-password-123');
+});
+
+test('an expired recovery link cannot show a password update form',async({page})=>{
+ await connected(page,false);await page.route('**/auth/v1/verify',r=>r.fulfill({status:403,json:{code:403,error_code:'otp_expired',msg:'Expired'}}));await page.goto('/?token_hash=expired-hash&type=recovery');await expect(page.getByText('This link is invalid or expired.',{exact:true})).toBeVisible();await expect(page.getByLabel('New password',{exact:true})).toHaveCount(0);await page.getByRole('button',{name:'Request a new link',exact:true}).click();await expect(page.getByRole('button',{name:'Send reset link',exact:true})).toBeVisible();
+});
+
+test('only administrators can open the account directory, search and send a reset',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await connected(page);await page.route('**/rest/v1/rpc/is_site_admin',r=>r.fulfill({json:true}));const queries:any[]=[];let sent:any;
+ await page.route('**/rest/v1/rpc/admin_accounts',async r=>{const body=r.request().postDataJSON();queries.push(body);await r.fulfill({json:{total:51,users:[{id:peer,username:body.p_page?'Second player':'Friend',email:'friend@example.test',created_at:'2026-01-01T00:00:00Z',last_sign_in_at:null,email_confirmed_at:'2026-01-01T00:00:00Z',provider:'email'}]}});});
+ await page.route('**/auth/v1/recover*',async r=>{sent=r.request().postDataJSON();await r.fulfill({json:{}});});
+ await page.goto('/#profile');await page.getByRole('button',{name:'Admin',exact:true}).click();await expect(page.getByRole('cell',{name:'Friend',exact:true})).toBeVisible();await page.getByRole('button',{name:'Send password reset to Friend',exact:true}).click();expect(sent.email).toBe('friend@example.test');await expect(page.getByRole('status')).toContainText('The user sets their own password');
+ await page.getByRole('button',{name:'Next',exact:true}).click();await expect(page.getByRole('cell',{name:'Second player',exact:true})).toBeVisible();expect(queries.at(-1).p_page).toBe(1);await page.getByLabel('Search accounts',{exact:true}).fill('Friend');await page.getByRole('button',{name:'Search',exact:true}).click();await expect.poll(()=>queries.at(-1)).toMatchObject({p_query:'Friend',p_page:0});
+ await page.route('**/rest/v1/rpc/is_site_admin',r=>r.fulfill({json:false}));await page.reload();await expect(page.getByText('Administrator access required.',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Admin',exact:true})).toHaveCount(0);await expect(page.getByRole('cell',{name:'friend@example.test',exact:true})).toHaveCount(0);
 });

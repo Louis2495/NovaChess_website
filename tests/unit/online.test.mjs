@@ -130,7 +130,7 @@ async function command(user, r, action, extra = {}) {
 }
 before(async () => {
   await pg.exec(
-    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to anon,authenticated,service_role;`,
+    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key,email text unique,created_at timestamptz default now(),last_sign_in_at timestamptz,email_confirmed_at timestamptz,raw_app_meta_data jsonb default '{}'::jsonb,encrypted_password text);create function auth.uid() returns uuid language sql as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to anon,authenticated,service_role;`,
   );
   let migration = readFileSync(
     "supabase/migrations/202611160001_online.sql",
@@ -155,6 +155,8 @@ before(async () => {
   await pg.exec(readFileSync("supabase/migrations/202611180002_all_online_variants.sql","utf8"));
   for (const uid of users)
     await pg.query("insert into auth.users(id)values($1)", [uid]);
+  await pg.query('update auth.users set email=$1,email_confirmed_at=now(),encrypted_password=$2 where id=$3',['louisanderson477@gmail.com','hashed-test-value',users[0]]);
+  await pg.exec(readFileSync('supabase/migrations/202611180003_owner_accounts.sql','utf8'));
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
     .replace('"./engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/engine.ts")).href))
@@ -508,4 +510,28 @@ test('online Bughouse seats four players, enforces board ownership and transfers
  game=(await command(users[2],game,'move',{move:'e2e4'})).data;
  const dropped=await command(users[3],game,'move',{move:'P@e6'});assert.equal(dropped.status,200,JSON.stringify(dropped.data));assert.equal(dropped.data.state.partner.moves.at(-1),'P@e6');
  const ended=await command(users[3],dropped.data,'resign');assert.equal(ended.data.state.result,'0-1');
+});
+
+
+test('account administration is pinned to the verified owner and exposes no password fields',async()=>{
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{
+  assert.equal((await pg.query('select is_site_admin() as allowed')).rows[0].allowed,true);
+  const result=(await pg.query("select admin_accounts('louisanderson477',0) as result")).rows[0].result;
+  assert.equal(result.total,1);assert.equal(result.users[0].email,'louisanderson477@gmail.com');assert.equal(result.users[0].id,users[0]);
+  assert.ok(!JSON.stringify(result).includes('hashed-test-value'));assert.ok(!Object.keys(result.users[0]).some(k=>/password|token|secret/.test(k)));
+  await assert.rejects(()=>pg.query('select * from site_admins'),/permission denied/);
+ }finally{await pg.exec('reset role');}
+ for(const role of ['authenticated','anon']){
+  await pg.exec(`set role ${role};set request.jwt.claim.sub='${users[1]}';`);
+  try{
+   await assert.rejects(()=>pg.query('select admin_accounts()'),/Administrator access required|permission denied/);
+   await assert.rejects(()=>pg.query(`insert into site_admins(user_id) values('${users[1]}')`),/permission denied|row-level security/);
+  }finally{await pg.exec('reset role');}
+ }
+ // Merely changing the email on a different account cannot acquire the pinned grant.
+ await pg.query('update auth.users set email=$1 where id=$2',['owner-other@example.test',users[0]]);
+ await pg.query('update auth.users set email=$1,email_confirmed_at=now() where id=$2',['louisanderson477@gmail.com',users[1]]);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
+ try{assert.equal((await pg.query('select is_site_admin() as allowed')).rows[0].allowed,false);await assert.rejects(()=>pg.query('select admin_accounts()'),/Administrator access required/);}finally{await pg.exec('reset role');}
 });
