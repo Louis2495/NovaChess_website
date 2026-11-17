@@ -4430,3 +4430,23 @@ select.theme-select {
 .mobile-wordmark img { width:30px; height:30px; object-fit:contain; }
 @media(max-width:1000px){ .mobile-wordmark { display:flex; } }
 .stats-overview .stat-metric-label { color:var(--text); }
+
+/* Keep each meme's frame snug to the image, without cropping its captions. */
+@media(min-width:1001px){
+ .home-practice-grid .daily-meme { width:min(100%,calc(var(--home-card-height) * var(--meme-aspect))); justify-self:center; padding:0; }
+ .home-practice-grid .daily-meme-image { width:100%; height:100%; max-width:100%; object-fit:contain; }
+}
+@media(max-width:1000px){
+ .home-practice-grid .daily-meme { padding:0; height:auto; }
+ .home-practice-grid .daily-meme-image { width:100%; height:auto; max-height:none; }
+}
+.home-practice-grid .home-puzzle { padding:18px; background:var(--panel); transition:background .16s,border-color .16s,box-shadow .16s; }
+.home-practice-grid .home-puzzle .home-section-heading { margin:0 0 8px; padding:0; border:0; }
+.home-practice-grid .home-puzzle-content { padding:0; background:transparent; border:0; }
+.home-practice-grid .home-puzzle:hover,.home-practice-grid .home-puzzle:focus-visible {
+ background:color-mix(in srgb,var(--panel) 82%,var(--button)); border-color:var(--accent);
+ box-shadow:0 0 0 2px var(--accent),0 8px 24px #10263720;
+}
+.home-puzzle:hover .home-puzzle-content { background:transparent; border-color:transparent; }
+.home-practice-grid .daily-board-preview .board { border-radius:3px; box-shadow:0 3px 12px #10263726; }
+@media(min-width:1001px){ .home-practice-grid .home-puzzle-content > .daily-board-preview { width:min(100%,360px,calc(var(--home-card-height) - 100px)); } }

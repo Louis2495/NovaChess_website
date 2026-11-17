@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { base, today } from "../lib/store";
 type Meme = {
   id: string;
@@ -42,6 +42,7 @@ export default function DailyMeme() {
       className="daily-meme"
       aria-label="Chess meme"
       data-meme-id={meme.id}
+      style={{ "--meme-aspect": (meme.width || 720) / (meme.height || 600) } as CSSProperties}
     >
       <img
         className="daily-meme-image"
