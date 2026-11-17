@@ -4450,3 +4450,36 @@ select.theme-select {
 .home-puzzle:hover .home-puzzle-content { background:transparent; border-color:transparent; }
 .home-practice-grid .daily-board-preview .board { border-radius:3px; box-shadow:0 3px 12px #10263726; }
 @media(min-width:1001px){ .home-practice-grid .home-puzzle-content > .daily-board-preview { width:min(100%,360px,calc(var(--home-card-height) - 100px)); } }
+.variant-gallery > button:first-child { grid-column:1 / -1; justify-self:center; width:min(100%,250px); }
+.speedrun-picture { display:grid; place-items:center; width:118px; height:118px; border-radius:24px; color:#ffe181; background:linear-gradient(145deg,#6542af,#284f86); }
+.speedrun-setup { max-width:320px; margin:20px auto; }
+.speedrun-clock { display:flex; align-items:center; justify-content:center; gap:8px; color:var(--accent); font-size:1.3rem; font-variant-numeric:tabular-nums; }
+.stats-competition-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-bottom:22px; }
+.stats-competition-grid h2 { display:flex; align-items:center; gap:9px; }
+.competition-total { display:block; font-size:2.3rem; margin-top:18px; font-variant-numeric:tabular-nums; }
+.speedrun-stats table { width:100%; border-collapse:collapse; margin-top:15px; text-align:left; }
+.speedrun-stats th,.speedrun-stats td { padding:9px 4px; border-bottom:1px solid #0002; }
+.stats-overview .stats-metrics > div:nth-child(1) { background:#65cff1; color:#102c42; }
+.stats-overview .stats-metrics > div:nth-child(2) { background:#75e2b7; color:#12362d; }
+.stats-overview .stats-metrics > div:nth-child(3) { background:#c5a3ff; color:#30204a; }
+.stats-overview .stats-metrics > div:nth-child(4) { background:#ffdb74; color:#46330b; }
+.stats-overview .stats-metrics b,.stats-overview .stats-metrics .stat-metric-label,.stats-overview .stats-metrics svg { color:inherit; }
+.stats-overview .throne-stat { background:#ffdb74; color:#46330b; }
+.stats-overview .speedrun-stats { background:#75e2b7; color:#12362d; }
+.stats-overview .speedrun-stats .caption,.stats-overview .throne-stat .caption { color:inherit; }
+.stats-overview .results-card { border-top:4px solid #75e2b7; }
+.stats-overview .activity-card { border-top:4px solid #65cff1; }
+.stats-overview .activity-track > span { background:linear-gradient(#72ddff,#5ce4af); }
+.recent-game-row { display:flex; gap:14px; padding:16px 12px; align-items:center; }
+.recent-game-info { flex:1; min-width:0; }
+.recent-game-info b,.recent-game-info small { display:block; overflow-wrap:anywhere; }
+.recent-game-info small { margin-top:7px; line-height:1.6; }
+.recent-versus { color:var(--muted); font-weight:400; font-size:.8em; }
+.recent-color-chip { width:13px; height:13px; flex:none; border-radius:50%; border:1px solid #94a8b8; }
+.recent-color-chip.white { background:#fff4d9; }.recent-color-chip.black { background:#18232c; }
+@media(max-width:600px){ .stats-competition-grid { grid-template-columns:1fr; }.recent-game-row { gap:10px; padding-inline:4px; } }
+.stats-competition-grid { margin-top:22px; }
+img.speedrun-picture { display:block; object-fit:cover; }
+.achievement-grid .achievement { border-top:3px solid #8edcf4; }
+.achievement-grid .achievement:nth-child(3n+2) { border-top-color:#c5a3ff; }
+.achievement-grid .achievement:nth-child(3n) { border-top-color:#ffdb74; }

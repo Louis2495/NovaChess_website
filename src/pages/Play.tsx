@@ -1,3 +1,4 @@
+import { duration } from "../lib/speedrun";
 import { weakComputerMove } from "../lib/computerStrength";
 import { matchTypedMove } from "../lib/moves";
 import { previewPremoves } from "../lib/premoves";
@@ -5,6 +6,7 @@ import { usePremoves } from "../lib/usePremoves";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FairyStockfish } from "ffish-es6";
 import {
+  Timer,
   RotateCcw,
   Flag,
   Handshake,
@@ -25,7 +27,7 @@ import {
   fog,
 } from "../lib/variants";
 import { search } from "../lib/engine";
-import { uid, useData, pieceUrl } from "../lib/store";
+import { uid, useData, pieceUrl, base } from "../lib/store";
 import type { Opening, SavedGame } from "../lib/types";
 import { Board, Piece } from "../components/Board";
 import {
@@ -114,6 +116,9 @@ export default function Play() {
     [error, setError] = useState(""),
     [playing, setPlaying] = useState(detail === "resume"),
     [variant, setVariant] = useState("chess"),
+    [speedrunMode, setSpeedrunMode] = useState(false),
+    [speedrunRating, setSpeedrunRating] = useState(1000),
+    [clockNow, setClockNow] = useState(Date.now()),
     [special, setSpecial] = useState<SpecialVariant | null>(
       detail === "resume" && library.activeGame?.special
         ? (library.activeGame.variant as SpecialVariant)
@@ -140,6 +145,7 @@ export default function Play() {
     [busy, setBusy] = useState(false);
   const { data: openings } = useData<Opening[]>("openings");
   const game = library.activeGame;
+  useEffect(() => { if (!game?.speedrun || game.result !== "*") return; const tick=setInterval(()=>setClockNow(Date.now()),100); return ()=>clearInterval(tick); },[game?.id,game?.result]);
   const live = useRef(game);
   live.current = game;
   useEffect(() => {
@@ -245,7 +251,7 @@ export default function Play() {
     }
     const g: SavedGame = {
       id: uid(),
-      title: variantList.find((v) => v.id === variant)?.name || "Game",
+      title: speedrunMode ? "Speedrun" : variantList.find((v) => v.id === variant)?.name || "Game",
       created: Date.now(),
       initial: fen,
       variant,
@@ -259,9 +265,10 @@ export default function Play() {
       origin: "novachess",
       opponent: "Computer",
       opponentChoice: choice,
-      botRating: choice === "Current rating" ? library.localRating : rating,
-      rated: rated && variant === "chess",
-      requestedOpening: openingId,
+      botRating: speedrunMode ? Math.max(50,Math.min(10000,Math.round(speedrunRating/50)*50)) : choice === "Current rating" ? library.localRating : rating,
+      speedrun: speedrunMode ? {elapsedMs:0,turnStartedAt:human === "w" ? Date.now() : null} : undefined,
+      rated: !speedrunMode && rated && variant === "chess",
+      requestedOpening: speedrunMode ? "" : openingId,
     };
     if (variant === "bughouse") {
       const b = new ff.Board("bughouse");
@@ -330,10 +337,12 @@ export default function Play() {
           !move.includes("@")
         )
           captured = pieces[move.slice(2, 3) + move[1]] || "";
+        const humanMoved = (b.turn() ? "w" : "b") === g.human;
         const san = b.sanMove(uci);
         if (!b.push(uci)) return l;
         const nextFen = b.fen();
         let next = { ...g };
+        if (g.speedrun && !boardB) next.speedrun = { ...g.speedrun, elapsedMs:g.speedrun.elapsedMs + (humanMoved && g.speedrun.turnStartedAt !== null ? Math.max(0,Date.now()-g.speedrun.turnStartedAt) : 0), turnStartedAt:humanMoved ? null : Date.now() };
         if (boardB) {
           next.partner = {
             ...g.partner!,
@@ -630,14 +639,16 @@ export default function Play() {
             {variantList.map((v) => (
               <button
                 key={v.id}
-                aria-pressed={variant === v.id}
-                onClick={() => setVariant(v.id)}
+                aria-pressed={!speedrunMode && variant === v.id}
+                onClick={() => {setVariant(v.id);setSpeedrunMode(false);}}
               >
                 <VariantIcon id={v.id} size={118} />
                 <span>{v.name}</span>
               </button>
             ))}
+            <button aria-pressed={speedrunMode} onClick={()=>{setVariant("chess");setSpeedrunMode(true);}}><img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/><span>Speedrun</span></button>
           </div>
+          {speedrunMode && <Card className="speedrun-setup"><Field label="Computer Elo"><input type="number" min={50} max={10000} step={50} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(Math.max(50,Math.min(10000,Math.round((speedrunRating||50)/50)*50)))}/></Field></Card>}
           <Card className="game-settings-card">
             <button
               className="options-toggle"
@@ -652,7 +663,7 @@ export default function Play() {
                 <Field label="Variant">
                   <ChoiceSelect
                     value={variant}
-                    onChange={(e) => setVariant(e.target.value)}
+                    onChange={(e) => {setVariant(e.target.value);setSpeedrunMode(false);}}
                   >
                     {variantList.map((v) => (
                       <option key={v.id} value={v.id}>
@@ -691,7 +702,7 @@ export default function Play() {
                     <option value="b">Black</option>
                   </ChoiceSelect>
                 </Field>
-                {!["dropping", "chaos", "random"].includes(variant) && (
+                {!speedrunMode && !["dropping", "chaos", "random"].includes(variant) && (
                   <>
                     <div className="opponent-choices">
                       {["Current rating", "Custom"].map((v) => (
@@ -785,6 +796,7 @@ export default function Play() {
         >
           <div className="board-column">
             <GameResult result={game.result} />
+            {game.speedrun && <div className="speedrun-clock" role="timer" aria-label="Your move time"><Timer size={18}/>{duration(game.speedrun.elapsedMs + (game.result === "*" && game.speedrun.turnStartedAt !== null ? Math.max(0,clockNow-game.speedrun.turnStartedAt) : 0))}</div>}
             <div
               className={`player-strip ${valid.turn !== game.human ? "to-move" : ""}`}
             >
@@ -1060,6 +1072,7 @@ export default function Play() {
                         ? {
                             ...l.activeGame,
                             rated: false,
+                            speedrun: l.activeGame.speedrun ? {...l.activeGame.speedrun,invalid:true,turnStartedAt:Date.now()} : undefined,
                             moves: l.activeGame.moves.slice(0, -count),
                             notation: l.activeGame.notation.slice(0, -count),
                             positions: l.activeGame.positions.slice(0, -count),

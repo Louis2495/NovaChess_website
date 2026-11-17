@@ -99,6 +99,8 @@ export type SavedGame = {
     notation: string[];
     result: string;
   };
+  speedrun?: { elapsedMs: number; turnStartedAt: number | null; invalid?: boolean };
+  timeControl?: string;
   rated?: boolean;
   opponentChoice?: string;
   requestedOpening?: string;

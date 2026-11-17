@@ -13,3 +13,5 @@ Pawns use traditional pedestal bodies with no legs or feet. Dropping Squares, Ra
 `horde.webp` overrides only the Horde tile. Its two front pawns have faces aligned with the row behind them; the other 17 illustrations continue to use the original sheet.
 
 `multiplayer.png` contains three square panels in one horizontal sheet (Throne, Vote Chess, Team Chess). Each scene uses open, expressive eyes and traditional chess-piece bases. `MultiplayerPicture.tsx` selects the panels without cropping the source file.
+
+`speedrun.webp` is a standalone Speedrun illustration: a caped king racing beside a gold stopwatch, with mint/gold motion streaks and a traditional pedestal base.

@@ -1,4 +1,6 @@
 import MultiplayerPicture from "../components/MultiplayerPicture";
+import { variantList } from "../lib/variants";
+import { duration } from "../lib/speedrun";
 import DailyMeme from "../components/DailyMeme";
 import { useMemo, useState } from "react";
 import { ArrowRight, Check, ChevronRight, RotateCcw } from "lucide-react";
@@ -6,7 +8,7 @@ import { useApp } from "../lib/context";
 import { useData, today, dateLabel } from "../lib/store";
 import type { PuzzleData, SavedGame } from "../lib/types";
 import { Chess } from "chess.js";
-import { Board, Piece } from "../components/Board";
+import { Board } from "../components/Board";
 import { Button, PageTitle } from "../components/UI";
 export function dailyPuzzle(puzzles: PuzzleData[]) {
   const choices = puzzles
@@ -108,14 +110,15 @@ export default function HomePage() {
 }
 
 function RecentGame({ game: g, open }: { game: SavedGame; open: () => void }) {
+  const {library}=useApp();
   const [preview, setPreview] = useState<number | null>(null);
   const positions = g.positions.length ? g.positions : [g.initial];
   const result = g.result === "*" || g.result === "1/2-1/2" ? "draw" :
     (g.result === "1-0") === (g.human === "w") ? "win" : "loss";
   return <div className={`recent-game-entry result-${result}`}>
     <button className="recent-game-row" onClick={open}>
-      <span className="recent-game-mark"><Piece symbol={g.human === "w" ? "K" : "k"} /></span>
-      <span><b>{g.title}</b><small>{dateLabel(g.created)} · {Math.ceil(g.moves.length / 2)} moves</small></span>
+      <span className={`recent-color-chip ${g.human === "w" ? "white" : "black"}`} title={`You played ${g.human === "w" ? "White" : "Black"}`} aria-label={`You played ${g.human === "w" ? "White" : "Black"}`} />
+      <span className="recent-game-info"><b>{library.profile.name || "You"} <span className="recent-versus">vs</span> {g.opponent || (g.origin === "archive" ? "Opponent" : "Computer")}{g.botRating ? ` · ${g.botRating}` : ""}</b><small>{g.speedrun ? "Speedrun" : variantList.find(v=>v.id===g.variant)?.name || g.title} · {Math.ceil(g.moves.length / 2)} moves{g.timeControl ? ` · ${g.timeControl}` : ""}{g.speedrun ? ` · ${duration(g.speedrun.elapsedMs)}` : ""} · {dateLabel(g.created)}</small></span>
       <span className="game-result-label">{g.result === "*" ? "Study" : g.result}</span>
       <ChevronRight size={15} />
     </button>

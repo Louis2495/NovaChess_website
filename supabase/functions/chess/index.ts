@@ -242,7 +242,7 @@ Deno.serve(async (req) => {
           seated.push(m);
         }
       }
-      state = fresh(r.variant, r.settings.dropCount);
+      state = {...fresh(r.variant, r.settings.dropCount), lastWinner: r.state.lastWinner !== uid && members.some(m=>m.id===r.state.lastWinner) ? r.state.lastWinner : undefined};
       status = seated.length === 2 ? "playing" : "waiting";
       return json(await commit());
     }
@@ -299,10 +299,15 @@ Deno.serve(async (req) => {
     const finishedState = state,
       finishedMembers = members.map((m) => ({ ...m }));
     if (state.result !== "*") status = "finished";
-    if (state.result !== "*" && r.mode === "throne") {
-      const winner = members.find(
-        (m) => m.team === (state.result === "0-1" ? "b" : "w"),
-      );
+    if (state.result !== "*" && r.mode === "throne" && state.result === "1/2-1/2") {
+      state = {...fresh(r.variant,r.settings.dropCount),lastResult:finishedState.result,lastWinner:r.state.lastWinner};
+      status = members.filter(m=>m.team).length === 2 ? "playing" : "waiting";
+      deadline=null; marks=[];
+    }
+    if (finishedState.result !== "*" && finishedState.result !== "1/2-1/2" && r.mode === "throne") {
+      const winner = state.result === "1/2-1/2"
+        ? members.find(m => m.id === r.state.lastWinner)
+        : members.find((m) => m.team === (state.result === "0-1" ? "b" : "w"));
       members = members.map((m) => ({
         ...m,
         team: m.id === winner?.id ? "w" : null,

@@ -1,8 +1,12 @@
+import { duration, speedrunBests } from "../lib/speedrun";
+import { online, useOnlineSession } from "../lib/online";
 import { isStudy } from "../lib/library";
 import Rankings from "./Rankings";
 import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
+  Crown,
+  Timer,
   Trophy,
   Flame,
   Puzzle,
@@ -243,6 +247,16 @@ export default function Stats() {
     </>
   );
 }
+function CompetitionStats() {
+ const {library}=useApp(), {session}=useOnlineSession();
+ const [total,setTotal]=useState(0),[error,setError]=useState("");
+ useEffect(()=>{setTotal(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_time_ms");if(active){setTotal(Number(r.data)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id]);
+ const bests=speedrunBests(library.games);
+ return <div className="stats-competition-grid">
+  <Card className="throne-stat"><h2><Crown size={21}/>Time on the throne</h2><strong className="competition-total">{duration(total)}</strong>{error && <p className="caption">{error}</p>}</Card>
+  <Card className="speedrun-stats"><h2><Timer size={21}/>Speedrun</h2>{bests.length ? <table><thead><tr><th>Computer Elo</th><th>Best time</th></tr></thead><tbody>{bests.map(([elo,g])=><tr key={elo}><td>{elo}</td><td>{duration(g.speedrun!.elapsedMs)}</td></tr>)}</tbody></table>:<p className="caption">No wins yet</p>}</Card>
+ </div>;
+}
 function StatsOverview({
   games,
   wins,
@@ -436,6 +450,7 @@ function StatsOverview({
           )}
         </Card>
       </div>
+      <CompetitionStats />
       <div className="stats-detail-grid">
         <Card>
           <div className="card-heading">

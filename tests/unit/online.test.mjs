@@ -148,6 +148,7 @@ before(async () => {
       "utf8",
     ),
   );
+  await pg.exec(readFileSync("supabase/migrations/202611170001_throne_time.sql","utf8"));
   for (const uid of users)
     await pg.query("insert into auth.users(id)values($1)", [uid]);
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
@@ -441,4 +442,20 @@ test("Team invitations join the requested side while Vote Chess always balances 
   let vote = createdVote.data;
   vote = (await command(users[0],vote,"join",{team:"w"})).data;
   assert.equal(vote.members.find(m=>m.id===users[0]).team,"b");
+});
+
+test("throne time is recorded by room transitions and protected from browser writes", async()=>{
+ const response=await call(users[0],{action:'create',mode:'throne',variant:'chess',name:'Timing'});assert.equal(response.status,200);const room=response.data;
+ await pg.query("update rooms set state=state || jsonb_build_object('lastWinner',$2::text) where id=$1",[room.id,users[0]]);
+ let records=await pg.query('select * from throne_reigns where room_id=$1',[room.id]);assert.equal(records.rows.length,1);assert.equal(records.rows[0].ended_at,null);
+ await pg.query("update rooms set state=state || jsonb_build_object('lastWinner',$2::text) where id=$1",[room.id,users[0]]);
+ records=await pg.query('select * from throne_reigns where room_id=$1',[room.id]);assert.equal(records.rows.length,1);
+ await pg.query("update rooms set state=state - 'lastWinner' where id=$1",[room.id]);records=await pg.query('select * from throne_reigns where room_id=$1',[room.id]);assert.ok(records.rows[0].ended_at);
+ const privilege=await pg.query("select has_table_privilege('authenticated','throne_reigns','INSERT') as allowed");assert.equal(privilege.rows[0].allowed,false);
+});
+
+test("throne aggregate returns only the signed-in player's full reign duration",async()=>{
+ const r=await room('throne');await pg.query("insert into throne_reigns(room_id,user_id,started_at,ended_at) values($1,$2,now()-interval '1 hour',now())",[r.id,users[0]]);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try { const total=await pg.query('select throne_time_ms() as ms');assert.ok(Number(total.rows[0].ms)>=3600000);await pg.exec(`set request.jwt.claim.sub='${users[3]}';`);const other=await pg.query('select throne_time_ms() as ms');assert.equal(Number(other.rows[0].ms),0); } finally {await pg.exec('reset role');}
 });

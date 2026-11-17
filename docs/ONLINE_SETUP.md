@@ -7,7 +7,7 @@ The site is fully usable for local chess, bots, lessons and puzzles without this
 ## One-time setup
 
 1. Create a Free project at [Supabase](https://supabase.com/dashboard). Save the project reference, project URL and **anon/publishable** key from the project’s API settings.
-2. In **SQL Editor**, run [the migration](../supabase/migrations/202611160001_online.sql). It creates the database, row-level security, Realtime publication, chat rate limits and server-only game/rating functions. Then run [chat moderation](../supabase/migrations/202611160002_chat_moderation.sql).
+2. In **SQL Editor**, run [the migration](../supabase/migrations/202611160001_online.sql). It creates the database, row-level security, Realtime publication, chat rate limits and server-only game/rating functions. Then run [chat moderation](../supabase/migrations/202611160002_chat_moderation.sql) and [Throne timing](../supabase/migrations/202611170001_throne_time.sql).
 3. In **Database → Extensions**, enable **pg_cron**. Then run:
 
    ```sql
@@ -99,7 +99,7 @@ The function caches records for six hours. Rebuild the standalone editor file af
 
 Global chat is a separate panel available throughout the site. It uses the existing public project URL/key and authenticated Realtime messages. Without a connection it allows drafting but does not pretend to publish a message.
 
-After applying both SQL migrations, create your account and save your username in Profile. From the SQL editor, assign a moderator:
+After applying the SQL migrations, create your account and save your username in Profile. From the SQL editor, assign a moderator:
 
 ```sql
 insert into public.chat_moderators(user_id)
@@ -108,3 +108,7 @@ on conflict do nothing;
 ```
 
 Members can report messages and delete their own. Moderators can see reported messages, delete posts, and ban senders; every moderation action is recorded in the protected audit table. Users cannot grant themselves moderator access. Posting enforces length limits, repeat-message rejection, link-spam limits, per-user rate limits and bans on the server. No automated classifier or round-the-clock human moderation is claimed.
+
+### Throne statistics
+
+Apply `supabase/migrations/202611170001_throne_time.sql` and redeploy the `chess` function. The database records reign start/end times in the same transaction as room transitions. Consecutive wins and draws keep the reigning champion's clock running; losing or clicking Finish ends it. A challenger leaving does not end the incumbent's reign. Existing reigns begin counting when this migration is applied; earlier durations cannot be reconstructed. Stats reads only the signed-in player's reigns. Local Speedrun records need no backend.
