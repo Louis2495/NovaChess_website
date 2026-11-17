@@ -9,6 +9,7 @@ export type Tab =
   | "variants"
   | "community"
   | "research"
+  | "signin"
   | "profile"
   | "controls"
   | "rankings";

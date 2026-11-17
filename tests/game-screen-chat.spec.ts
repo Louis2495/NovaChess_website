@@ -3,7 +3,7 @@ test("games maximize the board, omit typing/pause/game settings, use profile ima
   page,
   isMobile,
 }) => {
-  await page.goto("/#play");
+  await page.goto("/#play");await page.getByRole("button",{name:"Computer",exact:true}).click();
   await page.getByRole("button", { name: "Start game", exact: true }).click();
   await expect(page.locator(".play-match .board").first()).toBeVisible();
   await expect(page.getByLabel("Game move", { exact: true })).toHaveCount(0);

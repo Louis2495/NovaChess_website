@@ -31,7 +31,7 @@ In [repository Actions secrets](https://github.com/Louis2495/NovaChess_website/s
 | `SUPABASE_DB_PASSWORD` | The database password from project creation |
 | `SUPABASE_ACCESS_TOKEN` | A personal token generated at [Supabase account access tokens](https://supabase.com/dashboard/account/tokens) |
 
-These secrets let a manually started workflow deploy your project. They are not included in the website. Limit access to repository write permissions; the workflow runs only from `main` and does not run on pull requests.
+These secrets let the setup workflow deploy your project. Backend changes on `main` also trigger it automatically. They are not included in the website. Limit access to repository write permissions; the workflow runs only from `main` and does not run on pull requests.
 
 ## 3. Run the setup workflow
 
@@ -90,7 +90,7 @@ If you prefer email/password instead, configure a real SMTP provider for public 
 Use two separate browsers/profiles with **two different accounts**:
 
 1. Sign in from Profile and save a unique username and country.
-2. Open Play → Online. Other game types are in Variants; Throne, Vote Chess and Team Chess are under Variants → Online.
+2. Open Play (Online is selected by default). Other game types are in Variants; Throne, Vote Chess and Team Chess are under Variants → Online.
 3. Click Play online from both accounts to join a waiting game. You can also use Invite friends to share a direct game link. Play moves and confirm both boards still match after refreshing.
 4. Test resigning, drawing, and an illegal/out-of-turn move. Test chat from both accounts.
 5. Use a third account to test Throne's queue. Test Team Chess invitations/arrows. Vote Chess closes votes on the one-minute scheduler after its 24-hour period.
@@ -133,6 +133,8 @@ Sources: [Supabase pricing](https://supabase.com/pricing), [Realtime limits](htt
 
 ## After this is live
 
-Run **Set up multiplayer** manually after backend/migration changes. Normal frontend pushes deploy through GitHub Pages and, if connected, Cloudflare Pages. The scheduled database jobs persist without rerunning the workflow. The backend workflow never changes your Supabase billing plan.
+Backend/migration changes on `main` automatically run **Set up multiplayer**. You can still run it manually to retry or perform the initial setup. Normal frontend pushes deploy through GitHub Pages and, if connected, Cloudflare Pages. The scheduled database jobs persist without rerunning the workflow. The backend workflow never changes your Supabase billing plan.
 
 You can share the public project URL and publishable key with the maintainer to check browser configuration. Keep deployment credentials in GitHub Actions secrets. After launch, the live two-account check and actual usage monitoring are still necessary; the repository tests use controlled backend/WebSocket fixtures and cannot certify a project that has not been created.
+
+All computer variants are also listed under Variants → Online, after Throne, Vote Chess and Team Chess. Bughouse waits for four players and assigns a board/color to each; captured pieces go to the teammate on the other board. Online Speedrun times each player’s own turns and does not add records to the computer-Elo speedrun chart. Blindfold text alone accepts typed moves. The setup workflow pins Supabase CLI 2.72.9 and uses Docker bundling so the authoritative Fairy-Stockfish WASM is included as a static file; npm ci prepares those files automatically. No local working-directory or hosting setting changes are needed.

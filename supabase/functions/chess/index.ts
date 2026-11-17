@@ -1,3 +1,5 @@
+import {onlineEngine} from "./engine.ts";
+import {freshOnline,applyOnline,onlineVariantIds,specialVariants} from "../../../src/lib/onlineVariants.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.119.0";
 import { Chess } from "npm:chess.js@1.4.0";
 import {
@@ -20,8 +22,9 @@ function json(data: unknown, status = 200) {
     headers: { ...cors, "Content-Type": "application/json" },
   });
 }
-type Member = { id: string; team: "w" | "b" | null };
-function fresh(variant: string, count = 2) {
+type Member = { id: string; team: "w" | "b" | null; board?:number };
+async function fresh(variant: string, count = 2) {
+  if(!["chess",...specialVariants].includes(variant))return {...freshOnline(await onlineEngine(),variant),gameKey:crypto.randomUUID()};
   return variant === "chess"
     ? {
         fen: new Chess().fen(),
@@ -110,9 +113,10 @@ Deno.serve(async (req) => {
       const variant =
         body.mode === "vote"
           ? "chess"
-          : ["chess", "dropping", "chaos", "random"].includes(body.variant)
+          : onlineVariantIds.includes(body.variant)
             ? body.variant
             : "chess";
+      if(body.variant && !onlineVariantIds.includes(body.variant))throw Error("Unknown variant.");
       if (body.bot && variant !== "chess")
         throw Error("Online team bots currently use standard chess.");
       const { data, error } = await db
@@ -125,8 +129,8 @@ Deno.serve(async (req) => {
               .slice(0, 80) || "Chess room",
           mode: body.mode,
           variant,
-          state: fresh(variant, Math.max(1, Math.min(4, +body.dropCount || 2))),
-          members: [{ id: uid, team: "w" }],
+          state: await fresh(variant, Math.max(1, Math.min(4, +body.dropCount || 2))),
+          members: [{ id: uid, team: "w", ...(variant === "bughouse" ? {board:0} : {}) }],
           settings: {
             bot: body.mode === "team" && body.bot === true,
             dropCount: Math.max(1, Math.min(4, +body.dropCount || 2)),
@@ -155,7 +159,7 @@ Deno.serve(async (req) => {
       deadline = r.deadline,
       marks = r.marks;
     const me = members.find((m) => m.id === uid),
-      turn = state.fen.split(" ")[1];
+      turn = (r.variant === "bughouse" && me?.board === 1 ? state.partner.fen : state.fen).split(" ")[1];
     async function commit() {
       const { data, error } = await db.rpc("commit_room", {
         p_id: r.id,
@@ -195,7 +199,11 @@ Deno.serve(async (req) => {
               : "b";
         } else if (!members.some((m) => m.team === "w")) team = "w";
         else if (!members.some((m) => m.team === "b")) team = "b";
-        members = [...members, { id: uid, team }];
+        if(r.variant === "bughouse"){
+          const seat=[{board:0,team:"w"},{board:0,team:"b"},{board:1,team:"w"},{board:1,team:"b"}].find(s=>!members.some(m=>(m.board||0)===s.board && m.team===s.team));
+          if(!seat)throw Error("This game is full.");
+          members=[...members,{id:uid,...seat}];
+        }else members = [...members, { id: uid, team }];
       }
       if (
         r.mode === "throne" &&
@@ -207,7 +215,8 @@ Deno.serve(async (req) => {
         members.some((m) => m.team === "w") &&
         (r.settings.bot || members.some((m) => m.team === "b"))
       ) {
-        status = state.result === "*" ? "playing" : "finished";
+        status = r.variant === "bughouse" && members.length < 4 ? "waiting" : state.result === "*" ? "playing" : "finished";
+        if(state.speedrun && status === "playing" && r.status === "waiting")state={...state,speedrun:{...state.speedrun,startedAt:Date.now()}};
         if (r.mode === "vote" && r.status === "waiting")
           deadline = new Date(Date.now() + 86400000).toISOString();
       }
@@ -242,7 +251,7 @@ Deno.serve(async (req) => {
           seated.push(m);
         }
       }
-      state = {...fresh(r.variant, r.settings.dropCount), lastWinner: r.state.lastWinner !== uid && members.some(m=>m.id===r.state.lastWinner) ? r.state.lastWinner : undefined};
+      state = {...await fresh(r.variant, r.settings.dropCount), lastWinner: r.state.lastWinner !== uid && members.some(m=>m.id===r.state.lastWinner) ? r.state.lastWinner : undefined};
       status = seated.length === 2 ? "playing" : "waiting";
       return json(await commit());
     }
@@ -262,10 +271,10 @@ Deno.serve(async (req) => {
       const next =
         r.variant === "chess"
           ? standardApply(state, String(body.move))
-          : specialApply(
+          : specialVariants.includes(r.variant) ? specialApply(
               state,
               body.specialAction || { type: "move", move: String(body.move) },
-            );
+            ) : applyOnline(await onlineEngine(),r.variant,state,String(body.move),me.board||0);
       if (r.mode === "vote") {
         if (action !== "vote" || r.variant !== "chess")
           throw Error("Submit a move ballot.");
@@ -286,7 +295,7 @@ Deno.serve(async (req) => {
         throw Error("Draw offers are available against the computer.");
       state = { ...state, result: "1/2-1/2" };
     } else if (action === "resign") {
-      state = { ...state, result: me.team === "w" ? "0-1" : "1-0" };
+      state = { ...state, result: (me.team === "w") !== (r.variant === "bughouse" && me.board === 1) ? "0-1" : "1-0" };
     } else throw Error("Unknown action.");
     if (
       r.settings.bot &&
@@ -300,7 +309,7 @@ Deno.serve(async (req) => {
       finishedMembers = members.map((m) => ({ ...m }));
     if (state.result !== "*") status = "finished";
     if (state.result !== "*" && r.mode === "throne" && state.result === "1/2-1/2") {
-      state = {...fresh(r.variant,r.settings.dropCount),lastResult:finishedState.result,lastWinner:r.state.lastWinner};
+      state = {...await fresh(r.variant,r.settings.dropCount),lastResult:finishedState.result,lastWinner:r.state.lastWinner};
       status = members.filter(m=>m.team).length === 2 ? "playing" : "waiting";
       deadline=null; marks=[];
     }
@@ -318,7 +327,7 @@ Deno.serve(async (req) => {
         if (challenger) challenger.team = "b";
       }
       state = {
-        ...fresh(r.variant, r.settings.dropCount),
+        ...await fresh(r.variant, r.settings.dropCount),
         lastResult: finishedState.result,
         lastWinner: winner?.id,
       };

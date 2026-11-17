@@ -11,7 +11,7 @@ async function move(page: Page, m: string) {
 test("Variants has distinct artwork and keeps Standard in Play", async ({
   page,
 }) => {
-  await page.goto("/#variants");
+  await page.goto("/#variants");await page.getByRole("button",{name:"Computer",exact:true}).click();
   await expect(
     page.getByRole("heading", { name: "Play", exact: true }),
   ).toHaveCount(0);
@@ -127,7 +127,7 @@ test("right click cancels premoves before highlighting and the next right click 
       body: `self.onmessage=({data})=>{if(data==='uci')postMessage('uciok');else if(data==='isready')postMessage('readyok');else if(data.startsWith('go '))setTimeout(()=>postMessage('bestmove e7e5'),3500);};`,
     }),
   );
-  await page.goto("/#play");
+  await page.goto("/#play");await page.getByRole("button",{name:"Computer",exact:true}).click();
   await page.getByRole("button", { name: "Start game", exact: true }).click();
   await move(page, "e2e4");
   await move(page, "g1f3");

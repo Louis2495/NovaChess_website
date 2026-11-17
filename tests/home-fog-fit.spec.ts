@@ -15,7 +15,7 @@ test("recent game scrubber previews positions and colors results without home ac
   await expect(page.locator(".recent-game-preview").getByRole("button", { name: "e2, white pawn", exact: true })).toBeVisible();
 });
 test("Fog reveals attacked squares only, hides move traces, and uses checkmate rules", async ({ page }) => {
-  await page.goto("/#variants");
+  await page.goto("/#variants");await page.getByRole("button",{name:"Computer",exact:true}).click();
   const result = await page.evaluate(async () => {
     // Import the actual Vite module so visibility and native rules are both exercised.
     const path = "/src/lib/variants.ts";

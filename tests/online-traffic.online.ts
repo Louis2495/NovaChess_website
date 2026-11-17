@@ -1,3 +1,8 @@
+import load from "ffish-es6";
+import {readFileSync} from "node:fs";
+import {freshOnline,applyOnline,setupOnlineEngine} from "../src/lib/onlineVariants";
+let ffPromise:Promise<Awaited<ReturnType<typeof load>>>|null=null;
+function native(){return ffPromise ||= load({wasmBinary:readFileSync("node_modules/ffish-es6/ffish.wasm")}).then(ff=>{setupOnlineEngine(ff);return ff;});}
 import {test,expect, type Page} from '@playwright/test';
 import {Chess} from 'chess.js';
 const uid='11111111-1111-4111-8111-111111111111',peer='22222222-2222-4222-8222-222222222222',roomId='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -11,7 +16,7 @@ async function connected(page:Page){
   else if(url.pathname.endsWith('/user'))data={id:uid,email:'player@example.test'};
   else if(url.pathname.includes('/rpc/is_chat_moderator'))data=false;
   else if(url.pathname.includes('/rpc/'))data=0;
-  else if(url.pathname.endsWith('/functions/v1/chess')){const body=route.request().postDataJSON();actions.push(body);if(body.action==='move'){const move=c.move(body.move);room.state={...room.state,fen:c.fen(),moves:[...room.state.moves,body.move],notation:[...room.state.notation,move.san],positions:[...room.state.positions,c.fen()]};room.revision++;}data=room;}
+  else if(url.pathname.endsWith('/functions/v1/chess')){const body=route.request().postDataJSON();actions.push(body);if(body.action==='move' && room.variant!=='chess'){room.state=applyOnline(await native(),room.variant,room.state,body.move);room.revision++;}else if(body.action==='move'){const move=c.move(body.move);room.state={...room.state,fen:c.fen(),moves:[...room.state.moves,body.move],notation:[...room.state.notation,move.san],positions:[...room.state.positions,c.fen()]};room.revision++;}data=room;}
   else if(url.pathname.endsWith('/profiles')){const ids=url.searchParams.get('id')||'';const people=[{id:uid,username:'Player',avatar:'',bio:'',country:'US'},{id:peer,username:'Opponent',avatar:'',country:'CA'}].filter(p=>!ids||ids.includes(p.id));data=route.request().headers().accept?.includes('vnd.pgrst.object')?people[0]:people;}
   else if(url.pathname.endsWith('/room_lobby'))data=[{id:roomId,name:room.name,mode:room.mode,variant:room.variant,status:room.status,member_count:room.members.length}];
   else if(url.pathname.endsWith('/rooms'))data=url.searchParams.has('id')?room:[room];
@@ -65,4 +70,25 @@ test('Play online starts a waiting game when no opponent is available',async({pa
  const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>r.fulfill({json:[]}));
  await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();await page.getByRole('button',{name:'Play online',exact:true}).click();
  await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',name:'Standard'});
+});
+
+test('bottom-right Sign in opens the account form and disappears after authentication',async({page})=>{
+ await connected(page);await page.goto('/#profile');await expect(page.locator('.floating-sign-in')).toHaveCount(0);await page.getByRole('button',{name:'Sign out',exact:true}).click();
+ const action=page.locator('.floating-sign-in');await expect(action).toBeVisible();await expect(action).toHaveCSS('position','fixed');await action.click();
+ await expect(page).toHaveURL(/#signin/);await expect(page.getByRole('heading',{name:'Sign in',level:1})).toBeVisible();await expect(page.getByRole('button',{name:'Create an account',exact:true})).toBeVisible();await page.getByRole('button',{name:'Create an account',exact:true}).click();await expect(page.getByRole('button',{name:'Create account',exact:true})).toBeVisible();
+});
+
+
+test('online Duck requires both a piece move and duck placement',async({page})=>{
+ const env=await connected(page),ff=await native();env.room.variant='duck';env.room.state=freshOnline(ff,'duck');
+ await page.goto('/#variants/online/'+roomId);const board=page.locator('.chess-layout .board').first();await board.getByRole('button',{name:'e2, white pawn',exact:true}).click();await board.getByRole('button',{name:'e4, empty',exact:true}).click();expect(env.actions).toHaveLength(0);
+ await board.getByRole('button',{name:'d5, empty',exact:true}).click();await expect.poll(()=>env.room.state.moves.length).toBe(1);expect(env.actions[0].move).toMatch(/^e2e4,.*d5$/);
+});
+test('online Crazyhouse exposes captured pocket pieces and validates drops',async({page})=>{
+ const env=await connected(page),ff=await native();env.room.variant='crazyhouse';let state=freshOnline(ff,'crazyhouse');for(const move of ['e2e4','d7d5','e4d5','e7e6'])state=applyOnline(ff,'crazyhouse',state,move);env.room.state=state;
+ await page.goto('/#variants/online/'+roomId);await page.getByRole('button',{name:'Drop P',exact:true}).click();await page.getByRole('button',{name:'e3, empty',exact:true}).click();await expect.poll(()=>env.room.state.moves.at(-1)).toBe('P@e3');
+});
+test('online blindfold text has a move form instead of a visible board',async({page})=>{
+ const env=await connected(page),ff=await native();env.room.variant='blindtext';env.room.state=freshOnline(ff,'blindtext');await page.goto('/#variants/online/'+roomId);
+ await expect(page.locator('.chess-layout .board')).toHaveCount(0);const input=page.getByLabel('Blindfold move',{exact:true});await input.fill('e4');await input.press('Enter');await expect.poll(()=>env.room.state.moves.at(-1)).toBe('e2e4');await expect(input).toHaveValue('');
 });

@@ -1,14 +1,19 @@
 import {test,expect} from '@playwright/test';
 test('Play offers standard computer or online games and Variants has separate game types without room forms',async({page})=>{
  await page.goto('/#play');
+ const opponent=page.getByRole('group',{name:'Opponent',exact:true});await expect(opponent.getByRole('button').first()).toHaveText('Online');await expect(opponent.getByRole('button').last()).toHaveText('Computer');
  await expect(page.getByRole('button',{name:'Multiplayer',exact:true})).toHaveCount(0);
  await expect(page.locator('.variant-gallery')).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'Online',exact:true})).toHaveAttribute('aria-pressed','true');
+ await page.getByRole('button',{name:'Computer',exact:true}).click();
  await page.getByRole('button',{name:'Game options',exact:true}).click();
  await expect(page.getByLabel('Variant',{exact:true})).toHaveCount(0);
  await page.getByRole('button',{name:'Online',exact:true}).click();
  await expect(page.getByRole('button',{name:'Play online',exact:true})).toBeVisible();
  await expect(page.getByLabel('Room name',{exact:true})).toHaveCount(0);
  await page.goto('/#variants');
+ const onlineList=page.getByRole('group',{name:'Online variants',exact:true});await expect(onlineList.getByRole('button')).toHaveCount(21);await expect(onlineList.getByRole('button').nth(0)).toHaveText('Throne');await expect(onlineList.getByRole('button').nth(1)).toHaveText('Vote Chess');await expect(onlineList.getByRole('button').nth(2)).toHaveText('Team Chess');
+ await page.getByRole('button',{name:'Computer',exact:true}).click();
  await expect(page.locator('.variant-gallery>button')).toHaveCount(18);
  await expect(page.locator('.variant-gallery').getByRole('button',{name:'Standard',exact:true})).toHaveCount(0);
  await page.getByRole('button',{name:'Online',exact:true}).click();

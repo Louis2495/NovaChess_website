@@ -171,7 +171,7 @@ test("consecutive premoves preview a piece through three moves and execute in or
       body: `let fen='';self.onmessage=({data})=>{if(data==='uci')postMessage('uciok');else if(data==='isready')postMessage('readyok');else if(data.startsWith('position fen '))fen=data.slice(13);else if(data.startsWith('go ')){const ranks=fen.split(' ')[0].split('/');const move=ranks[1].startsWith('p')?'a7a6':ranks[2].startsWith('p')?'a6a5':'b7b6';setTimeout(()=>postMessage('bestmove '+move),2200);}};`,
     }),
   );
-  await page.goto("/#play");
+  await page.goto("/#play");await page.getByRole("button",{name:"Computer",exact:true}).click();
   await page.getByRole("button", { name: "Start game", exact: true }).click();
   await move(page, "e2e4");
   await move(page, "g1f3");

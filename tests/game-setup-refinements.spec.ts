@@ -28,7 +28,7 @@ test("picked-up pieces center on the pointer immediately and drop on the square 
 test("game setup offers two strength choices, defaults to rated, searches openings and centers standalone resume actions", async ({
   page,
 }) => {
-  await page.goto("/#play");
+  await page.goto("/#play");await page.getByRole("button",{name:"Computer",exact:true}).click();
   await page.getByRole("button", { name: "Game options", exact: true }).click();
   await expect(page.locator(".opponent-choices input")).toHaveCount(2);
   await expect(page.getByLabel("Current rating")).toBeChecked();
@@ -59,6 +59,7 @@ test("game setup offers two strength choices, defaults to rated, searches openin
   await page.goto("/#home");
   for (const route of ["home", "play"]) {
     await page.goto("/#" + route);
+    if(route === "play")await page.getByRole("button",{name:"Computer",exact:true}).click();
     const resume = page.getByRole("button", {
       name: "Resume saved game",
       exact: true,

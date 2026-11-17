@@ -1,3 +1,4 @@
+import {useOnlineSession} from "./lib/online";
 import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -48,7 +49,8 @@ import Appearance from "./components/Appearance";
 import HomePage from "./pages/Home";
 import "./styles.css";
 import "./redesign.css";
-const Analysis = lazy(() => import("./pages/Analysis")),
+const SignIn = lazy(() => import("./pages/SignIn")),
+  Analysis = lazy(() => import("./pages/Analysis")),
   Play = lazy(() => import("./pages/PlayHub")),
   Puzzles = lazy(() => import("./pages/Puzzles")),
   Research = lazy(() => import("./pages/Research")),
@@ -70,6 +72,7 @@ const mainNav = [
 ] as const;
 const validTabs = new Set<string>([
   "profile",
+  "signin",
   "controls",
   "rankings",
   "community",
@@ -99,6 +102,7 @@ function route() {
   };
 }
 function App() {
+  const {session,ready:authReady}=useOnlineSession();
   const appRoot = useRef<HTMLDivElement>(null);
   const [appearance, setAppearance] = usePersistent<AppearanceType>(
       "novachess-appearance-v2",
@@ -463,7 +467,7 @@ function App() {
       <Puzzles />
     ) : tab === "learn" ? (
       <Learn />
-    ) : tab === "research" ? null : tab === "profile" ? (
+    ) : tab === "research" ? null : tab === "signin" ? <SignIn/> : tab === "profile" ? (
       <ProfilePage />
     ) : tab === "library" ? (
       <LibraryPage />
@@ -509,6 +513,7 @@ function App() {
         )}
         <div className="site-background" aria-hidden="true" />
         <GlobalChat />
+        {authReady && !session && tab !== "signin" && !focusMode && <button className="floating-sign-in btn" onClick={()=>navigate("signin")}>Sign in</button>}
         <a className="skip-link" href="#workspace">
           Skip to workspace
         </a>

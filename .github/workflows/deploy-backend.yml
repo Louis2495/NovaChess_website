@@ -1,6 +1,15 @@
 name: Set up multiplayer
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - 'src/lib/onlineVariants.ts'
+      - 'src/lib/variantCatalog.ts'
+      - 'src/lib/specialRules.ts'
+      - 'scripts/prepare-assets.mjs'
+      - '.github/workflows/deploy-backend.yml'
 permissions:
   contents: read
 concurrency:
@@ -31,13 +40,13 @@ jobs:
       - run: npm run test:unit
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.72.9
       - name: Apply database migrations
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_REF"
-          supabase db push --remote --yes
+          supabase db push --linked --yes
       - name: Deploy game validation
-        run: supabase functions deploy chess --remote="$SUPABASE_PROJECT_REF" --no-verify-jwt --yes
+        run: supabase functions deploy chess --project-ref "$SUPABASE_PROJECT_REF" --use-docker --no-verify-jwt --yes
       - name: Verify deployed services
         run: node scripts/check-online-backend.mjs
       - name: Deployment summary

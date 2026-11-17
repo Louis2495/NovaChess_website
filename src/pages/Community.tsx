@@ -1,3 +1,10 @@
+import {matchTypedMove} from "../lib/moves";
+import type {FairyStockfish} from "ffish-es6";
+import {fairy, fog, squares} from "../lib/variants";
+import {variantList} from "../lib/variantCatalog";
+import {onlineLegal, specialVariants, type OnlinePosition} from "../lib/onlineVariants";
+import {buildFen} from "../components/PositionEditor";
+import {duration} from "../lib/speedrun";
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -15,17 +22,17 @@ import { online, onlineAction, useOnlineSession } from "../lib/online";
 import { useApp } from "../lib/context";
 import { copyText } from "../lib/store";
 import { specialLegal, type SpecialState } from "../lib/specialRules";
-import { Board, type BoardMark } from "../components/Board";
+import { Board, Piece, type BoardMark } from "../components/Board";
 import OnlineAccount from "../components/OnlineAccount";
 import GameResult from "../components/GameResult";
 import { ChoiceSelect, Button, Card, Field, PageTitle } from "../components/UI";
-type Member = { id: string; team: "w" | "b" | null };
+type Member = { id: string; team: "w" | "b" | null; board?:number };
 type Room = {
   id: string;
   name: string;
   mode: string;
   variant: string;
-  state: SpecialState & { lastWinner?: string; lastResult?: string };
+  state: SpecialState & { lastWinner?: string; lastResult?: string; initial:string; partner?:OnlinePosition; speedrun?:OnlinePosition["speedrun"] };
   members: Member[];
   queue: string[];
   status: string;
@@ -41,7 +48,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
   const [room, setRoom] = useState<Room | null>(null),
     [profiles, setProfiles] = useState<Profile[]>([]),
     [mode] = useState(presetMode),
-    [name] = useState(presetMode === "standard" ? ({chess:"Standard",dropping:"Dropping Squares",chaos:"Chaos chess",random:"Random"}[presetVariant] || "Standard") : presetMode === "vote" ? "Vote Chess" : presetMode === "team" ? "Team Chess" : "Throne"),
+    [name] = useState(presetMode === "standard" ? (variantList.find(v=>v.id===presetVariant)?.name || "Speedrun") : presetMode === "vote" ? "Vote Chess" : presetMode === "team" ? "Team Chess" : "Throne"),
     [variant] = useState(presetVariant),
     [bot, setBot] = useState(false),
     [busy, setBusy] = useState(false),
@@ -51,6 +58,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
     >([]),
     [armed, setArmed] = useState<"" | "freeze" | "swap">(""),
     [first, setFirst] = useState("");
+  const [ff,setFF]=useState<FairyStockfish|null>(null),[pocket,setPocket]=useState(""),[duck,setDuck]=useState<{fen:string;options:string[];queued?:boolean}|null>(null),[typed,setTyped]=useState(""),[clock,setClock]=useState(Date.now());
+  useEffect(()=>{let active=true;fairy().then(engine=>{if(active)setFF(engine);}).catch(e=>setError(e.message));return()=>{active=false;};},[]);
+  useEffect(()=>{if(!room?.state.speedrun)return;const t=setInterval(()=>setClock(Date.now()),100);return()=>clearInterval(t);},[room?.id,!!room?.state.speedrun]);
+  useEffect(()=>{setPocket("");setDuck(null);},[room?.id,room?.revision]);
   const uid = session?.user.id;
   const [roomId, inviteQuery = ""] = detail.replace(/^online\//, "").split("?");
   const inviteTeam = new URLSearchParams(inviteQuery).get("team");
@@ -138,7 +149,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
     }
   }
   const me = room?.members.find((m) => m.id === uid),
-    turn = room?.state.fen.split(" ")[1],
+    position = room?.variant === "bughouse" && me?.board === 1 ? room.state.partner : room?.state,
+    turn = position?.fen.split(" ")[1],
     canMove = room?.status === "playing" && me?.team === turn;
   let legal: string[] = [];
   if (room && room.state.result === "*")
@@ -148,10 +160,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
           ? new Chess(room.state.fen)
               .moves({ verbose: true })
               .map((m) => m.from + m.to + (m.promotion || ""))
-          : specialLegal(room.state);
+          : specialVariants.includes(room.variant) ? specialLegal(room.state) : ff ? onlineLegal(ff,room.variant,room.state,me?.board||0) : [];
     } catch {}
   const premove = usePremoves({
-    fen: room?.state.fen || "8/8/8/8/8/8/8/8 w - - 0 1",
+    fen: position?.fen || "8/8/8/8/8/8/8/8 w - - 0 1",
     side: me?.team || "w",
     legal,
     enabled: !!me?.team,
@@ -162,6 +174,24 @@ export default function Community({presetMode = "standard", presetVariant = "che
     chaos: room?.variant === "chaos",
     blocked: room?.state.blocked || [],
   });
+  function submitMove(move:string){return act(room?.mode === "vote" ? "vote" : "move",{move},true);}
+  function movePiece(from:string,to:string,promotion?:string){
+    const prefix=from+to+(promotion||"");
+    if(!canMove && room?.variant!=="duck"){premove.enqueue(prefix);return;}
+    let available=legal;
+    if(!canMove && ff){const b=new ff.Board("duck",premove.preview);try{available=b.legalMoves().trim().split(/\s+/);}finally{b.delete();}}
+    const choices=available.filter(m=>m.split(",")[0]===prefix);
+    if(room?.variant === "duck" && choices[0]?.includes(",") && position && me?.team){
+      const pieces=squares(canMove?position.fen:premove.preview),moving=pieces[from];
+      if(moving?.toLowerCase()==="p" && from[0]!==to[0] && !pieces[to])delete pieces[to[0]+from[1]];
+      delete pieces[from];for(const sq of Object.keys(pieces))if(pieces[sq]==="*")delete pieces[sq];
+      pieces[to]=promotion?(me.team==="w"?promotion.toUpperCase():promotion):moving;
+      if(moving?.toLowerCase()==="k" && Math.abs(from.charCodeAt(0)-to.charCodeAt(0))===2){const rFrom=(to[0]==="g"?"h":"a")+from[1],rTo=(to[0]==="g"?"f":"d")+from[1];pieces[rTo]=pieces[rFrom];delete pieces[rFrom];}
+      setDuck({fen:buildFen(pieces,me.team,"",""),options:choices,queued:!canMove});return;
+    }
+    if(choices[0])void submitMove(choices[0]).catch(()=>{});
+  }
+  const pocketPieces=(position?.fen.match(/\[([^\]]*)\]/)?.[1]||"").split("").filter(p=>me?.team && (p===p.toUpperCase()?"w":"b")===me.team);
   const totals = Object.entries(
     votes.reduce(
       (acc, v) => ({ ...acc, [v.move]: (acc[v.move] || 0) + 1 }),
@@ -196,7 +226,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                         ? "Vote Chess"
                         : room.mode === "team"
                           ? "Team Chess"
-                          : "Chess"}
+                          : variantList.find(v=>v.id===room.variant)?.name || "Speedrun"}
                   </span>
                 </div>
                 {room.state.lastWinner && (
@@ -204,10 +234,14 @@ export default function Community({presetMode = "standard", presetVariant = "che
                     {username(room.state.lastWinner)} holds the throne
                   </p>
                 )}
-                <Board
-                  fen={premove.preview}
-                  overlay={<GameResult result={room.state.result} human={me?.team}/>}
-                  materialFen={room.state.fen}
+                {room.state.speedrun && me?.team && <div className="speedrun-clock" role="timer" aria-label="Your move time">{duration(room.state.speedrun.elapsed[me.team]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}</div>}
+                {room.variant === "blindtext" ? <form onSubmit={e=>{e.preventDefault();if(!ff || !position)return;const b=new ff.Board("chess",position.fen);try{const move=matchTypedMove(typed,legal.map(m=>({uci:m,san:b.sanMove(m)})));if(move)void submitMove(move).then(()=>setTyped("")).catch(()=>{});}finally{b.delete();}}}><Field label="Blindfold move"><input value={typed} onChange={e=>setTyped(e.target.value)} autoComplete="off" disabled={!canMove || busy}/></Field><Button disabled={!canMove || busy}>Move</Button></form> : <Board
+                  fen={duck?.fen || premove.preview}
+                  hidden={room.variant === "blind"}
+                  visible={room.variant === "cvfog" ? fog(position!.fen,me?.team || "w") : undefined}
+                  highlights={[]}
+                  overlay={<GameResult result={room.variant === "bughouse" && me?.board === 1 && ["1-0","0-1"].includes(room.state.result) ? (room.state.result === "1-0" ? "0-1" : "1-0") : room.state.result} human={me?.team}/>}
+                  materialFen={position?.fen}
                   onCancelPremoves={premove.cancelOnRightClick}
                   flipped={me?.team === "b"}
                   disabled={
@@ -224,15 +258,9 @@ export default function Community({presetMode = "standard", presetVariant = "che
                       ? (marks) => void act("marks", { marks })
                       : undefined
                   }
-                  onMove={(from, to, promotion) =>
-                    !canMove
-                      ? premove.enqueue(from + to + (promotion || ""))
-                      : void act(room.mode === "vote" ? "vote" : "move", {
-                          move: from + to + (promotion || ""),
-                        })
-                  }
+                  onMove={movePiece}
                   onSquare={
-                    armed
+                    duck ? square=>{const move=duck.options.find(m=>m.split(",")[1]?.endsWith(square));if(move){if(duck.queued){premove.enqueue(move);setDuck(null);}else void submitMove(move).catch(()=>{});}} : pocket ? square=>{const move=pocket.toUpperCase()+"@"+square;if(!canMove){premove.enqueue(move);setPocket("");}else if(legal.includes(move))void submitMove(move).catch(()=>{});} : armed
                       ? (square) => {
                           if (armed === "freeze")
                             void act("move", {
@@ -250,16 +278,19 @@ export default function Community({presetMode = "standard", presetVariant = "che
                         }
                       : undefined
                   }
-                  selected={first || room.state.randomFrom || undefined}
+                  selected={pocket || first || room.state.randomFrom || undefined}
                   onCancel={
-                    armed
+                    armed || pocket || duck
                       ? () => {
+                          setPocket("");setDuck(null);
                           setArmed("");
                           setFirst("");
                         }
                       : undefined
                   }
-                />
+                />}
+                {!!pocketPieces.length && <div className="pockets">{[...new Set(pocketPieces)].map(p=><button key={p} aria-label={`Drop ${p.toUpperCase()}`} disabled={!canMove && !appearance.premoves} onClick={()=>setPocket(pocket===p?"":p)}><Piece symbol={p}/><span>{pocketPieces.filter(c=>c===p).length}</span></button>)}</div>}
+                {room.variant === "bughouse" && room.state.partner && <Card><h2>Partner board</h2><Board compact fen={me?.board===1?room.state.fen:room.state.partner.fen} disabled flipped={me?.team!=="b"}/></Card>}
                 <div className="button-row">
                   {room.variant === "chaos" && canMove && (
                     <>
@@ -344,6 +375,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                           .map((m) => (
                             <span key={m.id}>
                               {username(m.id)}
+                              {room.variant === "bughouse" ? ` · Board ${(m.board||0)+1}` : ""}
                               {m.id === uid ? " · you" : ""}
                             </span>
                           ))}
@@ -417,7 +449,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                 </Card>
                 <Card>
                   <div className="move-chips">
-                    {room.state.notation.map((m, i) => (
+                    {(position?.notation || []).map((m, i) => (
                       <span key={i}>
                         {i % 2 === 0 ? `${Math.floor(i / 2) + 1}. ` : ""}
                         {m}
@@ -435,7 +467,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                 try {
                   const {data,error}=await online!.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at").eq("mode",mode).eq("variant",variant).order("updated_at",{ascending:true}).limit(40);
                   if(error)throw error;
-                  const available=(data||[]).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count === 1));
+                  const available=(data||[]).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
                   if(available && !(mode === "team" && bot)) await act("join",{room:available.id});
                   else await act("create",{mode,name,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}

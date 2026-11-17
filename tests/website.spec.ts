@@ -552,7 +552,7 @@ for (const variant of [
     test.setTimeout(45000);
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.goto(variant === "chess" ? "/#play" : "/#variants");
+    await page.goto(variant === "chess" ? "/#play" : "/#variants");await page.getByRole("button",{name:"Computer",exact:true}).click();
     await page
       .getByRole("button", { name: "Game options", exact: true })
       .click();
@@ -752,6 +752,7 @@ test("simplified Home has one large New Game action and no repeated tool or stat
     page.locator(".tool-grid,.stats-strip,.home-bottom"),
   ).toHaveCount(0);
   await action.click();
+  await page.getByRole("button",{name:"Computer",exact:true}).click();
   const start = page.getByRole("button", { name: "Start game", exact: true });
   await expect(start).toBeVisible();
   expect((await start.boundingBox())!.height).toBeGreaterThanOrEqual(58);

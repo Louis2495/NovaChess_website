@@ -334,7 +334,7 @@ for (const variant of ["dropping", "chaos", "random"])
   test(`new ${variant} variant plays legal moves against the computer`, async ({
     page,
   }) => {
-    await page.goto("/#variants");
+    await page.goto("/#variants");await page.getByRole("button",{name:"Computer",exact:true}).click();
     await protectNativeEngine(page);
     await page
       .getByRole("button", { name: "Game options", exact: true })
@@ -407,6 +407,7 @@ for (const variant of ["dropping", "chaos", "random"])
       .toEqual([]);
     if (variant === "dropping") {
       await page.getByRole("button", { name: "New game", exact: true }).click();
+      await page.getByRole("button",{name:"Computer",exact:true}).click();
       await page
         .getByRole("button", { name: "Game options", exact: true })
         .click();

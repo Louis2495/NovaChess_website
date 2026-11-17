@@ -152,10 +152,13 @@ before(async () => {
   await pg.exec(readFileSync("supabase/migrations/202611170002_throne_games.sql","utf8"));
   await pg.exec(`create schema cron;create table cron.test_jobs(name text,schedule text,command text);create function cron.schedule(text,text,text) returns bigint language plpgsql as $$begin insert into cron.test_jobs values($1,$2,$3);return 1;end $$;`);
   await pg.exec(readFileSync("supabase/migrations/202611180001_online_operations.sql","utf8").replace('create extension if not exists pg_cron with schema pg_catalog;',''));
+  await pg.exec(readFileSync("supabase/migrations/202611180002_all_online_variants.sql","utf8"));
   for (const uid of users)
     await pg.query("insert into auth.users(id)values($1)", [uid]);
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
+    .replace('"./engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/engine.ts")).href))
+    .replace('"../../../src/lib/onlineVariants.ts"',JSON.stringify(pathToFileURL(resolve("src/lib/onlineVariants.ts")).href))
     .replace(
       /import \{ createClient \} from ["']npm:@supabase\/supabase-js@2(?:\.\d+\.\d+)?["'];/,
       "",
@@ -174,6 +177,7 @@ before(async () => {
     );
   globalThis.__testDb = mockDb;
   globalThis.Deno = {
+    readFile: async path => new Uint8Array(readFileSync(path)),
     env: { get: () => "" },
     serve: (fn) => {
       handler = fn;
@@ -478,4 +482,30 @@ test("online deployment schedules voting and bounded chat/vote retention",async(
 
 test('public lobby projection excludes full board histories and private-size queues',async()=>{
  const columns=await pg.query("select column_name from information_schema.columns where table_name='room_lobby' order by ordinal_position");assert.deepEqual(columns.rows.map(r=>r.column_name),['id','name','mode','variant','status','member_count','updated_at']);
+});
+
+test('every native online variant uses authoritative rules and rejects illegal moves',async()=>{
+ await pg.query('update profiles set banned=false');
+ const {onlineEngine}=await import('../../supabase/functions/chess/engine.ts');const ff=await onlineEngine();
+ const {variantList}=await import('../../src/lib/variantCatalog.ts');
+ for(const id of [...variantList.map(v=>v.id),'speedrun'].filter(id=>!['chess','dropping','chaos','random','bughouse'].includes(id))){
+  await pg.query("update rooms set created_at=now()-interval '2 hours'");
+  let game=await room('standard',{variant:id});assert.equal(game.variant,id);const joined=await command(users[1],game,'join');assert.equal(joined.status,200,JSON.stringify(joined.data));game=joined.data;assert.equal(game.status,'playing');
+  const invalid=await command(users[0],game,'move',{move:'a1a8'});assert.equal(invalid.status,400,id);
+  const {onlineLegal}=await import('../../src/lib/onlineVariants.ts');const move=onlineLegal(ff,id,game.state)[0];assert.ok(move,id);
+  const moved=await command(users[0],game,'move',{move});assert.equal(moved.status,200,JSON.stringify(moved.data));assert.equal(moved.data.state.moves[0],move,id);
+  if(id==='speedrun'){assert.ok(game.state.speedrun.startedAt);assert.ok(moved.data.state.speedrun.elapsed.w>=0);}
+ }
+});
+test('online Bughouse seats four players, enforces board ownership and transfers captured pieces',async()=>{
+ await pg.query('update profiles set banned=false');
+ await pg.query("update rooms set created_at=now()-interval '2 hours'");let game=await room('standard',{variant:'bughouse'});
+ for(let i=1;i<4;i++){const joined=await command(users[i],game,'join');assert.equal(joined.status,200,JSON.stringify(joined.data));game=joined.data;assert.equal(game.status,i===3?'playing':'waiting');}
+ assert.deepEqual(game.members.map(m=>[m.board,m.team]),[[0,'w'],[0,'b'],[1,'w'],[1,'b']]);
+ for(const [i,move] of [[0,'e2e4'],[1,'d7d5'],[0,'e4d5']]){const result=await command(users[i],game,'move',{move});assert.equal(result.status,200,JSON.stringify(result.data));game=result.data;}
+ assert.match(game.state.partner.fen,/\[p\]/);
+ const wrong=await command(users[0],game,'move',{move:'e2e4',board:1});assert.equal(wrong.status,400);
+ game=(await command(users[2],game,'move',{move:'e2e4'})).data;
+ const dropped=await command(users[3],game,'move',{move:'P@e6'});assert.equal(dropped.status,200,JSON.stringify(dropped.data));assert.equal(dropped.data.state.partner.moves.at(-1),'P@e6');
+ const ended=await command(users[3],dropped.data,'resign');assert.equal(ended.data.state.result,'0-1');
 });
