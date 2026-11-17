@@ -100,7 +100,7 @@ test("profile photo is inside the cover with a small accessible upload icon and 
   await expect(
     page.getByLabel("Upload profile picture", { exact: true }),
   ).toHaveCount(1);
-  await expect(page.locator(".app")).toHaveCSS("--button", "#a7bfd6");
+  await expect(page.locator(".app")).toHaveCSS("--button", "#add9ed");
   await expect(
     page.locator(".sidebar nav").getByRole("button", { name: "Multiplayer", exact: true, includeHidden: true }),
   ).toHaveCount(1);

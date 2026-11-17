@@ -322,7 +322,7 @@ export default function Appearance({ onClose, embedded = false }: { onClose: () 
                 >
                   {[
                     "DM Sans",
-                    "Nunito Sans", "Manrope",
+                    "Charlesworth", "Nunito Sans", "Manrope",
                     "Georgia",
                     "system-ui",
                     "monospace",

@@ -11,3 +11,5 @@ The sheet is encoded as WebP at its original resolution. Each picture has a dist
 Pawns use traditional pedestal bodies with no legs or feet. Dropping Squares, Random, Fog of War, 3-Check, Antichess, Bughouse and Pawn race were revised to preserve that rule, clarify the cubic die and show three plus signs.
 
 `horde.webp` overrides only the Horde tile. Its two front pawns have faces aligned with the row behind them; the other 17 illustrations continue to use the original sheet.
+
+`multiplayer.png` contains three square panels in one horizontal sheet (Throne, Vote Chess, Team Chess). Each scene uses open, expressive eyes and traditional chess-piece bases. `MultiplayerPicture.tsx` selects the panels without cropping the source file.

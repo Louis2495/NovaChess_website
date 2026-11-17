@@ -1,5 +1,5 @@
 import GlobalChat from "./components/GlobalChat";
-import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Home,
@@ -98,6 +98,7 @@ function route() {
   };
 }
 function App() {
+  const appRoot = useRef<HTMLDivElement>(null);
   const [appearance, setAppearance] = usePersistent<AppearanceType>(
       "novachess-appearance-v2",
       defaults,
@@ -118,6 +119,14 @@ function App() {
     [query, setQuery] = useState(""),
     [info, setInfo] = useState(false);
   useEffect(() => {
+    setAppearance(a => a.background === "Default" && a.backgroundColor === "#252e3a" && a.panelColor === "#354354" ? {
+      ...a, backgroundColor:defaults.backgroundColor, panelColor:defaults.panelColor,
+      ...(a.theme === "Steel" && a.accent === "#b2d3e7" ? {theme:defaults.theme,accent:defaults.accent} : {}),
+      ...(a.buttonColor === "#a7bfd6" ? {buttonColor:defaults.buttonColor} : {}),
+      ...(a.radius === 16 ? {radius:defaults.radius} : {}),
+    } : a);
+  }, []);
+  useEffect(() => {
     // Refresh only the previous default board/colors, preserving custom choices.
     setAppearance((a) => {
       const oldMarks = {
@@ -134,7 +143,7 @@ function App() {
         }
       }
       const board = a.board === "Classic" && a.dark.toLowerCase() === "#5c7866";
-      const font = a.font === "Manrope" && !a.fontCustomized;
+      const font = ["Manrope", "Nunito Sans"].includes(a.font) && !a.fontCustomized;
       return board || changed || font
         ? {
             ...a,
@@ -432,6 +441,14 @@ function App() {
           ? `url("${appearance.customBackground}")`
           : "none",
   } as React.CSSProperties;
+  useLayoutEffect(() => {
+    const root = appRoot.current;
+    if (!root) return;
+    // A route change can interrupt a drag before its release event.
+    root.classList.toggle("manual-boards", !!manualBoardSize);
+    for (const key of ["--board-max", "--analysis-board-size", "--play-board-size"])
+      root.style.setProperty(key, (style as React.CSSProperties & Record<string, string>)[key]);
+  }, [tab, detail]);
   const page =
     tab === "home" ? (
       <HomePage />
@@ -469,6 +486,7 @@ function App() {
       }}
     >
       <div
+        ref={appRoot}
         className={`app ${manualBoardSize ? "manual-boards" : ""} ${focusMode ? "focus-mode" : ""} ${appearance.animation ? "" : "no-motion"} bg-${appearance.background.toLowerCase()}`}
         style={style}
       >

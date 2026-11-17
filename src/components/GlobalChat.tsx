@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, Send, X, Flag, Trash2, ShieldBan } from "lucide-react";
+import { MessageCircle, Send, X, Flag, Trash2, ShieldBan, ArrowDownRight } from "lucide-react";
 import { online, useOnlineSession } from "../lib/online";
 import { useApp } from "../lib/context";
 import { pieceUrl } from "../lib/store";
@@ -12,7 +12,31 @@ type Message = {
   created_at: string;
 };
 type Person = { id: string; username: string; avatar: string };
+type ChatBox = { left: number; top: number; width: number; height: number };
+function fitChat(box: ChatBox): ChatBox {
+  const bottom = innerWidth <= 1000 ? 80 : 12;
+  const width = Math.max(Math.min(280, innerWidth-24), Math.min(box.width, innerWidth-24));
+  const height = Math.max(Math.min(320, innerHeight-bottom-12), Math.min(box.height, innerHeight-bottom-12));
+  return { width, height, left: Math.max(12, Math.min(box.left, innerWidth-width-12)), top: Math.max(12,Math.min(box.top,innerHeight-height-bottom)) };
+}
 export default function GlobalChat() {
+  const [box, setBox] = useState<ChatBox>(() => fitChat({left:innerWidth>1000?220:12,top:40,width:440,height:760}));
+  const moving = useRef<(ChatBox & { kind:"move"|"size"; x:number; y:number }) | null>(null);
+  const panel = useRef<HTMLElement>(null);
+  useEffect(() => { const resize = () => setBox(b => fitChat(b)); window.addEventListener("resize",resize); return () => window.removeEventListener("resize",resize); },[]);
+  function begin(e: React.PointerEvent<HTMLElement>, kind: "move"|"size") {
+    if(e.button!==0 || kind==="move" && (e.target as HTMLElement).closest("button")) return;
+    e.preventDefault(); e.stopPropagation();
+    const r=panel.current!.getBoundingClientRect();
+    moving.current={kind,x:e.clientX,y:e.clientY,left:r.left,top:r.top,width:r.width,height:r.height};
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+  function motion(e: React.PointerEvent<HTMLElement>) {
+    const r=moving.current; if(!r) return; e.preventDefault(); e.stopPropagation();
+    const dx=e.clientX-r.x,dy=e.clientY-r.y;
+    setBox(fitChat(r.kind==="move" ? {...r,left:r.left+dx,top:r.top+dy} : {...r,width:Math.min(innerWidth-r.left-12,r.width+dx),height:Math.min(innerHeight-r.top-(innerWidth<=1000?80:12),r.height+dy)}));
+  }
+  function end(e: React.PointerEvent<HTMLElement>) { moving.current=null; if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId); }
   const { library, navigate } = useApp(),
     { session } = useOnlineSession();
   const [host, setHost] = useState<HTMLElement | null>(null);
@@ -29,6 +53,7 @@ export default function GlobalChat() {
     input = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (open) input.current?.focus();
+    else moving.current = null;
   }, [open]);
   useEffect(() => {
     if (!open || !online || !session) return;
@@ -110,6 +135,8 @@ export default function GlobalChat() {
       {open && (
         <aside
           className="global-chat-panel"
+          ref={panel}
+          style={{...box,right:"auto",bottom:"auto",maxHeight:"none"}}
           aria-label="Global chat"
           onKeyDown={(e) => {
             if (e.key === "Escape") {
@@ -118,7 +145,9 @@ export default function GlobalChat() {
             }
           }}
         >
-          <div className="chat-dock-heading">
+          <div className="chat-dock-heading" role="group" aria-label="Move chat" tabIndex={0}
+            onPointerDown={e=>begin(e,"move")} onPointerMove={motion} onPointerUp={end} onPointerCancel={end}
+            onKeyDown={e=>{ if(e.target!==e.currentTarget || !["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key))return; e.preventDefault();e.stopPropagation();setBox(b=>fitChat({...b,left:b.left+(e.key==="ArrowRight"?20:e.key==="ArrowLeft"?-20:0),top:b.top+(e.key==="ArrowDown"?20:e.key==="ArrowUp"?-20:0)})); }}>
             <h2>Global chat</h2>
             <IconButton
               label="Close global chat"
@@ -249,6 +278,9 @@ export default function GlobalChat() {
               <Send size={18} />
             </IconButton>
           </form>
+          <div className="chat-resize-handle" role="slider" aria-label="Resize chat" aria-valuemin={Math.min(320,innerHeight-92)} aria-valuemax={innerHeight} aria-valuenow={Math.round(box.height)} aria-valuetext={`${Math.round(box.width)} by ${Math.round(box.height)} pixels`} tabIndex={0}
+            onPointerDown={e=>begin(e,"size")} onPointerMove={motion} onPointerUp={end} onPointerCancel={end}
+            onKeyDown={e=>{if(!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key))return;e.preventDefault();e.stopPropagation();setBox(b=>fitChat({...b,width:b.width+(e.key==="ArrowRight"?20:e.key==="ArrowLeft"?-20:0),height:b.height+(e.key==="ArrowDown"?20:e.key==="ArrowUp"?-20:0)}));}}><ArrowDownRight size={17}/></div>
         </aside>
       )}
     </>

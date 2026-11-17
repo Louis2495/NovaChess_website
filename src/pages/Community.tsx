@@ -1,3 +1,4 @@
+import MultiplayerPicture from "../components/MultiplayerPicture";
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
 import { useEffect, useState } from "react";
@@ -204,15 +205,15 @@ export default function Community() {
       {!online || !uid ? (
         <>
           <div className="multiplayer-modes" role="group" aria-label="Multiplayer modes">
-            {[["throne","Throne",Crown],["vote","Vote Chess",Vote],["team","Team Chess",Users]].map(([id,title,Icon])=>{
-              const I=Icon as typeof Users; return <button key={id as string} aria-pressed={mode===id} onClick={()=>setMode(id as string)}><I size={28}/>{title as string}</button>;
+            {[["throne","Throne"],["vote","Vote Chess"],["team","Team Chess"]].map(([id,title])=>{
+              return <button key={id as string} aria-pressed={mode===id} onClick={()=>setMode(id as string)}><MultiplayerPicture mode={id as string}/>{title as string}</button>;
             })}
           </div>
           <Card className="multiplayer-preview">
             <h2>{mode === "throne" ? "Throne" : mode === "vote" ? "Vote Chess" : "Team Chess"}</h2>
             <p>{mode === "throne" ? "Winner stays. Queue to challenge. Finish gives up your seat." : mode === "vote" ? "Even teams. One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>
             {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>setBot(e.target.value==="bot")}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
-            <Button disabled>Create room</Button>
+            <Button disabled>{mode === "throne" ? "Join queue" : "Create room"}</Button>
           </Card>
           <OnlineAccount />
         </>
@@ -484,7 +485,7 @@ export default function Community() {
                         aria-pressed={mode === id}
                         onClick={() => setMode(id as string)}
                       >
-                        <I size={24} />
+                        {id === "standard" ? <I size={24} /> : <MultiplayerPicture mode={id as string}/>}
                         {title as string}
                       </button>
                     );
@@ -525,7 +526,9 @@ export default function Community() {
                 <Button
                   disabled={busy}
                   onClick={() =>
-                    void act("create", {
+                    mode === "throne" && rooms.some(r => r.mode === "throne" && r.status !== "finished")
+                      ? void act("join", { room: rooms.find(r => r.mode === "throne" && r.status !== "finished")!.id })
+                      : void act("create", {
                       mode,
                       name,
                       variant: mode === "vote" || mode === "team" && bot ? "chess" : variant,
@@ -533,7 +536,7 @@ export default function Community() {
                     })
                   }
                 >
-                  Create room
+                  {mode === "throne" ? "Join queue" : "Create room"}
                   <ArrowRight size={16} />
                 </Button>
               </Card>

@@ -1,0 +1,34 @@
+import {test,expect} from '@playwright/test';
+import {Chess} from 'chess.js';
+test('board resizing stays continuous across diagonal direction changes and saves only on release',async({page,isMobile})=>{
+ await page.addInitScript(()=>{const save=Storage.prototype.setItem;(window as any).__appearanceWrites=0;Storage.prototype.setItem=function(k,v){if(k==='novachess-appearance-v2')(window as any).__appearanceWrites++;return save.call(this,k,v);};});
+ await page.goto('/#analysis');await page.evaluate(()=>document.fonts.ready);
+ const board=page.locator('.analysis-layout .board'),handle=page.getByRole('slider',{name:'Resize board',exact:true});await expect(handle).toBeVisible();
+ const h=(await handle.boundingBox())!,x=h.x+h.width/2,y=h.y+h.height/2,writes=await page.evaluate(()=>(window as any).__appearanceWrites);
+ await page.mouse.move(x,y);await page.mouse.down();
+ const widths=[];for(const [dx,dy] of [[-80,-79],[-79,-80],[-81,-80],[-80,-81]]){await page.mouse.move(x+dx,y+dy);await page.evaluate(()=>new Promise(requestAnimationFrame));widths.push((await board.boundingBox())!.width);}
+ expect(Math.max(...widths)-Math.min(...widths)).toBeLessThan(4);
+ expect(await page.evaluate(()=>(window as any).__appearanceWrites)).toBe(writes);
+ const n=isMobile?20:180;await page.mouse.move(x+n,y-n);await page.evaluate(()=>new Promise(requestAnimationFrame));const maximum=(await board.boundingBox())!.width;
+ await page.mouse.move(x+n-12,y-n+12);await page.evaluate(()=>new Promise(requestAnimationFrame));expect((await board.boundingBox())!.width).toBeLessThan(maximum-5);
+ await page.mouse.up();await expect.poll(()=>page.evaluate(()=>(window as any).__appearanceWrites)).toBe(writes+1);
+ const final=(await board.boundingBox())!.width;await page.reload();await expect.poll(async()=>(await board.boundingBox())!.width).toBeCloseTo(final,0);
+});
+test('Hint and Skip form a vertical rail on the left of the puzzle board',async({page})=>{
+ await page.goto('/#puzzles');const hint=page.getByRole('button',{name:'Hint',exact:true}),skip=page.getByRole('button',{name:'Skip',exact:true});await expect(hint).toBeVisible();const h=(await hint.boundingBox())!,s=(await skip.boundingBox())!,b=(await page.locator('.puzzle-board .board').boundingBox())!;expect(h.x+h.width).toBeLessThan(b.x);expect(s.y).toBeGreaterThan(h.y+h.height);expect(h.x).toBe(s.x);
+});
+test('chat starts tall, can be moved and resized, and stays on screen',async({page,isMobile})=>{
+ await page.goto('/');if(isMobile)await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('button',{name:'Open global chat',exact:true}).click();const chat=page.getByRole('complementary',{name:'Global chat',exact:true});await expect(chat).toBeVisible();expect((await chat.boundingBox())!.height).toBeGreaterThan(Math.min(700,page.viewportSize()!.height-92)-1);
+ const grip=page.getByRole('slider',{name:'Resize chat',exact:true});await grip.focus();for(let i=0;i<4;i++)await grip.press('ArrowUp');for(let i=0;i<4;i++)await grip.press('ArrowLeft');
+ const before=(await chat.boundingBox())!,header=(await page.getByRole('group',{name:'Move chat',exact:true}).boundingBox())!;await page.mouse.move(header.x+header.width/2,header.y+header.height/2);await page.mouse.down();await page.mouse.move(header.x+header.width/2+20,header.y+header.height/2+40,{steps:8});await page.mouse.up();
+ await expect.poll(async()=>(await chat.boundingBox())!.x).toBeCloseTo(before.x+20,0);const moved=(await chat.boundingBox())!,g=(await grip.boundingBox())!;await page.mouse.move(g.x+g.width/2,g.y+g.height/2);await page.mouse.down();await page.mouse.move(g.x+g.width/2+20,g.y+g.height/2+20,{steps:8});await page.mouse.up();await expect.poll(async()=>(await chat.boundingBox())!.height).toBeCloseTo(moved.height+20,0);const after=(await chat.boundingBox())!,viewport=page.viewportSize()!;expect(after.x).toBeGreaterThanOrEqual(0);expect(after.x+after.width).toBeLessThanOrEqual(viewport.width);expect(after.y+after.height).toBeLessThanOrEqual(viewport.height);
+});
+test('multiplayer uses three distinct illustrations and Throne says Join queue',async({page})=>{
+ await page.goto('/#community');const modes=page.getByRole('group',{name:'Multiplayer modes',exact:true});await expect(modes.locator('.multiplayer-picture')).toHaveCount(3);const positions=await modes.locator('.multiplayer-picture').evaluateAll(es=>es.map(e=>getComputedStyle(e).backgroundPosition));expect(new Set(positions).size).toBe(3);await modes.getByRole('button',{name:'Throne',exact:true}).click();await expect(page.getByRole('button',{name:'Join queue',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Create room',exact:true})).toHaveCount(0);
+});
+test('Library delete buttons sit at the card bottom right and are red',async({page})=>{
+ const c=new Chess(),initial=c.fen();c.move('e4');await page.addInitScript(g=>localStorage.setItem('novachess-library-v2',JSON.stringify({games:[g]})),{id:'example',title:'Example',created:Date.now(),variant:'chess',initial,positions:[initial,c.fen()],moves:['e2e4'],notation:['e4'],result:'1-0',human:'w',folder:'Games',kind:'game',origin:'archive'});await page.goto('/#library');const card=page.locator('.saved-game-card'),trash=page.getByRole('button',{name:'Delete Example',exact:true});await expect(trash).toBeVisible();const cbox=(await card.boundingBox())!,t=(await trash.boundingBox())!;expect(Math.abs(cbox.x+cbox.width-t.x-t.width-16)).toBeLessThan(2);expect(Math.abs(cbox.y+cbox.height-t.y-t.height-16)).toBeLessThan(2);await expect(trash).toHaveCSS('background-color','rgb(181, 44, 67)');
+});
+test('changing pages during a resize restores the destination board settings',async({page})=>{
+ await page.goto('/#analysis');const handle=page.getByRole('slider',{name:'Resize board',exact:true});await expect(handle).toBeVisible();const h=(await handle.boundingBox())!,x=h.x+h.width/2,y=h.y+h.height/2;await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+25,y-25,{steps:4});await page.evaluate(()=>location.hash='#research');await expect(page.getByRole('heading',{name:'Research',exact:true})).toBeVisible();await page.mouse.up();await expect(page.locator('.app')).toHaveCSS('--board-max','540px');await expect(page.locator('.app')).not.toHaveClass(/manual-boards/);
+});

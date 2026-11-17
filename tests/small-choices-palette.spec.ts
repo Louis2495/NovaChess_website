@@ -63,8 +63,8 @@ test("returning default lavender palette becomes neutral slate without changing 
     ),
   );
   await page.goto("/");
-  await expect(page.locator(".app")).toHaveCSS("--base", "#252e3a");
-  await expect(page.locator(".app")).toHaveCSS("--accent", "#b2d3e7");
+  await expect(page.locator(".app")).toHaveCSS("--base", "#24394b");
+  await expect(page.locator(".app")).toHaveCSS("--accent", "#b5eddc");
   await expect
     .poll(() =>
       page.evaluate(
@@ -73,7 +73,7 @@ test("returning default lavender palette becomes neutral slate without changing 
             .theme,
       ),
     )
-    .toBe("Steel");
+    .toBe("Sea Glass");
   expect(
     await page.evaluate(
       () =>

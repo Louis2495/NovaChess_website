@@ -5,6 +5,7 @@ export const base = import.meta.env.BASE_URL;
 export const initialFen =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 export const themes: Record<string, string> = {
+  "Sea Glass": "#b5eddc",
   Steel: "#b2d3e7",
   Periwinkle: "#c7c1ff",
   Forest: "#96d9b8",
@@ -62,14 +63,14 @@ export const annotationColors = {
   gold: "#ff9c16",
 };
 export const defaults: Appearance = {
-  theme: "Steel",
+  theme: "Sea Glass",
   background: "Default",
-  backgroundColor: "#252e3a",
-  accent: "#b2d3e7",
-  buttonColor: "#a7bfd6",
+  backgroundColor: "#24394b",
+  accent: "#b5eddc",
+  buttonColor: "#add9ed",
   textColor: "#f3f6fa",
   mutedColor: "#bdc9d5",
-  panelColor: "#354354",
+  panelColor: "#36536a",
   board: "Classic",
   light: boards.Classic[0],
   dark: boards.Classic[1],
@@ -78,8 +79,8 @@ export const defaults: Appearance = {
   backgroundBlur: 0,
   backgroundDim: 65,
   panelOpacity: 92,
-  radius: 16,
-  font: "Nunito Sans",
+  radius: 18,
+  font: "Charlesworth",
   fontSize: 16,
   density: "Comfortable",
   coordinates: true,

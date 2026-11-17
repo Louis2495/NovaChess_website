@@ -90,9 +90,10 @@ export function Board({
   const sizeKey = boardSizeKey(tab, detail);
   const manualBoardSize =
     appearance.boardSizes?.[sizeKey] ?? appearance.globalBoardSize;
-  const resizeGesture = useRef<{ x: number; y: number; size: number } | null>(
+  const resizeGesture = useRef<{ x: number; y: number; size: number; lastX: number; lastY: number; target: number; max: number } | null>(
     null,
   );
+  const [resizePreview, setResizePreview] = useState<number | null>(null);
   const [measuredSize, setMeasuredSize] = useState(appearance.boardSize);
   const [viewportLimit, setViewportLimit] = useState<number | null>(null);
   const boardRef = useRef<HTMLDivElement>(null),
@@ -313,6 +314,20 @@ export function Board({
           s + (values[p.toLowerCase()] || 0) * (p === p.toUpperCase() ? 1 : -1),
         0,
       ) * (flipped ? -1 : 1);
+  function previewBoard(size: number) {
+    setResizePreview(size);
+    const app = boardRef.current?.closest<HTMLElement>(".app");
+    app?.classList.add("manual-boards");
+    for (const key of ["--board-max", "--analysis-board-size", "--play-board-size"])
+      app?.style.setProperty(key, `${size}px`);
+  }
+  function finishResize() {
+    if (!resizeGesture.current) return;
+    const size = boardRef.current!.getBoundingClientRect().width;
+    resizeGesture.current = null;
+    setResizePreview(null);
+    resizeBoard(size);
+  }
   function resizeBoard(size: number) {
     const next = Math.max(160, Math.min(1400, Math.round(size)));
     setAppearance((a) => ({
@@ -326,6 +341,13 @@ export function Board({
     const measure = () => {
       const rect = el.getBoundingClientRect();
       setMeasuredSize(Math.round(rect.width));
+      const gesture = resizeGesture.current;
+      if (gesture && gesture.target > rect.width + .75) {
+        gesture.size = rect.width;
+        gesture.x = gesture.lastX;
+        gesture.y = gesture.lastY;
+        gesture.target = rect.width;
+      }
       el.parentElement?.style.setProperty("--board-top-offset", `${el.offsetTop}px`);
       el.closest<HTMLElement>(".board-column")
         ?.style.setProperty("--actual-board-width", `${rect.width}px`);
@@ -334,7 +356,7 @@ export function Board({
       const top = rect.top + window.scrollY;
       const available = window.innerHeight - top - 90;
       const limit = Math.floor(Math.max(160, available >= 160 ? available : window.innerHeight - 230));
-      setViewportLimit(previous => previous === limit ? previous : limit);
+      if (!resizeGesture.current) setViewportLimit(previous => previous === limit ? previous : limit);
     };
     const observer = new ResizeObserver(measure);
     observer.observe(el);
@@ -357,7 +379,7 @@ export function Board({
       style={
         {
           maxWidth: compact ? undefined : viewportLimit !== null ? `${viewportLimit}px` : "max(160px, calc(100dvh - 230px))",
-          ...(manualBoardSize ? { width: `min(100%, ${manualBoardSize}px)`, flex: "0 1 auto" } : {}),
+          ...((resizePreview ?? manualBoardSize) ? { width: `min(100%, ${resizePreview ?? manualBoardSize}px)`, flex: "0 1 auto" } : {}),
         }
       }
     >
@@ -656,6 +678,9 @@ export function Board({
               x: e.clientX,
               y: e.clientY,
               size: boardRef.current!.getBoundingClientRect().width,
+              lastX: e.clientX, lastY: e.clientY,
+              target: boardRef.current!.getBoundingClientRect().width,
+              max: Math.max(160, Math.min(1400, viewportLimit ?? innerHeight - 120)),
             };
             e.currentTarget.setPointerCapture(e.pointerId);
           }}
@@ -664,23 +689,26 @@ export function Board({
             e.preventDefault();
             e.stopPropagation();
             const r = resizeGesture.current;
-            resizeBoard(
-              r.size +
-                (Math.abs(e.clientX - r.x) > Math.abs(e.clientY - r.y)
-                  ? e.clientX - r.x
-                  : r.y - e.clientY),
-            );
+            r.lastX = e.clientX;
+            r.lastY = e.clientY;
+            const delta = ((e.clientX - r.x) - (e.clientY - r.y)) / 2;
+            const desired = r.size + delta;
+            r.target = Math.max(160, Math.min(r.max, desired));
+            previewBoard(r.target);
+            if (desired !== r.target) {
+              r.size = r.target;
+              r.x = e.clientX;
+              r.y = e.clientY;
+            }
           }}
           onPointerUp={(e) => {
             if (!resizeGesture.current) return;
             e.stopPropagation();
-            resizeGesture.current = null;
+            finishResize();
             if (e.currentTarget.hasPointerCapture(e.pointerId))
               e.currentTarget.releasePointerCapture(e.pointerId);
           }}
-          onPointerCancel={() => {
-            resizeGesture.current = null;
-          }}
+          onPointerCancel={finishResize}
           onKeyDown={(e) => {
             if (
               ["ArrowLeft", "ArrowDown", "ArrowRight", "ArrowUp"].includes(
@@ -698,7 +726,7 @@ export function Board({
         >
           <svg viewBox="0 0 16 16" aria-hidden="true">
             <path
-              d="M4 12 12 4M8 13l5-5"
+              d="M3 13 13 3M5 3h8v8"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.6"

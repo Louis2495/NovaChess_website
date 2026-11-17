@@ -1460,7 +1460,7 @@
 h1,
 h2,
 h3 {
-  font-family: var(--font), sans-serif;
+  font-family: var(--font), "Nunito Sans", sans-serif;
 }
 .card {
   background: var(--panel);
@@ -4300,3 +4300,46 @@ select.theme-select {
   .home-practice-grid .daily-meme-image { height:100%; max-height:var(--home-card-height); object-fit:contain; }
   .home-puzzle-content > .daily-board-preview { width:min(100%,360px,calc(var(--home-card-height) - 100px)); }
 }
+
+/* Ocean-blue surfaces, sea-glass accents and rounder geometry keep the workspace relaxed. */
+.page-title h1 { letter-spacing:-.025em; }
+.card { box-shadow:0 4px 18px #0b25331a; }
+.btn,.segmented-control,.analysis-tools-menu { border-radius:calc(var(--radius) * .67); }
+.sidebar nav button:hover { background:color-mix(in srgb,var(--accent) 12%,transparent); }
+@media(prefers-reduced-motion:no-preference){ .app:not(.no-motion) .btn:hover:not(:disabled) { transform:translateY(-1px); } }
+.puzzle-actions-left { display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
+.puzzle-actions-left > button { min-width:118px; justify-content:center; }
+.global-chat-panel { min-height:0; padding-bottom:28px; z-index:120; }
+.chat-dock-heading { cursor:grab; touch-action:none; user-select:none; }
+.chat-dock-heading:active { cursor:grabbing; }
+.chat-dock-heading:focus-visible { outline:2px solid var(--accent); outline-offset:4px; border-radius:6px; }
+.chat-dock-messages { flex:1; min-height:0; }
+.chat-resize-handle { position:absolute; right:3px; bottom:3px; width:24px; height:24px; display:grid; place-items:center; color:var(--muted); cursor:nwse-resize; touch-action:none; }
+.chat-resize-handle:focus-visible { outline:2px solid var(--accent); border-radius:5px; }
+.multiplayer-modes { grid-template-columns:repeat(3,minmax(0,1fr)); max-width:760px; }
+.multiplayer-modes > button { display:flex; flex-direction:column; align-items:center; gap:12px; padding:14px; border-radius:16px; }
+.multiplayer-picture { display:block; width:min(100%,160px); aspect-ratio:1; flex:none; background-size:300% 100%; background-repeat:no-repeat; border-radius:12px; }
+.online-lobby .multiplayer-modes { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.saved-game-card { position:relative; }
+.saved-game-card .button-row { padding-right:44px; }
+.saved-game-card .library-delete { position:absolute; right:16px; bottom:16px; background:#b52c43; color:#fff; border:1px solid #e8687c; }
+.saved-game-card .library-delete:hover { background:#ce3550; }
+@media(max-width:600px){ .multiplayer-modes > button { padding:8px; gap:8px; font-size:.78rem; } }
+@font-face { font-family:"Charlesworth"; src:local("Charlesworth"); font-style:normal; font-weight:400; font-display:swap; }
+.puzzle-layout { --puzzle-rail-space:100px; }
+.puzzle-board-area { display:grid; grid-template-columns:88px minmax(0,1fr); gap:12px; align-items:center; }
+.puzzle-actions-left { align-items:stretch; }
+.puzzle-actions-left > button { min-width:0; width:100%; padding-inline:10px; }
+.puzzle-layout > .board-column { width:100%; max-width:none; }
+@media(min-width:1001px){
+  .puzzle-layout.chess-layout { grid-template-columns:minmax(0,calc(var(--board-max) * 1.16 + var(--puzzle-rail-space))) minmax(280px,310px); max-width:calc(var(--board-max) * 1.16 + var(--puzzle-rail-space) + 337px); }
+  .manual-boards .puzzle-layout.chess-layout { grid-template-columns:minmax(0,calc(var(--board-max) + var(--puzzle-rail-space))) minmax(260px,310px); max-width:calc(var(--board-max) + var(--puzzle-rail-space) + 337px); }
+}
+@media(max-width:600px){
+  .puzzle-layout { --puzzle-rail-space:52px; }
+  .puzzle-board-area { grid-template-columns:44px minmax(0,1fr); gap:8px; }
+  .puzzle-actions-left .puzzle-action-label { display:none; }
+  .puzzle-actions-left > button { min-height:44px; padding:10px; }
+}
+.sidebar nav button.active { color:var(--text); }
+.chat-dock-messages { align-content:start; }

@@ -260,6 +260,37 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
         }
       >
         <div className="board-column">
+          <div className="puzzle-board-area">
+          <div className="puzzle-actions-left">
+            <Button
+              className="hint-button" aria-label="Hint" title="Hint"
+              disabled={done || c.turn() !== learner}
+              onClick={() => {
+                grade(false);
+                const m = new Chess(fen).move(puzzle.moves[cursor]);
+                setHint(m.from);
+                setMessage(`Try ${m.san}.`);
+              }}
+            >
+              <Lightbulb size={17} />
+              <span className="puzzle-action-label">Hint</span>
+            </Button>
+            <Button
+              aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
+              title={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
+              onClick={() => {
+                if (daily) {
+                  load(puzzle);
+                } else {
+                  if (!done) grade(false);
+                  load(choose(puzzle.id));
+                }
+              }}
+            >
+              {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
+              <span className="puzzle-action-label">{daily ? "Replay" : done ? "Next puzzle" : "Skip"}</span>
+            </Button>
+          </div>
           <div
             ref={puzzleBoardRef}
             className={`puzzle-board ${wrong ? "wrong" : ""} ${done ? "solved" : ""}`}
@@ -279,6 +310,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               hint={hint}
             />
           </div>
+          </div>
           <PremoveQueue
             moves={premove.queue}
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
@@ -287,34 +319,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           <div className="puzzle-feedback" role="status">
             {message}
           </div>
-          <div className="button-row equal-buttons">
-            <Button
-              className="hint-button"
-              disabled={done || c.turn() !== learner}
-              onClick={() => {
-                grade(false);
-                const m = new Chess(fen).move(puzzle.moves[cursor]);
-                setHint(m.from);
-                setMessage(`Try ${m.san}.`);
-              }}
-            >
-              <Lightbulb size={17} />
-              Hint
-            </Button>
-            <Button
-              onClick={() => {
-                if (daily) {
-                  load(puzzle);
-                } else {
-                  if (!done) grade(false);
-                  load(choose(puzzle.id));
-                }
-              }}
-            >
-              {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
-              {daily ? "Replay" : done ? "Next puzzle" : "Skip"}
-            </Button>
-          </div>
+
         </div>
         <div className="side-panels">
           <Card>

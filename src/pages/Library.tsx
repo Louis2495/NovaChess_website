@@ -210,6 +210,7 @@ export default function LibraryPage() {
                   </Button>
                 )}
                 <IconButton
+                  className="library-delete"
                   label={`Delete ${g.title}`}
                   onClick={() => {
                     setLibrary((l) => ({
