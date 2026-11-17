@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 const square = (page: any, name: string) => page.getByRole("group", { name: "Chessboard", exact: true }).first().getByRole("button", { name: new RegExp("^" + name + ",") });
-test("nearby illegal squares and slightly off-board drops snap to the intended legal destination", async ({ page }) => {
+test("drops require a legal square containing at least half of the held piece", async ({ page }) => {
   await page.goto("/#analysis");
   async function drop(from: string, to: string, offset: number) {
     const a = (await square(page, from).boundingBox())!, b = (await square(page, to).boundingBox())!;
@@ -8,10 +8,13 @@ test("nearby illegal squares and slightly off-board drops snap to the intended l
     await page.mouse.move(b.x + b.width*offset, b.y+b.height/2, {steps:8}); await page.mouse.up();
   }
   await drop("e2", "e4", 1.3);
+  await expect(square(page, "e2")).toHaveAttribute("aria-label", "e2, white pawn");
+  await drop("e2", "e4", .95);
   await expect(square(page, "e4")).toHaveAttribute("aria-label", "e4, white pawn");
   await page.getByRole("button", {name:"Reset",exact:true}).click();
   await drop("a2", "a4", -.3);
-  await expect(square(page, "a4")).toHaveAttribute("aria-label", "a4, white pawn");
+  await expect(square(page, "a2")).toHaveAttribute("aria-label", "a2, white pawn");
+
 });
 test("account legal-move preference persists and removes move dots everywhere", async ({ page }) => {
   await page.goto("/#profile");

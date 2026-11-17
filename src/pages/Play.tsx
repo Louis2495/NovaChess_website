@@ -603,7 +603,6 @@ export default function Play() {
                 onClick={start}
               >
                 Start game
-                <ArrowRight size={32} />
               </Button>
               {game?.result === "*" && (
                 <button
@@ -1049,7 +1048,7 @@ export default function Play() {
                 </Button>
                 <Button
                   className="takeback-button"
-                  disabled={!game.moves.length || game.rated}
+                  disabled={!game.moves.length || (game.moves.length === 1 && game.human === "b")}
                   onClick={() => {
                     const count =
                       valid.turn === game.human && game.moves.length > 1
@@ -1060,6 +1059,7 @@ export default function Play() {
                       activeGame: l.activeGame
                         ? {
                             ...l.activeGame,
+                            rated: false,
                             moves: l.activeGame.moves.slice(0, -count),
                             notation: l.activeGame.notation.slice(0, -count),
                             positions: l.activeGame.positions.slice(0, -count),

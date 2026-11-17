@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { base } from "./store";
 export type EngineLine = {
@@ -144,6 +144,21 @@ export function useEngine(fen: string, enabled: boolean, multiPV = 1) {
     return () => c.abort();
   }, [fen, enabled, multiPV]);
   return { lines, status, error };
+}
+// Keep the last settled score while a new position's shallow search warms up.
+export function useSettledEvaluation(fen: string, line?: EngineLine) {
+  const latest = useRef(line);
+  latest.current = line;
+  const [settled, setSettled] = useState<EngineLine | undefined>();
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const candidate = latest.current;
+      if (candidate && (candidate.depth >= 12 || candidate.mate !== null))
+        setSettled(candidate);
+    }, 450);
+    return () => clearInterval(timer);
+  }, [fen]);
+  return settled;
 }
 export function sanLine(fen: string, moves: string[]) {
   try {

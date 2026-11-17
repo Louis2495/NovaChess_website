@@ -235,18 +235,16 @@ export function Board({
     return files[col] + ranks[row];
   }
   function dropSquare(from: string, x: number, y: number) {
-    const direct = squareAt(x, y);
-    if (direct === from || moves!.some(m => m.startsWith(from + direct))) return direct;
     const box = boardRef.current!.getBoundingClientRect(), size = box.width / 8;
-    const candidates = [...new Set(moves!.filter(m => m.startsWith(from)).map(m => m.slice(2, 4)))];
-    const nearby = candidates.map(to => {
-      const cx = box.left + (files.indexOf(to[0]) + .5) * size;
-      const cy = box.top + (ranks.indexOf(to[1]) + .5) * size;
-      const edgeDistance = Math.hypot(Math.max(0, Math.abs(x-cx)-size/2), Math.max(0, Math.abs(y-cy)-size/2));
-      return { to, edgeDistance, distance: Math.hypot(x-cx, y-cy) };
-    }).filter(t => t.edgeDistance <= size * .49).sort((a,b) => a.distance-b.distance);
-    return nearby[0]?.to ?? direct;
+    if (x < box.left || x > box.right || y < box.top || y > box.bottom) return null;
+    const direct = squareAt(x, y);
+    if (!direct || (direct !== from && !moves!.some(m => m.startsWith(from + direct)))) return null;
+    const cx = box.left + (files.indexOf(direct[0]) + .5) * size;
+    const cy = box.top + (ranks.indexOf(direct[1]) + .5) * size;
+    const overlap = Math.max(0,size-Math.abs(x-cx)) * Math.max(0,size-Math.abs(y-cy));
+    return overlap >= size*size*.5 - .01 ? direct : null;
   }
+
   function choose(from: string, to: string) {
     setSelected(from);
     const options = moves!.filter((m) => m.startsWith(from + to));
@@ -255,7 +253,7 @@ export function Board({
       ...new Set(options.map((m) => m.split(",")[0].slice(4)).filter(Boolean)),
     ].sort((a, b) => "qrbn".indexOf(a) - "qrbn".indexOf(b));
     if (choices.length && !appearance.autoQueen) {
-      const size = Math.min(72, boardRef.current!.clientWidth / 6),
+      const size = boardRef.current!.getBoundingClientRect().width / 8,
         x = Math.max(
           size / 2,
           Math.min(innerWidth - size / 2, pointer.current.x),
@@ -351,6 +349,7 @@ export function Board({
       el.parentElement?.style.setProperty("--board-top-offset", `${el.offsetTop}px`);
       el.closest<HTMLElement>(".board-column")
         ?.style.setProperty("--actual-board-width", `${rect.width}px`);
+      el.closest<HTMLElement>(".board-column")?.style.setProperty("--board-surface-inset", `${rect.top - el.parentElement!.getBoundingClientRect().top}px`);
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
       const top = rect.top + window.scrollY;
@@ -691,7 +690,7 @@ export function Board({
             const r = resizeGesture.current;
             r.lastX = e.clientX;
             r.lastY = e.clientY;
-            const delta = ((e.clientX - r.x) - (e.clientY - r.y)) / 2;
+            const delta = ((e.clientX - r.x) - (e.clientY - r.y));
             const desired = r.size + delta;
             r.target = Math.max(160, Math.min(r.max, desired));
             previewBoard(r.target);

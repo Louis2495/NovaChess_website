@@ -577,7 +577,7 @@ function App() {
             >
               <Menu size={21} />
             </IconButton>
-            <span className="mobile-wordmark">NovaChess</span>
+            <span className="mobile-wordmark"><img src={`${base}app-icon.webp`} alt="" />NovaChess</span>
             <div className="topbar-right"></div>
           </header>
           <main id="workspace" tabIndex={-1} className="workspace">

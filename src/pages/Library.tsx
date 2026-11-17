@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import { uid, download, dateLabel, base, loadData, initialFen } from "../lib/store";
-import { search, useEngine, scoreLabel } from "../lib/engine";
+import { search, useEngine, useSettledEvaluation, scoreLabel } from "../lib/engine";
 import { fairy, legal, squares } from "../lib/variants";
 import type {
   SavedGame,
@@ -549,6 +549,7 @@ function GameViewer({
           ),
         }));
       }
+      if (!ctrl.signal.aborted) setCursor(n => n || Math.min(1, game.moves.length));
       setStatus(ctrl.signal.aborted ? "Review stopped." : "Review complete.");
     } catch (e) {
       if ((e as Error).name === "AbortError") setStatus("Review stopped.");
@@ -576,7 +577,8 @@ function GameViewer({
   const selected = rows.find((r) => r.ply === Math.max(0, cursor - 1));
   const sideRows = (side: string) => rows.filter(r => game.positions[r.ply]?.split(" ")[1] === side);
   const rating = (side: string) => performanceRating(sideRows(side));
-  const evaluation = liveEngine.lines[0]?.score ?? (cursor ? rows.find(r=>r.ply===cursor-1)?.afterScore : rows[0]?.score) ?? 0;
+  const settledEvaluation = useSettledEvaluation(game.positions[cursor] || game.initial, liveEngine.lines[0]);
+  const evaluation = settledEvaluation?.score ?? (cursor ? rows.find(r=>r.ply===cursor-1)?.afterScore : rows[0]?.score) ?? 0;
   const selectedMove = cursor ? game.moves[cursor-1]?.split(",")[0].slice(2,4) : "";
   return (
     <>
@@ -611,7 +613,7 @@ function GameViewer({
               <span>
                 Stockfish 19 Lite · Depth {liveEngine.lines[0]?.depth ?? selected?.depth ?? 0}
               </span>
-              <strong>{liveEngine.lines[0] ? scoreLabel(liveEngine.lines[0]) : `${evaluation>=0?"+":""}${(evaluation/100).toFixed(2)}`}</strong>
+              <strong>{settledEvaluation ? scoreLabel(settledEvaluation) : `${evaluation>=0?"+":""}${(evaluation/100).toFixed(2)}`}</strong>
             </div>
           )}
           {liveEngine.error && (

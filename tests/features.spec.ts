@@ -209,6 +209,8 @@ test("promotion is adjacent and puts the queen under the release point", async (
     Math.abs(q.y + q.height / 2 - target.y - target.height / 2),
   ).toBeLessThan(2);
   expect(Math.abs(q.x + q.width - r.x)).toBeLessThan(1);
+  expect(q.width).toBeCloseTo(target.width, 0);
+  expect(q.height).toBeCloseTo(target.height, 0);
   await queen.click();
   await expect(page.locator(".notation-table")).toContainText("a8=Q");
 });

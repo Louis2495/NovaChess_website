@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useApp } from "../lib/context";
 import { initialFen, uid, download, copyText } from "../lib/store";
-import { useEngine, scoreLabel } from "../lib/engine";
+import { useEngine, useSettledEvaluation, scoreLabel } from "../lib/engine";
 import { exportGIF, exportPNG } from "../lib/export";
 import type { SavedGame } from "../lib/types";
 import { useControl } from "../lib/controls";
@@ -200,7 +200,8 @@ export default function Analysis() {
     notify("Study saved to your library.");
   }
   const insights = positionInsights(fen, engine.lines[0]);
-  const white = engine.lines[0]?.score || 0;
+  const settledEvaluation = useSettledEvaluation(fen, engine.lines[0]);
+  const white = settledEvaluation?.score || 0;
   return (
     <>
       <PageTitle
@@ -223,9 +224,9 @@ export default function Analysis() {
         <div className="analysis-position-meta">
           <span
             className="evaluation-readout"
-            aria-label={`Evaluation ${scoreLabel(engine.lines[0])}`}
+            aria-label={`Evaluation ${scoreLabel(settledEvaluation)}`}
           >
-            {scoreLabel(engine.lines[0])}
+            {scoreLabel(settledEvaluation)}
           </span>
           <span
             className={`analysis-turn-dot ${c.turn() === "w" ? "white-turn" : "black-turn"}`}
@@ -241,7 +242,7 @@ export default function Analysis() {
             <div
               className="eval-meter"
               role="img"
-              aria-label={`Evaluation ${scoreLabel(engine.lines[0])}`}
+              aria-label={`Evaluation ${scoreLabel(settledEvaluation)}`}
             >
               <div style={{ height: `${50 + Math.tanh(white / 450) * 46}%` }} />
             </div>
