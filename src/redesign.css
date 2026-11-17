@@ -4603,3 +4603,33 @@ html { scrollbar-gutter:stable; }
 .opening-request .field { margin:10px 0 0; }
 .opening-request { min-width:0; }
 .online-game-title > .speedrun-picture { width:72px; height:72px; border-radius:16px; }
+
+/* Generous, consistent illustration cards and clear primary actions. */
+.variant-gallery { grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); }
+.variant-gallery .variant-picture,
+.variant-gallery .speedrun-picture,
+.variant-gallery .multiplayer-picture {
+  --variant-size:160px !important;
+  width:min(100%,160px); height:auto; aspect-ratio:1; flex:none;
+}
+.new-game-primary {
+  display:flex; justify-content:center; align-items:center; text-align:center;
+  font-family:"Nunito Sans","Arial Rounded MT Bold",sans-serif;
+  font-size:1.7rem; font-weight:900; line-height:1.2;
+}
+.quick-online-play .new-game-primary { min-height:78px; }
+@media(min-width:1001px){
+  .analysis-layout.chess-layout { gap:24px; max-width:none; grid-template-columns:minmax(0,calc(var(--analysis-board-size) + 29px)) minmax(260px,310px); }
+}
+@media(max-width:500px){
+  .variant-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(min-width:1001px){
+  .workspace:has(.analysis-layout) { padding:16px 24px 20px; max-width:none; }
+  .workspace:has(.analysis-layout) .page-title { margin-bottom:8px; }
+  .workspace:has(.analysis-layout) .board-topline { margin-block:8px; min-height:36px; }
+  .analysis-layout .engine-lines { grid-template-columns:1fr; }
+}
+@media(min-width:1001px){
+  .workspace-shell:has(.analysis-layout) > .topbar { display:none; }
+}

@@ -441,7 +441,7 @@ function App() {
     "--board-max": `${manualBoardSize || appearance.boardSize}px`,
     "--analysis-board-size": manualBoardSize
       ? `${manualBoardSize}px`
-      : `min(${appearance.boardSize}px, max(220px, calc(100dvh - 350px)))`,
+      : "max(220px, calc(100dvh - 190px))",
     "--play-board-size": manualBoardSize
       ? `${manualBoardSize}px`
       : "calc(100dvh - 150px)",

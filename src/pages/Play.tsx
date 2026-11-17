@@ -22,7 +22,7 @@ import {
   fairy,
   makeBoard,
   legal,
-  variantList,
+  variantList, variantRank,
   chess960,
   squares,
   promotedAt,
@@ -640,17 +640,17 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
             role="group"
             aria-label="Choose variant"
           >
-            {variantList.filter(v=>v.id!=="chess").map((v) => (
+            {[...variantList.filter(v=>v.id!=="chess"),{id:"speedrun",name:"Speedrun",description:""}].sort((a,b)=>variantRank(a.id)-variantRank(b.id)).map((v) => (
               <button
                 key={v.id}
-                aria-pressed={!speedrunMode && variant === v.id}
-                onClick={() => {setVariant(v.id);setSpeedrunMode(false);}}
+                aria-pressed={v.id==="speedrun"?speedrunMode:!speedrunMode && variant === v.id}
+                onClick={() => {setVariant(v.id==="speedrun"?"chess":v.id);setSpeedrunMode(v.id==="speedrun");}}
               >
-                <VariantIcon id={v.id} size={118} />
+                {v.id==="speedrun"?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={v.id} size={160} />}
                 <span>{v.name}</span>
               </button>
             ))}
-            <button aria-pressed={speedrunMode} onClick={()=>{setVariant("chess");setSpeedrunMode(true);}}><img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/><span>Speedrun</span></button>
+
           </div>}
           {speedrunMode && <Card className="speedrun-setup"><Field label="Computer Elo"><input type="number" min={100} max={3000} step={50} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(Math.max(100,Math.min(3000,Math.round((speedrunRating||100)/50)*50)))}/></Field></Card>}
           <Card className="game-settings-card">
@@ -666,20 +666,20 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
               <div className="game-options">
                 {variantsOnly && <Field label="Variant">
                   <ChoiceSelect
-                    value={variant}
-                    onChange={(e) => {setVariant(e.target.value);setSpeedrunMode(false);}}
+                    value={speedrunMode?"speedrun":variant}
+                    onChange={(e) => {setVariant(e.target.value==="speedrun"?"chess":e.target.value);setSpeedrunMode(e.target.value==="speedrun");}}
                   >
-                    {variantList.filter(v=>v.id!=="chess").map((v) => (
+                    {[...variantList.filter(v=>v.id!=="chess"),{id:"speedrun",name:"Speedrun",description:""}].sort((a,b)=>variantRank(a.id)-variantRank(b.id)).map((v) => (
                       <option key={v.id} value={v.id}>
                         {v.name}
                       </option>
                     ))}
                   </ChoiceSelect>
                 </Field>}
-                <div className="variant-summary">
+                {variant !== "chess" && <div className="variant-summary">
                   <VariantIcon id={variant} />
                   <span>{variantList.find((v) => v.id === variant)?.name}</span>
-                </div>
+                </div>}
                 {variantList.find((v) => v.id === variant)?.description && (
                   <p className="caption">
                     {variantList.find((v) => v.id === variant)?.description}
@@ -727,7 +727,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
                       ))}
                     </div>
                     {choice === "Custom" && (
-                      <Field label="Strength target (approximate)">
+                      <Field label="Rating">
                         <input
                           type="number"
                           min={1}
@@ -750,7 +750,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
                       onChange={(v) => setRated(v && variant === "chess")}
                     />
                     {variant === "chess" && (
-                      <fieldset className="opening-request"><legend>Opening</legend>
+                      <fieldset className="opening-request">
                         <Field label="Search openings">
                           <input
                             type="search"

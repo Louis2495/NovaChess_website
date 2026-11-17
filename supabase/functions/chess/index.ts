@@ -118,10 +118,12 @@ Deno.serve(async (req) => {
       if(body.variant && !onlineVariantIds.includes(body.variant))throw Error("Unknown variant.");
       if (body.bot && variant !== "chess")
         throw Error("Online team bots currently use standard chess.");
-      if(body.mode==="standard" && variant==="chess" && body.timeControlSeconds!==undefined && ![60,180,600].includes(body.timeControlSeconds))throw Error("Choose 1, 3 or 10 minutes.");
-      const timed=body.mode==="standard" && variant==="chess" && [60,180,600].includes(body.timeControlSeconds);
+      if(body.mode==="standard" && variant==="chess" && body.timeControlSeconds!==undefined && ![180,300,600].includes(body.timeControlSeconds))throw Error("Choose 3, 5 or 10 minutes.");
+      const increment=body.incrementSeconds??0;
+      if(![0,2].includes(increment) || (increment===2 && body.timeControlSeconds!==180))throw Error("Choose a supported time control.");
+      const timed=body.mode==="standard" && variant==="chess" && [180,300,600].includes(body.timeControlSeconds);
       const initial=await fresh(variant,Math.max(1,Math.min(4,+body.dropCount||2)));
-      if(timed)initial.clock={remaining:{w:body.timeControlSeconds*1000,b:body.timeControlSeconds*1000},startedAt:null};
+      if(timed)initial.clock={incrementMs:increment*1000,remaining:{w:body.timeControlSeconds*1000,b:body.timeControlSeconds*1000},startedAt:null};
       const { data, error } = await db
         .from("rooms")
         .insert({
@@ -138,6 +140,7 @@ Deno.serve(async (req) => {
             bot: body.mode === "team" && body.bot === true,
             dropCount: Math.max(1, Math.min(4, +body.dropCount || 2)),
             timeControlSeconds:timed?body.timeControlSeconds:0,
+            incrementSeconds:timed?increment:0,
           },
           status: body.mode === "team" && body.bot ? "playing" : "waiting",
           deadline:
@@ -295,7 +298,7 @@ Deno.serve(async (req) => {
         return json({ voted: true });
       }
       state = next;
-      if(clock)state={...state,clock:{remaining:{...clock.remaining,[turn]:Math.max(0,clock.remaining[turn]-Math.max(0,receivedAt-clock.startedAt))},startedAt:state.result==="*"?Date.now():null}};
+      if(clock)state={...state,clock:{incrementMs:clock.incrementMs||0,remaining:{...clock.remaining,[turn]:Math.max(0,clock.remaining[turn]-Math.max(0,receivedAt-clock.startedAt))+(clock.incrementMs||0)},startedAt:state.result==="*"?Date.now():null}};
       marks = [];
     } else if (action === "draw") {
       if (!r.settings.bot || r.mode !== "team")

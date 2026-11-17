@@ -48,7 +48,7 @@ type Room = {
   settings: { bot: boolean };
 };
 type Profile = { id: string; username: string;screen_name?:string };
-export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number}) {
+export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number}) {
   const { session } = useOnlineSession(),
     { tab, detail, navigate, notify, appearance } = useApp();
   const [confirmed, setConfirmed] = useState<Room | null>(null),
@@ -255,7 +255,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div><Button className="secondary" onClick={()=>navigate(room.mode==='standard' && room.variant==='chess'?'play':'variants')}>Back</Button></div>}
       {!online || !uid ? (
         <>
-          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Play online"}</Button></Card>
+          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button></Card>
           <OnlineAccount />
         </>
       ) : (
@@ -501,17 +501,17 @@ export default function Community({presetMode = "standard", presetVariant = "che
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 setBusy(true);setError("");
                 try {
-                  const listing=online!.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at,time_control").eq("mode",mode).eq("variant",variant).order("status",{ascending:true}).order("updated_at",{ascending:true}).limit(40);
+                  const listing=online!.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at,time_control,increment_seconds").eq("mode",mode).eq("variant",variant).order("status",{ascending:true}).order("updated_at",{ascending:true}).limit(40);
                   if(mode==="standard")listing.eq("status","waiting").lt("member_count",variant==="bughouse"?4:2);
-                  if(mode==="standard" && variant==="chess")listing.eq("time_control",timeControlSeconds);
+                  if(mode==="standard" && variant==="chess")listing.eq("time_control",timeControlSeconds).eq("increment_seconds",incrementSeconds);
                   const {data,error}=await listing;
                   if(error)throw error;
-                  const available=(data||[]).filter(r=>mode!=="standard" || variant!=="chess" || r.time_control===timeControlSeconds).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
+                  const available=(data||[]).filter(r=>mode!=="standard" || variant!=="chess" || (r.time_control===timeControlSeconds && r.increment_seconds===incrementSeconds)).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
                   if(available && !(mode === "team" && bot)) await act("join",{room:available.id});
-                  else await act("create",{mode,name,timeControlSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
+                  else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
-              }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Play online"}</Button>
-              <p className="caption">{mode === "standard" ? "Join an opponent, or wait for the next player." : mode === "throne" ? "Winner stays. Queue to challenge." : mode === "vote" ? "One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>
+              }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>
+              {mode !== "standard" && <p className="caption">{ mode === "throne" ? "Winner stays. Queue to challenge." : mode === "vote" ? "One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>}
             </Card>
           )}
 

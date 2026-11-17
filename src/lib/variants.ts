@@ -2,7 +2,7 @@ import load, { type FairyStockfish, type Board } from "ffish-es6";
 import wasm from "ffish-es6/ffish.wasm?url";
 let promise: Promise<FairyStockfish> | null = null;
 import { customVariants } from "./variantCatalog";
-export {customVariants, variantList, chess960} from "./variantCatalog";
+export {customVariants, variantList, variantRank, chess960} from "./variantCatalog";
 export function fairy() {
   if (!promise)
     promise = load({

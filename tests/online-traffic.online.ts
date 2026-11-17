@@ -18,7 +18,7 @@ async function connected(page:Page,signedIn=true){
   else if(url.pathname.includes('/rpc/'))data=0;
   else if(url.pathname.endsWith('/functions/v1/chess')){const body=route.request().postDataJSON();actions.push(body);if(body.action==='move' && room.variant!=='chess'){room.state=applyOnline(await native(),room.variant,room.state,body.move);room.revision++;}else if(body.action==='move'){const move=c.move(body.move);room.state={...room.state,fen:c.fen(),moves:[...room.state.moves,body.move],notation:[...room.state.notation,move.san],positions:[...room.state.positions,c.fen()]};room.revision++;}data=room;}
   else if(url.pathname.endsWith('/profiles')){const ids=url.searchParams.get('id')||'';const people=[{id:uid,username:'Player',avatar:'',bio:'',country:'US'},{id:peer,username:'Opponent',avatar:'',country:'CA'}].filter(p=>!ids||ids.includes(p.id));data=route.request().headers().accept?.includes('vnd.pgrst.object')?people[0]:people;}
-  else if(url.pathname.endsWith('/room_lobby'))data=[{id:roomId,name:room.name,mode:room.mode,variant:room.variant,status:room.status,member_count:room.members.length,time_control:room.settings.timeControlSeconds||180}];
+  else if(url.pathname.endsWith('/room_lobby'))data=[{id:roomId,name:room.name,mode:room.mode,variant:room.variant,status:room.status,member_count:room.members.length,time_control:room.settings.timeControlSeconds||180,increment_seconds:room.settings.incrementSeconds||0}];
   else if(url.pathname.endsWith('/rooms'))data=url.searchParams.has('id')?room:[room];
   else if(url.pathname.endsWith('/messages'))data=[{id:1,user_id:peer,body:'Initial message',created_at:new Date().toISOString()}];
   await route.fulfill({json:data});
@@ -34,7 +34,7 @@ async function connected(page:Page,signedIn=true){
  return {requests,joins,sockets,room,emit,c,actions,broadcast};
 }
 test('lobby stays light and live games subscribe only to their room without reloading room lists',async({page})=>{
- const env=await connected(page);await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();expect(env.sockets).toHaveLength(0);await expect(page.getByText('Room name',{exact:true})).toHaveCount(0);await page.getByRole('button',{name:'Play online',exact:true}).click();const lobby=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(lobby.searchParams.get('select')).not.toContain('state');
+ const env=await connected(page);await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();expect(env.sockets).toHaveLength(0);await expect(page.getByText('Room name',{exact:true})).toHaveCount(0);await page.getByRole('button',{name:'Start',exact:true}).click();const lobby=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(lobby.searchParams.get('select')).not.toContain('state');
  await expect(page.locator('.chess-layout .board').first()).toBeVisible();await expect.poll(()=>env.joins.length).toBe(1);expect(env.joins[0].payload.config.postgres_changes[0].filter).toBe('id=eq.'+roomId);await page.waitForTimeout(100);const reads=env.requests.filter(u=>u.pathname.endsWith('/rooms')).length;await page.getByRole('button',{name:'e2, white pawn',exact:true}).click();await page.getByRole('button',{name:'e4, empty',exact:true}).click();await expect(page.getByRole('button',{name:'e4, white pawn',exact:true})).toBeVisible();expect(env.requests.filter(u=>u.pathname.endsWith('/rooms')).length).toBe(reads);env.c.move('e5');env.emit('rooms',{...env.room,revision:2,state:{...env.room.state,fen:env.c.fen(),moves:['e2e4','e7e5'],notation:['e4','e5'],positions:[...env.room.state.positions,env.c.fen()]}});await expect(page.getByRole('button',{name:'e5, black pawn',exact:true})).toBeVisible();env.emit('rooms',{...env.room,revision:1});await expect(page.getByRole('button',{name:'e5, black pawn',exact:true})).toBeVisible();expect(env.requests.filter(u=>u.pathname.endsWith('/rooms')).length).toBe(reads);
 });
 test('chat applies incoming messages without reloading history or all user profiles',async({page})=>{
@@ -61,7 +61,7 @@ test('Vote Chess keeps its ballot subscriptions stable and ignores old ballot de
 
 test('Play online directly joins a waiting standard opponent without a room form',async({page})=>{
  const env=await connected(page);env.room.members=[{id:peer,team:'w'}];env.room.status='waiting';
- await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();await page.getByRole('button',{name:'Play online',exact:true}).click();
+ await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();
  await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'join',room:roomId});
  const query=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(query.searchParams.get('mode')).toBe('eq.standard');expect(query.searchParams.get('variant')).toBe('eq.chess');
  await expect(page.getByLabel('Room name',{exact:true})).toHaveCount(0);
@@ -69,7 +69,7 @@ test('Play online directly joins a waiting standard opponent without a room form
 
 test('Play online starts a waiting game when no opponent is available',async({page})=>{
  const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>r.fulfill({json:[]}));
- await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();await page.getByRole('button',{name:'Play online',exact:true}).click();
+ await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();
  await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',name:'Standard'});
 });
 
@@ -160,8 +160,8 @@ test('Throne has one illustrated title, scoped chat and a persistent resignation
  await page.goto('/#variants/online/'+roomId);await expect(page.getByRole('heading',{name:'Throne',exact:true})).toHaveCount(1);await expect(page.locator('.online-game-heading .multiplayer-picture')).toBeVisible();await expect(page.getByRole('button',{name:'Invite friends',exact:true})).toHaveCount(0);await page.getByLabel('Game chat message',{exact:true}).fill('Good game!');await page.getByRole('button',{name:'Send chat message',exact:true}).click();await expect(page.getByRole('log',{name:'Game chat',exact:true})).toContainText('Good game!');expect(sent.p_room).toBe(roomId);
  await expect.poll(()=>env.joins.some(j=>j.topic==='realtime:room-'+roomId)).toBe(true);env.emit('rooms',{...env.room,revision:1,members:[{id:uid,team:'w'},{id:peer,team:null}],status:'waiting',state:{...env.room.state,gameKey:'round2',lastWinner:uid,lastGame:{id:'round1',result:'1-0',white:uid,black:peer,reason:'resignation',resignedBy:peer}}});await expect(page.getByText('You won!',{exact:true})).toBeVisible();await expect(page.getByText('Opponent resigned.',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Continue',exact:true}).click();await expect(page.locator('.throne-round-result')).toHaveCount(0);
 });
-test('standard online games expose 1, 3 and 10 minute controls',async({page})=>{
- const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>r.fulfill({json:[]}));await page.goto('/#play');const controls=page.getByRole('group',{name:'Time control',exact:true});await expect(controls.getByRole('button')).toHaveCount(3);await controls.getByRole('button',{name:'10 min',exact:true}).click();await page.getByRole('button',{name:'Play online',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(600);
+test('standard online games expose 3, 3+2, 5 and 10 minute controls',async({page})=>{
+ const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>r.fulfill({json:[]}));await page.goto('/#play');const controls=page.getByRole('group',{name:'Time control',exact:true});await expect(controls.getByRole('button')).toHaveCount(4);await controls.getByRole('button',{name:'10 min',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(600);
 });
 
 test('consecutive online premoves advance on verified updates while an older HTTP response is pending',async({page})=>{
@@ -179,4 +179,9 @@ test('an expired live clock waits for server confirmation before showing the res
  const env=await connected(page);env.room.state.clock={remaining:{w:0,b:60000},startedAt:Date.now()-1000};let release:(()=>void)|undefined;let claim:any;
  await page.route('**/functions/v1/chess',async r=>{claim=r.request().postDataJSON();await new Promise<void>(resolve=>release=resolve);await r.fulfill({json:{...env.room,revision:1,status:'finished',state:{...env.room.state,result:'0-1',clock:{...env.room.state.clock,startedAt:null}}}});});
  await page.goto('/#play/online/'+roomId);await expect(page.getByRole('timer',{name:'White clock',exact:true})).toHaveText('0:00');await expect.poll(()=>claim?.action).toBe('claim_timeout');await expect(page.getByText('Black won',{exact:true})).toHaveCount(0);release!();await expect(page.getByText('Black won',{exact:true})).toBeVisible();
+});
+
+test('3+2 matchmaking sends both the base time and increment',async({page})=>{
+ const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>{env.requests.push(new URL(r.request().url()));return r.fulfill({json:[]});});await page.goto('/#play');await page.getByRole('button',{name:'3 min + 2 sec',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(180);expect(env.actions[0].incrementSeconds).toBe(2);
+ const lobby=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(lobby.searchParams.get('increment_seconds')).toBe('eq.2');
 });

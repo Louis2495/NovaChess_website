@@ -141,7 +141,7 @@ All computer variants are also listed under Variants → Online, after Throne, V
 
 ## Live play, clocks and Throne
 
-Play → Online offers 1, 3 and 10 minutes (3 by default); matchmaking pairs matching controls. Clocks start when both players join. The server validates time and moves; live clients claim expiry immediately, and a minute-level database job finishes expired games even if both browsers close. These controls apply to standard online games; Vote Chess keeps its one-day voting period.
+Play → Online offers 3, 5 and 10 minutes plus 3+2 (3 minutes by default); matchmaking pairs matching controls. Clocks start when both players join. The server validates time and moves; live clients claim expiry immediately, and a minute-level database job finishes expired games even if both browsers close. These controls apply to standard online games; Vote Chess keeps its one-day voting period.
 
 Throne has scoped chat and an illustrated header. Completed results remain visible across automatic reseating; Continue dismisses the result. Finish leaves both the game and queue, and queued spectators leaving do not reset the board. The Games statistic counts completed games for both participants, backed by result records and older available history. Basic chat moderation is available to the owner, and the database honors existing bans and enforces spam limits.
 

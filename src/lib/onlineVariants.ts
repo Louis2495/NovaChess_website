@@ -3,7 +3,7 @@ import {chess960, customVariants, variantList} from './variantCatalog.ts';
 export const onlineVariantIds=[...variantList.map(v=>v.id),'speedrun'];
 export const specialVariants=['dropping','chaos','random'];
 export const nativeVariant=(id:string)=>['blind','blindtext','chess960','speedrun'].includes(id)?'chess':id;
-export type OnlinePosition={fen:string;initial:string;moves:string[];notation:string[];positions:string[];result:string;partner?:OnlinePosition;speedrun?:{elapsed:{w:number;b:number};startedAt:number|null};gameKey?:string;clock?:{remaining:{w:number;b:number};startedAt:number|null}};
+export type OnlinePosition={fen:string;initial:string;moves:string[];notation:string[];positions:string[];result:string;partner?:OnlinePosition;speedrun?:{elapsed:{w:number;b:number};startedAt:number|null};gameKey?:string;clock?:{incrementMs?:number;remaining:{w:number;b:number};startedAt:number|null}};
 export function setupOnlineEngine(ff:FairyStockfish){ff.loadVariantConfig(customVariants);}
 export function freshOnline(ff:FairyStockfish,id:string):OnlinePosition {
  const b=id==='chess960'?new ff.Board('chess',chess960(),true):new ff.Board(nativeVariant(id));

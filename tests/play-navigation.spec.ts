@@ -9,7 +9,7 @@ test('Play offers standard computer or online games and Variants has separate ga
  await page.getByRole('button',{name:'Game options',exact:true}).click();
  await expect(page.getByLabel('Variant',{exact:true})).toHaveCount(0);
  await page.getByRole('button',{name:'Online',exact:true}).click();
- await expect(page.getByRole('button',{name:'Play online',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Start',exact:true})).toBeVisible();
  await expect(page.getByLabel('Room name',{exact:true})).toHaveCount(0);
  await page.goto('/#variants');
  const onlineList=page.getByRole('group',{name:'Online variants',exact:true});await expect(onlineList.getByRole('button')).toHaveCount(21);await expect(onlineList.getByRole('button').nth(0)).toHaveText('Throne');await expect(onlineList.getByRole('button').nth(1)).toHaveText('Vote Chess');await expect(onlineList.getByRole('button').nth(2)).toHaveText('Team Chess');

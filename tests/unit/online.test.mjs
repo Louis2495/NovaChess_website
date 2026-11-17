@@ -161,6 +161,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180004_screen_names.sql','utf8'));
   await pg.exec(`create schema realtime;create table realtime.messages(extension text default 'broadcast',payload jsonb,event text,topic text,private boolean);alter table realtime.messages enable row level security;grant usage on schema realtime to authenticated;grant select,insert on realtime.messages to authenticated;create function realtime.topic() returns text language sql stable as $$select current_setting('realtime.topic',true)$$;create function realtime.send(jsonb,text,text,boolean) returns void language sql as $$insert into realtime.messages(payload,event,topic,private) values($1,$2,$3,$4)$$;`);
   await pg.exec(readFileSync('supabase/migrations/202611180005_fast_rooms_chat_clocks.sql','utf8').replace('alter publication supabase_realtime add table public.room_messages;',''));
+  await pg.exec(readFileSync('supabase/migrations/202611180006_increment_matchmaking.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -488,7 +489,7 @@ test("online deployment schedules voting and bounded chat/vote retention",async(
 });
 
 test('public lobby projection excludes full board histories and private-size queues',async()=>{
- const columns=await pg.query("select column_name from information_schema.columns where table_name='room_lobby' order by ordinal_position");assert.deepEqual(columns.rows.map(r=>r.column_name),['id','name','mode','variant','status','member_count','updated_at','time_control']);
+ const columns=await pg.query("select column_name from information_schema.columns where table_name='room_lobby' order by ordinal_position");assert.deepEqual(columns.rows.map(r=>r.column_name),['id','name','mode','variant','status','member_count','updated_at','time_control','increment_seconds']);
 });
 
 test('every native online variant uses authoritative rules and rejects illegal moves',async()=>{
@@ -581,10 +582,10 @@ test('Throne announces the finished round, counts the first win and queued Finis
  game=(await command(users[0],game,'finish')).data;assert.ok(!game.members.some(m=>m.id===users[0]));assert.ok(!game.queue.includes(users[0]));
 });
 test('online clocks start on joining, deduct only the mover and reject premature flags',async()=>{
- await pg.exec("update profiles set banned=false;update rooms set created_at=now()-interval '2 hours'");let game=await room('standard',{variant:'chess',timeControlSeconds:60});assert.equal(game.state.clock.startedAt,null);assert.equal(game.settings.timeControlSeconds,60);game=(await command(users[1],game,'join')).data;assert.ok(game.state.clock.startedAt);
+ await pg.exec("update profiles set banned=false;update rooms set created_at=now()-interval '2 hours'");let game=await room('standard',{variant:'chess',timeControlSeconds:300});assert.equal(game.state.clock.startedAt,null);assert.equal(game.settings.timeControlSeconds,300);game=(await command(users[1],game,'join')).data;assert.ok(game.state.clock.startedAt);
  assert.equal((await command(users[1],game,'claim_timeout')).status,400);
  await pg.query("update rooms set state=jsonb_set(state,'{clock,startedAt}',to_jsonb($2::bigint)) where id=$1",[game.id,Date.now()-1500]);
- const moved=await command(users[0],game,'move',{move:'e2e4'});assert.equal(moved.status,200,JSON.stringify(moved.data));game=moved.data;assert.ok(game.state.clock.remaining.w<=58500);assert.equal(game.state.clock.remaining.b,60000);
+ const moved=await command(users[0],game,'move',{move:'e2e4'});assert.equal(moved.status,200,JSON.stringify(moved.data));game=moved.data;assert.ok(game.state.clock.remaining.w<=298500);assert.equal(game.state.clock.remaining.b,300000);
  await pg.query("update rooms set state=jsonb_set(jsonb_set(state,'{clock,remaining,b}','0'::jsonb),'{clock,startedAt}',to_jsonb($2::bigint)) where id=$1",[game.id,Date.now()-10]);
  const flagged=await command(users[0],game,'claim_timeout');assert.equal(flagged.status,200,JSON.stringify(flagged.data));assert.equal(flagged.data.state.result,'1-0');assert.equal(flagged.data.status,'finished');assert.equal(flagged.data.state.clock.startedAt,null);
 });
@@ -620,3 +621,17 @@ test('cached signed-claims authentication still respects Supabase account bans',
  await pg.query("update auth.users set banned_until=now()+interval '1 hour' where id=$1",[users[0]]);
  try{const blocked=await call(users[0],{action:'create',mode:'standard'});assert.equal(blocked.status,403);assert.equal(blocked.data.error,'Account unavailable.');}finally{await pg.query('update auth.users set banned_until=null where id=$1',[users[0]]);}
 });
+
+ test('3+2 clocks award exactly one increment to the mover and reject unsupported controls',async()=>{
+ await pg.exec("update profiles set banned=false;update rooms set created_at=now()-interval '2 hours'");
+ let game=await room('standard',{variant:'chess',timeControlSeconds:180,incrementSeconds:2});
+ assert.equal(game.state.clock.incrementMs,2000);assert.equal(game.settings.incrementSeconds,2);
+ game=(await command(users[1],game,'join')).data;
+ await pg.query("update rooms set state=jsonb_set(state,'{clock,startedAt}',to_jsonb($2::bigint)) where id=$1",[game.id,Date.now()-1000]);
+ const moved=await command(users[0],game,'move',{move:'e2e4'});assert.equal(moved.status,200,JSON.stringify(moved.data));
+ assert.ok(moved.data.state.clock.remaining.w>180500 && moved.data.state.clock.remaining.w<=181000);
+ assert.equal(moved.data.state.clock.remaining.b,180000);assert.equal(moved.data.state.clock.incrementMs,2000);
+ for(const opts of [{timeControlSeconds:60},{timeControlSeconds:300,incrementSeconds:2},{timeControlSeconds:180,incrementSeconds:3}]){
+ const rejected=await call(users[0],{action:'create',mode:'standard',variant:'chess',...opts});assert.notEqual(rejected.status,200);
+ }
+ });

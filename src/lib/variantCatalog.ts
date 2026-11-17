@@ -1,4 +1,6 @@
 export const customVariants = `[cvfog:chess]\n[cvpawns:chess]\nstartFen = 4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1\ncastling = false\n[cvpawnrace:chess]\nking = -\nstartFen = 8/pppppppp/8/8/8/8/PPPPPPPP/8 w - - 0 1\ncastling = false\npromotionPieceTypes = -\nmandatoryPawnPromotion = false\nflagPiece = p\nflagRegionWhite = *8\nflagRegionBlack = *1\nextinctionValue = loss\nextinctionPieceTypes = *\nstalemateValue = loss`;
+export const variantOrder = ["throne","vote","team","speedrun","bughouse","crazyhouse","chess960","horde","kingofthehill","atomic","antichess","cvfog","blind","blindtext","duck"];
+export const variantRank = (id:string) => { const rank=variantOrder.indexOf(id); return rank<0?100:rank; };
 export const variantList = [
   { id: "chess", name: "Standard", description: "" },
   {

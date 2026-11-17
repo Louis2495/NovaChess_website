@@ -8,6 +8,6 @@ export function previewRoomMove(ff:FairyStockfish|null,variant:string,state:Onli
   if(variant!=='chess')return ff?applyOnline(ff,variant,state,move,board):null;
   const chess=new Chess(state.fen),side=chess.turn(),now=Date.now();
   const played=chess.move(move);if(!played)return null;
-  return {...state,...(state.clock?{clock:{remaining:{...state.clock.remaining,[side]:Math.max(0,state.clock.remaining[side]-(state.clock.startedAt===null?0:Math.max(0,now-state.clock.startedAt)))},startedAt:now}}:{}),fen:chess.fen(),moves:[...state.moves,move],notation:[...state.notation,played.san],positions:[...state.positions,chess.fen()],result:chess.isCheckmate()?(chess.turn()==='w'?'0-1':'1-0'):chess.isDraw()?'1/2-1/2':'*'};
+  return {...state,...(state.clock?{clock:{incrementMs:state.clock.incrementMs,remaining:{...state.clock.remaining,[side]:Math.max(0,state.clock.remaining[side]-(state.clock.startedAt===null?0:Math.max(0,now-state.clock.startedAt)))+(state.clock.incrementMs||0)},startedAt:now}}:{}),fen:chess.fen(),moves:[...state.moves,move],notation:[...state.notation,played.san],positions:[...state.positions,chess.fen()],result:chess.isCheckmate()?(chess.turn()==='w'?'0-1':'1-0'):chess.isDraw()?'1/2-1/2':'*'};
  }catch{return null;}
 }
