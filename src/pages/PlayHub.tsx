@@ -17,7 +17,7 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
   const { detail } = useApp();
   const [opponent, setOpponent] = useState("online"),
     [mode, setMode] = useState("throne"),
-    [playing, setPlaying] = useState(false);
+    [playing, setPlaying] = useState(false),[timeControl,setTimeControl]=useState(180);
   const online = opponent === "online";
   if (detail.startsWith("online/")) return <Community />;
   if (detail === "resume") return <Play variantsOnly={variants} />;
@@ -29,13 +29,15 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
           <button key={id} aria-pressed={opponent === id} onClick={() => setOpponent(id)}>{label}</button>)}
       </div>
     </div>}
+    {!variants && online && <div className="time-control-toggle" role="group" aria-label="Time control">{[60,180,600].map(seconds=><button key={seconds} aria-pressed={timeControl===seconds} onClick={()=>setTimeControl(seconds)}>{seconds/60} min</button>)}</div>}
     {variants && online && <div className="variant-gallery online-variant-gallery" role="group" aria-label="Online variants">
       {onlineVariants.map(([id, label]) => <button key={id} aria-pressed={mode === id} onClick={() => setMode(id)}>
         {teamModes.includes(id) ? <MultiplayerPicture mode={id} /> : id === "speedrun" ? <img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/> : <VariantIcon id={id} size={118} />}
         {label}
       </button>)}
     </div>}
-    {online ? <Community key={variants ? mode : "standard"}
+    {online ? <Community key={variants ? mode : "standard"+timeControl}
+      timeControlSeconds={timeControl}
       presetMode={variants && teamModes.includes(mode) ? mode : "standard"}
       presetVariant={variants && !teamModes.includes(mode) ? mode : "chess"} />
       : <Play variantsOnly={variants} onPlayingChange={setPlaying} />}

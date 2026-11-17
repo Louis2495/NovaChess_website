@@ -15,9 +15,7 @@ import {
   newSpecial,
   specialApply,
   specialLegal,
-  specialBot,
   specialTurn,
-  cells,
   type SpecialVariant,
   type SpecialState,
 } from "../lib/specialRules";
@@ -103,40 +101,17 @@ export default function SpecialPlay({
   useEffect(() => {
     if (state.result !== "*" || specialTurn(state) === side) return;
     setBusy(true);
-    const t = setTimeout(() => {
-      try {
-        let next = state;
-        if (
-          variant === "chaos" &&
-          !next.freezeUsed.includes(specialTurn(next)) &&
-          next.ply > 8
-        ) {
-          const p = cells(next.fen),
-            enemy = Object.keys(p).filter(
-              (k) =>
-                (p[k] === p[k].toUpperCase() ? "w" : "b") === side &&
-                p[k].toLowerCase() !== "k",
-            );
-          if (enemy.length)
-            next = specialApply(next, {
-              type: "freeze",
-              square: enemy[Math.floor(Math.random() * enemy.length)],
-            });
-        }
-        const move = specialBot(next);
-        if (move)
-          setSaved((s) => ({
-            ...s,
-            history: [...(s.history || []), s.state],
-            state: specialApply(next, { type: "move", move }),
-          }));
-      } catch (e) {
-        notify((e as Error).message);
-      } finally {
-        setBusy(false);
-      }
-    }, 350);
-    return () => clearTimeout(t);
+    const worker=new Worker(new URL('../lib/special.worker.ts',import.meta.url),{type:'module'});
+    let active=true;
+    worker.onmessage=({data}:{data:{state?:SpecialState;error?:string}})=>{
+      if(!active)return;
+      if(data.error)notify(data.error);
+      else if(data.state)setSaved(s=>s.state===state?{...s,history:[...(s.history||[]),s.state],state:data.state!}:s);
+      setBusy(false);worker.terminate();
+    };
+    worker.onerror=()=>{if(active){notify('Computer move could not be calculated.');setBusy(false);}worker.terminate();};
+    worker.postMessage({state,side});
+    return()=>{active=false;worker.terminate();};
   }, [state, side]);
   const legal = specialLegal(state),
     turn = specialTurn(state),

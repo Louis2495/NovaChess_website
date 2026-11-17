@@ -1,3 +1,7 @@
+import MultiplayerPicture from "../components/MultiplayerPicture";
+import VariantIcon from "../components/VariantIcon";
+import RoomChat from "../components/RoomChat";
+import {previewRoomMove} from "../lib/roomPreview";
 import {screenName} from "../lib/screenName";
 import {matchTypedMove} from "../lib/moves";
 import type {FairyStockfish} from "ffish-es6";
@@ -8,7 +12,7 @@ import {buildFen} from "../components/PositionEditor";
 import {duration} from "../lib/speedrun";
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { Chess } from "chess.js";
 import {
   ArrowRight,
@@ -19,21 +23,22 @@ import {
   ArrowLeftRight,
   LogOut,
 } from "lucide-react";
-import { online, onlineAction, useOnlineSession } from "../lib/online";
+import { online, onlineAction, useOnlineSession, roomBroadcastReady, onlineNow, syncOnlineClock } from "../lib/online";
 import { useApp } from "../lib/context";
-import { copyText } from "../lib/store";
+import { copyText,base } from "../lib/store";
 import { specialLegal, type SpecialState } from "../lib/specialRules";
 import { Board, Piece, type BoardMark } from "../components/Board";
 import OnlineAccount from "../components/OnlineAccount";
 import GameResult from "../components/GameResult";
 import { ChoiceSelect, Button, Card, Field, PageTitle } from "../components/UI";
 type Member = { id: string; team: "w" | "b" | null; board?:number };
+type LastGame={id:string;result:string;white:string;black:string;reason:string;resignedBy?:string};
 type Room = {
   id: string;
   name: string;
   mode: string;
   variant: string;
-  state: SpecialState & { lastWinner?: string; lastResult?: string; initial:string; partner?:OnlinePosition; speedrun?:OnlinePosition["speedrun"] };
+  state: SpecialState & { gameKey?:string; lastWinner?: string; lastResult?: string; lastGame?:LastGame; clock?:{remaining:{w:number;b:number};startedAt:number|null}; initial:string; partner?:OnlinePosition; speedrun?:OnlinePosition["speedrun"] };
   members: Member[];
   queue: string[];
   status: string;
@@ -42,11 +47,11 @@ type Room = {
   marks: BoardMark[];
   settings: { bot: boolean };
 };
-type Profile = { id: string; username: string };
-export default function Community({presetMode = "standard", presetVariant = "chess"}: {presetMode?: string; presetVariant?: string}) {
+type Profile = { id: string; username: string;screen_name?:string };
+export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number}) {
   const { session } = useOnlineSession(),
     { tab, detail, navigate, notify, appearance } = useApp();
-  const [room, setRoom] = useState<Room | null>(null),
+  const [confirmed, setConfirmed] = useState<Room | null>(null),
     [profiles, setProfiles] = useState<Profile[]>([]),
     [mode] = useState(presetMode),
     [name] = useState(presetMode === "standard" ? (variantList.find(v=>v.id===presetVariant)?.name || "Speedrun") : presetMode === "vote" ? "Vote Chess" : presetMode === "team" ? "Team Chess" : "Throne"),
@@ -59,9 +64,24 @@ export default function Community({presetMode = "standard", presetVariant = "che
     >([]),
     [armed, setArmed] = useState<"" | "freeze" | "swap">(""),
     [first, setFirst] = useState("");
+  const [prediction,setPrediction]=useState<{roomId:string;revision:number;state:Room['state']}|null>(null),[dismissed,setDismissed]=useState<Record<string,string>>({});
+  const pending=useRef(false),confirmedRef=useRef(confirmed);confirmedRef.current=confirmed;
+  const room=prediction && confirmed?.id===prediction.roomId && confirmed.revision===prediction.revision?{...confirmed,state:prediction.state}:confirmed;
+  const acceptRoom=useCallback((next:Room)=>{if(routeRef.current && routeRef.current!==next.id)return;setConfirmed(current=>current && current.id===next.id && current.revision>=next.revision?current:next);},[]);
+  const pendingPrediction=useRef(false),requestId=useRef(0),submitted=useRef<{id:number;base:Room;move:string}|null>(null);
+  const confirmedMove=(current:Room|null,base:Room,move:string)=>!!current && current.id===base.id && (
+    (current.state.gameKey===base.state.gameKey && current.state.moves[base.state.moves.length]===move)
+    || (!!base.state.gameKey && current.state.lastGame?.id===base.state.gameKey));
+  useEffect(()=>{
+    const sent=submitted.current;
+    if(sent && sent.id===requestId.current && confirmedMove(confirmed,sent.base,sent.move)){
+      submitted.current=null;pending.current=false;pendingPrediction.current=false;setBusy(false);
+    }
+  },[confirmed]);
   const [ff,setFF]=useState<FairyStockfish|null>(null),[pocket,setPocket]=useState(""),[duck,setDuck]=useState<{fen:string;options:string[];queued?:boolean}|null>(null),[typed,setTyped]=useState(""),[clock,setClock]=useState(Date.now());
-  useEffect(()=>{let active=true;fairy().then(engine=>{if(active)setFF(engine);}).catch(e=>setError(e.message));return()=>{active=false;};},[]);
-  useEffect(()=>{if(!room?.state.speedrun)return;const t=setInterval(()=>setClock(Date.now()),100);return()=>clearInterval(t);},[room?.id,!!room?.state.speedrun]);
+  useEffect(()=>{if(!room || room.variant==="chess" || specialVariants.includes(room.variant))return;let active=true;fairy().then(engine=>{if(active)setFF(engine);}).catch(e=>setError(e.message));return()=>{active=false;};},[room?.variant]);
+  useEffect(()=>{if((!room?.state.speedrun && !room?.state.clock) || room.status!=="playing")return;const t=setInterval(()=>setClock(Date.now()),100);return()=>clearInterval(t);},[room?.id,!!room?.state.speedrun,!!room?.state.clock,room?.status]);
+  useEffect(()=>{if(room?.state.clock || room?.state.speedrun)void syncOnlineClock();},[room?.id,!!room?.state.clock,!!room?.state.speedrun]);
   useEffect(()=>{setPocket("");setDuck(null);},[room?.id,room?.revision]);
   const uid = session?.user.id;
   const [roomId, inviteQuery = ""] = detail.replace(/^online\//, "").split("?");
@@ -69,6 +89,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
   const username = (id: string) =>
     screenName(profiles.find((p) => p.id === id));
   const routeRef=useRef(roomId);routeRef.current=roomId;
+  useEffect(()=>{setConfirmed(null);setPrediction(null);pending.current=false;pendingPrediction.current=false;submitted.current=null;requestId.current++;setBusy(false);},[roomId]);
   const profileCache=useRef(new Map<string,Profile>());
   const loadProfiles=useCallback(async(ids:string[])=>{
     if(!online)return;const missing=[...new Set(ids)].filter(id=>!profileCache.current.has(id));
@@ -83,23 +104,29 @@ export default function Community({presetMode = "standard", presetVariant = "che
       const {data,error}=await online.from("rooms").select("*").eq("id",roomId).single();
       if(routeRef.current!==roomId)return;
       if(error){setError(error.message);return;}
-      if(data){setRoom(current=>current && current.id===data.id && current.revision>data.revision?current:data);void loadProfiles(data.members.map((m:Member)=>m.id));}
+      if(data){acceptRoom(data);void loadProfiles([...data.members.map((m:Member)=>m.id),...data.state.lastGame?[data.state.lastGame.white,data.state.lastGame.black]:[]]);}
     }else{
-      setRoom(null);
+      setConfirmed(null);setPrediction(null);
     }
-  },[uid,roomId,loadProfiles]);
+  },[uid,roomId,loadProfiles,acceptRoom]);
   useEffect(()=>{
     void load();if(!online || !uid)return;
-    const refresh=()=>{if(document.visibilityState!=="hidden")void load();};
+    const refresh=()=>{if(document.visibilityState!=="hidden"){void load();if(confirmedRef.current?.state.clock || confirmedRef.current?.state.speedrun)void syncOnlineClock();}};
     window.addEventListener("online",refresh);window.addEventListener("focus",refresh);
-    // Only an opened game subscribes to live updates; matchmaking reads on demand.
-    const channel=roomId?online.channel("room-"+roomId).on("postgres_changes",{event:"UPDATE",schema:"public",table:"rooms",filter:`id=eq.${roomId}`},payload=>{
-      const next=payload.new as Room;
-      setRoom(current=>current && current.id===next.id && current.revision>=next.revision?current:next);
-      void loadProfiles(next.members.map(m=>m.id));
-    }).subscribe(status=>{if(status==="SUBSCRIBED")void load();}):null;
-    return()=>{if(channel)void online!.removeChannel(channel);window.removeEventListener("online",refresh);window.removeEventListener("focus",refresh);};
-  },[uid,roomId,load,loadProfiles]);
+    let channel:ReturnType<NonNullable<typeof online>['channel']>|null=null,active=true,fallback=false;
+    const receive=(next:Room)=>{if(!active || next.id!==roomId)return;acceptRoom(next);void loadProfiles([...next.members.map(m=>m.id),...next.state.lastGame?[next.state.lastGame.white,next.state.lastGame.black]:[]]);};
+    const subscribeFallback=()=>{
+      if(!active || fallback)return;fallback=true;if(channel)void online!.removeChannel(channel);
+      channel=online!.channel('room-'+roomId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:`id=eq.${roomId}`},payload=>receive(payload.new as Room)).subscribe(status=>{if(status==='SUBSCRIBED')void load();});
+    };
+    if(roomId)void roomBroadcastReady().then(ready=>{
+      if(!active)return;if(!ready){subscribeFallback();return;}
+      channel=online!.channel('room:'+roomId,{config:{private:true}}).on('broadcast',{event:'state'},payload=>receive(payload.payload as Room)).subscribe(status=>{
+        if(status==='SUBSCRIBED')void load();else if(status==='CHANNEL_ERROR' || status==='TIMED_OUT')subscribeFallback();
+      });
+    });
+    return()=>{active=false;if(channel)void online!.removeChannel(channel);window.removeEventListener('online',refresh);window.removeEventListener('focus',refresh);};
+  },[uid,roomId,load,loadProfiles,acceptRoom]);
   useEffect(() => {
     if (!online || !room || room.mode !== "vote") return;
     const fetchVotes = async () => {
@@ -125,35 +152,43 @@ export default function Community({presetMode = "standard", presetVariant = "che
     extra: Record<string, unknown> = {},
     rethrow = false,
   ) {
-    setBusy(true);
-    setError("");
+    if(pending.current){if(rethrow)throw Error('A move is still being confirmed.');return;}
+    const ownRequest=++requestId.current;pending.current=true;setBusy(true);setError("");
+    const base=confirmedRef.current;
+    if(action==="move" && base){
+      if(typeof extra.move==="string")submitted.current={id:ownRequest,base,move:extra.move};
+      const side=base.members.find(m=>m.id===uid);
+      const next=previewRoomMove(ff,base.variant,base.state,String(extra.move||""),side?.board||0,extra.specialAction);
+      if(next){pendingPrediction.current=true;setPrediction({roomId:base.id,revision:base.revision,state:next as Room['state']});}
+    }
     try {
       const result = await onlineAction({
         action,
-        room: room?.id,
-        revision: room?.revision,
+        room: base?.id,
+        revision: base?.revision,
         ...extra,
       });
       if (result.id) {
-        setRoom(result);
+        acceptRoom(result);
         if (!roomId) navigate(result.mode === "standard" && result.variant === "chess" ? "play" : "variants", "online/"+result.id);
       }
       if(result.id)void loadProfiles(result.members?.map((m:Member)=>m.id)||[]);
-      else await load();
-      setArmed("");
-      setFirst("");
+      else if(action!=="vote")await load();
+      if(requestId.current===ownRequest && (extra.specialAction || action!=="move")){setArmed("");setFirst("");}
     } catch (e) {
-      setError((e as Error).message);
+      if(requestId.current!==ownRequest || (base && typeof extra.move==="string" && confirmedMove(confirmedRef.current,base,extra.move)))return;
+      setPrediction(null);await load();if(action!=="claim_timeout")setError((e as Error).message);
       if (rethrow) throw e;
     } finally {
-      setBusy(false);
+      if(requestId.current===ownRequest){submitted.current=null;pending.current=false;pendingPrediction.current=false;setPrediction(null);setBusy(false);}
     }
   }
   const me = room?.members.find((m) => m.id === uid),
     position = room?.variant === "bughouse" && me?.board === 1 ? room.state.partner : room?.state,
     turn = position?.fen.split(" ")[1],
     canMove = room?.status === "playing" && me?.team === turn;
-  let legal: string[] = [];
+  const legal=useMemo(()=>{
+    let legal:string[]=[];
   if (room && room.state.result === "*")
     try {
       legal =
@@ -163,13 +198,15 @@ export default function Community({presetMode = "standard", presetVariant = "che
               .map((m) => m.from + m.to + (m.promotion || ""))
           : specialVariants.includes(room.variant) ? specialLegal(room.state) : ff ? onlineLegal(ff,room.variant,room.state,me?.board||0) : [];
     } catch {}
+    return legal;
+  },[room?.state,room?.variant,me?.board,ff]);
   const premove = usePremoves({
     fen: position?.fen || "8/8/8/8/8/8/8/8 w - - 0 1",
     side: me?.team || "w",
     legal,
     enabled: !!me?.team,
     active: room?.status === "playing" && room.state.result === "*",
-    identity: room?.id,
+    identity: room?.id+":"+room?.state.gameKey,
     execute: (move) =>
       act(room?.mode === "vote" ? "vote" : "move", { move }, true),
     chaos: room?.variant === "chaos",
@@ -199,10 +236,23 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {} as Record<string, number>,
     ),
   ).sort((a, b) => b[1] - a[1]);
+  const variantTitle=room?.mode==='throne'?'Throne':room?.mode==='vote'?'Vote Chess':room?.mode==='team'?'Team Chess':variantList.find(v=>v.id===room?.variant)?.name || 'Speedrun';
+  const last=room?.state.lastGame,resultKey=(room?.id||'')+':'+(uid||'');
+  let seen:string|undefined=dismissed[resultKey];try{seen ||= sessionStorage.getItem('novachess-result-'+resultKey)||undefined;}catch{}
+  const showLast=!!last && [last.white,last.black].includes(uid||'') && last.id!==seen;
+  const dismissResult=()=>{if(!last)return;setDismissed(d=>({...d,[resultKey]:last.id}));try{sessionStorage.setItem('novachess-result-'+resultKey,last.id);}catch{}premove.clear();};
+  const clockSide=room?.state.fen.split(' ')[1] as 'w'|'b',gameClock=room?.state.clock;
+  const remaining=(side:'w'|'b')=>gameClock?Math.max(0,gameClock.remaining[side]-(room?.status==='playing' && clockSide===side && gameClock.startedAt!==null?Math.max(0,onlineNow()-gameClock.startedAt):0)):0;
+  const timeoutRequested=useRef({key:'',at:0});
+  useEffect(()=>{
+    if(!room || !gameClock || !me?.team || room.status!=='playing' || remaining(clockSide)>0)return;
+    const key=room.id+':'+room.revision;if((timeoutRequested.current.key===key && Date.now()-timeoutRequested.current.at<2000) || pending.current)return;timeoutRequested.current={key,at:Date.now()};
+    void act('claim_timeout');
+  },[clock,room?.revision,gameClock?.startedAt]);
   return (
     <>
       {!room && tab === "community" && <PageTitle title="Play" />}
-      {room && <PageTitle title={room.mode === "standard" && room.variant === "chess" ? "Play" : "Variants"}><Button className="secondary" onClick={() => navigate(room.mode === "standard" && room.variant === "chess" ? "play" : "variants")}>Back</Button></PageTitle>}
+      {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div><Button className="secondary" onClick={()=>navigate(room.mode==='standard' && room.variant==='chess'?'play':'variants')}>Back</Button></div>}
       {!online || !uid ? (
         <>
           <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Play online"}</Button></Card>
@@ -218,35 +268,19 @@ export default function Community({presetMode = "standard", presetVariant = "che
           {room ? (
             <div className="chess-layout">
               <div className="board-column">
-                <div className="card-heading">
-                  <h2>{room.name}</h2>
-                  <span className="pill">
-                    {room.mode === "throne"
-                      ? "Throne"
-                      : room.mode === "vote"
-                        ? "Vote Chess"
-                        : room.mode === "team"
-                          ? "Team Chess"
-                          : variantList.find(v=>v.id===room.variant)?.name || "Speedrun"}
-                  </span>
-                </div>
-                {room.state.lastWinner && (
-                  <p className="pill">
-                    {username(room.state.lastWinner)} holds the throne
-                  </p>
-                )}
+                {gameClock && <div className="online-clock-row" aria-label="Game clocks"><span role="timer" aria-label="White clock">{duration(remaining('w')).split('.')[0]}</span><span role="timer" aria-label="Black clock">{duration(remaining('b')).split('.')[0]}</span></div>}
                 {room.state.speedrun && me?.team && <div className="speedrun-clock" role="timer" aria-label="Your move time">{duration(room.state.speedrun.elapsed[me.team]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}</div>}
                 {room.variant === "blindtext" ? <form onSubmit={e=>{e.preventDefault();if(!ff || !position)return;const b=new ff.Board("chess",position.fen);try{const move=matchTypedMove(typed,legal.map(m=>({uci:m,san:b.sanMove(m)})));if(move)void submitMove(move).then(()=>setTyped("")).catch(()=>{});}finally{b.delete();}}}><Field label="Blindfold move"><input value={typed} onChange={e=>setTyped(e.target.value)} autoComplete="off" disabled={!canMove || busy}/></Field><Button disabled={!canMove || busy}>Move</Button></form> : <Board
                   fen={duck?.fen || premove.preview}
                   hidden={room.variant === "blind"}
                   visible={room.variant === "cvfog" ? fog(position!.fen,me?.team || "w") : undefined}
                   highlights={[]}
-                  overlay={<GameResult result={room.variant === "bughouse" && me?.board === 1 && ["1-0","0-1"].includes(room.state.result) ? (room.state.result === "1-0" ? "0-1" : "1-0") : room.state.result} human={me?.team}/>}
+                  overlay={showLast && last ? <div className="throne-round-result"><GameResult result={last.result} human={uid===last.white?"w":"b"}/><p>{last.resignedBy?`${last.resignedBy===uid?"You":username(last.resignedBy)} ${last.reason==="left"?"left the game":"resigned"}.`:last.reason==="draw"?"Draw":"Checkmate"}</p><Button onClick={dismissResult}>Continue</Button></div> : <GameResult result={room.variant === "bughouse" && me?.board === 1 && ["1-0","0-1"].includes(room.state.result) ? (room.state.result === "1-0" ? "0-1" : "1-0") : room.state.result} human={me?.team}/>}
                   materialFen={position?.fen}
                   onCancelPremoves={premove.cancelOnRightClick}
                   flipped={me?.team === "b"}
                   disabled={
-                    busy ||
+                    (busy && !(pendingPrediction.current && !canMove && appearance.premoves)) ||
                     room.status !== "playing" ||
                     !me?.team ||
                     (!canMove && !appearance.premoves)
@@ -344,7 +378,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                       Resign
                     </Button>
                   )}
-                  <Button
+                  {room.mode!=="throne" && <Button
                     className="secondary"
                     onClick={async () => {
                       const invite = new URL(location.href);
@@ -355,10 +389,11 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   >
                     <Copy size={16} />
                     Invite friends
-                  </Button>
+                  </Button>}
                 </div>
               </div>
               <div className="side-panels">
+                {room.mode==='throne' && <RoomChat roomId={room.id} uid={uid!} nameFor={username} loadProfiles={loadProfiles}/>}
                 <Card>
                   <h2>
                     {room.status === "waiting"
@@ -466,11 +501,14 @@ export default function Community({presetMode = "standard", presetVariant = "che
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 setBusy(true);setError("");
                 try {
-                  const {data,error}=await online!.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at").eq("mode",mode).eq("variant",variant).order("updated_at",{ascending:true}).limit(40);
+                  const listing=online!.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at,time_control").eq("mode",mode).eq("variant",variant).order("status",{ascending:true}).order("updated_at",{ascending:true}).limit(40);
+                  if(mode==="standard")listing.eq("status","waiting").lt("member_count",variant==="bughouse"?4:2);
+                  if(mode==="standard" && variant==="chess")listing.eq("time_control",timeControlSeconds);
+                  const {data,error}=await listing;
                   if(error)throw error;
-                  const available=(data||[]).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
+                  const available=(data||[]).filter(r=>mode!=="standard" || variant!=="chess" || r.time_control===timeControlSeconds).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
                   if(available && !(mode === "team" && bot)) await act("join",{room:available.id});
-                  else await act("create",{mode,name,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
+                  else await act("create",{mode,name,timeControlSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
               }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Play online"}</Button>
               <p className="caption">{mode === "standard" ? "Join an opponent, or wait for the next player." : mode === "throne" ? "Winner stays. Queue to challenge." : mode === "vote" ? "One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>

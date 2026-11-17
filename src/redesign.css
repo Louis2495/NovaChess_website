@@ -4581,3 +4581,25 @@ html { scrollbar-gutter:stable; }
 .admin-account-table .btn { white-space:nowrap; }
 .admin-account-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:20px; }
 .admin-password-hash { display:block; max-width:280px; margin-top:8px; white-space:normal; overflow-wrap:anywhere; user-select:all; font-size:.75rem; }
+.online-game-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
+.online-game-title { display:flex; align-items:center; gap:16px; }
+.online-game-title h1 { margin:0; }
+.online-game-title .multiplayer-picture { width:72px; height:72px; border-radius:16px; }
+.online-clock-row { display:flex; justify-content:space-between; gap:16px; margin-bottom:10px; font-size:1.5rem; font-variant-numeric:tabular-nums; }
+.time-control-toggle { display:flex; justify-content:center; gap:5px; padding:5px; border:1px solid var(--border); border-radius:14px; max-width:360px; margin:20px auto; background:var(--panel); }
+.time-control-toggle button { flex:1; padding:12px; border-radius:10px; }
+.time-control-toggle button[aria-pressed=true] { background:var(--button); color:var(--button-text); }
+.throne-round-result { display:flex; flex-direction:column; align-items:center; gap:12px; padding:20px; border-radius:20px; background:var(--panel-solid); box-shadow:0 10px 40px #0004; }
+.throne-round-result .game-result-banner { box-shadow:none; }
+.throne-round-result p { margin:0; }
+.room-chat-messages { height:220px; overflow-y:auto; margin:12px 0; }
+.room-chat-message { position:relative; padding:8px 25px 8px 0; font-size:.82rem; overflow-wrap:anywhere; }
+.room-chat-message p { margin:3px 0; white-space:pre-wrap; }
+.room-chat-message .icon-btn { position:absolute; top:4px; right:0; }
+.room-chat form { display:flex; gap:8px; }
+.room-chat form input { min-width:0; flex:1; margin:0; }
+.opening-request { border:1px solid var(--border); border-radius:16px; padding:8px 16px 16px; margin:12px 0 0; background:var(--accent-soft); }
+.opening-request legend { color:var(--text); padding:0 8px; font-weight:700; }
+.opening-request .field { margin:10px 0 0; }
+.opening-request { min-width:0; }
+.online-game-title > .speedrun-picture { width:72px; height:72px; border-radius:16px; }

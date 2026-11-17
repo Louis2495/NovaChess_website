@@ -1,3 +1,4 @@
+declare const EdgeRuntime: {waitUntil(task:Promise<unknown>):void};
 import {onlineEngine} from "./engine.ts";
 import {freshOnline,applyOnline,onlineVariantIds,specialVariants} from "../../../src/lib/onlineVariants.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.119.0";
@@ -16,8 +17,13 @@ const cors = {
     "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+function wireRoom(data:any){
+ if(!data?.state || !data?.id || specialVariants.includes(data.variant))return data;
+ const compact=(position:any)=>({...position,positions:position.positions?.length>1?[position.positions[0],position.fen]:position.positions});
+ return {...data,state:{...compact(data.state),...(data.state.partner?{partner:compact(data.state.partner)}:{})}};
+}
 function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), {
+  return new Response(JSON.stringify(wireRoom(data)), {
     status,
     headers: { ...cors, "Content-Type": "application/json" },
   });
@@ -80,27 +86,20 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "POST required" }, 405);
   try {
+    const receivedAt=Date.now();
     if (Number(req.headers.get("content-length") || 0) > 100000)
       throw Error("Request too large.");
     const token = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
     if (!token) return json({ error: "Sign in to play online." }, 401);
-    const {
-      data: { user },
-      error: authError,
-    } = await db.auth.getUser(token);
-    if (authError || !user)
-      return json({ error: "Sign in to play online." }, 401);
-    const uid = user.id;
-    const { data: profile } = await db
-      .from("profiles")
-      .select("banned")
-      .eq("id", uid)
-      .single();
-    if (!profile || profile.banned)
-      return json({ error: "Account unavailable." }, 403);
-    const body = await req.json();
-    const action = body.action;
+    const {data:verified,error:authError}=await db.auth.getClaims(token);
+    const uid=verified?.claims?.sub;
+    if(authError || !uid || verified?.claims?.role!=="authenticated")return json({error:"Sign in to play online."},401);
+    const body=await req.json();
+    let action=body.action;
+    const finishing=action==="finish";
     if (action === "create") {
+      const {data:active}=await db.rpc("active_online_account",{p_actor:uid});
+      if(active!==true)return json({error:"Account unavailable."},403);
       if (!["standard", "throne", "vote", "team"].includes(body.mode))
         throw Error("Unknown game mode.");
       const { count } = await db
@@ -108,8 +107,8 @@ Deno.serve(async (req) => {
         .select("id", { count: "exact", head: true })
         .eq("host", uid)
         .gt("created_at", new Date(Date.now() - 3600000).toISOString());
-      if ((count || 0) >= 10)
-        throw Error("Room limit reached. Use an existing room.");
+      if ((count || 0) >= 120)
+        throw Error("Too many new games. Please try again later.");
       const variant =
         body.mode === "vote"
           ? "chess"
@@ -119,6 +118,10 @@ Deno.serve(async (req) => {
       if(body.variant && !onlineVariantIds.includes(body.variant))throw Error("Unknown variant.");
       if (body.bot && variant !== "chess")
         throw Error("Online team bots currently use standard chess.");
+      if(body.mode==="standard" && variant==="chess" && body.timeControlSeconds!==undefined && ![60,180,600].includes(body.timeControlSeconds))throw Error("Choose 1, 3 or 10 minutes.");
+      const timed=body.mode==="standard" && variant==="chess" && [60,180,600].includes(body.timeControlSeconds);
+      const initial=await fresh(variant,Math.max(1,Math.min(4,+body.dropCount||2)));
+      if(timed)initial.clock={remaining:{w:body.timeControlSeconds*1000,b:body.timeControlSeconds*1000},startedAt:null};
       const { data, error } = await db
         .from("rooms")
         .insert({
@@ -129,11 +132,12 @@ Deno.serve(async (req) => {
               .slice(0, 80) || "Chess room",
           mode: body.mode,
           variant,
-          state: await fresh(variant, Math.max(1, Math.min(4, +body.dropCount || 2))),
+          state: initial,
           members: [{ id: uid, team: "w", ...(variant === "bughouse" ? {board:0} : {}) }],
           settings: {
             bot: body.mode === "team" && body.bot === true,
             dropCount: Math.max(1, Math.min(4, +body.dropCount || 2)),
+            timeControlSeconds:timed?body.timeControlSeconds:0,
           },
           status: body.mode === "team" && body.bot ? "playing" : "waiting",
           deadline:
@@ -146,12 +150,8 @@ Deno.serve(async (req) => {
       if (error) throw error;
       return json(data);
     }
-    const { data: r, error } = await db
-      .from("rooms")
-      .select("*")
-      .eq("id", body.room)
-      .single();
-    if (error || !r) throw Error("Room not found.");
+    const {data:r,error}=await db.rpc("room_for_action",{p_room:body.room,p_actor:uid});
+    if(error || !r)throw error || Error("Game not found.");
     let members = r.members as Member[],
       queue = r.queue as string[],
       state = r.state,
@@ -216,6 +216,7 @@ Deno.serve(async (req) => {
         (r.settings.bot || members.some((m) => m.team === "b"))
       ) {
         status = r.variant === "bughouse" && members.length < 4 ? "waiting" : state.result === "*" ? "playing" : "finished";
+        if(state.clock && status === "playing" && r.status === "waiting")state={...state,clock:{...state.clock,startedAt:Date.now()}};
         if(state.speedrun && status === "playing" && r.status === "waiting")state={...state,speedrun:{...state.speedrun,startedAt:Date.now()}};
         if (r.mode === "vote" && r.status === "waiting")
           deadline = new Date(Date.now() + 86400000).toISOString();
@@ -236,38 +237,43 @@ Deno.serve(async (req) => {
       );
       return json(await commit());
     }
-    if (action === "finish") {
-      if (r.mode !== "throne") throw Error("Finish is available in Throne.");
-      members = members.filter((m) => m.id !== uid);
-      queue = queue.filter((id) => id !== uid);
-      let seated = members.filter((m) => m.team);
-      if (!seated.some((m) => m.team === "w") && seated.length)
-        seated[0].team = "w";
-      while (seated.length < 2 && queue.length) {
-        const id = queue.shift()!;
-        const m = members.find((m) => m.id === id);
-        if (m) {
-          m.team = seated.some((m) => m.team === "w") ? "b" : "w";
-          seated.push(m);
+    if (finishing) {
+      if(r.mode!=="throne")throw Error("Finish is available in Throne.");
+      if(me.team && status==="playing" && members.filter(m=>m.team).length===2){action="resign";}
+      else {
+        members=members.filter(m=>m.id!==uid);queue=queue.filter(id=>id!==uid);
+        // A spectator leaving must not reset an ongoing game.
+        if(me.team){
+          const seated=members.filter(m=>m.team);if(seated[0])seated[0].team="w";
+          while(seated.length<2 && queue.length){const next=members.find(m=>m.id===queue.shift());if(next){next.team=seated.length?"b":"w";seated.push(next);}}
+          state={...await fresh(r.variant,r.settings.dropCount),lastGame:r.state.lastGame,lastWinner:r.state.lastWinner!==uid?r.state.lastWinner:undefined};
+          status=seated.length===2?"playing":"waiting";marks=[];deadline=null;
         }
+        return json(await commit());
       }
-      state = {...await fresh(r.variant, r.settings.dropCount), lastWinner: r.state.lastWinner !== uid && members.some(m=>m.id===r.state.lastWinner) ? r.state.lastWinner : undefined};
-      status = seated.length === 2 ? "playing" : "waiting";
-      return json(await commit());
+    }
+    const clock=state.clock;
+    const expired=!!clock && clock.startedAt!==null && clock.remaining[turn]-Math.max(0,receivedAt-clock.startedAt)<=0;
+    if(action==="claim_timeout"){
+      if(!me.team || status!=="playing" || state.result!=="*" || !expired)throw Error("The clock has not expired.");
     }
     if (
       !me.team ||
-      (!["resign", "draw"].includes(action) && me.team !== turn) ||
+      (!["resign", "draw", "claim_timeout"].includes(action) && me.team !== turn) ||
       status !== "playing" ||
       state.result !== "*"
     )
       throw Error("It is not your team’s turn.");
     if (
-      ["move", "vote", "resign", "draw"].includes(action) &&
+      !finishing && ["move", "vote", "resign", "draw"].includes(action) &&
       body.revision !== r.revision
     )
       throw Error("Position changed. Try again.");
-    if (action === "move" || action === "vote") {
+    if(expired && clock){
+      const c=new Chess(state.fen),winner=turn==="w"?"b":"w";
+      const pieces=Object.values(c.board().flat().filter(Boolean)).filter((p:any)=>p.color===winner && p.type!=="k");
+      state={...state,result:!pieces.length || c.isInsufficientMaterial()?"1/2-1/2":winner==="w"?"1-0":"0-1",clock:{...clock,remaining:{...clock.remaining,[turn]:0},startedAt:null}};
+    }else if (action === "move" || action === "vote") {
       const next =
         r.variant === "chess"
           ? standardApply(state, String(body.move))
@@ -289,6 +295,7 @@ Deno.serve(async (req) => {
         return json({ voted: true });
       }
       state = next;
+      if(clock)state={...state,clock:{remaining:{...clock.remaining,[turn]:Math.max(0,clock.remaining[turn]-Math.max(0,receivedAt-clock.startedAt))},startedAt:state.result==="*"?Date.now():null}};
       marks = [];
     } else if (action === "draw") {
       if (!r.settings.bot || r.mode !== "team")
@@ -305,11 +312,12 @@ Deno.serve(async (req) => {
       const move = simpleBot(state);
       if (move) state = standardApply(state, move);
     }
+    if(state.result!=="*" && state.clock)state={...state,clock:{...state.clock,startedAt:null}};
     const finishedState = state,
       finishedMembers = members.map((m) => ({ ...m }));
     if (state.result !== "*") status = "finished";
     if (state.result !== "*" && r.mode === "throne" && state.result === "1/2-1/2") {
-      state = {...await fresh(r.variant,r.settings.dropCount),lastResult:finishedState.result,lastWinner:r.state.lastWinner};
+      state = {...await fresh(r.variant,r.settings.dropCount),lastResult:finishedState.result,lastWinner:r.state.lastWinner,lastGame:{id:r.state.gameKey,result:finishedState.result,white:members.find(m=>m.team==="w")?.id,black:members.find(m=>m.team==="b")?.id,reason:"draw"}};
       status = members.filter(m=>m.team).length === 2 ? "playing" : "waiting";
       deadline=null; marks=[];
     }
@@ -317,7 +325,8 @@ Deno.serve(async (req) => {
       const winner = state.result === "1/2-1/2"
         ? members.find(m => m.id === r.state.lastWinner)
         : members.find((m) => m.team === (state.result === "0-1" ? "b" : "w"));
-      members = members.map((m) => ({
+      queue=queue.filter(id=>!finishing || id!==uid);
+      members = members.filter(m=>(!finishing || m.id!==uid) && (m.id===winner?.id || queue.includes(m.id))).map((m) => ({
         ...m,
         team: m.id === winner?.id ? "w" : null,
       }));
@@ -330,6 +339,7 @@ Deno.serve(async (req) => {
         ...await fresh(r.variant, r.settings.dropCount),
         lastResult: finishedState.result,
         lastWinner: winner?.id,
+        lastGame:{id:r.state.gameKey,result:finishedState.result,white:finishedMembers.find(m=>m.team==="w")?.id,black:finishedMembers.find(m=>m.team==="b")?.id,reason:finishing?"left":action==="resign"?"resignation":"checkmate",resignedBy:action==="resign"?uid:undefined},
       };
       status = next ? "playing" : "waiting";
       deadline = null;
@@ -345,14 +355,14 @@ Deno.serve(async (req) => {
       const w = finishedMembers.find((m) => m.team === "w"),
         b = finishedMembers.find((m) => m.team === "b");
       if (w && b) {
-        const { error } = await db.rpc("rate_game", {
+        const ratingTask = db.rpc("rate_game", {
           p_room: r.id,
           p_key: finishedState.gameKey,
           p_white: w.id,
           p_black: b.id,
           p_result: finishedState.result,
-        });
-        if (error) console.error("Rating update failed", error);
+        }).then(({error})=>{if(error)console.error("Rating update failed",error.message);});
+        if(typeof EdgeRuntime!=="undefined")EdgeRuntime.waitUntil(ratingTask);else await ratingTask;
       }
     }
     return json(result);

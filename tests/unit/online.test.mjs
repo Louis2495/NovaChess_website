@@ -83,6 +83,7 @@ class Query {
 }
 const mockDb = {
   auth: {
+    getClaims: async token=>({data:{claims:users.includes(token)?{sub:token,role:"authenticated"}:null},error:users.includes(token)?null:"Invalid"}),
     getUser: async (token) => ({
       data: { user: users.includes(token) ? { id: token } : null },
       error: users.includes(token) ? null : "Invalid",
@@ -101,7 +102,7 @@ const mockDb = {
         `select * from public.${name}(${keys.map((k, i) => k + "=> $" + (i + 1)).join(",")})`,
         args,
       );
-      return { data: r.rows[0], error: null };
+      return { data: name==="room_for_action"?r.rows[0].room_for_action:name==="active_online_account"?r.rows[0].active_online_account:r.rows[0], error: null };
     } catch (e) {
       return { data: null, error: { message: e.message } };
     }
@@ -130,7 +131,7 @@ async function command(user, r, action, extra = {}) {
 }
 before(async () => {
   await pg.exec(
-    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key,email text unique,created_at timestamptz default now(),last_sign_in_at timestamptz,email_confirmed_at timestamptz,raw_app_meta_data jsonb default '{}'::jsonb,raw_user_meta_data jsonb default '{}'::jsonb,encrypted_password text);create function auth.uid() returns uuid language sql as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to anon,authenticated,service_role;`,
+    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key,email text unique,created_at timestamptz default now(),last_sign_in_at timestamptz,email_confirmed_at timestamptz,banned_until timestamptz,raw_app_meta_data jsonb default '{}'::jsonb,raw_user_meta_data jsonb default '{}'::jsonb,encrypted_password text);create function auth.uid() returns uuid language sql as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to anon,authenticated,service_role;`,
   );
   let migration = readFileSync(
     "supabase/migrations/202611160001_online.sql",
@@ -158,6 +159,9 @@ before(async () => {
   await pg.query('update auth.users set email=$1,email_confirmed_at=now(),encrypted_password=$2 where id=$3',['louisanderson477@gmail.com','hashed-test-value',users[0]]);
   await pg.exec(readFileSync('supabase/migrations/202611180003_owner_accounts.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180004_screen_names.sql','utf8'));
+  await pg.exec(`create schema realtime;create table realtime.messages(extension text default 'broadcast',payload jsonb,event text,topic text,private boolean);alter table realtime.messages enable row level security;grant usage on schema realtime to authenticated;grant select,insert on realtime.messages to authenticated;create function realtime.topic() returns text language sql stable as $$select current_setting('realtime.topic',true)$$;create function realtime.send(jsonb,text,text,boolean) returns void language sql as $$insert into realtime.messages(payload,event,topic,private) values($1,$2,$3,$4)$$;`);
+  await pg.exec(readFileSync('supabase/migrations/202611180005_fast_rooms_chat_clocks.sql','utf8').replace('alter publication supabase_realtime add table public.room_messages;',''));
+
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
     .replace('"./engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/engine.ts")).href))
@@ -474,17 +478,17 @@ test("Throne counts completed incumbent games once, including loss and draw",asy
  const r=await room('throne');await pg.query("update rooms set status='playing',state=state || jsonb_build_object('lastWinner',$2::text,'gameKey','round1') where id=$1",[r.id,users[0]]);
  await pg.query("update rooms set state=state || jsonb_build_object('lastWinner',$2::text,'gameKey','round2','lastResult','1/2-1/2') where id=$1",[r.id,users[0]]);
  await pg.query("update rooms set revision=revision+1 where id=$1",[r.id]);
- let rows=await pg.query('select games from throne_reigns where room_id=$1',[r.id]);assert.equal(rows.rows[0].games,1);
+ let rows=await pg.query('select games from throne_reigns where room_id=$1',[r.id]);assert.equal(rows.rows[0].games,2);
  await pg.query("update rooms set state=state || jsonb_build_object('lastWinner',$2::text,'gameKey','round3','lastResult','0-1') where id=$1",[r.id,users[1]]);
- rows=await pg.query('select games,ended_at from throne_reigns where room_id=$1 order by id',[r.id]);assert.equal(rows.rows[0].games,2);assert.ok(rows.rows[0].ended_at);assert.equal(rows.rows[1].games,0);
+ rows=await pg.query('select games,ended_at from throne_reigns where room_id=$1 order by id',[r.id]);assert.equal(rows.rows[0].games,3);assert.ok(rows.rows[0].ended_at);assert.equal(rows.rows[1].games,1);
 });
 
 test("online deployment schedules voting and bounded chat/vote retention",async()=>{
- const jobs=await pg.query('select * from cron.test_jobs order by name');assert.equal(jobs.rows.length,3);const votes=jobs.rows.find(j=>j.name==='novachess-votes');assert.equal(votes.schedule,'* * * * *');assert.match(votes.command,/close_due_votes/);assert.match(jobs.rows.find(j=>j.name==='novachess-chat-retention').command,/30 days/);
+ const jobs=await pg.query('select * from cron.test_jobs order by name');assert.equal(jobs.rows.length,5);const votes=jobs.rows.find(j=>j.name==='novachess-votes');assert.equal(votes.schedule,'* * * * *');assert.match(votes.command,/close_due_votes/);assert.match(jobs.rows.find(j=>j.name==='novachess-chat-retention').command,/30 days/);
 });
 
 test('public lobby projection excludes full board histories and private-size queues',async()=>{
- const columns=await pg.query("select column_name from information_schema.columns where table_name='room_lobby' order by ordinal_position");assert.deepEqual(columns.rows.map(r=>r.column_name),['id','name','mode','variant','status','member_count','updated_at']);
+ const columns=await pg.query("select column_name from information_schema.columns where table_name='room_lobby' order by ordinal_position");assert.deepEqual(columns.rows.map(r=>r.column_name),['id','name','mode','variant','status','member_count','updated_at','time_control']);
 });
 
 test('every native online variant uses authoritative rules and rejects illegal moves',async()=>{
@@ -564,4 +568,55 @@ test('password hashes are fetched on demand only by the pinned owner',async()=>{
   await pg.exec(`set role ${role};set request.jwt.claim.sub='${users[1]}';`);
   try{await assert.rejects(()=>pg.query('select admin_password_hash($1)',[users[0]]),/Administrator access required|permission denied/);}finally{await pg.exec('reset role');}
  }
+});
+
+test('Throne announces the finished round, counts the first win and queued Finish preserves the active game',async()=>{
+ await pg.exec("update profiles set banned=false;update rooms set created_at=now()-interval '2 hours'");
+ let game=await room('throne');game=(await command(users[1],game,'join')).data;game=(await command(users[2],game,'join')).data;
+ game=(await command(users[0],game,'move',{move:'e2e4'})).data;const before=structuredClone(game.state);
+ game=(await command(users[2],game,'finish')).data;assert.equal(game.state.gameKey,before.gameKey);assert.deepEqual(game.state.moves,before.moves);assert.ok(!game.members.some(m=>m.id===users[2]));assert.ok(!game.queue.includes(users[2]));
+ const id=game.state.gameKey;game=(await command(users[1],game,'resign')).data;assert.equal(game.state.lastGame.id,id);assert.equal(game.state.lastGame.reason,'resignation');assert.equal(game.state.lastGame.resignedBy,users[1]);assert.equal(game.state.lastGame.white,users[0]);assert.equal(game.state.lastWinner,users[0]);
+ const reign=await pg.query('select games from throne_reigns where room_id=$1',[game.id]);assert.equal(reign.rows[0].games,1);
+ const logged=await pg.query('select * from throne_results where room_id=$1',[game.id]);assert.equal(logged.rows.length,1);assert.equal(logged.rows[0].black,users[1]);
+ game=(await command(users[0],game,'finish')).data;assert.ok(!game.members.some(m=>m.id===users[0]));assert.ok(!game.queue.includes(users[0]));
+});
+test('online clocks start on joining, deduct only the mover and reject premature flags',async()=>{
+ await pg.exec("update profiles set banned=false;update rooms set created_at=now()-interval '2 hours'");let game=await room('standard',{variant:'chess',timeControlSeconds:60});assert.equal(game.state.clock.startedAt,null);assert.equal(game.settings.timeControlSeconds,60);game=(await command(users[1],game,'join')).data;assert.ok(game.state.clock.startedAt);
+ assert.equal((await command(users[1],game,'claim_timeout')).status,400);
+ await pg.query("update rooms set state=jsonb_set(state,'{clock,startedAt}',to_jsonb($2::bigint)) where id=$1",[game.id,Date.now()-1500]);
+ const moved=await command(users[0],game,'move',{move:'e2e4'});assert.equal(moved.status,200,JSON.stringify(moved.data));game=moved.data;assert.ok(game.state.clock.remaining.w<=58500);assert.equal(game.state.clock.remaining.b,60000);
+ await pg.query("update rooms set state=jsonb_set(jsonb_set(state,'{clock,remaining,b}','0'::jsonb),'{clock,startedAt}',to_jsonb($2::bigint)) where id=$1",[game.id,Date.now()-10]);
+ const flagged=await command(users[0],game,'claim_timeout');assert.equal(flagged.status,200,JSON.stringify(flagged.data));assert.equal(flagged.data.state.result,'1-0');assert.equal(flagged.data.status,'finished');assert.equal(flagged.data.state.clock.startedAt,null);
+});
+test('live game replies are compact while complete replay history stays in the database',async()=>{
+ await pg.exec("update rooms set created_at=now()-interval '2 hours'");let game=await room();game=(await command(users[1],game,'join')).data;
+ for(const [user,move]of [[0,'e2e4'],[1,'e7e5'],[0,'g1f3'],[1,'b8c6']])game=(await command(users[user],game,'move',{move})).data;
+ assert.equal(game.state.moves.length,4);assert.equal(game.state.positions.length,2);const stored=(await pg.query('select state from rooms where id=$1',[game.id])).rows[0].state;assert.equal(stored.positions.length,5);assert.equal(game.state.positions[0],stored.positions[0]);assert.equal(game.state.positions[1],stored.fen);
+ const sent=(await pg.query('select payload from realtime.messages where topic=$1 order by (payload->>\'revision\')::int desc limit 1',['room:'+game.id])).rows[0].payload;assert.equal(sent.state.positions.length,2);assert.equal(sent.revision,game.revision);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';set realtime.topic='room:${game.id}';`);
+ try{assert.ok((await pg.query('select * from realtime.messages')).rows.length);await assert.rejects(()=>pg.query("insert into realtime.messages(topic,event,payload,private)values($1,'state','{}',true)",['room:'+game.id]),/row-level security|permission denied/);await assert.rejects(()=>pg.query('select room_for_action($1,$2)',[game.id,users[1]]),/permission denied/);}finally{await pg.exec('reset role');}
+});
+test('Throne chat is scoped, rejects direct forged writes and throttles even after deletion',async()=>{
+ await pg.exec("update profiles set banned=false;update rooms set created_at=now()-interval '2 hours'");const game=await room('throne');
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{
+  const row=(await pg.query("select * from post_room_message($1,'Good game!')",[game.id])).rows[0];assert.equal(row.room_id,game.id);assert.equal(row.user_id,users[0]);assert.equal(row.body,'Good game!');
+  await assert.rejects(()=>pg.query("insert into room_messages(room_id,user_id,body)values($1,$2,'Forged')",[game.id,users[1]]),/permission denied|row-level security/);
+  await pg.query('delete from room_messages where id=$1',[row.id]);for(let i=0;i<4;i++)await pg.query("select post_room_message($1,'Hello')",[game.id]);await assert.rejects(()=>pg.query("select post_room_message($1,'Too fast')",[game.id]),/Wait a moment/);
+ }finally{await pg.exec('reset role');}
+});
+
+
+test('expired clocks finish and rate games without an open browser',async()=>{
+ await pg.exec("update profiles set banned=false;update rooms set created_at=now()-interval '2 hours'");let game=await room('standard',{variant:'chess',timeControlSeconds:180});game=(await command(users[1],game,'join')).data;
+ await pg.query("update rooms set state=jsonb_set(jsonb_set(state,'{clock,remaining,w}','0'::jsonb),'{clock,startedAt}',to_jsonb($2::bigint)) where id=$1",[game.id,Date.now()-10000]);
+ assert.ok((await pg.query('select close_expired_games() as count')).rows[0].count>=1);
+ const saved=(await pg.query('select state,status from rooms where id=$1',[game.id])).rows[0];assert.equal(saved.status,'finished');assert.equal(saved.state.result,'0-1');assert.equal((await pg.query('select * from rated_games where room_id=$1',[game.id])).rows.length,1);
+ assert.equal((await pg.query("select timeout_result('4k3/8/8/8/8/8/P7/4K3 w - - 0 1') as result")).rows[0].result,'1/2-1/2');
+});
+
+
+test('cached signed-claims authentication still respects Supabase account bans',async()=>{
+ await pg.query("update auth.users set banned_until=now()+interval '1 hour' where id=$1",[users[0]]);
+ try{const blocked=await call(users[0],{action:'create',mode:'standard'});assert.equal(blocked.status,403);assert.equal(blocked.data.error,'Account unavailable.');}finally{await pg.query('update auth.users set banned_until=null where id=$1',[users[0]]);}
 });

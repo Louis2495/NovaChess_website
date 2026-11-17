@@ -493,7 +493,6 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
         if (selected && game!.moves.every((m, i) => m === selected.moves[i]))
           book = selected.moves[game!.moves.length] || "";
         if (book && valid!.legal.includes(book)) {
-          await new Promise((r) => setTimeout(r, 350));
           if (!controller.signal.aborted) apply(book, id, ply);
           return;
         }
@@ -751,7 +750,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
                       onChange={(v) => setRated(v && variant === "chess")}
                     />
                     {variant === "chess" && (
-                      <div className="opening-request">
+                      <fieldset className="opening-request"><legend>Opening</legend>
                         <Field label="Search openings">
                           <input
                             type="search"
@@ -783,7 +782,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
                               ))}
                           </ChoiceSelect>
                         </Field>
-                      </div>
+                      </fieldset>
                     )}
                   </>
                 )}

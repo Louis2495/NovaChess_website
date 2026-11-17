@@ -91,3 +91,14 @@ export function useSiteAdmin(){
  },[session?.user.id]);
  return {isAdmin:!!session && checked?.id===session.user.id && checked.allowed,ready:ready && (!session || checked?.id===session.user.id),userId:session?.user.id};
 }
+let broadcastReady:Promise<boolean>|null=null;
+export function roomBroadcastReady(){
+ return broadcastReady ||= online?Promise.resolve(online.rpc('room_broadcast_ready')).then(({data,error})=>!error && data===true).catch(()=>false):Promise.resolve(false);
+}
+let clockOffset=0,lastClockSync=0,clockSync:Promise<void>|null=null;
+export function onlineNow(){return Date.now()+clockOffset;}
+export function syncOnlineClock(){
+ if(!online || Date.now()-lastClockSync<300000)return Promise.resolve();
+ if(clockSync)return clockSync;
+ const start=Date.now();clockSync=Promise.resolve(online.rpc('server_time_ms')).then(({data,error})=>{const end=Date.now();if(!error && Number(data)>0){clockOffset=Number(data)-(start+end)/2;lastClockSync=end;}}).finally(()=>{clockSync=null;});return clockSync;
+}

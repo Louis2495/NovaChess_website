@@ -59,14 +59,13 @@ export function usePremoves({
     last.current = fen;
     const epoch = generation.current,
       run = fn.current;
+    // Dequeue when submitted, not when HTTP responds: a verified opponent reply
+    // can arrive first, and the next premove must not be mistaken for this one.
+    setQueue((q) => (q[0] === wanted ? q.slice(1) : q));
+    setSent({ fen, move });
     Promise.resolve()
       .then(() => {
         if (epoch === generation.current) return run(move);
-      })
-      .then(() => {
-        if (epoch !== generation.current) return;
-        setQueue((q) => (q[0] === wanted ? q.slice(1) : q));
-        setSent({ fen, move });
       })
       .catch((e) => {
         if (epoch !== generation.current) return;
