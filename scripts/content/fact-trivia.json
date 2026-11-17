@@ -1,0 +1,786 @@
+[
+  {
+    "id": "fact-trivia-insight-1",
+    "prompt": "How many eight-queen arrangements remain when rotations and reflections count as the same solution?",
+    "category": "Mathematics",
+    "answers": [
+      "12",
+      "8",
+      "46",
+      "92"
+    ],
+    "correct": 0,
+    "explanation": "Eight queens can occupy an otherwise empty board without attacking one another in 92 arrangements. Treating rotations and reflections as the same leaves just 12.",
+    "source": "https://en.wikipedia.org/wiki/Eight_queens_puzzle"
+  },
+  {
+    "id": "fact-trivia-insight-2",
+    "prompt": "What distinguishes a closed knight’s tour from an open one?",
+    "category": "Mathematics",
+    "answers": [
+      "The last square is a knight move from the first",
+      "It visits only dark squares",
+      "It returns by retracing every move",
+      "It uses two knights"
+    ],
+    "correct": 0,
+    "explanation": "A knight’s tour visits all 64 squares exactly once. In a closed tour, its final square is one knight move from its starting square.",
+    "source": "https://en.wikipedia.org/wiki/Knight%27s_tour"
+  },
+  {
+    "id": "fact-trivia-insight-3",
+    "prompt": "Why is a closed knight’s tour impossible on a board with an odd number of squares?",
+    "category": "Mathematics",
+    "answers": [
+      "Every jump switches square color",
+      "A knight cannot reach a corner",
+      "A closed tour requires a capture",
+      "The center square blocks the knight"
+    ],
+    "correct": 0,
+    "explanation": "Every knight move switches square color. That simple fact proves that a closed knight tour on a board with an odd number of squares is impossible.",
+    "source": "https://en.wikipedia.org/wiki/Knight%27s_tour"
+  },
+  {
+    "id": "fact-trivia-insight-4",
+    "prompt": "Why can’t dominoes tile a chessboard after two opposite corners are removed?",
+    "category": "Mathematics",
+    "answers": [
+      "The remaining colors have unequal square counts",
+      "There are an odd number of remaining squares",
+      "Dominoes cannot touch the border",
+      "The board becomes disconnected"
+    ],
+    "correct": 0,
+    "explanation": "Remove two opposite corners from a chessboard and 31 dominoes can no longer cover it. Both corners share a color; every domino must cover one square of each color.",
+    "source": "https://en.wikipedia.org/wiki/Mutilated_chessboard_problem"
+  },
+  {
+    "id": "fact-trivia-insight-6",
+    "prompt": "What allows some rook-and-pawn positions to hold against a queen?",
+    "category": "Endgames",
+    "answers": [
+      "A fortress that prevents progress",
+      "A rule forbidding queen checks",
+      "Automatic threefold repetition at the start",
+      "Rooks gaining extra movement"
+    ],
+    "correct": 0,
+    "explanation": "In a fortress, the stronger side may have no way to make progress. Some carefully arranged rook-and-pawn fortresses hold against a queen despite the material deficit.",
+    "source": "https://en.wikipedia.org/wiki/Fortress_(chess)"
+  },
+  {
+    "id": "fact-trivia-insight-7",
+    "prompt": "In the endgame position called a trebuchet, what is the problem for the player whose turn it is?",
+    "category": "Endgames",
+    "answers": [
+      "Moving loses a defended pawn",
+      "Both kings are already in check",
+      "Every pawn must promote",
+      "The kings must exchange places"
+    ],
+    "correct": 0,
+    "explanation": "In a trebuchet position, two kings defend mutually attacked pawns. Whoever must move first loses a pawn: the turn itself becomes a disadvantage.",
+    "source": "https://en.wikipedia.org/wiki/Zugzwang"
+  },
+  {
+    "id": "fact-trivia-insight-8",
+    "prompt": "What makes Réti’s 1921 king study work?",
+    "category": "Endgames",
+    "answers": [
+      "One diagonal route pursues a pawn and supports its own pawn",
+      "The king captures two pawns in one move",
+      "A rook sacrifices itself on the back rank",
+      "The defender castles out of danger"
+    ],
+    "correct": 0,
+    "explanation": "Réti’s 1921 study draws because a king approaches an enemy pawn and supports its own pawn along the same diagonal. Moving diagonally need not cost extra moves.",
+    "source": "https://en.wikipedia.org/wiki/R%C3%A9ti_endgame_study"
+  },
+  {
+    "id": "fact-trivia-insight-9",
+    "prompt": "Why is promoting to a queen wrong in the Saavedra study?",
+    "category": "Endgames",
+    "answers": [
+      "It allows a stalemate trick",
+      "It leaves the king in check",
+      "It permits en passant",
+      "It makes the promoted piece immobile"
+    ],
+    "correct": 0,
+    "explanation": "The Saavedra study requires promotion to a rook. Choosing a queen allows a stalemate trick; the less powerful piece keeps a winning threat alive.",
+    "source": "https://en.wikipedia.org/wiki/Saavedra_position"
+  },
+  {
+    "id": "fact-trivia-insight-10",
+    "prompt": "How many 2×2 squares are contained in an 8×8 board?",
+    "category": "Mathematics",
+    "answers": [
+      "49",
+      "32",
+      "56",
+      "64"
+    ],
+    "correct": 0,
+    "explanation": "There are 64 one-by-one squares, but also 49 two-by-two squares, 36 three-by-three squares, and so on. Add all eight sizes to get 204.",
+    "source": "https://en.wikipedia.org/wiki/Square_pyramidal_number"
+  },
+  {
+    "id": "fact-trivia-insight-11",
+    "prompt": "What is the goal of the five-queen domination problem?",
+    "category": "Mathematics",
+    "answers": [
+      "Attack or occupy every square",
+      "Place five queens without any attacks",
+      "Force mate against a bare king",
+      "Visit every square exactly once"
+    ],
+    "correct": 0,
+    "explanation": "Five queens suffice to attack or occupy every square on an otherwise empty 8×8 board. Four cannot do it. This is a domination problem, distinct from the eight-queens puzzle.",
+    "source": "https://en.wikipedia.org/wiki/Mathematical_chess_problem"
+  },
+  {
+    "id": "fact-trivia-insight-12",
+    "prompt": "What is an opening transposition?",
+    "category": "Strategy",
+    "answers": [
+      "Reaching the same position by a different move order",
+      "Exchanging the two kings",
+      "Changing the board orientation",
+      "Promoting a piece back into a pawn"
+    ],
+    "correct": 0,
+    "explanation": "A move-order transposition reaches the same position through different moves. Opening names describe a route; the resulting position, side to move and available rights determine what can happen next.",
+    "source": "https://en.wikipedia.org/wiki/Transposition_(chess)"
+  },
+  {
+    "id": "fact-trivia-insight-13",
+    "prompt": "What does a desperado piece try to do?",
+    "category": "Tactics",
+    "answers": [
+      "Capture something useful before it is inevitably lost",
+      "Avoid making any capture",
+      "Stay permanently on its starting square",
+      "Trade itself only for the enemy king"
+    ],
+    "correct": 0,
+    "explanation": "In a desperado combination, an already doomed piece captures something before disappearing. Its apparent sacrifice may recover material that would otherwise be lost.",
+    "source": "https://en.wikipedia.org/wiki/Desperado_(chess)"
+  },
+  {
+    "id": "fact-trivia-insight-14",
+    "prompt": "What is the point of an interference sacrifice?",
+    "category": "Tactics",
+    "answers": [
+      "Obstruct communication between enemy pieces",
+      "Add a new legal move to a knight",
+      "Force the opponent to castle",
+      "Stop both clocks"
+    ],
+    "correct": 0,
+    "explanation": "An interference sacrifice places a piece on a line between two enemy pieces. Capturing it may obstruct a different defender, which is the point of a Novotny theme.",
+    "source": "https://en.wikipedia.org/wiki/Novotny_(chess)"
+  },
+  {
+    "id": "fact-trivia-insight-15",
+    "prompt": "How can a waiting move win without making a direct threat?",
+    "category": "Tactics",
+    "answers": [
+      "It leaves the opponent in zugzwang",
+      "It cancels the opponent’s turn",
+      "It makes an illegal move legal",
+      "It removes the fifty-move rule"
+    ],
+    "correct": 0,
+    "explanation": "A waiting move in a composed problem can create zugzwang: it makes no direct threat, yet every legal reply gives something away.",
+    "source": "https://en.wikipedia.org/wiki/Zugzwang"
+  },
+  {
+    "id": "fact-trivia-insight-16",
+    "prompt": "Where should the defending king head against a wrong bishop and rook pawn?",
+    "category": "Endgames",
+    "answers": [
+      "The promotion corner not controlled by the bishop",
+      "Any square next to the attacking king",
+      "The center, regardless of the pawn",
+      "The corner controlled by the bishop"
+    ],
+    "correct": 0,
+    "explanation": "A bishop controls only one square color, so the wrong rook-pawn corner can be a draw even with an extra bishop and pawn. The defending king must actually reach the safe corner.",
+    "source": "https://en.wikipedia.org/wiki/Wrong_rook_pawn"
+  },
+  {
+    "id": "fact-trivia-insight-17",
+    "prompt": "Why can a tablebase win fail to be a practical tournament win?",
+    "category": "Computers",
+    "answers": [
+      "The fifty-move rule may prevent completing the win",
+      "Tablebases assume a ninth file",
+      "Tournament boards have fewer squares",
+      "Tablebases forbid pawn promotions"
+    ],
+    "correct": 0,
+    "explanation": "Seven-piece tablebases contain positions requiring more than 500 moves to mate with perfect resistance when the fifty-move rule is ignored. A theoretical win is not always a tournament win.",
+    "source": "https://en.wikipedia.org/wiki/Endgame_tablebase"
+  },
+  {
+    "id": "fact-trivia-insight-18",
+    "prompt": "On which device did Pocket Fritz 4 win the 2009 Copa Mercosur?",
+    "category": "Computers",
+    "answers": [
+      "HTC Touch HD",
+      "IBM Deep Blue",
+      "Apple Macintosh 128K",
+      "Nintendo Game Boy"
+    ],
+    "correct": 0,
+    "explanation": "Pocket Fritz 4 won the 2009 Copa Mercosur with 9½/10 while running on an HTC Touch HD. Its search speed was tiny beside desktop engines, showing the value of evaluation and software.",
+    "source": "https://en.wikipedia.org/wiki/Pocket_Fritz"
+  },
+  {
+    "id": "fact-trivia-insight-19",
+    "prompt": "How did Alan Turing test Turochamp against Alick Glennie in 1952?",
+    "category": "Computers",
+    "answers": [
+      "He simulated the algorithm by hand",
+      "He ran it on Deep Blue",
+      "He used an internet chess server",
+      "He loaded a seven-piece tablebase"
+    ],
+    "correct": 0,
+    "explanation": "Turing’s Turochamp algorithm was conceived before a suitable computer was available to him. He manually simulated it in a 1952 game against Alick Glennie.",
+    "source": "https://en.wikipedia.org/wiki/Turochamp"
+  },
+  {
+    "id": "fact-trivia-insight-20",
+    "prompt": "Which technology carried moves in the 1844 Washington–Baltimore correspondence match?",
+    "category": "History",
+    "answers": [
+      "Electric telegraph",
+      "Radio",
+      "Telephone",
+      "Satellite"
+    ],
+    "correct": 0,
+    "explanation": "The 1844 correspondence match between Washington and Baltimore used the new electric telegraph. Moves traveled faster than mailed letters long before internet chess.",
+    "source": "https://en.wikipedia.org/wiki/Correspondence_chess"
+  },
+  {
+    "id": "fact-trivia-insight-21",
+    "prompt": "Which cities hosted the opposing teams in the 1945 USA–USSR radio match?",
+    "category": "History",
+    "answers": [
+      "New York and Moscow",
+      "London and Paris",
+      "Berlin and Vienna",
+      "Reykjavík and Leningrad"
+    ],
+    "correct": 0,
+    "explanation": "The 1945 USA–USSR radio match connected players in New York and Moscow. The Soviet team won 15½–4½ without the teams sharing a room.",
+    "source": "https://en.wikipedia.org/wiki/USA%E2%80%93USSR_radio_match"
+  },
+  {
+    "id": "fact-trivia-insight-22",
+    "prompt": "Who won the 1962 Curaçao Candidates tournament without losing a game?",
+    "category": "History",
+    "answers": [
+      "Tigran Petrosian",
+      "Bobby Fischer",
+      "Mikhail Tal",
+      "Paul Keres"
+    ],
+    "correct": 0,
+    "explanation": "The 1962 Candidates tournament took place in Curaçao, with eight players meeting four times each. Tigran Petrosian won without losing a game.",
+    "source": "https://en.wikipedia.org/wiki/Candidates_Tournament_1962"
+  },
+  {
+    "id": "fact-trivia-insight-23",
+    "prompt": "In which year did Max Euwe become world champion?",
+    "category": "People",
+    "answers": [
+      "1935",
+      "1926",
+      "1948",
+      "1963"
+    ],
+    "correct": 0,
+    "explanation": "Max Euwe earned a doctorate in mathematics in 1926, became world chess champion in 1935, and later served as FIDE president.",
+    "source": "https://en.wikipedia.org/wiki/Max_Euwe"
+  },
+  {
+    "id": "fact-trivia-insight-24",
+    "prompt": "Which world champion wrote the philosophical work Kampf?",
+    "category": "People",
+    "answers": [
+      "Emanuel Lasker",
+      "José Raúl Capablanca",
+      "Mikhail Botvinnik",
+      "Boris Spassky"
+    ],
+    "correct": 0,
+    "explanation": "Emanuel Lasker earned a mathematics doctorate and wrote philosophical works, including Kampf. His chess title reign lasted from 1894 to 1921.",
+    "source": "https://en.wikipedia.org/wiki/Emanuel_Lasker"
+  },
+  {
+    "id": "fact-trivia-insight-25",
+    "prompt": "Whose grandmaster age record did Judit Polgár surpass in 1991?",
+    "category": "People",
+    "answers": [
+      "Bobby Fischer’s",
+      "Garry Kasparov’s",
+      "Anatoly Karpov’s",
+      "Magnus Carlsen’s"
+    ],
+    "correct": 0,
+    "explanation": "Judit Polgár became a grandmaster in 1991 at 15 years and 4 months, younger than Fischer had been. She later reached eighth in the world on a FIDE rating list.",
+    "source": "https://en.wikipedia.org/wiki/Judit_Polg%C3%A1r"
+  },
+  {
+    "id": "fact-trivia-insight-26",
+    "prompt": "What was the purpose of a sealed move when a game was adjourned?",
+    "category": "History",
+    "answers": [
+      "Commit to the next move before overnight analysis",
+      "Hide the game result from spectators",
+      "Select the opponent’s opening",
+      "Request an automatic draw"
+    ],
+    "correct": 0,
+    "explanation": "Before powerful portable engines, long games could be paused with a sealed move. Players and their teams analyzed overnight, making preparation part of the unfinished game.",
+    "source": "https://en.wikipedia.org/wiki/Adjournment_(games)"
+  },
+  {
+    "id": "fact-trivia-insight-27",
+    "prompt": "What could happen if a sealed move was illegal or ambiguous?",
+    "category": "Rules",
+    "answers": [
+      "The player could lose when the envelope was opened",
+      "Both players received a new queen",
+      "The whole tournament was restarted",
+      "The move was automatically replaced by castling"
+    ],
+    "correct": 0,
+    "explanation": "Under adjournment rules, an ambiguous or illegal sealed move could cost the game when the envelope was opened. Players had to record the exact move, not just an intention.",
+    "source": "https://en.wikipedia.org/wiki/Adjournment_(games)"
+  },
+  {
+    "id": "fact-trivia-insight-28",
+    "prompt": "Which restriction applies to a legal Chess960 starting position?",
+    "category": "Variants",
+    "answers": [
+      "The king starts between the rooks",
+      "Both bishops start on light squares",
+      "The queen must start on d1",
+      "The knights must be adjacent"
+    ],
+    "correct": 0,
+    "explanation": "Chess960 has 960 legal starting arrangements: bishops must stand on opposite colors, and the king must be between the rooks. Not every shuffle qualifies.",
+    "source": "https://en.wikipedia.org/wiki/Chess960"
+  },
+  {
+    "id": "fact-trivia-insight-29",
+    "prompt": "Why doesn’t a simple strategy-stealing argument prove that White must win chess?",
+    "category": "Mathematics",
+    "answers": [
+      "An extra move can be harmful because of zugzwang",
+      "White cannot promote pawns",
+      "Black starts with extra material",
+      "White cannot repeat a position"
+    ],
+    "correct": 0,
+    "explanation": "In the game-theory strategy-stealing argument, being able to imitate a first player does not prove chess is a win for White: zugzwang means an extra move can be harmful.",
+    "source": "https://en.wikipedia.org/wiki/Strategy-stealing_argument"
+  },
+  {
+    "id": "fact-trivia-insight-30",
+    "prompt": "Why could one square have different names in descriptive notation?",
+    "category": "History",
+    "answers": [
+      "Names depended on each player’s perspective",
+      "Names changed after every capture",
+      "Only diagonal moves were recorded",
+      "Each player chose a private alphabet"
+    ],
+    "correct": 0,
+    "explanation": "Algebraic notation is a coordinate system, while older descriptive notation names squares from each player’s perspective. The same square could therefore have different descriptive names.",
+    "source": "https://en.wikipedia.org/wiki/Descriptive_notation"
+  },
+  {
+    "id": "fact-trivia-insight-31",
+    "prompt": "Which piece retained its familiar leap while the queen and bishop changed substantially?",
+    "category": "History",
+    "answers": [
+      "Knight",
+      "Queen",
+      "Bishop",
+      "Rook"
+    ],
+    "correct": 0,
+    "explanation": "While the queen and bishop changed dramatically as modern chess evolved, the knight’s familiar leap is inherited from much earlier forms of the game.",
+    "source": "https://en.wikipedia.org/wiki/History_of_chess"
+  },
+  {
+    "id": "fact-trivia-insight-33",
+    "prompt": "Why can opposite-colored bishops help an attacking side in a middlegame?",
+    "category": "Strategy",
+    "answers": [
+      "The rival bishop cannot defend the attacker’s square color",
+      "Both bishops become queens",
+      "The defending king loses its legal moves automatically",
+      "Opposite bishops make every position a draw"
+    ],
+    "correct": 0,
+    "explanation": "Opposite-colored bishop endgames often draw, but in a middlegame the attacking bishop can operate on squares its rival can never defend. Queens and exposed kings change the story.",
+    "source": "https://en.wikipedia.org/wiki/Opposite-colored_bishops_endgame"
+  },
+  {
+    "id": "fact-trivia-insight-34",
+    "prompt": "What did Levitsky do after Marshall’s famous 23...Qg3 in 1912?",
+    "category": "Tactics",
+    "answers": [
+      "Resigned without taking the queen",
+      "Captured the queen and won",
+      "Claimed stalemate immediately",
+      "Promoted a pawn to a knight"
+    ],
+    "correct": 0,
+    "explanation": "After Marshall’s 23...Qg3 in the 1912 Levitsky game, White resigned rather than capture the queen. The famous position is a threat calculation, not a queen blunder.",
+    "source": "https://en.wikipedia.org/wiki/Levitsky_versus_Marshall"
+  },
+  {
+    "id": "fact-trivia-insight-35",
+    "prompt": "Which square was the destination of Nigel Short’s famous king walk against Timman?",
+    "category": "Strategy",
+    "answers": [
+      "g5",
+      "a8",
+      "d1",
+      "b2"
+    ],
+    "correct": 0,
+    "explanation": "Against Timman in 1991, Nigel Short walked his king from g1 through h2, g3, f4 and g5. Its destination helped finish an attack while queens remained on the board.",
+    "source": "https://en.wikipedia.org/wiki/Nigel_Short"
+  },
+  {
+    "id": "fact-trivia-shannon",
+    "prompt": "What does Shannon’s estimate of roughly 10¹²⁰ describe?",
+    "category": "Numbers",
+    "answers": [
+      "The approximate chess game-tree complexity",
+      "The exact number of legal board positions",
+      "The number of grandmasters",
+      "The number of possible first moves"
+    ],
+    "correct": 0,
+    "explanation": "Shannon’s famous rough game-tree estimate is about 10¹²⁰. It is an estimate, not an exact count.",
+    "source": "https://en.wikipedia.org/wiki/Shannon_number"
+  },
+  {
+    "id": "fact-trivia-nine-queens",
+    "prompt": "How many queens can one side theoretically have after promotions?",
+    "category": "Numbers",
+    "answers": [
+      "Nine",
+      "Eight",
+      "Ten",
+      "Six"
+    ],
+    "correct": 0,
+    "explanation": "One side can theoretically have nine queens: the original plus eight promoted pawns.",
+    "source": "https://handbook.fide.com/chapter/E012023"
+  },
+  {
+    "id": "fact-trivia-castle-rook",
+    "prompt": "Does an attack on a rook alone forbid castling with that rook?",
+    "category": "Rules",
+    "answers": [
+      "No, the king’s path and other castling conditions matter",
+      "Yes, any attack on the rook forbids it",
+      "Only if the rook is attacked by a bishop",
+      "Only if the rook has not moved"
+    ],
+    "correct": 0,
+    "explanation": "A rook being attacked does not by itself prevent castling.",
+    "source": "https://handbook.fide.com/chapter/E012023"
+  },
+  {
+    "id": "fact-trivia-threefold",
+    "prompt": "Must the repeated positions be consecutive for a threefold-repetition claim?",
+    "category": "Rules",
+    "answers": [
+      "No",
+      "Yes, always",
+      "Only in rapid chess",
+      "Only if both kings are in check"
+    ],
+    "correct": 0,
+    "explanation": "Threefold repetition can be claimed; the repeated positions need not be consecutive.",
+    "source": "https://handbook.fide.com/chapter/E012023"
+  },
+  {
+    "id": "fact-trivia-fivefold",
+    "prompt": "How many repetitions make a draw automatic under standard FIDE rules?",
+    "category": "Rules",
+    "answers": [
+      "Five",
+      "Three",
+      "Four",
+      "Six"
+    ],
+    "correct": 0,
+    "explanation": "Fivefold repetition ends a standard game automatically under FIDE rules.",
+    "source": "https://handbook.fide.com/chapter/E012023"
+  },
+  {
+    "id": "fact-trivia-seventy-five",
+    "prompt": "What takes priority if the last move also reaches the automatic 75-move limit?",
+    "category": "Rules",
+    "answers": [
+      "Checkmate",
+      "An immediate draw regardless of mate",
+      "A coin toss",
+      "Replaying the previous move"
+    ],
+    "correct": 0,
+    "explanation": "After 75 such moves by each side, the game is drawn; checkmate on the last move takes priority.",
+    "source": "https://handbook.fide.com/chapter/E012023"
+  },
+  {
+    "id": "fact-trivia-same-position",
+    "prompt": "Which extra information matters when deciding whether two positions are identical for repetition?",
+    "category": "Rules",
+    "answers": [
+      "Side to move and castling/en-passant rights",
+      "The players’ ratings",
+      "The color of the board frame",
+      "The opening’s name"
+    ],
+    "correct": 0,
+    "explanation": "Repetition also depends on whose turn it is and the available castling and en-passant rights.",
+    "source": "https://handbook.fide.com/chapter/E012023"
+  },
+  {
+    "id": "fact-trivia-two-knights",
+    "prompt": "Can two knights force checkmate against a bare king with best defense?",
+    "category": "Pieces",
+    "answers": [
+      "No, although mating positions exist",
+      "Yes, from every legal position",
+      "Only if both knights began on b1",
+      "Only after a queen promotion"
+    ],
+    "correct": 0,
+    "explanation": "Two knights cannot force checkmate against a bare king with best defense.",
+    "source": "https://en.wikipedia.org/wiki/Two_knights_endgame"
+  },
+  {
+    "id": "fact-trivia-bishop-knight",
+    "prompt": "Toward which corner does bishop-and-knight checkmate drive the king?",
+    "category": "Pieces",
+    "answers": [
+      "A corner matching the bishop’s square color",
+      "Any corner opposite the knight",
+      "Only a8",
+      "A corner not controlled by the bishop"
+    ],
+    "correct": 0,
+    "explanation": "Bishop-and-knight mate drives the king toward a corner matching the bishop’s color.",
+    "source": "https://en.wikipedia.org/wiki/Bishop_and_knight_checkmate"
+  },
+  {
+    "id": "fact-trivia-chaturanga",
+    "prompt": "Which region is associated with chaturanga, a major ancestor of chess?",
+    "category": "Origins",
+    "answers": [
+      "India",
+      "Iceland",
+      "Scotland",
+      "Peru"
+    ],
+    "correct": 0,
+    "explanation": "Chess traces its roots to chaturanga in India, around the sixth century.",
+    "source": "https://en.wikipedia.org/wiki/History_of_chess"
+  },
+  {
+    "id": "fact-trivia-queen-evolves",
+    "prompt": "When did the modern long-range queen emerge in Europe?",
+    "category": "Origins",
+    "answers": [
+      "Late fifteenth century",
+      "Early eighth century",
+      "Mid-nineteenth century",
+      "After the 1972 world championship"
+    ],
+    "correct": 0,
+    "explanation": "The modern queen’s long-range movement emerged in Europe in the late fifteenth century.",
+    "source": "https://en.wikipedia.org/wiki/History_of_chess"
+  },
+  {
+    "id": "fact-trivia-lucena",
+    "prompt": "In which year was Lucena’s early printed chess book published?",
+    "category": "Origins",
+    "answers": [
+      "1497",
+      "1849",
+      "1924",
+      "1575"
+    ],
+    "correct": 0,
+    "explanation": "Lucena’s 1497 book is an early printed source for modern chess rules and positions.",
+    "source": "https://en.wikipedia.org/wiki/Luis_Ram%C3%ADrez_de_Lucena"
+  },
+  {
+    "id": "fact-trivia-staunton",
+    "prompt": "When was the Staunton chess-piece design introduced?",
+    "category": "Origins",
+    "answers": [
+      "1849",
+      "1497",
+      "1927",
+      "1978"
+    ],
+    "correct": 0,
+    "explanation": "The Staunton piece design was introduced in 1849 and named after Howard Staunton.",
+    "source": "https://en.wikipedia.org/wiki/Staunton_chess_set"
+  },
+  {
+    "id": "fact-trivia-london1851",
+    "prompt": "Who won the landmark London 1851 tournament?",
+    "category": "Origins",
+    "answers": [
+      "Adolf Anderssen",
+      "Wilhelm Steinitz",
+      "Paul Morphy",
+      "Howard Staunton"
+    ],
+    "correct": 0,
+    "explanation": "Adolf Anderssen won London 1851, a landmark international chess tournament.",
+    "source": "https://en.wikipedia.org/wiki/London_1851_chess_tournament"
+  },
+  {
+    "id": "fact-trivia-menchik",
+    "prompt": "Who won the first Women’s World Championship in 1927?",
+    "category": "People",
+    "answers": [
+      "Vera Menchik",
+      "Nona Gaprindashvili",
+      "Judit Polgár",
+      "Maia Chiburdanidze"
+    ],
+    "correct": 0,
+    "explanation": "Vera Menchik won the first Women’s World Championship in 1927.",
+    "source": "https://en.wikipedia.org/wiki/Vera_Menchik"
+  },
+  {
+    "id": "fact-trivia-first-gms",
+    "prompt": "How many grandmaster titles did FIDE award in its inaugural 1950 group?",
+    "category": "People",
+    "answers": [
+      "27",
+      "12",
+      "64",
+      "100"
+    ],
+    "correct": 0,
+    "explanation": "FIDE awarded its first 27 grandmaster titles in 1950.",
+    "source": "https://en.wikipedia.org/wiki/Grandmaster_(chess)"
+  },
+  {
+    "id": "fact-trivia-nona",
+    "prompt": "Who became the first woman awarded the open grandmaster title in 1978?",
+    "category": "People",
+    "answers": [
+      "Nona Gaprindashvili",
+      "Vera Menchik",
+      "Susan Polgár",
+      "Pia Cramling"
+    ],
+    "correct": 0,
+    "explanation": "Nona Gaprindashvili became the first woman awarded the open GM title in 1978.",
+    "source": "https://en.wikipedia.org/wiki/Nona_Gaprindashvili"
+  },
+  {
+    "id": "fact-trivia-marathon-match",
+    "prompt": "After how many games was the 1984–85 Karpov–Kasparov match stopped?",
+    "category": "People",
+    "answers": [
+      "48",
+      "24",
+      "32",
+      "60"
+    ],
+    "correct": 0,
+    "explanation": "The 1984–85 Karpov–Kasparov title match was stopped after 48 games without a champion being decided.",
+    "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+  },
+  {
+    "id": "fact-trivia-longest-game",
+    "prompt": "How many moves did the 1989 Nikolić–Arsović draw last?",
+    "category": "Numbers",
+    "answers": [
+      "269",
+      "150",
+      "200",
+      "312"
+    ],
+    "correct": 0,
+    "explanation": "Nikolić–Arsović, Belgrade 1989, lasted 269 moves.",
+    "source": "https://en.wikipedia.org/wiki/List_of_world_records_in_chess"
+  },
+  {
+    "id": "fact-trivia-tablebases",
+    "prompt": "What can an endgame tablebase provide within its piece limit?",
+    "category": "Technology",
+    "answers": [
+      "Exact results for legal positions",
+      "The player’s next tournament rating",
+      "A guaranteed human playing time",
+      "The identity of an unknown player"
+    ],
+    "correct": 0,
+    "explanation": "An endgame tablebase can give exact results for positions within its piece limit.",
+    "source": "https://en.wikipedia.org/wiki/Endgame_tablebase"
+  },
+  {
+    "id": "fact-trivia-elo",
+    "prompt": "Why aren’t ratings from different player pools automatically interchangeable?",
+    "category": "Numbers",
+    "answers": [
+      "Elo is relative to results within its pool",
+      "A rating measures the number of games alone",
+      "Every pool uses identical opponents",
+      "The board color determines the scale"
+    ],
+    "correct": 0,
+    "explanation": "Elo measures results within a player pool; different pools are not automatically equivalent.",
+    "source": "https://en.wikipedia.org/wiki/Elo_rating_system"
+  },
+  {
+    "id": "fact-trivia-fide-lists",
+    "prompt": "Why don’t early world champions have FIDE ratings from their title reigns?",
+    "category": "Technology",
+    "answers": [
+      "Published FIDE Elo lists began much later",
+      "Champions were banned from rating lists",
+      "Only correspondence games were rated then",
+      "All their games ended in draws"
+    ],
+    "correct": 0,
+    "explanation": "Published FIDE Elo lists began long after the first world championship. Early champions have no title-era FIDE rating.",
+    "source": "https://en.wikipedia.org/wiki/FIDE_world_rankings"
+  },
+  {
+    "id": "fact-trivia-reunification",
+    "prompt": "Which match reunited the split world championship in 2006?",
+    "category": "People",
+    "answers": [
+      "Kramnik–Topalov",
+      "Fischer–Spassky",
+      "Kasparov–Short",
+      "Anand–Carlsen"
+    ],
+    "correct": 0,
+    "explanation": "Kramnik’s 2006 victory over Topalov reunited the split world championship.",
+    "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+  }
+]

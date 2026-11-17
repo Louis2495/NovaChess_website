@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, ArrowUpRight, BookOpen, ChevronRight } from "lucide-react";
+import { Search, ArrowUpRight, BookOpen } from "lucide-react";
 import { useData } from "../../lib/store";
 import { useApp } from "../../lib/context";
 import { ChoiceSelect, Card, Button, Loading } from "../../components/UI";
@@ -75,7 +75,7 @@ export default function Encyclopedia() {
                 {e.title}
                 <small>{e.category}</small>
               </span>
-              <ChevronRight size={15} />
+
             </button>
           ))}
           {filtered.length > limit && (

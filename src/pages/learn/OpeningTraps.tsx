@@ -103,7 +103,7 @@ function TrapArchive({ traps }: { traps: Trap[] }) {
               {solved.includes(t.id) ? (
                 <Check size={15} />
               ) : (
-                <ChevronRight size={15} />
+                null
               )}
             </button>
           ))}

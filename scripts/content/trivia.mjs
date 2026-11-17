@@ -191,6 +191,8 @@ for (const [i, [prompt, answer, ...wrong]] of extra.entries())
       "https://en.wikipedia.org/w/index.php?search=" +
       encodeURIComponent(prompt + " chess"),
   });
+const factQuestions=JSON.parse(readFileSync(new URL("./fact-trivia.json",import.meta.url),"utf8"));
+for(const q of factQuestions) if(!questions.some(existing=>existing.prompt===q.prompt)) questions.push(q);
 writeFileSync(
   "public/data/trivia.json",
   JSON.stringify(questions, null, 2) + "\n",

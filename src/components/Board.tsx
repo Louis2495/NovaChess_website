@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { useApp } from "../lib/context";
 import { base, pieceUrl, boardSizeKey, annotationColors } from "../lib/store";
@@ -338,7 +338,7 @@ export function Board({
       boardSizes: { ...a.boardSizes, [sizeKey]: next },
     }));
   }
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = boardRef.current;
     if (!el) return;
     const measure = () => {
@@ -358,7 +358,7 @@ export function Board({
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
       const top = rect.top + window.scrollY;
-      const available = window.innerHeight - top - 90;
+      const available = window.innerHeight - top - (tab === "puzzles" && window.innerWidth <= 1000 ? 158 : 90);
       const limit = Math.floor(Math.max(160, available >= 160 ? available : window.innerHeight - 230));
       if (!resizeGesture.current) setViewportLimit(previous => previous === limit ? previous : limit);
     };

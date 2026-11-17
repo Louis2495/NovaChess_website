@@ -194,7 +194,7 @@ function Archive({ games }: { games: FamousGame[] }) {
                   {g.white.split(" ").at(-1)} · {g.black.split(" ").at(-1)}
                 </small>
               </span>
-              <ChevronRight size={15} />
+
             </button>
           ))}
           {!filtered.length && <p className="caption">No matching games.</p>}

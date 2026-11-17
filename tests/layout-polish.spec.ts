@@ -8,7 +8,7 @@ test('Analysis uses icon tools, full-width insights, notation below the board an
  const board=page.locator('.analysis-layout .board'),notation=page.locator('.board-column > .analysis-notation');
  await expect(notation).toBeVisible();
  const bb=(await board.boundingBox())!,nb=(await notation.boundingBox())!,handle=(await page.getByRole('slider',{name:'Resize board',exact:true}).boundingBox())!;
- expect(nb.y).toBeGreaterThan(bb.y+bb.height);expect(handle.y+handle.height).toBeLessThanOrEqual(bb.y);expect(Math.abs(handle.x+handle.width-bb.x-bb.width)).toBeLessThan(1);
+ expect(nb.y).toBeGreaterThan(bb.y+bb.height);if(isMobile){const tail=await page.getByRole("slider",{name:"Resize board",exact:true}).locator("svg").evaluate((svg:SVGSVGElement)=>{const p=new DOMPoint(3,13).matrixTransform(svg.getScreenCTM()!);return {x:p.x,y:p.y};});expect(Math.abs(tail.x-bb.x-bb.width)).toBeLessThan(1);expect(Math.abs(tail.y-bb.y)).toBeLessThan(1);}else{expect(handle.y+handle.height).toBeLessThanOrEqual(bb.y);expect(Math.abs(handle.x+handle.width-bb.x-bb.width)).toBeLessThan(1);}
  await expect(board.locator('.board-resize-handle')).toHaveCount(0);
  if(!isMobile){const insights=(await page.locator('.positional-insights').boundingBox())!,lines=(await page.locator('.engine-top-lines').boundingBox())!;expect(Math.abs(insights.width-lines.width)).toBeLessThan(1);expect(Math.abs(insights.y-bb.y)).toBeLessThan(1);}
  const e2=board.getByRole('button',{name:'e2, white pawn',exact:true});await e2.click();await expect(e2).toHaveAttribute('aria-pressed','true');await page.getByRole('heading',{name:'Analysis',exact:true}).click({button:'right'});await expect(e2).toHaveAttribute('aria-pressed','false');

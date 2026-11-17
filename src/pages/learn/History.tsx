@@ -136,7 +136,7 @@ export default function History({ data }: { data: HistoryData }) {
                   >
                     <time>{m.year}</time>
                     <span>{m.title}</span>
-                    <ChevronRight size={15} />
+
                   </button>
                 ))}
               </div>

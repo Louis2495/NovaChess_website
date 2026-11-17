@@ -341,13 +341,12 @@ test("Research loads public games and calculates real opening frequencies", asyn
   await expect(page.locator(".research-branches")).toContainText("c5");
 });
 
-test("facts, history, dated ratings and map controls provide real content", async ({
+test("trivia, history, dated ratings and map controls provide real content", async ({
   page,
 }) => {
   await page.goto("/#learn/facts");
-  await expect(page.locator(".facts-grid .card")).toHaveCount(75);
-  await expect(page.getByLabel("Search facts")).toHaveCount(0);
-  await expect(page.locator(".facts-grid .card").first()).toBeVisible();
+  await expect(page.locator(".trivia-game")).toBeVisible();
+  await expect(page.locator(".facts-grid")).toHaveCount(0);
   await page.goto("/#learn/history");
   await expect(page.locator(".history-event-list>button")).toHaveCount(22);
   await page

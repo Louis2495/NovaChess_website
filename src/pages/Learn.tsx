@@ -1,18 +1,6 @@
-import {
-  BookOpen,
-  GraduationCap,
-  Library,
-  Clapperboard,
-  Target,
-  Lightbulb,
-  History,
-  Brain,
-  Sparkles,
-  BookMarked,
-  ShieldCheck,
-  ChevronRight,
-  ArrowLeft,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { base } from "../lib/store";
 import { useApp } from "../lib/context";
 import { PageTitle, Button } from "../components/UI";
 import OpeningTraps from "./learn/OpeningTraps";
@@ -26,20 +14,8 @@ import Knowledge from "./learn/Knowledge";
 export default function Learn() {
   const { detail, navigate, library } = useApp();
   const section = detail.split(":")[0];
-  const labels: Record<string, string> = {
-    repertoire: "Your repertoire",
-    train: "Train an opening",
-    lessons: "Opening lessons",
-    traps: "Opening traps",
-    search: "Opening library",
-    famous: "Famous games",
-    endgames: "Endgame Lessons",
-    facts: "Fun facts",
-    history: "History",
-    encyclopedia: "Encyclopedia",
-    trivia: "Trivia",
-    quizzes: "Quizzes",
-  };
+  const [openingTab,setOpeningTab]=useState("Lessons"),[historyTab,setHistoryTab]=useState("Timeline");
+  const labels: Record<string,string>={repertoire:"Your repertoire",train:"Train an opening",lessons:"Opening lessons",traps:"Opening lessons",search:"Opening lessons",famous:"History",history:"History",endgames:"Endgame Lessons",encyclopedia:"Encyclopedia",trivia:"Trivia",facts:"Trivia",quizzes:"Quizzes"};
   if (detail)
     return (
       <>
@@ -53,138 +29,29 @@ export default function Learn() {
           </Button>
           <PageTitle title={labels[section] || "Learn"}></PageTitle>
         </div>
-        {section === "traps" ? (
-          <OpeningTraps />
-        ) : section === "encyclopedia" ? (
-          <Encyclopedia />
-        ) : section === "trivia" ? (
-          <Playground trivia />
-        ) : section === "quizzes" ? (
-          <Playground />
-        ) : section === "repertoire" ? (
-          <Repertoire />
-        ) : section === "famous" ? (
-          <FamousGames />
-        ) : section === "endgames" ? (
-          <Endgames />
-        ) : section === "facts" || section === "history" ? (
-          <Knowledge section={section} />
-        ) : (
-          <Openings
-            mode={section === "train" ? "train" : "lesson"}
-            query={section === "search" ? detail.slice(7) : ""}
-            selectedId={section === "lessons" ? detail.slice(8) : undefined}
-          />
-        )}
+        {["lessons","traps","search"].includes(section) ? <>
+          <div className="segmented learn-section-tabs" role="group" aria-label="Opening lessons section">{["Lessons","Traps"].map(t=><button key={t} className={(section==="traps"?"Traps":openingTab)===t?"active":""} onClick={()=>{setOpeningTab(t);if(section==="traps")navigate("learn","lessons");}}>{t}</button>)}</div>
+          {(section==="traps" || openingTab==="Traps") ? <OpeningTraps/> : <Openings mode="lesson" query={section==="search"?detail.slice(7):""} selectedId={section==="lessons"?detail.slice(8):undefined}/>}
+        </> : ["history","famous"].includes(section) ? <>
+          <div className="segmented learn-section-tabs" role="group" aria-label="History section">{["Timeline","Famous games"].map(t=><button key={t} className={(section==="famous"?"Famous games":historyTab)===t?"active":""} onClick={()=>{setHistoryTab(t);if(section==="famous")navigate("learn","history");}}>{t}</button>)}</div>
+          {(section==="famous" || historyTab==="Famous games") ? <FamousGames/> : <Knowledge section="history"/>}
+        </> : section==="encyclopedia" ? <Encyclopedia/> : section==="trivia" || section==="facts" ? <Playground trivia/> : section==="quizzes" ? <Playground/> : section==="repertoire" ? <Repertoire/> : section==="endgames" ? <Endgames/> : <Openings mode={section==="train"?"train":"lesson"}/>}
+
       </>
     );
-  const tiles = [
-          {
-            id: "traps",
-            title: "Opening traps",
-            text: "20 traps · defenses & practice",
-            icon: ShieldCheck,
-            color: "orange",
-          },
-          {
-            id: "encyclopedia",
-            title: "Encyclopedia",
-            text: "Motifs, players, events & more",
-            icon: BookMarked,
-            color: "blue",
-          },
-          {
-            id: "trivia",
-            title: "Trivia",
-            text: "Test your chess knowledge",
-            icon: Brain,
-            color: "purple",
-          },
-          {
-            id: "quizzes",
-            title: "Quizzes",
-            text: "Choose moves, find your style",
-            icon: Sparkles,
-            color: "orange",
-          },
-          {
-            id: "repertoire",
-            title: "Your repertoire",
-            text: `${library.repertoire.length} saved lines`,
-            icon: Library,
-            color: "green",
-          },
-          {
-            id: "train",
-            title: "Train an opening",
-            text: "Practice the next move",
-            icon: GraduationCap,
-            color: "purple",
-          },
-          {
-            id: "lessons",
-            title: "Opening lessons",
-            text: "129 guided lessons",
-            icon: BookOpen,
-            color: "blue",
-          },
-          {
-            id: "famous",
-            title: "Famous games",
-            text: "Master games · replay & explore",
-            icon: Clapperboard,
-            color: "orange",
-          },
-          {
-            id: "endgames",
-            title: "Endgame Lessons",
-            text: "17 positions · engine replies",
-            icon: Target,
-            color: "blue",
-          },
-          {
-            id: "facts",
-            title: "Fun facts",
-            text: "75 selected stories",
-            icon: Lightbulb,
-            color: "orange",
-          },
-          {
-            id: "history",
-            title: "History",
-            text: "Milestones, champions & ratings",
-            icon: History,
-            color: "purple",
-          },
-        ];
-  return (
-    <>
-      <PageTitle title="Learn" />
-      <div className="learn-groups">
-        {[
-          {title:"Lessons & practice", ids:["lessons","traps","endgames","train","repertoire"]},
-          {title:"Explore chess", ids:["famous","encyclopedia","history"]},
-          {title:"Just for fun", ids:["quizzes","trivia","facts"]},
-        ].map(group => <section className="learn-group" key={group.title}>
-          <h2 className="learn-group-title">{group.title}</h2>
-          <div className="learn-hub">
-          {group.ids.map(id => tiles.find(tile => tile.id === id)!).map(({ id, title, text, icon: Icon, color }) => (
-          <button
-            className={`card learn-tile ${color}`}
-            key={id}
-            onClick={() => navigate("learn", id)}
-          >
-            <span className="learn-tile-icon">
-              <Icon size={30} />
-            </span>
-            <h2>{title}</h2>
-            <p>{text}</p>
-            <ChevronRight size={19} />
-          </button>
-        ))}
-          </div>
-        </section>)}
-      </div>
-    </>
-  );
+  const tiles=[
+    {id:"repertoire",title:"Your repertoire",text:`${library.repertoire.length} saved lines`,tile:0},
+    {id:"lessons",title:"Opening lessons",text:"Lessons, traps & refutations",tile:1},
+    {id:"endgames",title:"Endgame Lessons",text:"17 positions · engine replies",tile:2},
+    {id:"train",title:"Train an opening",text:"Practice the next move",tile:3},
+    {id:"history",title:"History",text:"Famous games, champions & milestones",tile:4},
+    {id:"encyclopedia",title:"Encyclopedia",text:"Motifs, players, events & more",tile:5},
+    {id:"quizzes",title:"Quizzes",text:"Choose moves, find your style",tile:6},
+    {id:"trivia",title:"Trivia",text:"Test your chess knowledge",tile:7},
+  ];
+  return <><PageTitle title="Learn"/><div className="learn-groups">{[
+    {title:"Lessons & practice",ids:["repertoire","lessons","endgames","train"]},
+    {title:"Explore chess",ids:["history","encyclopedia"]},
+    {title:"Just for fun",ids:["quizzes","trivia"]},
+  ].map(group=><section className="learn-group" key={group.title}><h2 className="learn-group-title">{group.title}</h2><div className="learn-hub">{group.ids.map(id=>tiles.find(t=>t.id===id)!).map(t=><button className="card learn-tile" key={t.id} onClick={()=>navigate("learn",t.id)}><span className="learn-picture" aria-hidden="true" style={{backgroundImage:`url("${base}learn/illustrations.webp")`,backgroundPosition:`${(t.tile%4)*100/3}% ${Math.floor(t.tile/4)*100}%`}}/><h2>{t.title}</h2><p>{t.text}</p></button>)}</div></section>)}</div></>;
 }
