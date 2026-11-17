@@ -438,7 +438,7 @@ function App() {
         : appearance.density === "Spacious"
           ? "28px"
           : "21px",
-    "--board-max": `${manualBoardSize || appearance.boardSize}px`,
+    "--board-max": manualBoardSize ? `${manualBoardSize}px` : "max(220px, calc(100dvh - 160px))",
     "--analysis-board-size": manualBoardSize
       ? `${manualBoardSize}px`
       : "max(220px, calc(100dvh - 190px))",

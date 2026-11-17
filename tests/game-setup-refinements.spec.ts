@@ -45,7 +45,7 @@ test("game setup offers two strength choices, defaults to rated, searches openin
   expect(names.slice(1).every((n) => /Sicilian/i.test(n))).toBeTruthy();
   await opening.selectOption({ index: 1 });
   await page.getByLabel("Custom", { exact: true }).check();
-  await page.getByLabel("Strength target (approximate)").fill("1500");
+  await page.getByLabel("Rating", { exact: true }).fill("1500");
   await page.getByRole("button", { name: "Start game", exact: true }).click();
   await expect
     .poll(async () =>
@@ -92,6 +92,7 @@ test("desktop daily puzzle and meme share their top and bottom, and Analysis sta
   const panels = (await page
     .locator(".analysis-layout .side-panels")
     .boundingBox())!;
-  expect(board.width).toBeLessThanOrEqual(540);
+  expect(board.width).toBeGreaterThan(600);
+  expect(board.y + board.height).toBeLessThan((await page.viewportSize())!.height - 50);
   expect(panels.width).toBeGreaterThan(280);
 });

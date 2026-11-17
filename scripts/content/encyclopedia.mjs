@@ -1,4 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
+import {Chess} from "chess.js";
+import {expandedEntries} from "./encyclopedia-expanded.mjs";
+import {foundationEntries} from "./encyclopedia-foundations.mjs";
 const groups = {
   Tactics: [
     [
@@ -493,6 +496,7 @@ for (const g of guides)
     title: g.family,
     category: "Openings",
     body: g.idea + " " + g.structure,
+    sections:[{title:"White's plans",body:g.white.join(" ")},{title:"Black's plans",body:g.black.join(" ")},{title:"Common mistake",body:g.avoid}],
     aliases: [g.eco, ...g.breaks],
     source:
       "https://en.wikipedia.org/w/index.php?search=" +
@@ -502,11 +506,15 @@ for (const g of guides)
 const allOpenings = JSON.parse(readFileSync("public/data/openings.json"));
 for (const o of allOpenings) {
   if (entries.some((e) => e.title === o.name)) continue;
+  const board=new Chess();
+  for(const move of o.moves)board.move(move);
+  const family=guides.filter(g=>o.name.toLowerCase().startsWith(g.family.toLowerCase())).sort((a,b)=>b.family.length-a.family.length)[0];
   entries.push({
     id: "opening-line-" + o.id,
     title: o.name,
     category: "Openings",
-    body: `${o.name} is classified as ${o.eco}. Study its legal move order and compare it with the neighboring variations in the opening library.`,
+    body: `${o.name} is classified as ${o.eco}. ${family?family.idea:"The move order below defines this named line. Compare the resulting central structure, development, and king safety before choosing a continuation."}`,
+    sections:[{title:"Defining move order",body:board.pgn()},...(family?[{title:"Plans and pawn structure",body:family.structure+" White: "+family.white.join(" ")+" Black: "+family.black.join(" ")},{title:"Watch for",body:family.avoid}]:[])],
     aliases: [o.eco],
     source:
       "https://en.wikipedia.org/w/index.php?search=" +
@@ -528,6 +536,13 @@ for (const g of masters) {
       source: g.source,
     });
   }
+}
+// Expand existing articles in place so saved IDs and aliases keep working.
+const key=title=>title.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+for(const article of [...expandedEntries,...foundationEntries]){
+ const existing=entries.find(e=>key(e.title)===key(article.title));
+ if(existing)Object.assign(existing,{body:article.body,sections:article.sections});
+ else entries.push(article);
 }
 writeFileSync(
   "public/data/encyclopedia.json",

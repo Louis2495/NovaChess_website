@@ -11,7 +11,9 @@ type Entry = {
   aliases: string[];
   source: string;
   lesson?: string;
+  sections?: {title:string;body:string}[];
 };
+const normalize=(text:string)=>text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 export default function Encyclopedia() {
   const { data, error } = useData<Entry[]>("encyclopedia"),
     { navigate } = useApp();
@@ -25,9 +27,7 @@ export default function Encyclopedia() {
         ?.filter(
           (e) =>
             (category === "All" || e.category === category) &&
-            (e.title + " " + e.body + " " + e.aliases.join(" "))
-              .toLowerCase()
-              .includes(query.toLowerCase()),
+            normalize(query).trim().split(/\s+/).every(term=>normalize(e.title+" "+e.body+" "+e.aliases.join(" ")+" "+(e.sections||[]).map(s=>s.body).join(" ")).includes(term)),
         )
         .sort((a, b) => a.title.localeCompare(b.title)) || [],
     [data, query, category],
@@ -36,6 +36,7 @@ export default function Encyclopedia() {
   const selected = filtered.find((e) => e.id === id) || filtered[0];
   return (
     <>
+      <div className="encyclopedia-overview"><h2>Your chess reference shelf</h2><p>{data.length.toLocaleString()} articles · {new Set(data.map(e=>e.category)).size} topics</p><div className="encyclopedia-topics">{["All",...new Set(data.map(e=>e.category))].map(c=><button key={c} aria-pressed={category===c} onClick={()=>{setCategory(c);setLimit(100);setId("");setQuery("");}}>{c}<span>{c==="All"?data.length:data.filter(e=>e.category===c).length}</span></button>)}</div></div>
       <div className="section-toolbar">
         <div className="search-field">
           <Search size={17} />
@@ -94,6 +95,8 @@ export default function Encyclopedia() {
             <BookOpen size={38} />
             <h2>{selected.title}</h2>
             <p>{selected.body}</p>
+            {selected.sections?.map(section=><section className="encyclopedia-article-section" key={section.title}><h3>{section.title}</h3><p>{section.body}</p></section>)}
+            <div className="encyclopedia-related"><h3>Keep exploring</h3>{data.filter(e=>e.category===selected.category && e.id!==selected.id && (selected.category!=="Openings" || e.title.split(":")[0]===selected.title.split(":")[0])).slice(0,4).map(e=><button key={e.id} onClick={()=>{setQuery("");setCategory(e.category);setId(e.id);}}>{e.title}</button>)}</div>
             <div className="button-row">
               {selected.aliases.map((a) => (
                 <span className="pill" key={a}>

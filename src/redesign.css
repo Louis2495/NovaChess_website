@@ -4633,3 +4633,45 @@ html { scrollbar-gutter:stable; }
 @media(min-width:1001px){
   .workspace-shell:has(.analysis-layout) > .topbar { display:none; }
 }
+
+/* Use the screen for the main board while preserving explicit manual sizes. */
+@media(min-width:1001px){
+ .workspace:has(.puzzle-layout),.workspace:has(.research-layout) { padding:16px 24px 20px; max-width:none; }
+ .workspace-shell:has(.puzzle-layout) > .topbar,.workspace-shell:has(.research-layout) > .topbar { display:none; }
+ .workspace:has(.puzzle-layout) .page-title,.workspace:has(.research-layout) .page-title { margin-bottom:12px; }
+ .puzzle-layout.chess-layout,.manual-boards .puzzle-layout.chess-layout,.research-layout.chess-layout {
+   grid-template-columns:minmax(0,var(--board-max)) minmax(250px,290px); gap:24px; max-width:none;
+ }
+ .research-layout > .board-column { max-width:none; }
+ .research-form { padding:14px 18px; margin-bottom:14px; }
+}
+.puzzle-layout .side-panels > .card { background:#d7f3ff; color:#173b59; border:1px solid #81d4f6; box-shadow:0 5px 18px #15314d18; }
+.puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#eee0ff; border-color:#ba93f1; color:#6533ab; }
+.puzzle-layout .side-panels > .card:has(.theme-select) { background:#c8f4dd; border-color:#64cc9a; color:#145438; }
+.puzzle-layout .side-panels h2 { color:inherit; }
+.puzzle-layout .side-panels .field > span { color:#235540; }
+.puzzle-layout .theme-select { background:#f6fffa; color:#16452e; border-color:#69bd94; }
+.puzzle-layout .puzzle-actions-right .hint-button { background:#ffe066; color:#563e08; border-color:#e1b332; }
+.puzzle-layout .puzzle-actions-right > .btn:not(.hint-button) { background:#aa87f5; color:#21103e; border-color:#c6b0fa; }
+.puzzle-layout .move-chips > * { background:#f3fbff; color:#173b59; }
+.admin-grant { margin-block:18px 24px; padding:18px; border:1px solid var(--accent); border-radius:14px; background:var(--accent-soft); }
+.admin-grant .field { max-width:420px; }
+.admin-grant > p { font-size:.85rem; }
+.fun-quiz { max-width:850px; margin-inline:auto; }
+.fun-quiz > .quiz-picture { width:130px; height:130px; margin:12px auto; }
+.fun-quiz .quiz-moves { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-block:20px; }
+.fun-quiz .quiz-moves > button { min-height:82px; line-height:1.5; text-align:left; padding:16px; }
+@media(max-width:600px){ .fun-quiz .quiz-moves { grid-template-columns:1fr; } }
+.encyclopedia-overview { margin-bottom:20px; }
+.encyclopedia-overview > p { color:var(--muted); font-size:.88rem; }
+.encyclopedia-topics { display:flex; flex-wrap:wrap; gap:8px; }
+.encyclopedia-topics > button { border:1px solid var(--border); border-radius:12px; padding:9px 12px; background:var(--panel); font-size:.8rem; }
+.encyclopedia-topics > button[aria-pressed="true"] { background:var(--button); color:var(--button-text); }
+.encyclopedia-topics > button > span { margin-left:8px; font-variant-numeric:tabular-nums; opacity:.8; }
+.encyclopedia-entry p { line-height:1.8; white-space:pre-line; }
+.encyclopedia-article-section { margin-block:22px; padding-top:16px; border-top:1px solid var(--border); }
+.encyclopedia-article-section h3 { font-size:1rem; color:var(--accent); }
+.encyclopedia-related { margin-block:20px; padding-block:16px; border-top:1px solid var(--border); }
+.encyclopedia-related > button { display:inline-block; margin:4px 8px 4px 0; padding:8px 10px; border-radius:8px; background:var(--accent-soft); color:var(--text); border:1px solid var(--border); }
+.research-layout .board-navigation { width:var(--actual-board-width,100%); max-width:100%; box-sizing:border-box; }
+@media(min-width:1001px){ .workspace:has(.lesson-workspace) { padding-bottom:20px; } }

@@ -32,6 +32,7 @@ type Question = {
   explanation: string;
   source: string;
 };
+type FunQuiz = {id:string;title:string;description:string;art:number;results:{title:string;text:string}[];questions:{prompt:string;answers:{label:string;score:number}[]}[]};
 type Scenario = { prompt: string; fen: string; moves: string[] };
 function shuffle<T>(a: T[]) {
   return [...a].sort(() => Math.random() - 0.5);
@@ -218,10 +219,25 @@ const results = {
     ],
   ],
 };
+function ExtraQuiz({quiz,onBack}:{quiz:FunQuiz;onBack:()=>void}){
+ const [answers,setAnswers]=useState<number[]>([]);
+ const scores=quiz.results.map((_,i)=>answers.filter(a=>a===i).length);
+ const done=answers.length===quiz.questions.length;
+ const winner=scores.indexOf(Math.max(...scores));
+ const question=quiz.questions[answers.length];
+ return <Card className={done?"quiz-result":"personality-question fun-quiz"}>
+ <div className="game-score-row"><span>{done?"Your result":`${answers.length+1} / ${quiz.questions.length}`}</span><button onClick={onBack}>Quizzes</button></div>
+ <QuizPicture tile={done?[3,4,5,6][winner]:quiz.art} result={done}/>
+ {done?<><span className="pill">For fun</span><h2>{quiz.results[winner].title}</h2><p>{quiz.results[winner].text}</p><p className="caption">Based on your chess preferences, not your playing strength.</p><Button onClick={onBack}><RotateCcw size={16}/>Try another quiz</Button><Button className="secondary" onClick={()=>setAnswers([])}>Retake quiz</Button></>:<><span className="pill">{quiz.title}</span><h2>{question.prompt}</h2><div className="quiz-moves">{question.answers.map(a=><button key={a.label} onClick={()=>setAnswers(prev=>[...prev,a.score])}>{a.label}</button>)}</div>{answers.length>0 && <Button className="text-button" onClick={()=>setAnswers(prev=>prev.slice(0,-1))}>Previous question</Button>}</>}
+ </Card>;
+}
 function Personality({ scenarios }: { scenarios: Scenario[] }) {
+  const {data:extras,error:extraError}=useData<FunQuiz[]>("personality-quizzes");
+  const [extra,setExtra]=useState<FunQuiz|null>(null);
   const [quiz, setQuiz] = useState<keyof typeof results | null>(null),
     [step, setStep] = useState(0),
     [scores, setScores] = useState([0, 0, 0, 0]);
+  if(extra)return <ExtraQuiz key={extra.id} quiz={extra} onBack={()=>setExtra(null)}/>;
   if (!quiz)
     return (
       <div className="quiz-selection">
@@ -237,6 +253,8 @@ function Personality({ scenarios }: { scenarios: Scenario[] }) {
             <ArrowRight size={20} />
           </button>
         ))}
+        {extras?.map(q=><button className="card" key={q.id} onClick={()=>setExtra(q)}><QuizPicture tile={q.art}/><h2>{q.title}</h2><p className="caption">{q.description}</p><span className="caption">{q.questions.length} chess choices</span></button>)}
+        {!extras && <Loading error={extraError}/>}
       </div>
     );
   if (step === scenarios.length) {

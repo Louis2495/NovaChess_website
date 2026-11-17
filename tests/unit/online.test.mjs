@@ -162,6 +162,7 @@ before(async () => {
   await pg.exec(`create schema realtime;create table realtime.messages(extension text default 'broadcast',payload jsonb,event text,topic text,private boolean);alter table realtime.messages enable row level security;grant usage on schema realtime to authenticated;grant select,insert on realtime.messages to authenticated;create function realtime.topic() returns text language sql stable as $$select current_setting('realtime.topic',true)$$;create function realtime.send(jsonb,text,text,boolean) returns void language sql as $$insert into realtime.messages(payload,event,topic,private) values($1,$2,$3,$4)$$;`);
   await pg.exec(readFileSync('supabase/migrations/202611180005_fast_rooms_chat_clocks.sql','utf8').replace('alter publication supabase_realtime add table public.room_messages;',''));
   await pg.exec(readFileSync('supabase/migrations/202611180006_increment_matchmaking.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180007_delegated_admins.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -635,3 +636,35 @@ test('cached signed-claims authentication still respects Supabase account bans',
  const rejected=await call(users[0],{action:'create',mode:'standard',variant:'chess',...opts});assert.notEqual(rejected.status,200);
  }
  });
+
+test('only the pinned owner can grant admin access to confirmed active accounts by email',async()=>{
+ await pg.query("update auth.users set email='delegate@example.test',email_confirmed_at=now(),banned_until=null where id=$1",[users[2]]);
+ await pg.query('update profiles set banned=false where id=$1',[users[2]]);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{
+ assert.equal((await pg.query('select is_site_owner() as owner')).rows[0].owner,true);
+ const granted=(await pg.query("select grant_site_admin('  DELEGATE@EXAMPLE.TEST  ') as result")).rows[0].result;
+ assert.equal(granted.email,'delegate@example.test');
+ await pg.query("select grant_site_admin('delegate@example.test')");
+ await assert.rejects(()=>pg.query("select grant_site_admin('missing@example.test')"),/No active, confirmed/);
+ }finally{await pg.exec('reset role');}
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[2]}';`);
+ try{
+ assert.equal((await pg.query('select is_site_admin() as admin')).rows[0].admin,true);
+ assert.equal((await pg.query('select is_site_owner() as owner')).rows[0].owner,false);
+ assert.ok((await pg.query("select admin_accounts() as result")).rows[0].result.users.length>0);
+ await assert.rejects(()=>pg.query("select grant_site_admin('other@example.test')"),/Only the site owner/);
+ await assert.rejects(()=>pg.query(`insert into site_owners values('${users[2]}')`),/permission denied|row-level security/);
+ await assert.rejects(()=>pg.query(`insert into site_admins values('${users[1]}')`),/permission denied|row-level security/);
+ }finally{await pg.exec('reset role');}
+ for(const update of ['email_confirmed_at=null',"banned_until=now()+interval '1 day'"]){
+ await pg.query('update auth.users set email_confirmed_at=now(),banned_until=null where id=$1',[users[2]]);
+ await pg.query('update auth.users set '+update+' where id=$1',[users[2]]);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[2]}';`);
+ try{assert.equal((await pg.query('select is_site_admin() as allowed')).rows[0].allowed,false);}finally{await pg.exec('reset role');}
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{await assert.rejects(()=>pg.query("select grant_site_admin('delegate@example.test')"),/No active, confirmed/);}finally{await pg.exec('reset role');}
+ }
+ await pg.query('update auth.users set email_confirmed_at=now(),banned_until=null where id=$1',[users[2]]);
+ await pg.query('delete from site_admins where user_id=$1',[users[2]]);
+});

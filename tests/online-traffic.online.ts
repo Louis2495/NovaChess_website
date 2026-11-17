@@ -185,3 +185,12 @@ test('3+2 matchmaking sends both the base time and increment',async({page})=>{
  const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>{env.requests.push(new URL(r.request().url()));return r.fulfill({json:[]});});await page.goto('/#play');await page.getByRole('button',{name:'3 min + 2 sec',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(180);expect(env.actions[0].incrementSeconds).toBe(2);
  const lobby=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(lobby.searchParams.get('increment_seconds')).toBe('eq.2');
 });
+test('the owner can grant administrator access by email, while delegated admins cannot see that form',async({page})=>{
+ await connected(page);let owner=true;const grants:string[]=[];
+ await page.route('**/rest/v1/rpc/is_site_admin',r=>r.fulfill({json:true}));
+ await page.route('**/rest/v1/rpc/is_site_owner',r=>r.fulfill({json:owner}));
+ await page.route('**/rest/v1/rpc/admin_accounts',r=>r.fulfill({json:{users:[],total:0}}));
+ await page.route('**/rest/v1/rpc/grant_site_admin',r=>{grants.push(r.request().postDataJSON().p_email);return r.fulfill({json:{email:'friend@example.test'}});});
+ await page.goto('/#profile/admin');await page.getByLabel('Administrator email',{exact:true}).fill('friend@example.test');await page.getByRole('button',{name:'Grant admin access',exact:true}).click();await expect(page.getByRole('status')).toContainText('Administrator access granted to friend@example.test');expect(grants).toEqual(['friend@example.test']);
+ owner=false;await page.reload();await expect(page.getByRole('heading',{name:'Accounts',exact:true})).toBeVisible();await expect(page.getByLabel('Administrator email',{exact:true})).toHaveCount(0);
+});

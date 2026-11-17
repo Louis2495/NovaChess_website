@@ -1,0 +1,1522 @@
+[
+  {
+    "id": "snack",
+    "title": "Your chess moves reveal your emergency tournament snack",
+    "description": "The board says you packed snacks. The clock says you forgot lunch.",
+    "art": 0,
+    "results": [
+      {
+        "title": "Flaming hot chips",
+        "text": "You attack before the bag is even open. Your position is spicy; your king would like some water."
+      },
+      {
+        "title": "Trail mix with a spreadsheet",
+        "text": "You balance every ingredient like a pawn structure. Yes, you counted the almonds."
+      },
+      {
+        "title": "The reliable sandwich",
+        "text": "Solid development, sensible trades, lunch wrapped properly. Terrifyingly functional."
+      },
+      {
+        "title": "Pocket spaghetti",
+        "text": "Nobody understands your preparation, including you. Somehow it creates practical problems."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "Your opponent castles toward your pawn storm. What is your plan?",
+        "answers": [
+          {
+            "label": "Push a pawn and turn up the heat",
+            "score": 0
+          },
+          {
+            "label": "Prepare a central break first",
+            "score": 1
+          },
+          {
+            "label": "Improve the worst piece before attacking",
+            "score": 2
+          },
+          {
+            "label": "Castle the other way and make it everybody’s problem",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You have ten minutes before round one. What do you review?",
+        "answers": [
+          {
+            "label": "A sacrificial attacking line",
+            "score": 0
+          },
+          {
+            "label": "My opponent’s favorite pawn structures",
+            "score": 1
+          },
+          {
+            "label": "My usual opening plans",
+            "score": 2
+          },
+          {
+            "label": "An opening they have probably never seen",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "A queen trade leads to an equal ending. What is your reaction?",
+        "answers": [
+          {
+            "label": "Can I keep the queens and an attack?",
+            "score": 0
+          },
+          {
+            "label": "Which pawn weaknesses will remain?",
+            "score": 1
+          },
+          {
+            "label": "Equal is fine if my pieces are easier to play",
+            "score": 2
+          },
+          {
+            "label": "What if I underpromote later?",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You spot a possible knight sacrifice. What happens next?",
+        "answers": [
+          {
+            "label": "Calculate forcing checks first",
+            "score": 0
+          },
+          {
+            "label": "Check every defensive resource",
+            "score": 1
+          },
+          {
+            "label": "Take the free pawn instead if the sacrifice is unclear",
+            "score": 2
+          },
+          {
+            "label": "Look for a stranger sacrifice with better practical chances",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You reach a quiet position. What are you looking for?",
+        "answers": [
+          {
+            "label": "A way to open a file toward the king",
+            "score": 0
+          },
+          {
+            "label": "A useful pawn break",
+            "score": 1
+          },
+          {
+            "label": "A safe square for my worst piece",
+            "score": 2
+          },
+          {
+            "label": "An unexpected rook lift",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You lose a close game. What do you do first?",
+        "answers": [
+          {
+            "label": "Find the attack I missed",
+            "score": 0
+          },
+          {
+            "label": "Identify where my plan stopped working",
+            "score": 1
+          },
+          {
+            "label": "Check the decisive mistake",
+            "score": 2
+          },
+          {
+            "label": "Try the weird variation I chickened out of",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "villain",
+    "title": "Which chess villain origin story is yours?",
+    "description": "One innocent opening choice. One extremely dramatic backstory.",
+    "art": 1,
+    "results": [
+      {
+        "title": "The Back-Rank Menace",
+        "text": "You started giving checks and never emotionally recovered. Your lair has no escape squares."
+      },
+      {
+        "title": "The Squeeze Lord",
+        "text": "Your evil plan takes 38 moves and includes a beautiful knight outpost. Your victims call it “a bit cramped.”"
+      },
+      {
+        "title": "The Endgame Tax Collector",
+        "text": "Every loose pawn receives an invoice. No, being down to 12 seconds does not waive the fee."
+      },
+      {
+        "title": "The Preparation Goblin",
+        "text": "You brought a novelty to a casual game. Your opponent brought a cup of tea. This was never fair socially."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "Your opponent forgets to make luft. What catches your eye?",
+        "answers": [
+          {
+            "label": "A back-rank combination",
+            "score": 0
+          },
+          {
+            "label": "A way to tie down the defenders",
+            "score": 1
+          },
+          {
+            "label": "A safe extra pawn",
+            "score": 2
+          },
+          {
+            "label": "A ridiculous-looking move with a real threat",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Which winning position would you enjoy most?",
+        "answers": [
+          {
+            "label": "A mating attack",
+            "score": 0
+          },
+          {
+            "label": "A bind with no useful enemy moves",
+            "score": 1
+          },
+          {
+            "label": "A clean rook ending a pawn up",
+            "score": 2
+          },
+          {
+            "label": "A trap that still works against the best defense",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Your opponent offers a draw in a level position. What do you check?",
+        "answers": [
+          {
+            "label": "Whether I still have attacking chances",
+            "score": 0
+          },
+          {
+            "label": "Whether I can improve without risk",
+            "score": 1
+          },
+          {
+            "label": "The clock and remaining material",
+            "score": 2
+          },
+          {
+            "label": "Whether the position is secretly uncomfortable to defend",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What would your secret opening file contain?",
+        "answers": [
+          {
+            "label": "King attacks and sacrifices",
+            "score": 0
+          },
+          {
+            "label": "Structures and maneuvering plans",
+            "score": 1
+          },
+          {
+            "label": "Reliable sidelines with easy development",
+            "score": 2
+          },
+          {
+            "label": "Offbeat lines with actual tactical justification",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "A defender guards two important squares. What do you want to do?",
+        "answers": [
+          {
+            "label": "Overload it with a forcing threat",
+            "score": 0
+          },
+          {
+            "label": "Restrict it until a weakness appears",
+            "score": 1
+          },
+          {
+            "label": "Trade it if the resulting ending favors me",
+            "score": 2
+          },
+          {
+            "label": "Lure it onto a very inconvenient square",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What is your villain catchphrase after winning a pawn?",
+        "answers": [
+          {
+            "label": "Now your king has a problem",
+            "score": 0
+          },
+          {
+            "label": "This weakness will be here forever",
+            "score": 1
+          },
+          {
+            "label": "I shall be collecting interest",
+            "score": 2
+          },
+          {
+            "label": "You thought that move was a mouse slip",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vacation",
+    "title": "Plan a chess game and we’ll pick your vacation",
+    "description": "Your passport says “citizen.” Your knight says “forklift operator.”",
+    "art": 2,
+    "results": [
+      {
+        "title": "Volcano weekend",
+        "text": "You booked the active volcano. You also booked opposite-side castling. Travel insurance is concerned."
+      },
+      {
+        "title": "Museum city break",
+        "text": "You will admire a pawn structure for three hours and call it a packed itinerary."
+      },
+      {
+        "title": "Quiet cabin retreat",
+        "text": "Good squares, a safe king, and absolutely no surprise excursions. Bliss."
+      },
+      {
+        "title": "Mystery destination",
+        "text": "You chose the airport before choosing the country. Your opening preparation has similar energy."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "Where would you place your king if both castles are legal?",
+        "answers": [
+          {
+            "label": "Opposite the enemy king to start a pawn race",
+            "score": 0
+          },
+          {
+            "label": "Where the structure will stay safest long term",
+            "score": 1
+          },
+          {
+            "label": "On the short side after completing development",
+            "score": 2
+          },
+          {
+            "label": "Keep the option open until the position decides",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What is your ideal middlegame landscape?",
+        "answers": [
+          {
+            "label": "Open files aimed at the king",
+            "score": 0
+          },
+          {
+            "label": "A stable central outpost",
+            "score": 1
+          },
+          {
+            "label": "A clear extra pawn and no complications",
+            "score": 2
+          },
+          {
+            "label": "An asymmetrical position nobody has seen",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Your knight has three useful routes. Which do you choose?",
+        "answers": [
+          {
+            "label": "The route that threatens a fork",
+            "score": 0
+          },
+          {
+            "label": "The route toward a permanent outpost",
+            "score": 1
+          },
+          {
+            "label": "The quickest safe development",
+            "score": 2
+          },
+          {
+            "label": "The unexpected route that changes the character of the game",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Which chess attraction would you visit first?",
+        "answers": [
+          {
+            "label": "A spectacular attacking game collection",
+            "score": 0
+          },
+          {
+            "label": "A positional masterclass",
+            "score": 1
+          },
+          {
+            "label": "A rook-ending workshop",
+            "score": 2
+          },
+          {
+            "label": "A simultaneous exhibition with unusual openings",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "A pawn break changes the center. What excites you?",
+        "answers": [
+          {
+            "label": "New attacking lines",
+            "score": 0
+          },
+          {
+            "label": "The new weak squares",
+            "score": 1
+          },
+          {
+            "label": "A position I can evaluate clearly",
+            "score": 2
+          },
+          {
+            "label": "Getting everyone out of their preparation",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What counts as a perfect final round?",
+        "answers": [
+          {
+            "label": "Winning with a mating combination",
+            "score": 0
+          },
+          {
+            "label": "Making a long-term plan work",
+            "score": 1
+          },
+          {
+            "label": "Converting a small advantage cleanly",
+            "score": 2
+          },
+          {
+            "label": "Finding a creative resource in a strange position",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "groupchat",
+    "title": "What job do you have in the chess group chat?",
+    "description": "Six decisions will expose who sends the 2 a.m. sacrifice screenshots.",
+    "art": 3,
+    "results": [
+      {
+        "title": "The “Mate in 12, trust me” Friend",
+        "text": "You send diagrams with eight arrows and no explanation. Someone is typing “isn’t your queen hanging?”"
+      },
+      {
+        "title": "The Annotator",
+        "text": "You reply with a plan, a variation, and three useful questions. The group did not deserve you."
+      },
+      {
+        "title": "The Adult in the Room",
+        "text": "You ask whether the move is legal and whether anyone ate dinner. Both questions were necessary."
+      },
+      {
+        "title": "The Chaos Poster",
+        "text": "You found an underpromotion study and made it everyone’s personality for the week."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "A friend posts a position with a loose enemy king. What do you send?",
+        "answers": [
+          {
+            "label": "The forcing attacking line",
+            "score": 0
+          },
+          {
+            "label": "A description of the key weaknesses",
+            "score": 1
+          },
+          {
+            "label": "The safest strong move",
+            "score": 2
+          },
+          {
+            "label": "The most surprising legal candidate",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Someone says their opening is terrible. What do you ask?",
+        "answers": [
+          {
+            "label": "Where are the attacking chances?",
+            "score": 0
+          },
+          {
+            "label": "Which pawn structure keeps causing trouble?",
+            "score": 1
+          },
+          {
+            "label": "Did you finish development before moving the queen again?",
+            "score": 2
+          },
+          {
+            "label": "Have you tried a different move order?",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "A friend shares a win with three missed mates. What do you notice?",
+        "answers": [
+          {
+            "label": "The most beautiful missed finish",
+            "score": 0
+          },
+          {
+            "label": "The pattern behind all three opportunities",
+            "score": 1
+          },
+          {
+            "label": "The move that actually secured the win",
+            "score": 2
+          },
+          {
+            "label": "The hilarious legal move that nearly worked",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "The group wants a team name. What chess theme do you choose?",
+        "answers": [
+          {
+            "label": "Mating nets",
+            "score": 0
+          },
+          {
+            "label": "Outposts and strong squares",
+            "score": 1
+          },
+          {
+            "label": "Passed pawns",
+            "score": 2
+          },
+          {
+            "label": "Underpromotions",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You can send only one annotation. What is it?",
+        "answers": [
+          {
+            "label": "A forcing variation",
+            "score": 0
+          },
+          {
+            "label": "A clear plan",
+            "score": 1
+          },
+          {
+            "label": "A warning about a hanging piece",
+            "score": 2
+          },
+          {
+            "label": "An unexpected defensive resource",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "A friend loses on time in a winning position. What is your advice?",
+        "answers": [
+          {
+            "label": "Calculate checks before drifting",
+            "score": 0
+          },
+          {
+            "label": "Make a plan earlier",
+            "score": 1
+          },
+          {
+            "label": "Leave time for the conversion",
+            "score": 2
+          },
+          {
+            "label": "Try a different time control and embrace the adventure",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pet",
+    "title": "Which animal is secretly playing your chess?",
+    "description": "No animals were rated during the making of this quiz.",
+    "art": 4,
+    "results": [
+      {
+        "title": "A caffeinated squirrel",
+        "text": "You see threats everywhere and your knight has already left the meeting."
+      },
+      {
+        "title": "A patient octopus",
+        "text": "Every arm improves a piece. By the time the opponent notices the squeeze, the furniture is yours."
+      },
+      {
+        "title": "A sensible tortoise",
+        "text": "You brought a safe king and a conversion plan. The hare is currently explaining their sacrifice."
+      },
+      {
+        "title": "A raccoon with opening files",
+        "text": "Resourceful, curious, and somehow holding a rook you do not remember losing."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "An enemy rook and king share a fork square. What do you check?",
+        "answers": [
+          {
+            "label": "Can my knight get there with tempo?",
+            "score": 0
+          },
+          {
+            "label": "Can I prepare it without losing control?",
+            "score": 1
+          },
+          {
+            "label": "Does the simple capture already win safely?",
+            "score": 2
+          },
+          {
+            "label": "Can a surprising move lure them into it?",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Which piece would you rescue first from inactivity?",
+        "answers": [
+          {
+            "label": "The queen, so it can attack",
+            "score": 0
+          },
+          {
+            "label": "The knight that needs a long route to an outpost",
+            "score": 1
+          },
+          {
+            "label": "The undeveloped bishop blocking castling",
+            "score": 2
+          },
+          {
+            "label": "The rook that could make an unusual lift",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "The center is locked. What do you consider?",
+        "answers": [
+          {
+            "label": "A kingside pawn storm",
+            "score": 0
+          },
+          {
+            "label": "A carefully prepared pawn break",
+            "score": 1
+          },
+          {
+            "label": "Finishing development and securing the king",
+            "score": 2
+          },
+          {
+            "label": "A piece sacrifice to change the structure",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You win the exchange. How do you proceed?",
+        "answers": [
+          {
+            "label": "Keep the initiative and hunt the king",
+            "score": 0
+          },
+          {
+            "label": "Fix weaknesses before opening lines",
+            "score": 1
+          },
+          {
+            "label": "Trade into a favorable ending",
+            "score": 2
+          },
+          {
+            "label": "Look for a creative way to avoid counterplay",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What makes a puzzle satisfying?",
+        "answers": [
+          {
+            "label": "A forcing mating sequence",
+            "score": 0
+          },
+          {
+            "label": "A quiet first move with a clear point",
+            "score": 1
+          },
+          {
+            "label": "A clean material-winning combination",
+            "score": 2
+          },
+          {
+            "label": "An improbable-looking underpromotion",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "How do you answer an unexpected opening?",
+        "answers": [
+          {
+            "label": "Grab the initiative",
+            "score": 0
+          },
+          {
+            "label": "Identify the structure",
+            "score": 1
+          },
+          {
+            "label": "Develop and castle",
+            "score": 2
+          },
+          {
+            "label": "Investigate the strange line on its own terms",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "weather",
+    "title": "What is your chess weather forecast?",
+    "description": "A 90% chance of checks, with isolated rook lifts after lunch.",
+    "art": 5,
+    "results": [
+      {
+        "title": "Tactical thunderstorm",
+        "text": "Severe checking weather. Secure loose queens and avoid standing under a pinned bishop."
+      },
+      {
+        "title": "Slow-moving pressure system",
+        "text": "The barometer has fallen and so has the opponent’s space. This could last 60 moves."
+      },
+      {
+        "title": "Clear skies, safe king",
+        "text": "Excellent visibility. Development is complete. No speculative sacrifices expected."
+      },
+      {
+        "title": "Localized knight tornado",
+        "text": "The forecast model cannot explain that move. Neither can your opponent. Bring a diagram."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "What kind of position would you choose for a must-win game?",
+        "answers": [
+          {
+            "label": "An open position with attacking chances",
+            "score": 0
+          },
+          {
+            "label": "A lasting space advantage",
+            "score": 1
+          },
+          {
+            "label": "A small but safe edge",
+            "score": 2
+          },
+          {
+            "label": "A complicated imbalance",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Your opponent begins a pawn storm. What is your first thought?",
+        "answers": [
+          {
+            "label": "Counterattack the king",
+            "score": 0
+          },
+          {
+            "label": "Strike in the center",
+            "score": 1
+          },
+          {
+            "label": "Find the safest defensive setup",
+            "score": 2
+          },
+          {
+            "label": "Look for a tactical counter-threat",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You get an open file. What is your plan?",
+        "answers": [
+          {
+            "label": "Invade near the king",
+            "score": 0
+          },
+          {
+            "label": "Double rooks and restrict entry squares",
+            "score": 1
+          },
+          {
+            "label": "Trade the active enemy rook",
+            "score": 2
+          },
+          {
+            "label": "Swing a rook across to an unexpected target",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What do you want from an opening novelty?",
+        "answers": [
+          {
+            "label": "Immediate threats",
+            "score": 0
+          },
+          {
+            "label": "A better long-term structure",
+            "score": 1
+          },
+          {
+            "label": "A comfortable, sound position",
+            "score": 2
+          },
+          {
+            "label": "A new kind of problem for the opponent",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You have a passed pawn. What do you do?",
+        "answers": [
+          {
+            "label": "Use promotion threats to attack",
+            "score": 0
+          },
+          {
+            "label": "Improve its support first",
+            "score": 1
+          },
+          {
+            "label": "Calculate a safe advance",
+            "score": 2
+          },
+          {
+            "label": "Look for a tactical distraction on the other wing",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Which defense feels most natural?",
+        "answers": [
+          {
+            "label": "Counterattack",
+            "score": 0
+          },
+          {
+            "label": "Remove the opponent’s useful squares",
+            "score": 1
+          },
+          {
+            "label": "Simplify into a holdable ending",
+            "score": 2
+          },
+          {
+            "label": "Find a surprising resource",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "restaurant",
+    "title": "Your chess restaurant is about to get a review",
+    "description": "The chef recommends development. You ordered a queen sacrifice.",
+    "art": 6,
+    "results": [
+      {
+        "title": "The All-You-Can-Check Buffet",
+        "text": "The menu has 43 forcing moves and no quiet seating. Five stars for initiative, one for fire safety."
+      },
+      {
+        "title": "The Positional Tasting Menu",
+        "text": "Each course improves your worst piece. Dessert arrives after the minority attack."
+      },
+      {
+        "title": "The Solid Opening Diner",
+        "text": "Dependable development, sensible portions, and a rook ending cooked exactly right."
+      },
+      {
+        "title": "The Experimental Gambit Truck",
+        "text": "The location changes every round. The food is probably sound. The compensation definitely needs checking."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "What would your opening menu feature?",
+        "answers": [
+          {
+            "label": "Gambits with real attacking compensation",
+            "score": 0
+          },
+          {
+            "label": "Space and central control",
+            "score": 1
+          },
+          {
+            "label": "Reliable development",
+            "score": 2
+          },
+          {
+            "label": "Unusual but playable systems",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "A pawn is free but taking it opens your king. What do you do?",
+        "answers": [
+          {
+            "label": "Calculate whether I can attack first",
+            "score": 0
+          },
+          {
+            "label": "Compare the lasting structural costs",
+            "score": 1
+          },
+          {
+            "label": "Decline unless it is clearly safe",
+            "score": 2
+          },
+          {
+            "label": "Find a zwischenzug before deciding",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What is your signature conversion?",
+        "answers": [
+          {
+            "label": "A mating net",
+            "score": 0
+          },
+          {
+            "label": "A squeeze against a fixed weakness",
+            "score": 1
+          },
+          {
+            "label": "Trading down with an extra pawn",
+            "score": 2
+          },
+          {
+            "label": "An unexpected tactical finish",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Which ingredient is missing from your position?",
+        "answers": [
+          {
+            "label": "An open line toward the king",
+            "score": 0
+          },
+          {
+            "label": "A useful pawn break",
+            "score": 1
+          },
+          {
+            "label": "A developed last piece",
+            "score": 2
+          },
+          {
+            "label": "A fresh idea that changes the plan",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "An opponent serves an early queen raid. What is your reply?",
+        "answers": [
+          {
+            "label": "Gain tempi while building an attack",
+            "score": 0
+          },
+          {
+            "label": "Control the squares the queen needs",
+            "score": 1
+          },
+          {
+            "label": "Defend the threat and develop",
+            "score": 2
+          },
+          {
+            "label": "Set a sound trap along its retreat route",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What do you order in time trouble?",
+        "answers": [
+          {
+            "label": "Forcing moves I can verify",
+            "score": 0
+          },
+          {
+            "label": "A simple plan",
+            "score": 1
+          },
+          {
+            "label": "Safe moves with clear threats",
+            "score": 2
+          },
+          {
+            "label": "An awkward practical problem for the opponent",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wizard",
+    "title": "Which chess wizard school would admit you?",
+    "description": "The sorting hat checked your last ten games. It has questions.",
+    "art": 7,
+    "results": [
+      {
+        "title": "School of Forcing Spells",
+        "text": "You learned check, capture, threat and immediately tried to summon a mating net in the dining hall."
+      },
+      {
+        "title": "Academy of Square Control",
+        "text": "Your robes have outpost pockets. Your thesis is about a knight nobody can chase away."
+      },
+      {
+        "title": "College of Sensible Castling",
+        "text": "You passed King Safety with honors and declined the elective called “Probably Compensation.”"
+      },
+      {
+        "title": "Institute of Forbidden Underpromotions",
+        "text": "Your homework was legal, creative, and caused the grading engine to think for a while."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "Which chess spell would you study first?",
+        "answers": [
+          {
+            "label": "A double-check combination",
+            "score": 0
+          },
+          {
+            "label": "Prophylaxis",
+            "score": 1
+          },
+          {
+            "label": "A reliable defensive technique",
+            "score": 2
+          },
+          {
+            "label": "An underpromotion study",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Your bishop is trapped behind pawns. What do you attempt?",
+        "answers": [
+          {
+            "label": "A sacrifice to open the attack if it works",
+            "score": 0
+          },
+          {
+            "label": "Prepare a freeing pawn break",
+            "score": 1
+          },
+          {
+            "label": "Reroute it through a safe diagonal",
+            "score": 2
+          },
+          {
+            "label": "Transform the structure with an unusual exchange",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What is your preferred magical artifact?",
+        "answers": [
+          {
+            "label": "An active queen near the king",
+            "score": 0
+          },
+          {
+            "label": "An unchallenged knight outpost",
+            "score": 1
+          },
+          {
+            "label": "A rook behind a passed pawn",
+            "score": 2
+          },
+          {
+            "label": "A piece with an unexpected tactical role",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "How do you break a defensive fortress?",
+        "answers": [
+          {
+            "label": "Look for a forcing sacrifice",
+            "score": 0
+          },
+          {
+            "label": "Create a second weakness",
+            "score": 1
+          },
+          {
+            "label": "Check whether a win is actually possible",
+            "score": 2
+          },
+          {
+            "label": "Search for a surprising maneuver",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "A move looks too strange to work. What do you do?",
+        "answers": [
+          {
+            "label": "Calculate its forcing lines",
+            "score": 0
+          },
+          {
+            "label": "Ask what squares it changes",
+            "score": 1
+          },
+          {
+            "label": "Compare it with the solid alternative",
+            "score": 2
+          },
+          {
+            "label": "Explore it before dismissing it",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What would your graduation game demonstrate?",
+        "answers": [
+          {
+            "label": "An attacking combination",
+            "score": 0
+          },
+          {
+            "label": "A long-term strategic plan",
+            "score": 1
+          },
+          {
+            "label": "Precise endgame technique",
+            "score": 2
+          },
+          {
+            "label": "A creative save from a difficult position",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "apocalypse",
+    "title": "Could your chess habits survive a zombie apocalypse?",
+    "description": "The zombies are slow. Unfortunately, you used all your time in the opening.",
+    "art": 0,
+    "results": [
+      {
+        "title": "The Front-Door Counterattacker",
+        "text": "You chose active defense and then kicked the door open. The plan has initiative. The building has concerns."
+      },
+      {
+        "title": "The Fortress Architect",
+        "text": "You checked every entry square. The zombies have filed a complaint about insufficient counterplay."
+      },
+      {
+        "title": "The Emergency-Kit Endgamer",
+        "text": "You packed opposition, spare batteries, and a rook behind the passer. You will be fine."
+      },
+      {
+        "title": "The Decoy Specialist",
+        "text": "You distracted the zombies with a queen sacrifice. Nobody asked whether it was sound."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "You are under a strong attack. What do you search for?",
+        "answers": [
+          {
+            "label": "A counterattack with forcing moves",
+            "score": 0
+          },
+          {
+            "label": "A way to close the entry lines",
+            "score": 1
+          },
+          {
+            "label": "A simplifying defensive exchange",
+            "score": 2
+          },
+          {
+            "label": "A resource that changes the nature of the position",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "You have one move to improve safety. What do you prioritize?",
+        "answers": [
+          {
+            "label": "A threat that forces a response",
+            "score": 0
+          },
+          {
+            "label": "Control of the invasion square",
+            "score": 1
+          },
+          {
+            "label": "A safe escape square for the king",
+            "score": 2
+          },
+          {
+            "label": "An unexpected defensive regrouping",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Which teammate do you want in a losing position?",
+        "answers": [
+          {
+            "label": "Someone who keeps creating threats",
+            "score": 0
+          },
+          {
+            "label": "Someone who can build a fortress",
+            "score": 1
+          },
+          {
+            "label": "Someone who knows drawing techniques",
+            "score": 2
+          },
+          {
+            "label": "Someone who spots impossible-looking saves",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "A pawn ending might be lost. What do you check?",
+        "answers": [
+          {
+            "label": "Whether I can promote with check",
+            "score": 0
+          },
+          {
+            "label": "Opposition and key squares",
+            "score": 1
+          },
+          {
+            "label": "The exact pawn race",
+            "score": 2
+          },
+          {
+            "label": "A breakthrough sacrifice",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Your opponent has only one dangerous piece. What is your plan?",
+        "answers": [
+          {
+            "label": "Attack before it arrives",
+            "score": 0
+          },
+          {
+            "label": "Deny it useful squares",
+            "score": 1
+          },
+          {
+            "label": "Trade it off",
+            "score": 2
+          },
+          {
+            "label": "Divert it with a tactical threat",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What is your post-disaster training plan?",
+        "answers": [
+          {
+            "label": "Calculate forcing sequences",
+            "score": 0
+          },
+          {
+            "label": "Study defensive structures",
+            "score": 1
+          },
+          {
+            "label": "Learn essential endgames",
+            "score": 2
+          },
+          {
+            "label": "Solve resourceful defensive studies",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "movie",
+    "title": "What movie genre are your chess games?",
+    "description": "The reviews are in. Your queen would like an agent.",
+    "art": 1,
+    "results": [
+      {
+        "title": "Action blockbuster",
+        "text": "Explosions, checks, and a rook lift with a completely unnecessary slow-motion entrance."
+      },
+      {
+        "title": "Prestige slow-burn drama",
+        "text": "The isolated pawn had an arc. The knight on d5 deserved an award."
+      },
+      {
+        "title": "Comfort-watch procedural",
+        "text": "Develop, castle, improve, convert. You solve the case before the credits."
+      },
+      {
+        "title": "Experimental midnight comedy",
+        "text": "A perfectly legal move made everyone laugh, then made everyone calculate."
+      }
+    ],
+    "questions": [
+      {
+        "prompt": "What is your opening scene?",
+        "answers": [
+          {
+            "label": "An energetic central advance",
+            "score": 0
+          },
+          {
+            "label": "A carefully chosen structure",
+            "score": 1
+          },
+          {
+            "label": "Natural development",
+            "score": 2
+          },
+          {
+            "label": "An offbeat but playable first idea",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "Where does your middlegame plot twist come from?",
+        "answers": [
+          {
+            "label": "A sacrifice near the king",
+            "score": 0
+          },
+          {
+            "label": "A quiet move that changes the plan",
+            "score": 1
+          },
+          {
+            "label": "An opponent’s tactical oversight",
+            "score": 2
+          },
+          {
+            "label": "A surprising change of direction",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "How do you want the final scene to end?",
+        "answers": [
+          {
+            "label": "Checkmate",
+            "score": 0
+          },
+          {
+            "label": "A position with no useful defense",
+            "score": 1
+          },
+          {
+            "label": "A clean promotion",
+            "score": 2
+          },
+          {
+            "label": "An unexpected resource deciding the game",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What would the narrator say about your worst piece?",
+        "answers": [
+          {
+            "label": "It needs an attacking role",
+            "score": 0
+          },
+          {
+            "label": "It needs a better square",
+            "score": 1
+          },
+          {
+            "label": "It needs to develop",
+            "score": 2
+          },
+          {
+            "label": "It needs a creative reroute",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What do you do when the position becomes equal?",
+        "answers": [
+          {
+            "label": "Create attacking chances",
+            "score": 0
+          },
+          {
+            "label": "Keep improving patiently",
+            "score": 1
+          },
+          {
+            "label": "Play accurate, simple moves",
+            "score": 2
+          },
+          {
+            "label": "Introduce a fresh imbalance",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "prompt": "What belongs on your highlight reel?",
+        "answers": [
+          {
+            "label": "A calculated king attack",
+            "score": 0
+          },
+          {
+            "label": "A successful strategic plan",
+            "score": 1
+          },
+          {
+            "label": "A precise endgame win",
+            "score": 2
+          },
+          {
+            "label": "An imaginative defensive save",
+            "score": 3
+          }
+        ]
+      }
+    ]
+  }
+]

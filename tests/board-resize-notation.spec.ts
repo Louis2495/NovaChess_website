@@ -1,11 +1,12 @@
 import { test, expect } from "@playwright/test";
-test("Analysis starts small enough for the screen and supports dragging, keyboard resizing and persisted size", async ({
+test("Analysis fills available space while staying inside the screen and supports dragging, keyboard resizing and persisted size", async ({
   page,
 }) => {
   await page.goto("/#analysis");
   const board = page.locator(".analysis-layout .board");
   const before = (await board.boundingBox())!;
-  expect(before.width).toBeLessThanOrEqual(540);
+  expect(before.width).toBeLessThan((await page.viewportSize())!.width);
+  expect(before.width).toBeGreaterThan((await page.viewportSize())!.width>1000?600:240);
   expect(before.y + before.height).toBeLessThan(
     (await page.viewportSize())!.height - 50,
   );
@@ -70,7 +71,7 @@ test("boards can be resized in puzzles, play and readonly quizzes, and only Blin
   await page.goto("/#analysis");
   expect(
     (await page.locator(".analysis-layout .board").boundingBox())!.width,
-  ).toBeLessThanOrEqual(540);
+  ).toBeLessThan((await page.viewportSize())!.width);
   await page.goto("/#variants");await page.getByRole("button",{name:"Computer",exact:true}).click();
   await page.getByRole("button", { name: "Game options", exact: true }).click();
   await page.getByLabel("Variant", { exact: true }).selectOption("blindtext");
@@ -119,7 +120,7 @@ test("top lines have individual White/Black move tables, including Black-to-play
   if (!isMobile) {
     const a = (await tables.nth(0).boundingBox())!,
       b = (await tables.nth(1).boundingBox())!;
-    expect(Math.abs(a.y - b.y)).toBeLessThan(2);
-    expect(b.x).toBeGreaterThan(a.x);
+    expect(b.y).toBeGreaterThan(a.y + a.height);
+    expect(Math.abs(b.x-a.x)).toBeLessThan(2);
   }
 });

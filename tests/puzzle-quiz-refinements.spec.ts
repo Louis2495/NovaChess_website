@@ -63,7 +63,7 @@ test("every quiz position faces its side to move and introductions/results have 
     fs.readFileSync("public/data/personality.json", "utf8"),
   );
   await page.goto("/#learn/quizzes");
-  await expect(page.locator(".quiz-selection .quiz-picture")).toHaveCount(3);
+  await expect(page.locator(".quiz-selection .quiz-picture")).toHaveCount(13);
   await page.getByRole("button", { name: /Your chess style/ }).click();
   for (const scenario of scenarios) {
     await expect(squares(page).last()).toHaveAttribute(

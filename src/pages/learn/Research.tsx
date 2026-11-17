@@ -315,7 +315,7 @@ export default function Research() {
           </p>
         )}
       </Card>
-      <div className="chess-layout">
+      <div className="chess-layout research-layout">
         <div className="board-column">
           <Board
             fen={c.fen()}
