@@ -4450,7 +4450,6 @@ select.theme-select {
 .home-puzzle:hover .home-puzzle-content { background:transparent; border-color:transparent; }
 .home-practice-grid .daily-board-preview .board { border-radius:3px; box-shadow:0 3px 12px #10263726; }
 @media(min-width:1001px){ .home-practice-grid .home-puzzle-content > .daily-board-preview { width:min(100%,360px,calc(var(--home-card-height) - 100px)); } }
-.variant-gallery > button:first-child { grid-column:1 / -1; justify-self:center; width:min(100%,250px); }
 .speedrun-picture { display:grid; place-items:center; width:118px; height:118px; border-radius:24px; color:#ffe181; background:linear-gradient(145deg,#6542af,#284f86); }
 .speedrun-setup { max-width:320px; margin:20px auto; }
 .speedrun-clock { display:flex; align-items:center; justify-content:center; gap:8px; color:var(--accent); font-size:1.3rem; font-variant-numeric:tabular-nums; }

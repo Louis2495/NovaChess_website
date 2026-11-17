@@ -20,6 +20,9 @@ test("Variants has distinct artwork and keeps Standard in Play", async ({
   await expect(cards).toHaveCount(18);
   await expect(cards.first()).toHaveText("Dropping Squares");
   await expect(cards.first()).toHaveAttribute("aria-pressed", "true");
+  const first = (await cards.nth(0).boundingBox())!, second = (await cards.nth(1).boundingBox())!;
+  expect(Math.abs(first.y-second.y)).toBeLessThan(1);
+  expect(Math.abs(first.width-second.width)).toBeLessThan(1);
   const tiles = page.locator(".variant-gallery .variant-picture");
   const positions = await tiles.evaluateAll((es) =>
     es.map((e) => getComputedStyle(e).backgroundPosition),
