@@ -1,10 +1,18 @@
 # Quiz illustrations
 
-`illustrations.webp` is a four-column, two-row sheet of original chess cartoons.
+All artwork is bundled for offline use. Every sheet uses four columns and two rows, indexed 0–7 from left to right, top to bottom. `src/lib/quizArtwork.ts` maps quiz IDs and outcome indices to the correct picture.
 
-- Row 1: personality introduction, princess introduction, alter-ego introduction, attacker/tactician result.
-- Row 2: architect/cartographer result, technician/detective result, explorer result, trivia trophy.
+| Sheet | Top row | Bottom row |
+| --- | --- | --- |
+| `food-villains.webp` | Hot chips, trail mix, sandwich, pocket spaghetti | Back-rank villain, squeeze lord, tax collector, preparation goblin |
+| `travel-chat.webp` | Volcano, museum, cabin, mystery suitcase | Tactical chat poster, annotator, sensible friend, chaos poster |
+| `animals-weather.webp` | Squirrel, octopus, tortoise, raccoon | Thunderstorm, pressure cloud, clear skies, knight tornado |
+| `restaurants-wizards.webp` | Buffet, tasting menu, diner, food truck | Fire wizard, magic academy, safe castling school, underpromotion spellbook |
+| `survival-movies.webp` | Counterattacker, fortress, emergency kit, decoy | Action, drama, detective, comedy |
+| `princesses-archetypes.webp` | Sword/blossom, book/rose, lily tiara/frog, lantern/braid | Attacker, architect, detective, explorer |
 
-The three personality quizzes use the result illustration matching their winning archetype. All images are bundled for offline use.
+`illustrations.webp` retains the three original quiz introductions and the trivia trophy. Its generic outcome tiles have been replaced by the subject-specific pictures above.
 
-Ten additional themed quizzes are stored in `public/data/personality-quizzes.json`: 60 original chess-preference questions and 40 humorous outcomes. Each quiz supports going back, retaking, and returning to the selection. Results are for fun and do not estimate playing strength. They reuse the bundled illustrations above.
+The ten additional quizzes live in `public/data/personality-quizzes.json`: 60 chess-preference questions and 40 humorous outcomes. Each supports going back, retaking, and returning to selection. Titles appear on selection cards, not repeated on questions. Result illustrations identify the outcome itself, rather than recycling one generic archetype across unrelated quizzes.
+
+The standalone transparent homepage group is `public/home-team.webp`, derived from the Team Chess artwork. It does not have an opaque square background.

@@ -10,7 +10,7 @@ type Meme = {
   width?: number;
   height?: number;
 };
-export default function DailyMeme() {
+export default function DailyMeme({onAspectChange}:{onAspectChange?:(aspect:number)=>void}={}) {
   const [candidates, setCandidates] = useState<Meme[]>([]);
   const [date, setDate] = useState(today);
   useEffect(() => {
@@ -33,10 +33,11 @@ export default function DailyMeme() {
     return () => controller.abort();
   }, []);
   const eligible = candidates.filter((m) => m.status !== "rejected");
-  if (!eligible.length) return null;
   const day = Math.floor(Date.parse(date + "T12:00:00Z") / 86400000);
   const meme =
     eligible[((day % eligible.length) + eligible.length) % eligible.length];
+  useEffect(()=>{if(meme)onAspectChange?.((meme.width||720)/(meme.height||600));},[meme?.id,meme?.width,meme?.height,onAspectChange]);
+  if(!meme)return null;
   return (
     <section
       className="daily-meme"

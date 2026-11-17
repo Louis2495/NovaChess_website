@@ -1,12 +1,11 @@
 import {screenName} from "../lib/screenName";
-import MultiplayerPicture from "../components/MultiplayerPicture";
 import { variantList } from "../lib/variants";
 import { duration } from "../lib/speedrun";
 import DailyMeme from "../components/DailyMeme";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Check, ChevronRight, RotateCcw } from "lucide-react";
 import { useApp } from "../lib/context";
-import { useData, today, dateLabel } from "../lib/store";
+import { useData, today, dateLabel, base } from "../lib/store";
 import type { PuzzleData, SavedGame } from "../lib/types";
 import { Chess } from "chess.js";
 import { Board } from "../components/Board";
@@ -23,6 +22,14 @@ export function dailyPuzzle(puzzles: PuzzleData[]) {
 export default function HomePage() {
   const { library, navigate, appearance } = useApp();
   const { data } = useData<PuzzleData[]>("puzzles");
+  const mediaRef=useRef<HTMLDivElement>(null);
+  const [memeAspect,setMemeAspect]=useState(1),[mediaHeight,setMediaHeight]=useState(420);
+  useLayoutEffect(()=>{
+    const parent=mediaRef.current?.parentElement;if(!parent)return;
+    const measure=()=>{if(innerWidth<=1000)return;const width=parent.clientWidth;setMediaHeight(Math.min(560,Math.max(300,innerHeight-260),appearance.showMemes?(width-24)/(1+memeAspect):width));};
+    const observer=new ResizeObserver(measure);observer.observe(parent);window.addEventListener('resize',measure);measure();
+    return()=>{observer.disconnect();window.removeEventListener('resize',measure);};
+  },[memeAspect,appearance.showMemes]);
   const puzzle = useMemo(() => (data ? dailyPuzzle(data) : null), [data]);
   let fen = "";
   if (puzzle) {
@@ -36,7 +43,7 @@ export default function HomePage() {
     <div className={`home-page ${appearance.showMemes ? "" : "memes-hidden"}`}>
       <PageTitle title="Home" />
       <section className="new-game-section home-welcome" aria-label="New game">
-        <div className="home-welcome-art" aria-hidden="true"><MultiplayerPicture mode="team" /></div>
+        <div className="home-welcome-art" aria-hidden="true"><span className="multiplayer-picture home-team-cutout" style={{backgroundImage:`url("${base}home-team.webp")`}}/></div>
         <div className="home-welcome-actions">
         <Button className="new-game-primary" onClick={() => navigate("play")}>
           New game
@@ -52,7 +59,7 @@ export default function HomePage() {
         )}
         </div>
       </section>
-      <div className="home-practice-grid">
+      <div className="home-practice-grid" ref={mediaRef} style={{"--home-card-height":`${mediaHeight}px`,"--home-meme-aspect":memeAspect} as React.CSSProperties}>
         <section
           className="home-puzzle"
           aria-labelledby="daily-title"
@@ -90,7 +97,7 @@ export default function HomePage() {
             )}
           </div>
         </section>
-        {appearance.showMemes && <DailyMeme />}
+        {appearance.showMemes && <DailyMeme onAspectChange={setMemeAspect}/>}
       </div>
       {library.games.length > 0 && (
         <section className="home-recent">

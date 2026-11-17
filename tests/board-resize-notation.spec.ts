@@ -47,7 +47,7 @@ test("boards can be resized in puzzles, play and readonly quizzes, and only Blin
         .getByRole("button", { name: "Start game", exact: true })
         .click();
     if (route === "learn/quizzes")
-      await page.getByRole("button", { name: /Your chess style/ }).click();
+      await page.getByRole("button", { name: /What's your chess style/ }).click();
     const handle = page
       .getByRole("slider", { name: "Resize board", exact: true })
       .first();

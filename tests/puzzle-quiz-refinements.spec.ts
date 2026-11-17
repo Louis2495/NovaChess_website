@@ -64,7 +64,7 @@ test("every quiz position faces its side to move and introductions/results have 
   );
   await page.goto("/#learn/quizzes");
   await expect(page.locator(".quiz-selection .quiz-picture")).toHaveCount(13);
-  await page.getByRole("button", { name: /Your chess style/ }).click();
+  await page.getByRole("button", { name: /What's your chess style/ }).click();
   for (const scenario of scenarios) {
     await expect(squares(page).last()).toHaveAttribute(
       "aria-label",
@@ -77,10 +77,10 @@ test("every quiz position faces its side to move and introductions/results have 
   await expect(page.locator(".quiz-result .quiz-picture")).toBeVisible();
   await expect(page.locator(".quiz-result .quiz-picture")).toHaveCSS(
     "background-image",
-    /quizzes\/illustrations\.webp/,
+    /quizzes\/princesses-archetypes\.webp/,
   );
   expect(
-    (await page.request.get("/quizzes/illustrations.webp")).ok(),
+    (await page.request.get("/quizzes/princesses-archetypes.webp")).ok(),
   ).toBeTruthy();
 });
 

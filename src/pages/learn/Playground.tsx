@@ -1,3 +1,4 @@
+import {quizArtwork} from "../../lib/quizArtwork";
 import { useState } from "react";
 import { ArrowRight, RotateCcw, Check, ArrowUpRight } from "lucide-react";
 import { base, useData } from "../../lib/store";
@@ -7,16 +8,22 @@ import { Button, Card, Loading } from "../../components/UI";
 function QuizPicture({
   tile,
   result = false,
+  sheet = "illustrations.webp",
+  label,
 }: {
   tile: number;
   result?: boolean;
+  sheet?: string;
+  label?: string;
 }) {
   return (
     <span
-      aria-hidden="true"
+      aria-hidden={label?undefined:true}
+      role={label?"img":undefined}
+      aria-label={label}
       className={`quiz-picture${result ? " quiz-picture-result" : ""}`}
       style={{
-        backgroundImage: `url("${base}quizzes/illustrations.webp")`,
+        backgroundImage: `url("${base}quizzes/${sheet}")`,
         backgroundPosition: `${((tile % 4) * 100) / 3}% ${Math.floor(tile / 4) * 100}%`,
       }}
     />
@@ -171,9 +178,9 @@ function Trivia({ questions }: { questions: Question[] }) {
   );
 }
 const quizzes = [
-  { id: "style", title: "Your chess style", art: 0 },
-  { id: "princess", title: "Which Disney princess?", art: 1 },
-  { id: "alter", title: "Your chess alter ego", art: 2 },
+  { id: "style", title: "What's your chess style?", art: 0 },
+  { id: "princess", title: "Which Disney princess are you?", art: 1 },
+  { id: "alter", title: "What's your chess alter ego?", art: 2 },
 ];
 const results = {
   style: [
@@ -227,8 +234,8 @@ function ExtraQuiz({quiz,onBack}:{quiz:FunQuiz;onBack:()=>void}){
  const question=quiz.questions[answers.length];
  return <Card className={done?"quiz-result":"personality-question fun-quiz"}>
  <div className="game-score-row"><span>{done?"Your result":`${answers.length+1} / ${quiz.questions.length}`}</span><button onClick={onBack}>Quizzes</button></div>
- <QuizPicture tile={done?[3,4,5,6][winner]:quiz.art} result={done}/>
- {done?<><span className="pill">For fun</span><h2>{quiz.results[winner].title}</h2><p>{quiz.results[winner].text}</p><p className="caption">Based on your chess preferences, not your playing strength.</p><Button onClick={onBack}><RotateCcw size={16}/>Try another quiz</Button><Button className="secondary" onClick={()=>setAnswers([])}>Retake quiz</Button></>:<><span className="pill">{quiz.title}</span><h2>{question.prompt}</h2><div className="quiz-moves">{question.answers.map(a=><button key={a.label} onClick={()=>setAnswers(prev=>[...prev,a.score])}>{a.label}</button>)}</div>{answers.length>0 && <Button className="text-button" onClick={()=>setAnswers(prev=>prev.slice(0,-1))}>Previous question</Button>}</>}
+ <QuizPicture {...quizArtwork(quiz.id,done?winner:undefined)} label={done?quiz.results[winner].title:undefined} result={done}/>
+ {done?<><h2>{quiz.results[winner].title}</h2><p>{quiz.results[winner].text}</p><Button onClick={onBack}><RotateCcw size={16}/>Try another quiz</Button><Button className="secondary" onClick={()=>setAnswers([])}>Retake quiz</Button></>:<><h2>{question.prompt}</h2><div className="quiz-moves">{question.answers.map(a=><button key={a.label} onClick={()=>setAnswers(prev=>[...prev,a.score])}>{a.label}</button>)}</div>{answers.length>0 && <Button className="text-button" onClick={()=>setAnswers(prev=>prev.slice(0,-1))}>Previous</Button>}</>}
  </Card>;
 }
 function Personality({ scenarios }: { scenarios: Scenario[] }) {
@@ -253,7 +260,7 @@ function Personality({ scenarios }: { scenarios: Scenario[] }) {
             <ArrowRight size={20} />
           </button>
         ))}
-        {extras?.map(q=><button className="card" key={q.id} onClick={()=>setExtra(q)}><QuizPicture tile={q.art}/><h2>{q.title}</h2><p className="caption">{q.description}</p><span className="caption">{q.questions.length} chess choices</span></button>)}
+        {extras?.map(q=><button className="card" key={q.id} onClick={()=>setExtra(q)}><QuizPicture {...quizArtwork(q.id)}/><h2>{q.title}</h2><p className="caption">{q.description}</p><span className="caption">{q.questions.length} chess choices</span></button>)}
         {!extras && <Loading error={extraError}/>}
       </div>
     );
@@ -262,8 +269,7 @@ function Personality({ scenarios }: { scenarios: Scenario[] }) {
       [title, text] = results[quiz][index];
     return (
       <Card className="quiz-result">
-        <QuizPicture tile={[3, 4, 5, 6][index]} result />
-        <span className="pill">For fun</span>
+        <QuizPicture {...quizArtwork(quiz,index)} label={title} result />
         <h2>{title}</h2>
         <p>{text}</p>
         <Button

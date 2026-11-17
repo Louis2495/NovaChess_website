@@ -7,7 +7,7 @@ test('new personality quizzes have unique chess questions and reachable, distinc
  const quizzes=data('personality-quizzes');assert.equal(quizzes.length,10);
  assert.equal(new Set(quizzes.map(q=>q.id)).size,10);
  const prompts=[];
- for(const q of quizzes){assert.equal(q.questions.length,6);assert.equal(q.results.length,4);assert.equal(new Set(q.results.map(r=>r.title)).size,4);
+ for(const q of quizzes){assert.match(q.title,/\?$/);assert.equal(q.questions.length,6);assert.equal(q.results.length,4);assert.equal(new Set(q.results.map(r=>r.title)).size,4);
   for(const question of q.questions){prompts.push(question.prompt);assert.match(question.prompt,/\?$/);assert.equal(question.answers.length,4);assert.equal(new Set(question.answers.map(a=>a.label)).size,4);assert.deepEqual(question.answers.map(a=>a.score).sort(),[0,1,2,3]);}
   for(let outcome=0;outcome<4;outcome++){const score=[0,0,0,0];for(const question of q.questions)score[question.answers.find(a=>a.score===outcome).score]++;assert.equal(score.indexOf(Math.max(...score)),outcome);}
  }

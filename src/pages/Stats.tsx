@@ -434,7 +434,6 @@ function StatsOverview({
           )}
         </Card>
       </div>
-      <CompetitionStats />
       <div className="stats-detail-grid">
         <Card className="training-stat">
           <div className="card-heading">
@@ -464,6 +463,7 @@ function StatsOverview({
           <div className="color-results-key"><span><i className="outcome-win"/>Wins</span><span><i className="outcome-loss"/>Losses</span><span><i className="outcome-draw"/>Draws</span></div>
         </Card>
       </div>
+      <CompetitionStats />
       <Card className="variant-breakdown-card">
         <details className="variant-breakdown">
           <summary>Variant breakdown</summary>

@@ -1,7 +1,7 @@
 [
   {
     "id": "snack",
-    "title": "Your chess moves reveal your emergency tournament snack",
+    "title": "What's your emergency tournament snack?",
     "description": "The board says you packed snacks. The clock says you forgot lunch.",
     "art": 0,
     "results": [
@@ -153,7 +153,7 @@
   },
   {
     "id": "villain",
-    "title": "Which chess villain origin story is yours?",
+    "title": "What's your chess villain origin story?",
     "description": "One innocent opening choice. One extremely dramatic backstory.",
     "art": 1,
     "results": [
@@ -305,7 +305,7 @@
   },
   {
     "id": "vacation",
-    "title": "Plan a chess game and we’ll pick your vacation",
+    "title": "Where should your chess moves take you on vacation?",
     "description": "Your passport says “citizen.” Your knight says “forklift operator.”",
     "art": 2,
     "results": [
@@ -457,7 +457,7 @@
   },
   {
     "id": "groupchat",
-    "title": "What job do you have in the chess group chat?",
+    "title": "What's your job in the chess group chat?",
     "description": "Six decisions will expose who sends the 2 a.m. sacrifice screenshots.",
     "art": 3,
     "results": [
@@ -761,7 +761,7 @@
   },
   {
     "id": "weather",
-    "title": "What is your chess weather forecast?",
+    "title": "What's your chess weather forecast?",
     "description": "A 90% chance of checks, with isolated rook lifts after lunch.",
     "art": 5,
     "results": [
@@ -913,7 +913,7 @@
   },
   {
     "id": "restaurant",
-    "title": "Your chess restaurant is about to get a review",
+    "title": "What kind of chess restaurant would you run?",
     "description": "The chef recommends development. You ordered a queen sacrifice.",
     "art": 6,
     "results": [
