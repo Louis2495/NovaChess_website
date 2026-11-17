@@ -89,7 +89,7 @@ If you prefer email/password instead, configure a real SMTP provider for public 
 
 Use two separate browsers/profiles with **two different accounts**:
 
-1. Sign in from Profile and save a unique username and country.
+1. Sign in from Profile and save a screen name and country.
 2. Open Play (Online is selected by default). Other game types are in Variants; Throne, Vote Chess and Team Chess are under Variants → Online.
 3. Click Play online from both accounts to join a waiting game. You can also use Invite friends to share a direct game link. Play moves and confirm both boards still match after refreshing.
 4. Test resigning, drawing, and an illegal/out-of-turn move. Test chat from both accounts.
@@ -99,7 +99,7 @@ In Supabase SQL Editor, make your account a chat moderator:
 
 ```sql
 insert into public.chat_moderators(user_id)
-select id from public.profiles where username = 'YOUR_USERNAME'
+values ('YOUR_AUTH_USER_ID')
 on conflict do nothing;
 ```
 

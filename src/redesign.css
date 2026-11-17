@@ -4580,3 +4580,4 @@ html { scrollbar-gutter:stable; }
 .admin-account-table td small { display:block; color:var(--muted); }
 .admin-account-table .btn { white-space:nowrap; }
 .admin-account-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:20px; }
+.admin-password-hash { display:block; max-width:280px; margin-top:8px; white-space:normal; overflow-wrap:anywhere; user-select:all; font-size:.75rem; }

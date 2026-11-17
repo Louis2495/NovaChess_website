@@ -1,3 +1,4 @@
+import {screenName,isGeneratedUsername} from "../lib/screenName";
 import AdminAccounts from "../components/AdminAccounts";
 import Appearance from "../components/Appearance";
 import { FederationProfiles } from "../components/FederationProfiles";
@@ -27,7 +28,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
     detail,
     navigate,
   } = useApp();
-  const [name, setName] = useState(library.profile.name),
+  const [name, setName] = useState(screenName(library.profile,"")),
     [bio, setBio] = useState(library.profile.bio || ""),
     [country, setCountry] = useState(library.profile.country);
   const { session } = useOnlineSession(),{isAdmin}=useSiteAdmin();
@@ -35,19 +36,19 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
     if (!online || !session) return;
     online
       .from("profiles")
-      .select("username,bio,country,avatar")
+      .select("username,screen_name,bio,country,avatar")
       .eq("id", session.user.id)
       .single()
       .then(({ data }) => {
-        if (data && !data.username.startsWith("player_")) {
-          setName(data.username);
+        if (data) {
+          setName(screenName(data,""));
           setBio(data.bio);
           setCountry(data.country);
           setLibrary((l) => ({
             ...l,
             profile: {
               ...l.profile,
-              name: data.username,
+              name: screenName(data),
               bio: data.bio,
               country: data.country,
               avatar: data.avatar,
@@ -135,21 +136,12 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
-                if (!name.trim()) return;
-                setLibrary((l) => ({
-                  ...l,
-                  profile: {
-                    ...l.profile,
-                    name: name.trim(),
-                    bio: bio.trim(),
-                    country,
-                  },
-                }));
+                if (name.trim().length<2 || isGeneratedUsername(name)) {notify("Choose a screen name with 2–32 characters.");return;}
                 if (online && session) {
                   const { error } = await online
                     .from("profiles")
                     .update({
-                      username: name.trim(),
+                      screen_name: name.trim(),
                       bio: bio.trim(),
                       country,
                       avatar,
@@ -160,14 +152,25 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
                     return;
                   }
                 }
+                setLibrary((l) => ({
+                  ...l,
+                  profile: {
+                    ...l.profile,
+                    name: name.trim(),
+                    bio: bio.trim(),
+                    country,
+                  },
+                }));
                 notify("Profile saved.");
               }}
             >
-              <Field label="Username">
+              <Field label="Screen name">
                 <input
                   required
                   value={name}
                   maxLength={32}
+                  minLength={2}
+                  placeholder="Choose a screen name"
                   onChange={(e) => setName(e.target.value)}
                   autoComplete="nickname"
                 />

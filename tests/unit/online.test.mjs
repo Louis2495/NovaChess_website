@@ -130,7 +130,7 @@ async function command(user, r, action, extra = {}) {
 }
 before(async () => {
   await pg.exec(
-    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key,email text unique,created_at timestamptz default now(),last_sign_in_at timestamptz,email_confirmed_at timestamptz,raw_app_meta_data jsonb default '{}'::jsonb,encrypted_password text);create function auth.uid() returns uuid language sql as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to anon,authenticated,service_role;`,
+    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key,email text unique,created_at timestamptz default now(),last_sign_in_at timestamptz,email_confirmed_at timestamptz,raw_app_meta_data jsonb default '{}'::jsonb,raw_user_meta_data jsonb default '{}'::jsonb,encrypted_password text);create function auth.uid() returns uuid language sql as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to anon,authenticated,service_role;`,
   );
   let migration = readFileSync(
     "supabase/migrations/202611160001_online.sql",
@@ -157,6 +157,7 @@ before(async () => {
     await pg.query("insert into auth.users(id)values($1)", [uid]);
   await pg.query('update auth.users set email=$1,email_confirmed_at=now(),encrypted_password=$2 where id=$3',['louisanderson477@gmail.com','hashed-test-value',users[0]]);
   await pg.exec(readFileSync('supabase/migrations/202611180003_owner_accounts.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180004_screen_names.sql','utf8'));
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
     .replace('"./engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/engine.ts")).href))
@@ -534,4 +535,33 @@ test('account administration is pinned to the verified owner and exposes no pass
  await pg.query('update auth.users set email=$1,email_confirmed_at=now() where id=$2',['louisanderson477@gmail.com',users[1]]);
  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
  try{assert.equal((await pg.query('select is_site_admin() as allowed')).rows[0].allowed,false);await assert.rejects(()=>pg.query('select admin_accounts()'),/Administrator access required/);}finally{await pg.exec('reset role');}
+});
+
+
+test('public screen names are separate from generated handles and owner search includes them',async()=>{
+ await pg.query("update profiles set screen_name='Fork Master' where id=$1",[users[2]]);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[2]}';`);
+ try{
+  await pg.query("update profiles set screen_name='Knight Rider' where id=$1",[users[2]]);
+  const p=(await pg.query('select username,screen_name from profiles where id=$1',[users[2]])).rows[0];assert.match(p.username,/^player_/);assert.equal(p.screen_name,'Knight Rider');
+  await assert.rejects(()=>pg.query("update profiles set screen_name='player_fake' where id=$1",[users[2]]),/check constraint/);
+ }finally{await pg.exec('reset role');}
+ const fresh='55555555-5555-4555-8555-555555555555';
+ await pg.query('insert into auth.users(id,raw_user_meta_data) values($1,$2)',[fresh,JSON.stringify({screen_name:'New Knight'})]);
+ assert.equal((await pg.query('select screen_name from profiles where id=$1',[fresh])).rows[0].screen_name,'New Knight');
+ // Restore the pinned owner after the preceding email-change denial test.
+ await pg.query('update auth.users set email=$1 where id=$2',['other@example.test',users[1]]);
+ await pg.query('update auth.users set email=$1 where id=$2',['louisanderson477@gmail.com',users[0]]);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{const result=(await pg.query("select admin_accounts('Knight Rider',0) as result")).rows[0].result;assert.equal(result.total,1);assert.equal(result.users[0].screen_name,'Knight Rider');}finally{await pg.exec('reset role');}
+});
+
+
+test('password hashes are fetched on demand only by the pinned owner',async()=>{
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{assert.equal((await pg.query('select admin_password_hash($1) as hash',[users[0]])).rows[0].hash,'hashed-test-value');assert.equal((await pg.query('select admin_password_hash($1) as hash',[users[2]])).rows[0].hash,null);}finally{await pg.exec('reset role');}
+ for(const role of ['authenticated','anon']){
+  await pg.exec(`set role ${role};set request.jwt.claim.sub='${users[1]}';`);
+  try{await assert.rejects(()=>pg.query('select admin_password_hash($1)',[users[0]]),/Administrator access required|permission denied/);}finally{await pg.exec('reset role');}
+ }
 });

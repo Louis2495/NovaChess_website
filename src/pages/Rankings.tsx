@@ -1,3 +1,4 @@
+import {screenName} from "../lib/screenName";
 import { FederationCards } from "../components/FederationProfiles";
 import { useEffect, useState } from "react";
 import { Trophy, ArrowUpRight } from "lucide-react";
@@ -6,7 +7,7 @@ import { regions } from "../lib/regions";
 import { ChoiceSelect, Button, Card, Field, PageTitle } from "../components/UI";
 type Ranking = {
   id: string;
-  username: string;
+  username: string; screen_name?:string;
   country: string;
   rating: number;
   wins: number;
@@ -117,7 +118,7 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
             <div key={r.id} className={r.id === session?.user.id ? "you" : ""}>
               <b>#{country ? r.country_rank : r.global_rank}</b>
               <span>
-                {r.country && flag(r.country)} {r.username}
+                {r.country && flag(r.country)} {screenName(r)}
               </span>
               <strong>{r.rating}</strong>
             </div>

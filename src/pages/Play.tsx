@@ -1,3 +1,4 @@
+import {screenName} from "../lib/screenName";
 import { useReviewWarmup } from "../lib/useReviewWarmup";
 import { duration } from "../lib/speedrun";
 import { weakComputerMove } from "../lib/computerStrength";
@@ -905,7 +906,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
                 />
               </span>
               <div>
-                <b>{library.profile.name}</b>
+                <b>{screenName(library.profile)}</b>
                 <small>{Math.round(library.localRating)}</small>
               </div>
             </div>

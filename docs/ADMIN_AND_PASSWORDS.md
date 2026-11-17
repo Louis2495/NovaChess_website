@@ -1,8 +1,10 @@
 # Account administration and passwords
 
-After the automatic **Set up multiplayer** deployment turns green, sign in as **louisanderson477@gmail.com**, then open **Profile → Admin**. The migration pins the account ID belonging to that already-confirmed email. The tab shows usernames, emails, signup dates, last sign-ins and providers, with search, pages and **Send reset**. Other accounts cannot read the directory or grant themselves administrator access, even by calling the database directly or using a matching display name. Changing to a different email or banning the owner account disables access.
+After the automatic **Set up multiplayer** deployment turns green, sign in as **louisanderson477@gmail.com**, then open **Profile → Admin**. The migration pins the account ID belonging to that already-confirmed email. Set or change your public screen name under Profile → Account. Existing chosen names are preserved; generated `player_…` handles are never displayed.
 
-Passwords are hashed by Supabase Auth. NovaChess never stores a plaintext copy, retrieves password hashes, or provides an owner password-viewing feature. **Send reset** emails the user a one-time link; they choose their own new password.
+The tab shows screen names, meaningful legacy usernames, emails, signup dates, last sign-ins and providers, with search, pages and **Send reset**. Other accounts cannot read the directory or grant themselves administrator access, even by calling the database directly or using a matching display name. Changing to a different email or banning the owner account disables access.
+
+Passwords are hashed by Supabase Auth. NovaChess never stores a plaintext copy. The owner-only **Show hash** control retrieves one account’s stored hash on demand; it does not recover the original password. Hashes are excluded from directory/search responses and are cleared when hidden, leaving the page or switching accounts. Accounts using only an external provider may have no password set. **Send reset** emails the user a one-time link; they choose their own new password.
 
 ## Password recovery
 

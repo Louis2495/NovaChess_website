@@ -1,3 +1,5 @@
+import {online} from "./lib/online";
+import {screenName} from "./lib/screenName";
 import {useOnlineSession,useRecoveryState} from "./lib/online";
 import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -201,6 +203,12 @@ function App() {
   );
   const audio = useRef<HTMLAudioElement | null>(null);
   const musicReady = useRef<Promise<void> | null>(null);
+  useEffect(()=>{
+    if(!online || !session)return;let active=true;
+    void online.from("profiles").select("username,screen_name,bio,country,avatar").eq("id",session.user.id).single().then(({data})=>{
+      if(active && data)setLibrary(l=>({...l,profile:{...l.profile,name:screenName(data),bio:data.bio||"",country:data.country||"",avatar:data.avatar||""}}));
+    });return()=>{active=false;};
+  },[session?.user.id]);
   const { tab, detail } = locationState;
   const notify = (text: string) => {
     if (
@@ -560,7 +568,7 @@ function App() {
                   />
                 )}
               </span>
-              <span>{library.profile.name}</span>
+              <span>{screenName(library.profile)}</span>
             </button>
             <div className="sidebar-footer">
               <button onClick={() => setInfo(true)}>

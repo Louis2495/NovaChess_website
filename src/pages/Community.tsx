@@ -1,3 +1,4 @@
+import {screenName} from "../lib/screenName";
 import {matchTypedMove} from "../lib/moves";
 import type {FairyStockfish} from "ffish-es6";
 import {fairy, fog, squares} from "../lib/variants";
@@ -66,13 +67,13 @@ export default function Community({presetMode = "standard", presetVariant = "che
   const [roomId, inviteQuery = ""] = detail.replace(/^online\//, "").split("?");
   const inviteTeam = new URLSearchParams(inviteQuery).get("team");
   const username = (id: string) =>
-    profiles.find((p) => p.id === id)?.username || "Player";
+    screenName(profiles.find((p) => p.id === id));
   const routeRef=useRef(roomId);routeRef.current=roomId;
   const profileCache=useRef(new Map<string,Profile>());
   const loadProfiles=useCallback(async(ids:string[])=>{
     if(!online)return;const missing=[...new Set(ids)].filter(id=>!profileCache.current.has(id));
     if(!missing.length)return;
-    const {data}=await online.from("profiles").select("id,username").in("id",missing);
+    const {data}=await online.from("profiles").select("id,username,screen_name").in("id",missing);
     for(const p of data||[])profileCache.current.set(p.id,p);
     setProfiles([...profileCache.current.values()]);
   },[]);

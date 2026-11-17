@@ -391,7 +391,7 @@ test("Profile saves username, bio and avatar; defaults are auto-queen off and pr
   page,
 }) => {
   await page.goto("/#profile");
-  await page.getByLabel("Username", { exact: true }).fill("Alex");
+  await page.getByLabel("Screen name", { exact: true }).fill("Alex");
   await page
     .getByLabel("Bio", { exact: true })
     .fill("Rook endings and coffee.");

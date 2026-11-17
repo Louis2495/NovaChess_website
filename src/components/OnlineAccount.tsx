@@ -1,3 +1,4 @@
+import {isGeneratedUsername} from "../lib/screenName";
 import { useEffect, useState } from "react";
 import { online, useOnlineSession, onlineAuthOptions, useRecoveryState, finishPasswordRecovery, requestPasswordReset } from "../lib/online";
 import { useApp } from "../lib/context";
@@ -6,7 +7,7 @@ import PasswordField from './PasswordField';
 export default function OnlineAccount() {
  const {session,ready}=useOnlineSession(),recovery=useRecoveryState(),{notify,navigate,detail}=useApp();
  const [providers,setProviders]=useState<("google"|"github")[]>([]),[emailEnabled,setEmailEnabled]=useState(true);
- const [mode,setMode]=useState<'signin'|'signup'|'forgot'>(detail==='forgot'?'forgot':'signin'),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+ const [mode,setMode]=useState<'signin'|'signup'|'forgot'>(detail==='forgot'?'forgot':'signin'),[email,setEmail]=useState(''),[name,setName]=useState(''),[password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
  useEffect(()=>{let active=true;void onlineAuthOptions().then(p=>{if(active){setProviders(p.providers as ("google"|"github")[]);setEmailEnabled(p.emailEnabled);}}).catch(()=>{});return()=>{active=false;};},[]);
  function changeMode(next:typeof mode){setMode(next);setPassword('');setConfirm('');setMessage('');setError('');}
  if(!online)return <Card className="online-unavailable"><h2>Online play</h2><p className="caption">Not connected yet.</p></Card>;
@@ -24,6 +25,7 @@ export default function OnlineAccount() {
    <form onSubmit={async e=>{
     e.preventDefault();setBusy(true);setError('');setMessage('');
     try {
+     if(!reset && mode==='signup' && (name.trim().length<2 || isGeneratedUsername(name)))throw Error('Choose a screen name with 2–32 characters.');
      if(reset){
       if(password!==confirm)throw Error('Passwords do not match.');
       const {error}=await online!.auth.updateUser({password});if(error)throw error;
@@ -31,12 +33,13 @@ export default function OnlineAccount() {
      }else if(mode==='forgot'){
       await requestPasswordReset(email);setMessage('If this email has an account, a reset link is on its way.');
      }else{
-      const {data,error}=mode==='signup'?await online!.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:location.origin+location.pathname}}):await online!.auth.signInWithPassword({email:email.trim(),password});
+      const {data,error}=mode==='signup'?await online!.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:location.origin+location.pathname,data:{screen_name:name.trim()}}}):await online!.auth.signInWithPassword({email:email.trim(),password});
       if(error)throw error;
       if(mode==='signup' && !data.session)setMessage('Check your email to confirm your account.');
      }
     }catch(e){setError((e as Error).message || 'Please try again.');}finally{setBusy(false);}
    }}>
+    {!reset && mode==='signup' && <Field label="Screen name"><input required minLength={2} maxLength={32} autoComplete="nickname" value={name} onChange={e=>setName(e.target.value)}/></Field>}
     {!reset && <Field label="Email"><input type="email" required autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>}
     {mode!=='forgot' || reset ? <PasswordField label={reset?'New password':'Password'} required minLength={8} autoComplete={reset || mode==='signup'?'new-password':'current-password'} value={password} onChange={e=>setPassword(e.target.value)}/> : null}
     {reset && <PasswordField id="confirm-password" label="Confirm password" required minLength={8} autoComplete="new-password" value={confirm} onChange={e=>setConfirm(e.target.value)}/>}

@@ -1,3 +1,4 @@
+import {screenName} from "../lib/screenName";
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
 import { useEffect, useState } from "react";
@@ -198,7 +199,7 @@ export default function SpecialPlay({
                 alt=""
               />
             </span>
-            <b>{library.profile.name}</b>
+            <b>{screenName(library.profile)}</b>
           </div>
           <PremoveQueue
             moves={premove.queue}

@@ -1,3 +1,4 @@
+import {screenName} from "../lib/screenName";
 import { cachedReview, cacheReview } from "../lib/reviewCache";
 import { classifyMove, performanceRating } from "../lib/gameReview";
 import { MoveBadge, EvaluationGraph } from "../components/ReviewVisuals";
@@ -51,8 +52,8 @@ export function gamePGN(g: SavedGame) {
     g.moves.forEach((m) => c.move(m));
     c.setHeader("Event", g.title);
     c.setHeader("Result", g.result);
-    c.setHeader("White", g.human === "w" ? "You" : g.opponent || "Computer");
-    c.setHeader("Black", g.human === "b" ? "You" : g.opponent || "Computer");
+    c.setHeader("White", g.human === "w" ? "You" : screenName({name:g.opponent},g.opponent?"Opponent":"Computer"));
+    c.setHeader("Black", g.human === "b" ? "You" : screenName({name:g.opponent},g.opponent?"Opponent":"Computer"));
     return c.pgn();
   }
   return `[Event "${g.title.replaceAll('"', "")} "]\n[Variant "${g.variant}"]\n[FEN "${g.initial}"]\n[Result "${g.result}"]\n\n${g.notation.map((m, i) => (i % 2 === 0 ? `${Math.floor(i / 2) + 1}. ` : "") + m).join(" ")} ${g.result}`;

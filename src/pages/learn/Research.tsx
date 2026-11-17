@@ -1,3 +1,4 @@
+import {screenName} from "../../lib/screenName";
 import { isNovaChessGame } from "../../lib/library";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
@@ -118,8 +119,8 @@ export default function Research() {
     }
     try {
       if (site === "NovaChess") {
-        if (name.toLowerCase() !== library.profile.name.toLowerCase())
-          throw Error("No saved NovaChess games for that username.");
+        if (name.toLowerCase() !== screenName(library.profile).toLowerCase())
+          throw Error("No saved NovaChess games for that screen name.");
         const records =
           library.activeGame &&
           !library.games.some((g) => g.id === library.activeGame?.id)
@@ -135,11 +136,11 @@ export default function Research() {
             for (const move of g.moves) b.move(move);
             b.setHeader(
               "White",
-              g.human === "w" ? name : g.opponent || "Computer",
+              g.human === "w" ? name : screenName({name:g.opponent},g.opponent?"Opponent":"Computer"),
             );
             b.setHeader(
               "Black",
-              g.human === "b" ? name : g.opponent || "Computer",
+              g.human === "b" ? name : screenName({name:g.opponent},g.opponent?"Opponent":"Computer"),
             );
             b.setHeader("Result", g.result);
             const parsed = parsePGN(b.pgn(), name);
@@ -241,7 +242,7 @@ export default function Research() {
                   onClick={() => {
                     setSite(value);
                     if (value === "NovaChess")
-                      setUsername(library.profile.name);
+                      setUsername(screenName(library.profile));
                   }}
                 >
                   {value}

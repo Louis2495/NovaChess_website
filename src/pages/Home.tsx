@@ -1,3 +1,4 @@
+import {screenName} from "../lib/screenName";
 import MultiplayerPicture from "../components/MultiplayerPicture";
 import { variantList } from "../lib/variants";
 import { duration } from "../lib/speedrun";
@@ -118,7 +119,7 @@ function RecentGame({ game: g, open }: { game: SavedGame; open: () => void }) {
   return <div className={`recent-game-entry result-${result}`}>
     <button className="recent-game-row" onClick={open}>
       <span className={`recent-color-chip ${g.human === "w" ? "white" : "black"}`} title={`You played ${g.human === "w" ? "White" : "Black"}`} aria-label={`You played ${g.human === "w" ? "White" : "Black"}`} />
-      <span className="recent-game-info"><b>{library.profile.name || "You"} <span className="recent-versus">vs</span> {g.opponent || (g.origin === "archive" ? "Opponent" : "Computer")}{g.botRating ? ` · ${g.botRating}` : ""}</b><small>{g.speedrun ? "Speedrun" : variantList.find(v=>v.id===g.variant)?.name || g.title} · {Math.ceil(g.moves.length / 2)} moves{g.timeControl ? ` · ${g.timeControl}` : ""}{g.speedrun ? ` · ${duration(g.speedrun.elapsedMs)}` : ""} · {dateLabel(g.created)}</small></span>
+      <span className="recent-game-info"><b>{screenName(library.profile,"You")} <span className="recent-versus">vs</span> {screenName({name:g.opponent},g.opponent || g.origin === "archive" ? "Opponent" : "Computer")}{g.botRating ? ` · ${g.botRating}` : ""}</b><small>{g.speedrun ? "Speedrun" : variantList.find(v=>v.id===g.variant)?.name || g.title} · {Math.ceil(g.moves.length / 2)} moves{g.timeControl ? ` · ${g.timeControl}` : ""}{g.speedrun ? ` · ${duration(g.speedrun.elapsedMs)}` : ""} · {dateLabel(g.created)}</small></span>
       <span className="game-result-label">{g.result === "*" ? "Study" : g.result}</span>
       <ChevronRight size={15} />
     </button>

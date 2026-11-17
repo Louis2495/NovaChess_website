@@ -1,3 +1,4 @@
+import {screenName} from "../lib/screenName";
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, X, Flag, Trash2, ShieldBan, ArrowDownRight } from "lucide-react";
@@ -11,7 +12,7 @@ type Message = {
   body: string;
   created_at: string;
 };
-type Person = { id: string; username: string; avatar: string };
+type Person = { id: string; username: string; screen_name?:string; avatar: string };
 type ChatBox = { left: number; top: number; width: number; height: number };
 function fitChat(box: ChatBox): ChatBox {
   const bottom = innerWidth <= 1000 ? 80 : 12;
@@ -75,7 +76,7 @@ export default function GlobalChat() {
     async function authors(ids:string[]){
       for(const id of new Set(ids)){const p=knownPeople.get(id);if(p){knownPeople.delete(id);knownPeople.set(id,p);}}
       const missing=[...new Set(ids)].filter(id=>!knownPeople.has(id));if(!missing.length)return;
-      const {data}=await client.from("profiles").select("id,username,avatar").in("id",missing);
+      const {data}=await client.from("profiles").select("id,username,screen_name,avatar").in("id",missing);
       if(!active)return;for(const p of data||[])knownPeople.set(p.id,p);
       while(knownPeople.size>200)knownPeople.delete(knownPeople.keys().next().value!);
       setPeople([...knownPeople.values()]);
@@ -198,7 +199,7 @@ export default function GlobalChat() {
                   <div>
                     <div className="chat-entry-meta">
                       <b>
-                        {self ? library.profile.name : p?.username || "Player"}
+                        {self ? screenName(library.profile) : screenName(p)}
                       </b>
                       <time dateTime={m.created_at}>
                         {new Date(m.created_at).toLocaleTimeString([], {
