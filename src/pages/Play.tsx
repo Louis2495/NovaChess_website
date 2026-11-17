@@ -267,7 +267,7 @@ export default function Play() {
       origin: "novachess",
       opponent: "Computer",
       opponentChoice: choice,
-      botRating: speedrunMode ? Math.max(50,Math.min(10000,Math.round(speedrunRating/50)*50)) : choice === "Current rating" ? library.localRating : rating,
+      botRating: speedrunMode ? Math.max(100,Math.min(3000,Math.round(speedrunRating/50)*50)) : choice === "Current rating" ? library.localRating : rating,
       speedrun: speedrunMode ? {elapsedMs:0,turnStartedAt:human === "w" ? Date.now() : null} : undefined,
       rated: !speedrunMode && rated && variant === "chess",
       requestedOpening: speedrunMode ? "" : openingId,
@@ -650,7 +650,7 @@ export default function Play() {
             ))}
             <button aria-pressed={speedrunMode} onClick={()=>{setVariant("chess");setSpeedrunMode(true);}}><img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/><span>Speedrun</span></button>
           </div>
-          {speedrunMode && <Card className="speedrun-setup"><Field label="Computer Elo"><input type="number" min={50} max={10000} step={50} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(Math.max(50,Math.min(10000,Math.round((speedrunRating||50)/50)*50)))}/></Field></Card>}
+          {speedrunMode && <Card className="speedrun-setup"><Field label="Computer Elo"><input type="number" min={100} max={3000} step={50} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(Math.max(100,Math.min(3000,Math.round((speedrunRating||100)/50)*50)))}/></Field></Card>}
           <Card className="game-settings-card">
             <button
               className="options-toggle"

@@ -254,7 +254,7 @@ function CompetitionStats() {
  const bests=new Map(speedrunBests(library.games));
  return <div className="stats-competition-grid">
   <Card className="throne-stat"><div className="card-heading"><h2><Crown size={21}/>On the Throne</h2><div className="segmented" role="group" aria-label="Throne metric">{["Time","Games"].map(m=><button key={m} aria-pressed={metric===m} className={metric===m?"active":""} onClick={()=>setMetric(m)}>{m}</button>)}</div></div><strong className="competition-total">{metric==="Time" ? duration(total) : throneGames}</strong>{error && <p className="caption">{error}</p>}</Card>
-  <Card className="speedrun-stats"><h2><Timer size={21}/>Speedrun</h2><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating" tabIndex={0}>{Array.from({length:60},(_,i)=>(i+1)*50).map(elo=>{const game=bests.get(elo);return <div role="listitem" className={`speedrun-rating ${game?"has-record":""}`} key={elo} aria-label={`${elo} Elo: ${game?duration(game.speedrun!.elapsedMs):"No win yet"}`}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs):"—"}</strong></div>;})}</div></Card>
+  <Card className="speedrun-stats"><h2><Timer size={21}/>Speedrun</h2><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating" tabIndex={0}>{Array.from({length:59},(_,i)=>100+i*50).map(elo=>{const game=bests.get(elo);return <div role="listitem" className={`speedrun-rating ${game?"has-record":""}`} key={elo} aria-label={`${elo} Elo: ${game?duration(game.speedrun!.elapsedMs):"No win yet"}`}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs):"—"}</strong></div>;})}</div></Card>
  </div>;
 }
 

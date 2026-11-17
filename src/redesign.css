@@ -4493,7 +4493,7 @@ img.speedrun-picture { display:block; object-fit:cover; }
 .throne-stat .segmented button { color:#47261e; padding:7px 14px; border:0; }
 .throne-stat .segmented button.active { background:#47261e; color:#fff; border-radius:9px; }
 .stats-overview .speedrun-stats { background:#ffd4ed; color:#4b2340; }
-.speedrun-rating-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:10px; max-height:350px; overflow:auto; margin-top:18px; padding:3px 8px 3px 3px; }
+.speedrun-rating-grid { display:grid; grid-auto-flow:column; grid-auto-columns:100px; gap:10px; overflow-x:auto; margin-top:18px; padding:3px 3px 12px; }
 .speedrun-rating { background:#fff8; border:1px solid #4b234026; border-radius:12px; padding:10px; text-align:center; }
 .speedrun-rating span,.speedrun-rating strong { display:block; }
 .speedrun-rating span { font-size:.8rem; }.speedrun-rating strong { margin-top:7px; font-variant-numeric:tabular-nums; }
