@@ -161,12 +161,12 @@ export default function SpecialPlay({
       <h1 className="sr-only">{names[variant]}</h1>
       <div className="chess-layout play-match special-match">
         <div className="board-column">
-          <GameResult result={state.result} />
           <div className="player-strip">
             <b>Computer</b>
           </div>
           <Board
             fen={premove.preview}
+            overlay={<GameResult result={state.result} human={side}/>}
             materialFen={state.fen}
             onCancelPremoves={premove.cancelOnRightClick}
             flipped={side === "b"}

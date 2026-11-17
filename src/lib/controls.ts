@@ -13,6 +13,7 @@ export const defaultControls = {
   last: "ArrowDown",
   autoplay: " ",
   clearMarks: "Escape",
+  clearArrows: "c",
   mark: "none",
   markBlue: "shift",
   markRed: "alt",

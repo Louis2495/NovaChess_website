@@ -85,6 +85,7 @@ export const defaults: Appearance = {
   density: "Comfortable",
   coordinates: true,
   legalMoves: false,
+  showMemes: true,
   lastMove: true,
   animation: true,
   sound: false,

@@ -20,7 +20,7 @@ export function dailyPuzzle(puzzles: PuzzleData[]) {
   return choices[Number(hash % BigInt(choices.length))];
 }
 export default function HomePage() {
-  const { library, navigate } = useApp();
+  const { library, navigate, appearance } = useApp();
   const { data } = useData<PuzzleData[]>("puzzles");
   const puzzle = useMemo(() => (data ? dailyPuzzle(data) : null), [data]);
   let fen = "";
@@ -32,7 +32,7 @@ export default function HomePage() {
   const daily = !!library.progress.daily[today()]?.completed;
   const resumable = library.activeGame?.result === "*";
   return (
-    <div className="home-page">
+    <div className={`home-page ${appearance.showMemes ? "" : "memes-hidden"}`}>
       <PageTitle title="Home" />
       <section className="new-game-section home-welcome" aria-label="New game">
         <div className="home-welcome-art" aria-hidden="true"><MultiplayerPicture mode="team" /></div>
@@ -89,7 +89,7 @@ export default function HomePage() {
             )}
           </div>
         </section>
-        <DailyMeme />
+        {appearance.showMemes && <DailyMeme />}
       </div>
       {library.games.length > 0 && (
         <section className="home-recent">

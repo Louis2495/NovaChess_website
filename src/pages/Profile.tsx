@@ -217,6 +217,7 @@ export default function Profile({ embedded = false }: { embedded?: boolean }) {
                   setAppearance((a) => ({ ...a, premoves }))
                 }
               />
+              <Toggle label="Show memes" checked={appearance.showMemes} onChange={showMemes=>setAppearance(a=>({...a,showMemes}))}/>
               <Toggle
                 label="Show legal moves"
                 checked={appearance.legalMoves}

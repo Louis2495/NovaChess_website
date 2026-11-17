@@ -1,5 +1,5 @@
 import { Crown, Handshake } from "lucide-react";
-export default function GameResult({ result }: { result: string }) {
+export default function GameResult({ result, human }: { result: string; human?: "w" | "b" | null }) {
   if (result === "*") return null;
   return (
     <div
@@ -8,11 +8,7 @@ export default function GameResult({ result }: { result: string }) {
     >
       {result === "1/2-1/2" ? <Handshake size={42} /> : <Crown size={42} />}
       <strong>
-        {result === "1-0"
-          ? "White wins"
-          : result === "0-1"
-            ? "Black wins"
-            : "Draw"}
+        {result === (human === "w" ? "1-0" : human === "b" ? "0-1" : "") ? "You won!" : result === "1-0" ? "White won" : result === "0-1" ? "Black won" : "Draw"}
       </strong>
     </div>
   );

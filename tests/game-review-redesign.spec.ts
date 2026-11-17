@@ -11,7 +11,7 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  await page.goto('/#library/review-fixture');
  await expect(page.getByRole('heading',{name:'Game review',exact:true})).toBeVisible();
  await expect(page.getByLabel('Time per position')).toHaveCount(0);await expect(page.getByLabel('Replay speed')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Engine review',exact:true})).toHaveCount(0);
- await page.getByRole('button',{name:'Review game',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'Review complete.'})).toBeVisible();
+ await expect(page.getByRole('status').filter({hasText:'Review complete.'})).toBeVisible();
  await expect(page.locator('.review-notation th')).toHaveText(['#','White','Black']);await expect(page.locator('.review-notation .move-quality')).toHaveCount(moves.length);
  await expect(page.locator('.evaluation-graph polyline')).toHaveAttribute('points',/\S+ \S+/);
  await expect(page.locator('.review-performance .metric-pair b')).not.toHaveText(['—','—']);

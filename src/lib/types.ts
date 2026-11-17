@@ -62,6 +62,7 @@ export type Appearance = {
   density: string;
   coordinates: boolean;
   legalMoves: boolean;
+  showMemes: boolean;
   lastMove: boolean;
   animation: boolean;
   sound: boolean;

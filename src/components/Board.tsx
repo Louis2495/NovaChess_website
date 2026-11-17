@@ -61,7 +61,9 @@ export function Board({
   materialFen,
   guides = [],
   badge,
+  overlay,
 }: {
+  overlay?: React.ReactNode;
   badge?: { square: string; content: React.ReactNode };
   fen: string;
   onMove?: (from: string, to: string, promotion?: string) => void;
@@ -141,6 +143,9 @@ export function Board({
       if (onFlip) onFlip();
       else setFlipOffset((v) => !v);
     }
+  });
+  useControl("clearArrows", () => {
+    if (!compact && !boardRef.current?.closest("[hidden]")) updateMarks(currentMarks.filter(m => m.from === m.to));
   });
   useControl("clearMarks", () => {
     updateMarks([]);
@@ -644,7 +649,7 @@ export function Board({
             );
           })}
         </svg>
-
+        {overlay && <div className="board-result-overlay">{overlay}</div>}
       </div>
         {!compact && <div
           className="board-resize-handle"

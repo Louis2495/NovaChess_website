@@ -17,6 +17,7 @@ const labels: Record<string, string> = {
   last: "Last move",
   autoplay: "Play / stop",
   clearMarks: "Clear annotations / cancel",
+  clearArrows: "Clear arrows",
 };
 export default function Controls({ embedded = false }: { embedded?: boolean }) {
   const { appearance, setAppearance, notify } = useApp();

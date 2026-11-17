@@ -395,7 +395,7 @@ for (const variant of ["dropping", "chaos", "random"])
       expect(ply).toBe(2);
     }
     await page.getByRole("button", { name: "Resign", exact: true }).click();
-    await expect(page.getByText("Black wins", { exact: true })).toBeVisible();
+    await expect(page.getByText("Black won", { exact: true })).toBeVisible();
     await expect
       .poll(() =>
         page.evaluate(() =>

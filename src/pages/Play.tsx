@@ -1,3 +1,4 @@
+import { useReviewWarmup } from "../lib/useReviewWarmup";
 import { duration } from "../lib/speedrun";
 import { weakComputerMove } from "../lib/computerStrength";
 import { matchTypedMove } from "../lib/moves";
@@ -169,6 +170,7 @@ export default function Play() {
     }
   }, [ff, game]);
   const valid = snap && !("error" in snap) ? snap : null;
+  useReviewWarmup(game,!!game && playing && game.result === "*" && valid?.turn === game.human);
   function archive(l: typeof library, g: SavedGame) {
     const existing = l.games.some((v) => v.id === g.id);
     return {
@@ -795,7 +797,6 @@ export default function Play() {
           }
         >
           <div className="board-column">
-            <GameResult result={game.result} />
             {game.speedrun && <div className="speedrun-clock" role="timer" aria-label="Your move time"><Timer size={18}/>{duration(game.speedrun.elapsedMs + (game.result === "*" && game.speedrun.turnStartedAt !== null ? Math.max(0,clockNow-game.speedrun.turnStartedAt) : 0))}</div>}
             <div
               className={`player-strip ${valid.turn !== game.human ? "to-move" : ""}`}
@@ -824,7 +825,8 @@ export default function Play() {
               />
               <Board
                 fen={duck?.fen || premove.preview}
-                materialFen={valid.fen}
+                overlay={<GameResult result={game.result} human={game.human}/>}
+              materialFen={valid.fen}
                 onCancelPremoves={premove.cancelOnRightClick}
                 onMove={play}
                 legalMoves={premoveLegal}
@@ -1076,6 +1078,7 @@ export default function Play() {
                             moves: l.activeGame.moves.slice(0, -count),
                             notation: l.activeGame.notation.slice(0, -count),
                             positions: l.activeGame.positions.slice(0, -count),
+                            review: l.activeGame.review?.slice(0,l.activeGame.moves.length-count),
                           }
                         : null,
                     }));

@@ -1,3 +1,4 @@
+import { cachedReview, cacheReview } from "../lib/reviewCache";
 import { classifyMove, performanceRating } from "../lib/gameReview";
 import { MoveBadge, EvaluationGraph } from "../components/ReviewVisuals";
 import { isStudy, libraryKind } from "../lib/library";
@@ -384,7 +385,7 @@ function GameViewer({
     [playing, setPlaying] = useState(false),
     [fogEnabled, setFogEnabled] = useState(true),
     [sharing, setSharing] = useState(false),
-    [reviewing, setReviewing] = useState(false),
+    [reviewing, setReviewing] = useState(!game.special && game.moves.length > 0 && (game.review?.length !== game.moves.length || game.review.some(r=>r.afterScore===undefined))),
 
     [status, setStatus] = useState(""),
     [flipped, setFlipped] = useState(game.initial.split(" ")[1] === "b"),
@@ -407,6 +408,7 @@ function GameViewer({
     standard && !reviewing,
   );
   useEffect(() => () => controller.current?.abort(), []);
+  useEffect(()=>{if(!game.special && game.moves.length > 0 && (rows.some(r=>r.afterScore===undefined) || game.moves.length>rows.length)) void review();},[game.id]);
   useEffect(() => {
     if (!playing) return;
     if (cursor >= game.moves.length) {
@@ -417,6 +419,7 @@ function GameViewer({
     return () => clearTimeout(t);
   }, [playing, cursor]);
   async function review() {
+    if (controller.current && !controller.current.signal.aborted) return;
     setReviewing(true);
     const ctrl = new AbortController();
     controller.current = ctrl;
@@ -425,6 +428,8 @@ function GameViewer({
     const cache = new Map<string, Awaited<ReturnType<typeof search>>>();
     const evaluate = async (fen: string, deeper = false) => {
       if (!deeper && cache.has(fen)) return cache.get(fen)!;
+      const warmed=cachedReview(fen,deeper?20:14);
+      if(warmed){cache.set(fen,warmed);return warmed;}
       const c = new Chess(fen);
       if (c.isCheckmate())
         return {
@@ -445,10 +450,11 @@ function GameViewer({
           lines: [{ score: 0, depth: 0, mate: null, moves: [], rank: 1 }],
         };
       const result = await search(fen, {
-        time: deeper ? 1200 : c.isCheck() ? 800 : 500,
-        depth: deeper ? 22 : 20, worker, signal: ctrl.signal,
+        time: deeper ? 900 : c.isCheck() ? 650 : 350,
+        depth: deeper ? 22 : 18, worker, signal: ctrl.signal,
       });
       cache.set(fen, result);
+      cacheReview(fen,result);
       return result;
     };
     try {
@@ -549,6 +555,7 @@ function GameViewer({
           games: l.games.map((g) =>
             g.id === game.id ? { ...g, review: [...collected] } : g,
           ),
+          activeGame: l.activeGame?.id === game.id ? {...l.activeGame,review:[...collected]} : l.activeGame,
         }));
       }
       if (!ctrl.signal.aborted) setCursor(n => n || Math.min(1, game.moves.length));

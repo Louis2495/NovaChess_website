@@ -1,9 +1,8 @@
-import { BookOpen, Star, Check, ThumbsUp, TriangleAlert, X, CircleAlert } from "lucide-react";
 import { reviewQuality } from "../lib/gameReview";
 import type { ReviewRow } from "../lib/types";
 export function MoveBadge({label}: {label:string}) {
-  const quality=reviewQuality(label), Icon={book:BookOpen,best:Star,excellent:Check,good:ThumbsUp,inaccuracy:CircleAlert,mistake:TriangleAlert,blunder:X}[quality];
-  return <span className={`move-quality quality-${quality}`} role="img" aria-label={label} title={label}><Icon size={13} strokeWidth={2.7}/></span>;
+  const quality=reviewQuality(label),symbol={book:"Book",best:"!",excellent:"!",good:"",inaccuracy:"?!",mistake:"?",blunder:"??"}[quality];
+  return <span className={`move-quality quality-${quality}`} role="img" aria-label={label} title={label}>{symbol}</span>;
 }
 export function EvaluationGraph({rows,total,cursor,onSelect}:{rows:ReviewRow[];total:number;cursor:number;onSelect:(n:number)=>void}) {
   const samples=rows.length?[{index:0,score:rows[0].score},...rows.filter(r=>r.afterScore!==undefined).map(r=>({index:r.ply+1,score:r.afterScore!}))]:[];

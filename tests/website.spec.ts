@@ -469,7 +469,6 @@ test("saved games replay and engine review persist real results", async ({
   await expect(
     page.getByRole("slider", { name: "Replay position" }),
   ).toHaveValue("1");
-  await page.getByRole("button", { name: "Review game", exact: true }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "Review complete." }),
   ).toBeVisible({ timeout: 45000 });

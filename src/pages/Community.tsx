@@ -239,7 +239,6 @@ export default function Community() {
                           : "Chess"}
                   </span>
                 </div>
-                <GameResult result={room.state.result} />
                 {room.state.lastWinner && (
                   <p className="pill">
                     {username(room.state.lastWinner)} holds the throne
@@ -247,6 +246,7 @@ export default function Community() {
                 )}
                 <Board
                   fen={premove.preview}
+                  overlay={<GameResult result={room.state.result} human={me?.team}/>}
                   materialFen={room.state.fen}
                   onCancelPremoves={premove.cancelOnRightClick}
                   flipped={me?.team === "b"}
