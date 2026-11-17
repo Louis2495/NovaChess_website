@@ -828,7 +828,7 @@ test("Stats has dedicated navigation and derives charts from completed local gam
   ).toBeVisible();
   await expect(page.locator(".results-ring strong")).toHaveText("33%");
   await expect(
-    page.locator(".stats-metrics>div").first().locator("b"),
+    page.locator(".stats-metrics>div").nth(1).locator("b"),
   ).toHaveText("3");
   const totals = await page
     .locator(".activity-track>span")

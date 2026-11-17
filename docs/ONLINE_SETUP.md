@@ -7,7 +7,7 @@ The site is fully usable for local chess, bots, lessons and puzzles without this
 ## One-time setup
 
 1. Create a Free project at [Supabase](https://supabase.com/dashboard). Save the project reference, project URL and **anon/publishable** key from the project’s API settings.
-2. In **SQL Editor**, run [the migration](../supabase/migrations/202611160001_online.sql). It creates the database, row-level security, Realtime publication, chat rate limits and server-only game/rating functions. Then run [chat moderation](../supabase/migrations/202611160002_chat_moderation.sql) and [Throne timing](../supabase/migrations/202611170001_throne_time.sql).
+2. In **SQL Editor**, run [the migration](../supabase/migrations/202611160001_online.sql). It creates the database, row-level security, Realtime publication, chat rate limits and server-only game/rating functions. Then run [chat moderation](../supabase/migrations/202611160002_chat_moderation.sql) [Throne timing](../supabase/migrations/202611170001_throne_time.sql), and [Throne game counts](../supabase/migrations/202611170002_throne_games.sql).
 3. In **Database → Extensions**, enable **pg_cron**. Then run:
 
    ```sql
@@ -112,3 +112,5 @@ Members can report messages and delete their own. Moderators can see reported me
 ### Throne statistics
 
 Apply `supabase/migrations/202611170001_throne_time.sql` and redeploy the `chess` function. The database records reign start/end times in the same transaction as room transitions. Consecutive wins and draws keep the reigning champion's clock running; losing or clicking Finish ends it. A challenger leaving does not end the incumbent's reign. Existing reigns begin counting when this migration is applied; earlier durations cannot be reconstructed. Stats reads only the signed-in player's reigns. Local Speedrun records need no backend.
+
+The On the Throne Time/Games toggle also requires `202611170002_throne_games.sql`. Games counts completed games played as the incumbent, including draws and the game that ends a reign. The initial game that wins the seat is not counted as an incumbent game. Historical counts before this migration cannot be reconstructed.

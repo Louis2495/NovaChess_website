@@ -249,14 +249,15 @@ export default function Stats() {
 }
 function CompetitionStats() {
  const {library}=useApp(), {session}=useOnlineSession();
- const [total,setTotal]=useState(0),[error,setError]=useState("");
- useEffect(()=>{setTotal(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_time_ms");if(active){setTotal(Number(r.data)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id]);
- const bests=speedrunBests(library.games);
+ const [total,setTotal]=useState(0),[throneGames,setThroneGames]=useState(0),[metric,setMetric]=useState("Time"),[error,setError]=useState("");
+ useEffect(()=>{setTotal(0);setThroneGames(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_stats");if(active){setTotal(Number(r.data?.timeMs)||0);setThroneGames(Number(r.data?.games)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id]);
+ const bests=new Map(speedrunBests(library.games));
  return <div className="stats-competition-grid">
-  <Card className="throne-stat"><h2><Crown size={21}/>Time on the throne</h2><strong className="competition-total">{duration(total)}</strong>{error && <p className="caption">{error}</p>}</Card>
-  <Card className="speedrun-stats"><h2><Timer size={21}/>Speedrun</h2>{bests.length ? <table><thead><tr><th>Computer Elo</th><th>Best time</th></tr></thead><tbody>{bests.map(([elo,g])=><tr key={elo}><td>{elo}</td><td>{duration(g.speedrun!.elapsedMs)}</td></tr>)}</tbody></table>:<p className="caption">No wins yet</p>}</Card>
+  <Card className="throne-stat"><div className="card-heading"><h2><Crown size={21}/>On the Throne</h2><div className="segmented" role="group" aria-label="Throne metric">{["Time","Games"].map(m=><button key={m} aria-pressed={metric===m} className={metric===m?"active":""} onClick={()=>setMetric(m)}>{m}</button>)}</div></div><strong className="competition-total">{metric==="Time" ? duration(total) : throneGames}</strong>{error && <p className="caption">{error}</p>}</Card>
+  <Card className="speedrun-stats"><h2><Timer size={21}/>Speedrun</h2><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating" tabIndex={0}>{Array.from({length:200},(_,i)=>(i+1)*50).map(elo=>{const game=bests.get(elo);return <div role="listitem" className={`speedrun-rating ${game?"has-record":""}`} key={elo} aria-label={`${elo} Elo: ${game?duration(game.speedrun!.elapsedMs):"No win yet"}`}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs):"—"}</strong></div>;})}</div></Card>
  </div>;
 }
+
 function StatsOverview({
   games,
   wins,
@@ -321,12 +322,12 @@ function StatsOverview({
     <div className="stats-overview">
       <section className="stats-metrics" aria-label="Your statistics">
         {[
-          { icon: Trophy, label: "Games played", value: games.length },
           {
             icon: Target,
-            label: "Local rating",
+            label: "Rating",
             value: Math.round(library.localRating),
           },
+          { icon: Trophy, label: "Games played", value: games.length },
           {
             icon: Puzzle,
             label: "Puzzles solved",
@@ -357,7 +358,7 @@ function StatsOverview({
               aria-label={`${wins} wins, ${draws} draws, ${losses} losses`}
               style={{
                 background: games.length
-                  ? `conic-gradient(var(--accent) 0% ${winStop}%, #b2bec3 ${winStop}% ${drawStop}%, #d38b8d ${drawStop}% 100%)`
+                  ? `conic-gradient(#39ed83 0% ${winStop}%, #e1e7ed ${winStop}% ${drawStop}%, #ff5364 ${drawStop}% 100%)`
                   : "var(--border)",
               }}
             >
@@ -368,9 +369,9 @@ function StatsOverview({
             </div>
             <div className="results-legend">
               {[
-                ["Wins", wins, "var(--accent)"],
-                ["Draws", draws, "#b2bec3"],
-                ["Losses", losses, "#d38b8d"],
+                ["Wins", wins, "#39ed83"],
+                ["Draws", draws, "#e1e7ed"],
+                ["Losses", losses, "#ff5364"],
               ].map(([label, value, color]) => (
                 <div key={label}>
                   <i style={{ background: String(color) }} />
@@ -452,7 +453,7 @@ function StatsOverview({
       </div>
       <CompetitionStats />
       <div className="stats-detail-grid">
-        <Card>
+        <Card className="training-stat">
           <div className="card-heading">
             <h2>Training</h2>
             <BookOpen size={18} />
@@ -471,19 +472,13 @@ function StatsOverview({
             <span>{library.repertoire.length} repertoire lines</span>
           </div>
         </Card>
-        <Card>
+        <Card className="playing-color-stat">
           <h2>Playing color</h2>
-          <Bar
-            label="White"
-            value={games.filter((g) => g.human === "w").length}
-            total={games.length}
-          />
-          <Bar
-            label="Black"
-            value={games.filter((g) => g.human === "b").length}
-            total={games.length}
-          />
-          <p className="caption">Local ratings are training estimates.</p>
+          {["w","b"].map(side=>{
+            const chosen=games.filter(g=>g.human===side),win=chosen.filter(g=>g.result===(side==="w"?"1-0":"0-1")).length,draw=chosen.filter(g=>g.result==="1/2-1/2").length,loss=chosen.length-win-draw;
+            return <div className="playing-color-row" key={side}><div className="playing-color-label"><span>{side==="w"?"White":"Black"}</span><b>{chosen.length}</b></div><div className="playing-color-stack" role="img" aria-label={`${side==="w"?"White":"Black"}: ${win} wins, ${loss} losses, ${draw} draws`}>{[["win",win],["loss",loss],["draw",draw]].map(([kind,count])=><span key={kind} className={`outcome-${kind}`} style={{width:`${Number(count)/Math.max(1,chosen.length)*100}%`}} title={`${count} ${kind === "win"?"wins":kind === "loss"?"losses":"draws"}`}>{Number(count)>0?count:""}</span>)}</div></div>;
+          })}
+          <div className="color-results-key"><span><i className="outcome-win"/>Wins</span><span><i className="outcome-loss"/>Losses</span><span><i className="outcome-draw"/>Draws</span></div>
         </Card>
       </div>
       <section className="improvement-section">

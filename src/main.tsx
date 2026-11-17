@@ -24,6 +24,7 @@ import "@fontsource/nunito-sans/latin-400.css";
 import "@fontsource/nunito-sans/latin-500.css";
 import "@fontsource/nunito-sans/latin-600.css";
 import "@fontsource/nunito-sans/latin-700.css";
+import "@fontsource/nunito-sans/latin-900.css";
 import "@fontsource/manrope/latin-400.css";
 import "@fontsource/manrope/latin-500.css";
 import "@fontsource/manrope/latin-600.css";

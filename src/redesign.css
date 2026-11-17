@@ -4483,3 +4483,29 @@ img.speedrun-picture { display:block; object-fit:cover; }
 .achievement-grid .achievement { border-top:3px solid #8edcf4; }
 .achievement-grid .achievement:nth-child(3n+2) { border-top-color:#c5a3ff; }
 .achievement-grid .achievement:nth-child(3n) { border-top-color:#ffdb74; }
+/* Distinct metric colors, shared outcome colors, and rounded display headings. */
+.stats-overview h2 { font-family:"Arial Rounded MT Bold","Nunito Sans",sans-serif; font-weight:900; font-size:1.35rem; letter-spacing:.01em; color:#f7fbff; -webkit-text-stroke:.2px currentColor; }
+.stats-overview .throne-stat { background:#ffad9f; color:#47261e; }
+.stats-overview .throne-stat h2,.stats-overview .speedrun-stats h2 { color:inherit; }
+.stats-competition-grid { grid-template-columns:1fr; }
+.throne-stat .card-heading { align-items:center; flex-wrap:wrap; gap:12px; }
+.throne-stat .segmented { margin:0 0 0 auto; border:1px solid #47261e55; border-radius:12px; background:#fff6; padding:3px; }
+.throne-stat .segmented button { color:#47261e; padding:7px 14px; border:0; }
+.throne-stat .segmented button.active { background:#47261e; color:#fff; border-radius:9px; }
+.stats-overview .speedrun-stats { background:#ffd4ed; color:#4b2340; }
+.speedrun-rating-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:10px; max-height:350px; overflow:auto; margin-top:18px; padding:3px 8px 3px 3px; }
+.speedrun-rating { background:#fff8; border:1px solid #4b234026; border-radius:12px; padding:10px; text-align:center; }
+.speedrun-rating span,.speedrun-rating strong { display:block; }
+.speedrun-rating span { font-size:.8rem; }.speedrun-rating strong { margin-top:7px; font-variant-numeric:tabular-nums; }
+.speedrun-rating.has-record { background:#fff; border-color:#8a3970; box-shadow:0 2px 0 #8a397022; }
+.playing-color-row { margin:20px 0; }.playing-color-label { display:flex; justify-content:space-between; margin-bottom:9px; }
+.playing-color-stack { display:flex; height:28px; overflow:hidden; border-radius:9px; background:#ffffff15; }
+.playing-color-stack > span { display:grid; place-items:center; color:#172e24; font-size:.75rem; font-weight:800; }
+.outcome-win { background:#39ed83; }.outcome-loss { background:#ff5364; }.outcome-draw { background:#e1e7ed; }
+.color-results-key { display:flex; gap:16px; flex-wrap:wrap; font-size:.75rem; }.color-results-key span { display:flex; align-items:center; gap:6px; }.color-results-key i { width:10px; height:10px; border-radius:3px; }
+.stats-overview .training-stat { background:linear-gradient(135deg,#66502b,var(--panel)); border-top:4px solid #ffb45c; }
+.training-stat .stat-bar i { background:#ffb45c; }
+.stats-overview .playing-color-stat { background:linear-gradient(135deg,#365568,var(--panel)); }
+.stats-overview .improvement-section { border:1px solid #ffc78366; border-radius:var(--radius); padding:22px; background:linear-gradient(125deg,#60472f44,var(--panel)); }
+.improvement-bars .stat-bar i { background:#ffc783; }.variant-breakdown summary { color:#ffc783; }
+.stats-overview .stat-metric-label { font-family:"Nunito Sans",sans-serif; font-weight:900; font-size:.85rem; }
