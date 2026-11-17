@@ -4675,3 +4675,63 @@ html { scrollbar-gutter:stable; }
 .encyclopedia-related > button { display:inline-block; margin:4px 8px 4px 0; padding:8px 10px; border-radius:8px; background:var(--accent-soft); color:var(--text); border:1px solid var(--border); }
 .research-layout .board-navigation { width:var(--actual-board-width,100%); max-width:100%; box-sizing:border-box; }
 @media(min-width:1001px){ .workspace:has(.lesson-workspace) { padding-bottom:20px; } }
+
+/* Keep every navigation destination and the account controls inside the sidebar. */
+.sidebar { height:100dvh; padding-block:clamp(6px,2dvh,20px); overflow:hidden; box-sizing:border-box; }
+.sidebar .brand { flex:none; padding-bottom:clamp(6px,2dvh,20px); min-height:38px; }
+.sidebar nav { flex:1 1 0; min-height:0; gap:clamp(1px,.5dvh,5px); }
+.sidebar nav > button,.sidebar nav > #sidebar-chat { flex:1 1 0; min-height:0; max-height:44px; }
+.sidebar nav button { min-height:0; height:100%; padding:clamp(2px,.9dvh,12px) 12px; box-sizing:border-box; }
+.sidebar #sidebar-chat { display:flex; }
+.sidebar #sidebar-chat > button { flex:1; }
+.sidebar .sidebar-bottom { flex:none; padding-top:clamp(4px,1.2dvh,12px); }
+.sidebar .account-stamp { padding-block:clamp(4px,1.2dvh,12px); }
+.sidebar .sidebar-footer { padding-top:4px; }
+@media(max-height:500px){
+ .sidebar .brand { font-size:1rem; min-height:30px; padding-bottom:4px; }
+ .sidebar .brand img { width:26px; height:26px; }
+ .sidebar nav button { font-size:.72rem; padding-block:1px; gap:9px; }
+ .sidebar nav button svg { width:16px; height:16px; }
+ .sidebar .account-stamp .avatar { width:22px; height:22px; }
+ .sidebar .sidebar-footer button { font-size:.62rem; }
+}
+.opening-picker { position:relative; display:grid; gap:8px; min-width:0; }
+.opening-picker > label { font-size:.8rem; color:var(--muted); }
+.opening-picker-input { position:relative; }
+.opening-picker-input input { width:100%; padding-right:36px; }
+.opening-picker-input > svg { position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--muted); }
+.opening-picker-popup { position:absolute; top:100%; left:0; right:0; z-index:15; background:var(--panel-solid); border:1px solid var(--accent); border-radius:12px; box-shadow:0 12px 28px #0005; overflow:hidden; margin-top:4px; }
+.opening-picker-popup > [role="listbox"] { max-height:min(280px,36dvh); overflow-y:auto; overscroll-behavior:contain; padding:5px; }
+.opening-picker-popup [role="option"] { display:block; width:100%; text-align:left; padding:10px; border-radius:7px; font-size:.8rem; line-height:1.5; }
+.opening-picker-popup [role="option"].highlighted { background:var(--accent-soft); }
+.opening-picker-popup [role="option"][aria-selected="true"] { color:var(--accent); font-weight:700; }
+.opening-picker-count { display:block; padding:7px 12px; border-top:1px solid var(--border); color:var(--muted); font-size:.7rem; }
+.opening-picker-popup.above { top:auto; bottom:calc(100% - 24px); margin-top:0; margin-bottom:4px; }
+@media(max-width:760px){
+ .workspace:has(.research-layout) { padding:8px 12px 12px; }
+ .workspace:has(.research-layout) .page-title { margin-bottom:10px; }
+ .research-form { padding:12px; margin-bottom:8px; }
+ .research-fields { gap:8px; }
+ .research-fields > .field { grid-template-rows:16px 40px; gap:4px; }
+ .research-fields > .field > span { line-height:16px; }
+ .research-fields > .field > input,.research-fields > .field > .segmented-control,
+ .research-fields .field input,.research-fields .segmented-control,.research-fields > .btn { height:40px; min-height:40px; }
+}
+/* Seven illustrations per desktop row; the mobile gallery keeps its own grid. */
+@media(min-width:1001px){
+ .workspace:has(.variant-gallery) { max-width:none; padding-inline:24px; }
+ .variant-gallery { grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; }
+ .variant-gallery button { min-width:0; }
+ .variant-gallery .variant-picture,.variant-gallery .multiplayer-picture,.variant-gallery .speedrun-picture { width:min(100%,160px); }
+}
+/* Fixed shared rows prevent autofill badges from shifting one field upward. */
+.research-fields { align-items:end; }
+.research-fields > .field { position:relative; grid-template-columns:minmax(0,1fr); height:72px; min-height:72px; align-self:end; }
+.research-fields > .field > span { grid-column:1; grid-row:1; }
+.research-fields > .field > input,.research-fields > .field > .segmented-control { grid-column:1; grid-row:2; align-self:start; }
+.research-fields > .research-username > :not(span):not(input) { position:absolute; right:8px; top:36px; }
+@media(max-width:760px){
+ .research-fields > .field { height:60px; min-height:60px; }
+ .research-fields > .research-username > :not(span):not(input) { top:28px; }
+}
+.quick-online-play:has(+ .variant-gallery) { padding:0; border:0; background:transparent; box-shadow:none; margin:8px auto 16px; }

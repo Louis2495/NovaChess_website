@@ -161,7 +161,7 @@ test('Throne has one illustrated title, scoped chat and a persistent resignation
  await expect.poll(()=>env.joins.some(j=>j.topic==='realtime:room-'+roomId)).toBe(true);env.emit('rooms',{...env.room,revision:1,members:[{id:uid,team:'w'},{id:peer,team:null}],status:'waiting',state:{...env.room.state,gameKey:'round2',lastWinner:uid,lastGame:{id:'round1',result:'1-0',white:uid,black:peer,reason:'resignation',resignedBy:peer}}});await expect(page.getByText('You won!',{exact:true})).toBeVisible();await expect(page.getByText('Opponent resigned.',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Continue',exact:true}).click();await expect(page.locator('.throne-round-result')).toHaveCount(0);
 });
 test('standard online games expose 3, 3+2, 5 and 10 minute controls',async({page})=>{
- const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>r.fulfill({json:[]}));await page.goto('/#play');const controls=page.getByRole('group',{name:'Time control',exact:true});await expect(controls.getByRole('button')).toHaveCount(4);await controls.getByRole('button',{name:'10 min',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(600);
+ const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>r.fulfill({json:[]}));await page.goto('/#play');const controls=page.getByRole('group',{name:'Time control',exact:true});await expect(controls.getByRole('button')).toHaveCount(4);await controls.getByRole('button',{name:'10',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(600);
 });
 
 test('consecutive online premoves advance on verified updates while an older HTTP response is pending',async({page})=>{
@@ -182,7 +182,7 @@ test('an expired live clock waits for server confirmation before showing the res
 });
 
 test('3+2 matchmaking sends both the base time and increment',async({page})=>{
- const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>{env.requests.push(new URL(r.request().url()));return r.fulfill({json:[]});});await page.goto('/#play');await page.getByRole('button',{name:'3 min + 2 sec',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(180);expect(env.actions[0].incrementSeconds).toBe(2);
+ const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>{env.requests.push(new URL(r.request().url()));return r.fulfill({json:[]});});await page.goto('/#play');await page.getByRole('button',{name:'3|2',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(180);expect(env.actions[0].incrementSeconds).toBe(2);
  const lobby=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(lobby.searchParams.get('increment_seconds')).toBe('eq.2');
 });
 test('the owner can grant administrator access by email, while delegated admins cannot see that form',async({page})=>{

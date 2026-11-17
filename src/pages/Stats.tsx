@@ -10,7 +10,6 @@ import {
   Trophy,
   Flame,
   Puzzle,
-  ArrowRight,
   BookOpen,
   Target,
   Plus,
@@ -168,16 +167,6 @@ export default function Stats() {
     "Trivia scholar": "Answer 500 trivia questions correctly",
     "Evaluation instinct": "Guess 100 engine evaluations within 0.25 pawns",
   };
-  const concepts = new Map<string, number>();
-  let reviewed = 0;
-  for (const g of library.games) {
-    if (g.review?.length) {
-      reviewed++;
-      for (const r of g.review)
-        if (r.loss >= 100 || r.expected)
-          concepts.set(r.concept, (concepts.get(r.concept) || 0) + 1);
-    }
-  }
   const visited = [
     ...new Set(
       library.games
@@ -240,8 +229,6 @@ export default function Stats() {
           wins={wins}
           draws={draws}
           losses={losses}
-          concepts={concepts}
-          reviewed={reviewed}
         />
       )}
     </>
@@ -263,17 +250,13 @@ function StatsOverview({
   wins,
   draws,
   losses,
-  concepts,
-  reviewed,
 }: {
   games: SavedGame[];
   wins: number;
   draws: number;
   losses: number;
-  concepts: Map<string, number>;
-  reviewed: number;
 }) {
-  const { library, navigate } = useApp();
+  const { library } = useApp();
   const rate = games.length ? Math.round((wins / games.length) * 100) : null;
   const [dayRange, setDayRange] = useState(7),
     [customRange, setCustomRange] = useState(false);
@@ -481,33 +464,7 @@ function StatsOverview({
           <div className="color-results-key"><span><i className="outcome-win"/>Wins</span><span><i className="outcome-loss"/>Losses</span><span><i className="outcome-draw"/>Draws</span></div>
         </Card>
       </div>
-      <section className="improvement-section">
-        <div className="home-section-heading">
-          <h2>Improvement areas</h2>
-          <span className="caption">{reviewed} reviewed games</span>
-        </div>
-        {concepts.size ? (
-          <div className="improvement-bars">
-            {[...concepts]
-              .sort((a, b) => b[1] - a[1])
-              .map(([concept, count]) => (
-                <Bar
-                  key={concept}
-                  label={concept}
-                  value={count}
-                  total={Math.max(...concepts.values())}
-                />
-              ))}
-          </div>
-        ) : (
-          <p className="muted">
-            Review a game to identify patterns in your play.
-          </p>
-        )}
-        <button className="text-link" onClick={() => navigate("library")}>
-          Review games
-          <ArrowRight size={14} />
-        </button>
+      <Card className="variant-breakdown-card">
         <details className="variant-breakdown">
           <summary>Variant breakdown</summary>
           {[...new Set(games.map((g) => g.variant))].map((v) => (
@@ -520,7 +477,7 @@ function StatsOverview({
           ))}
           {!games.length && <p className="caption">No completed games.</p>}
         </details>
-      </section>
+      </Card>
     </div>
   );
 }

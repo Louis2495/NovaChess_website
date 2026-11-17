@@ -1,3 +1,4 @@
+import OpeningPicker from "../components/OpeningPicker";
 import {screenName} from "../lib/screenName";
 import { useReviewWarmup } from "../lib/useReviewWarmup";
 import { duration } from "../lib/speedrun";
@@ -129,7 +130,6 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
     [dropCount, setDropCount] = useState(2),
     [human, setHuman] = useState<"w" | "b">("w"),
     [choice, setChoice] = useState("Current rating"),
-    [openingSearch, setOpeningSearch] = useState(""),
     [rating, setRating] = useState(1200),
     [rated, setRated] = useState(true),
     [openingId, setOpeningId] = useState(""),
@@ -750,39 +750,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
                       onChange={(v) => setRated(v && variant === "chess")}
                     />
                     {variant === "chess" && (
-                      <fieldset className="opening-request">
-                        <Field label="Search openings">
-                          <input
-                            type="search"
-                            value={openingSearch}
-                            placeholder="Name or ECO code"
-                            onChange={(e) => setOpeningSearch(e.target.value)}
-                          />
-                        </Field>
-                        <Field label="Request an opening">
-                          <ChoiceSelect
-                            value={openingId}
-                            onChange={(e) => setOpeningId(e.target.value)}
-                          >
-                            <option value="">Any opening</option>
-                            {openings
-                              ?.filter(
-                                (o) =>
-                                  o.id === openingId ||
-                                  `${o.eco} ${o.name}`
-                                    .toLowerCase()
-                                    .includes(
-                                      openingSearch.trim().toLowerCase(),
-                                    ),
-                              )
-                              .map((o) => (
-                                <option key={o.id} value={o.id}>
-                                  {o.eco} · {o.name}
-                                </option>
-                              ))}
-                          </ChoiceSelect>
-                        </Field>
-                      </fieldset>
+                      <OpeningPicker openings={openings||[]} value={openingId} onChange={setOpeningId}/>
                     )}
                   </>
                 )}

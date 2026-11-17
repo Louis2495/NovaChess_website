@@ -1,3 +1,4 @@
+import type {ReactNode} from "react";
 import MultiplayerPicture from "../components/MultiplayerPicture";
 import VariantIcon from "../components/VariantIcon";
 import RoomChat from "../components/RoomChat";
@@ -48,7 +49,7 @@ type Room = {
   settings: { bot: boolean };
 };
 type Profile = { id: string; username: string;screen_name?:string };
-export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number}) {
+export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0, children}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number; children?:ReactNode}) {
   const { session } = useOnlineSession(),
     { tab, detail, navigate, notify, appearance } = useApp();
   const [confirmed, setConfirmed] = useState<Room | null>(null),
@@ -256,6 +257,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {!online || !uid ? (
         <>
           <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button></Card>
+          {children}
           <OnlineAccount />
         </>
       ) : (
@@ -514,7 +516,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
               {mode !== "standard" && <p className="caption">{ mode === "throne" ? "Winner stays. Queue to challenge." : mode === "vote" ? "One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>}
             </Card>
           )}
-
+          {!room && children}
         </>
       )}
     </>

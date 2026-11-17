@@ -358,13 +358,22 @@ export function Board({
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
       const top = rect.top + window.scrollY;
-      const available = window.innerHeight - top - (tab === "puzzles" && window.innerWidth <= 1000 ? 158 : 90);
-      const limit = Math.floor(Math.max(160, available >= 160 ? available : window.innerHeight - 230));
+      const reserve = tab === "puzzles" ? (window.innerWidth <= 1000 ? 158 : 56) : 90;
+      const available = window.innerHeight - top - reserve;
+      const heightLimit = top < window.innerHeight - 80
+        ? Math.max(80,available)
+        : Math.max(80,window.innerHeight - reserve - 100);
+      const widthLimit = Math.max(0, window.innerWidth - rect.left - 12);
+      const limit = Math.floor(Math.min(heightLimit,widthLimit));
       if (!resizeGesture.current) setViewportLimit(previous => previous === limit ? previous : limit);
     };
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     if (el.parentElement) observer.observe(el.parentElement);
+    if (!compact) {
+      const workspace=el.closest(".workspace");
+      if(workspace)observer.observe(workspace);
+    }
     window.addEventListener("resize", measure);
     let active = true;
     document.fonts.ready.then(() => { if (active) measure(); });
@@ -656,7 +665,7 @@ export function Board({
           role="slider"
           aria-label="Resize board"
           title="Drag to resize · double-click to reset"
-          aria-valuemin={160}
+          aria-valuemin={Math.min(160,measuredSize)}
           aria-valuemax={1400}
           aria-valuenow={measuredSize}
           aria-valuetext={`${measuredSize} pixels`}

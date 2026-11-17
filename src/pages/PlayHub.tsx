@@ -29,17 +29,19 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
           <button key={id} aria-pressed={opponent === id} onClick={() => setOpponent(id)}>{label}</button>)}
       </div>
     </div>}
-    {!variants && online && <div className="time-control-toggle" role="group" aria-label="Time control">{[["180:0","3 min"],["180:2","3 min + 2 sec"],["300:0","5 min"],["600:0","10 min"]].map(([id,label])=><button key={id} aria-pressed={timeControl===id} onClick={()=>setTimeControl(id)}>{label}</button>)}</div>}
+    {!variants && online && <div className="time-control-toggle" role="group" aria-label="Time control">{[["180:0","3"],["180:2","3|2"],["300:0","5"],["600:0","10"]].map(([id,label])=><button key={id} aria-pressed={timeControl===id} onClick={()=>setTimeControl(id)}>{label}</button>)}</div>}
+
+    {online ? <Community key={variants ? mode : "standard"+timeControl}
+      timeControlSeconds={+timeControl.split(":")[0]} incrementSeconds={+timeControl.split(":")[1]}
+      presetMode={variants && teamModes.includes(mode) ? mode : "standard"}
+      presetVariant={variants && !teamModes.includes(mode) ? mode : "chess"}>
     {variants && online && <div className="variant-gallery online-variant-gallery" role="group" aria-label="Online variants">
       {onlineVariants.map(([id, label]) => <button key={id} aria-pressed={mode === id} onClick={() => setMode(id)}>
         {teamModes.includes(id) ? <MultiplayerPicture mode={id} /> : id === "speedrun" ? <img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/> : <VariantIcon id={id} size={118} />}
         {label}
       </button>)}
     </div>}
-    {online ? <Community key={variants ? mode : "standard"+timeControl}
-      timeControlSeconds={+timeControl.split(":")[0]} incrementSeconds={+timeControl.split(":")[1]}
-      presetMode={variants && teamModes.includes(mode) ? mode : "standard"}
-      presetVariant={variants && !teamModes.includes(mode) ? mode : "chess"} />
+    </Community>
       : <Play variantsOnly={variants} onPlayingChange={setPlaying} />}
   </>;
 }
