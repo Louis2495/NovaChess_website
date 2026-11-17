@@ -24,7 +24,7 @@ import {
 import { useApp } from "../lib/context";
 import { uid, download, dateLabel, base, loadData, initialFen } from "../lib/store";
 import { search, useEngine, useSettledEvaluation, scoreLabel } from "../lib/engine";
-import { fairy, legal, squares } from "../lib/variants";
+import { fairy, legal, squares, fog } from "../lib/variants";
 import type {
   SavedGame,
   ReviewRow,
@@ -35,6 +35,7 @@ import { useControl } from "../lib/controls";
 import { Board } from "../components/Board";
 import {
   ChoiceSelect,
+  Toggle,
   PageTitle,
   Card,
   Button,
@@ -381,6 +382,7 @@ function GameViewer({
   const { library, setLibrary, navigate, notify } = useApp();
   const [cursor, setCursor] = useState(0),
     [playing, setPlaying] = useState(false),
+    [fogEnabled, setFogEnabled] = useState(true),
     [sharing, setSharing] = useState(false),
     [reviewing, setReviewing] = useState(false),
 
@@ -589,6 +591,7 @@ function GameViewer({
         <Button className="secondary" onClick={onClose}>
           Back to Library
         </Button>
+        {game.variant === "cvfog" && <Toggle label="Fog" checked={fogEnabled} onChange={setFogEnabled} />}
         <Button className="secondary" onClick={() => setSharing(true)}><Share2 size={16}/>Share</Button>
         {!game.special && <Button disabled={reviewing || rows.length >= game.moves.length && rows.every(r=>r.afterScore!==undefined)} onClick={() => void review()}>
           {reviewing ? <LoaderCircle className="spin" size={16}/> : <ScanLine size={16}/>}
@@ -627,6 +630,7 @@ function GameViewer({
             </div>}
           <Board
             fen={game.positions[cursor] || game.initial}
+            visible={game.variant === "cvfog" && fogEnabled ? fog(game.positions[cursor] || game.initial, game.human) : undefined}
             blocked={
               game.special?.blocked.slice(0, Math.floor(cursor / 10)) || []
             }
@@ -635,7 +639,7 @@ function GameViewer({
             flipped={flipped}
             onFlip={() => setFlipped((v) => !v)}
             highlights={
-              cursor
+              cursor && !(game.variant === "cvfog" && fogEnabled)
                 ? [
                     game.moves[cursor - 1]?.slice(0, 2),
                     game.moves[cursor - 1]?.slice(2, 4),
