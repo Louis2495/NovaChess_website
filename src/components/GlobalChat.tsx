@@ -67,42 +67,39 @@ export default function GlobalChat() {
     if (!open || !online || !session) return;
     const client = online;
     let active = true;
-    async function load() {
-      const [m, p, mod] = await Promise.all([
-        client
-          .from("messages")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(80),
-        client.from("profiles").select("id,username,avatar").limit(1000),
-        client.rpc("is_chat_moderator"),
-      ]);
-      if (!active) return;
-      if (m.error) {
-        setError(m.error.message);
-        return;
-      }
-      setMessages((m.data || []).reverse());
-      setPeople(p.data || []);
-      setModerator(mod.data === true);
-      if (mod.data === true) {
-        const r = await client.from("reports").select("message_id");
-        if (active) setReported((r.data || []).map((r) => r.message_id));
-      }
+    const knownPeople=new Map<string,Person>();
+    let isModerator=false,sequence=0,loadId=0;
+    const pendingLoads=new Map<number,number>();
+    let changes:{sequence:number;event:string;message:Message;id:number}[]=[];
+    const applyChange=(ms:Message[],change:{event:string;message:Message;id:number})=>change.event==="DELETE"?ms.filter(m=>m.id!==change.id):[...ms.filter(m=>m.id!==change.message.id),change.message].sort((a,b)=>a.id-b.id).slice(-80);
+    async function authors(ids:string[]){
+      for(const id of new Set(ids)){const p=knownPeople.get(id);if(p){knownPeople.delete(id);knownPeople.set(id,p);}}
+      const missing=[...new Set(ids)].filter(id=>!knownPeople.has(id));if(!missing.length)return;
+      const {data}=await client.from("profiles").select("id,username,avatar").in("id",missing);
+      if(!active)return;for(const p of data||[])knownPeople.set(p.id,p);
+      while(knownPeople.size>200)knownPeople.delete(knownPeople.keys().next().value!);
+      setPeople([...knownPeople.values()]);
+    }
+    async function reports(){if(!isModerator)return;const r=await client.from("reports").select("message_id");if(active)setReported((r.data||[]).map(r=>r.message_id));}
+    async function load(){
+      const id=++loadId,start=sequence;pendingLoads.set(id,start);
+      try{
+        const [m,mod]=await Promise.all([client.from("messages").select("*").order("created_at",{ascending:false}).limit(80),client.rpc("is_chat_moderator")]);
+        if(!active)return;if(m.error){setError(m.error.message);return;}
+        let snapshot=(m.data||[]).reverse();for(const change of changes)if(change.sequence>start)snapshot=applyChange(snapshot,change);
+        setMessages(snapshot);isModerator=mod.data===true;setModerator(isModerator);
+        void authors(snapshot.map(m=>m.user_id));void reports();
+      }finally{pendingLoads.delete(id);const oldest=pendingLoads.size?Math.min(...pendingLoads.values()):sequence;changes=changes.filter(c=>c.sequence>oldest);}
     }
     void load();
-    const channel = client
-      .channel("global-chat-dock")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "messages" },
-        () => void load(),
-      )
-      .subscribe();
-    return () => {
-      active = false;
-      void client.removeChannel(channel);
-    };
+    const channel=client.channel("global-chat-dock").on("postgres_changes",{event:"*",schema:"public",table:"messages"},payload=>{
+      if(!active)return;
+      const message=payload.new as Message,change={sequence:++sequence,event:payload.eventType,message,id:(payload.old as {id:number}).id};
+      if(pendingLoads.size)changes.push(change);
+      setMessages(ms=>applyChange(ms,change));if(payload.eventType!=="DELETE")void authors([message.user_id]);
+    }).subscribe(status=>{if(status==="SUBSCRIBED")void load();});
+    const refreshReports=setInterval(()=>{if(document.visibilityState!=="hidden")void reports();},30000);
+    return()=>{active=false;clearInterval(refreshReports);void client.removeChannel(channel);};
   }, [open, session?.user.id]);
   useEffect(() => {
     if (list.current) list.current.scrollTop = list.current.scrollHeight;

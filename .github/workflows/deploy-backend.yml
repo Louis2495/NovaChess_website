@@ -1,0 +1,51 @@
+name: Set up multiplayer
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: supabase-production
+  cancel-in-progress: false
+jobs:
+  backend:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Validate configuration
+        run: |
+          node scripts/check-online-config.mjs
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo 'Add the SUPABASE_ACCESS_TOKEN repository Actions secret.'; exit 1; }
+          test -n "$SUPABASE_DB_PASSWORD" || { echo 'Add the SUPABASE_DB_PASSWORD repository Actions secret.'; exit 1; }
+      - run: npm ci
+      - run: npm run test:unit
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Apply database migrations
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push --linked
+      - name: Deploy game validation
+        run: supabase functions deploy chess --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
+      - name: Verify deployed services
+        run: node scripts/check-online-backend.mjs
+      - name: Deployment summary
+        run: echo 'Backend deployed. Configure Auth URLs and a signup provider, then test with two separate accounts.' >> "$GITHUB_STEP_SUMMARY"
+  website:
+    needs: backend
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml

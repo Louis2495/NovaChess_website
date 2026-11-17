@@ -4555,3 +4555,4 @@ html { scrollbar-gutter:stable; }
 .learn-group .learn-tile p { font-size:.75rem; line-height:1.4; }
 @media(max-width:1000px){ .learn-group .learn-hub { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:600px){ .learn-group .learn-tile { padding:12px; } }
+.oauth-buttons { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }

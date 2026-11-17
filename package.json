@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build && node scripts/offline.mjs",
+    "build": "node scripts/check-build-config.mjs && tsc -b && vite build && node scripts/offline.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "test": "npm run test:unit && playwright test",
     "postinstall": "node scripts/prepare-assets.mjs",
     "test:unit": "node --test tests/unit/*.test.mjs",
-    "prepare:federations": "node scripts/prepare-federation-function.mjs"
+    "prepare:federations": "node scripts/prepare-federation-function.mjs",
+    "check:online": "node scripts/check-online-backend.mjs",
+    "test:online": "playwright test --config playwright.online.config.ts"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",

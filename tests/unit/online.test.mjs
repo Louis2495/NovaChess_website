@@ -150,6 +150,8 @@ before(async () => {
   );
   await pg.exec(readFileSync("supabase/migrations/202611170001_throne_time.sql","utf8"));
   await pg.exec(readFileSync("supabase/migrations/202611170002_throne_games.sql","utf8"));
+  await pg.exec(`create schema cron;create table cron.test_jobs(name text,schedule text,command text);create function cron.schedule(text,text,text) returns bigint language plpgsql as $$begin insert into cron.test_jobs values($1,$2,$3);return 1;end $$;`);
+  await pg.exec(readFileSync("supabase/migrations/202611180001_online_operations.sql","utf8").replace('create extension if not exists pg_cron with schema pg_catalog;',''));
   for (const uid of users)
     await pg.query("insert into auth.users(id)values($1)", [uid]);
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
@@ -468,4 +470,12 @@ test("Throne counts completed incumbent games once, including loss and draw",asy
  let rows=await pg.query('select games from throne_reigns where room_id=$1',[r.id]);assert.equal(rows.rows[0].games,1);
  await pg.query("update rooms set state=state || jsonb_build_object('lastWinner',$2::text,'gameKey','round3','lastResult','0-1') where id=$1",[r.id,users[1]]);
  rows=await pg.query('select games,ended_at from throne_reigns where room_id=$1 order by id',[r.id]);assert.equal(rows.rows[0].games,2);assert.ok(rows.rows[0].ended_at);assert.equal(rows.rows[1].games,0);
+});
+
+test("online deployment schedules voting and bounded chat/vote retention",async()=>{
+ const jobs=await pg.query('select * from cron.test_jobs order by name');assert.equal(jobs.rows.length,3);const votes=jobs.rows.find(j=>j.name==='novachess-votes');assert.equal(votes.schedule,'* * * * *');assert.match(votes.command,/close_due_votes/);assert.match(jobs.rows.find(j=>j.name==='novachess-chat-retention').command,/30 days/);
+});
+
+test('public lobby projection excludes full board histories and private-size queues',async()=>{
+ const columns=await pg.query("select column_name from information_schema.columns where table_name='room_lobby' order by ordinal_position");assert.deepEqual(columns.rows.map(r=>r.column_name),['id','name','mode','variant','status','member_count','updated_at']);
 });

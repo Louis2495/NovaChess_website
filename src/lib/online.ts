@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 const url = import.meta.env.VITE_SUPABASE_URL,
   key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-export const online = url && key ? createClient(url, key) : null;
+export const online = url && key ? createClient(url, key, {auth:{flowType:"pkce"}}) : null;
 export function useOnlineSession() {
   const [session, setSession] = useState<Session | null>(null),
     [ready, setReady] = useState(!online);
@@ -33,4 +33,13 @@ export async function onlineAction(body: Record<string, unknown>) {
   }
   if (data?.error) throw Error(data.error);
   return data;
+}
+
+export async function onlineAuthOptions(){
+ if(!url || !key)return {providers:[],emailEnabled:true};
+ const response=await fetch(`${url.replace(/\/$/,"")}/auth/v1/settings`,{headers:{apikey:key},signal:AbortSignal.timeout(10000)});
+ if(!response.ok)return {providers:[],emailEnabled:true};
+ const settings=await response.json();
+ const providers=["google","github"].filter(provider=>settings.external?.[provider]===true) as ("google"|"github")[];
+ return {providers,emailEnabled:settings.external?.email!==false};
 }

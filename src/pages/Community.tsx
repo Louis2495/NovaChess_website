@@ -1,7 +1,7 @@
 import MultiplayerPicture from "../components/MultiplayerPicture";
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Chess } from "chess.js";
 import {
   Crown,
@@ -38,11 +38,12 @@ type Room = {
   marks: BoardMark[];
   settings: { bot: boolean };
 };
+type RoomSummary = Pick<Room,"id"|"name"|"mode"|"variant"|"status"> & {member_count:number};
 type Profile = { id: string; username: string };
 export default function Community() {
   const { session } = useOnlineSession(),
     { detail, navigate, notify, appearance } = useApp();
-  const [rooms, setRooms] = useState<Room[]>([]),
+  const [rooms, setRooms] = useState<RoomSummary[]>([]),
     [room, setRoom] = useState<Room | null>(null),
     [profiles, setProfiles] = useState<Profile[]>([]),
     [mode, setMode] = useState("throne"),
@@ -61,51 +62,42 @@ export default function Community() {
   const inviteTeam = new URLSearchParams(inviteQuery).get("team");
   const username = (id: string) =>
     profiles.find((p) => p.id === id)?.username || "Player";
-  async function load() {
-    if (!online || !uid) return;
-    const [{ data: r, error }, { data: p }] = await Promise.all([
-      online
-        .from("rooms")
-        .select("*")
-        .order("updated_at", { ascending: false })
-        .limit(40),
-      online.from("profiles").select("id,username").limit(1000),
-
-    ]);
-    if (error) {
-      setError(error.message);
-      return;
+  const routeRef=useRef(roomId);routeRef.current=roomId;
+  const profileCache=useRef(new Map<string,Profile>());
+  const loadProfiles=useCallback(async(ids:string[])=>{
+    if(!online)return;const missing=[...new Set(ids)].filter(id=>!profileCache.current.has(id));
+    if(!missing.length)return;
+    const {data}=await online.from("profiles").select("id,username").in("id",missing);
+    for(const p of data||[])profileCache.current.set(p.id,p);
+    setProfiles([...profileCache.current.values()]);
+  },[]);
+  const load=useCallback(async()=>{
+    if(!online || !uid)return;
+    if(roomId){
+      const {data,error}=await online.from("rooms").select("*").eq("id",roomId).single();
+      if(routeRef.current!==roomId)return;
+      if(error){setError(error.message);return;}
+      if(data){setRoom(current=>current && current.id===data.id && current.revision>data.revision?current:data);void loadProfiles(data.members.map((m:Member)=>m.id));}
+    }else{
+      const {data,error}=await online.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at").order("updated_at",{ascending:false}).limit(40);
+      if(routeRef.current!==roomId)return;
+      if(error){setError(error.message);return;}
+      setRooms(data||[]);setRoom(null);
     }
-    setRooms(r || []);
-    setProfiles(p || []);
-    if (roomId) {
-      const found = (r || []).find((x) => x.id === roomId);
-      if (found) setRoom(found);
-      else {
-        const { data } = await online
-          .from("rooms")
-          .select("*")
-          .eq("id", roomId)
-          .single();
-        if (data) setRoom(data);
-      }
-    } else setRoom(null);
-  }
-  useEffect(() => {
-    void load();
-    if (!online || !uid) return;
-    const channel = online
-      .channel("novachess-lobby")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "rooms" },
-        () => void load(),
-      )
-      .subscribe();
-    return () => {
-      void online?.removeChannel(channel);
-    };
-  }, [uid, detail]);
+  },[uid,roomId,loadProfiles]);
+  useEffect(()=>{
+    void load();if(!online || !uid)return;
+    const refresh=()=>{if(document.visibilityState!=="hidden")void load();};
+    window.addEventListener("online",refresh);window.addEventListener("focus",refresh);
+    // The lobby has no global move subscription. Only an opened room is live.
+    const poll=roomId?undefined:setInterval(refresh,30000);
+    const channel=roomId?online.channel("room-"+roomId).on("postgres_changes",{event:"UPDATE",schema:"public",table:"rooms",filter:`id=eq.${roomId}`},payload=>{
+      const next=payload.new as Room;
+      setRoom(current=>current && current.id===next.id && current.revision>=next.revision?current:next);
+      void loadProfiles(next.members.map(m=>m.id));
+    }).subscribe(status=>{if(status==="SUBSCRIBED")void load();}):null;
+    return()=>{if(poll)clearInterval(poll);if(channel)void online!.removeChannel(channel);window.removeEventListener("online",refresh);window.removeEventListener("focus",refresh);};
+  },[uid,roomId,load,loadProfiles]);
   useEffect(() => {
     if (!online || !room || room.mode !== "vote") return;
     const fetchVotes = async () => {
@@ -117,23 +109,15 @@ export default function Community() {
       setVotes(data || []);
     };
     void fetchVotes();
-    const ch = online
-      .channel("votes-" + room.id)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "votes",
-          filter: `room_id=eq.${room.id}`,
-        },
-        () => void fetchVotes(),
-      )
+    const filters={schema:"public",table:"votes",filter:`room_id=eq.${room.id}`};
+    const ch=online.channel("votes-"+room.id)
+      .on("postgres_changes",{...filters,event:"INSERT"},()=>void fetchVotes())
+      .on("postgres_changes",{...filters,event:"UPDATE"},()=>void fetchVotes())
       .subscribe();
     return () => {
       void online?.removeChannel(ch);
     };
-  }, [room?.id, room?.revision]);
+  }, [room?.id, room?.state.moves.length]);
   async function act(
     action: string,
     extra: Record<string, unknown> = {},
@@ -152,7 +136,8 @@ export default function Community() {
         setRoom(result);
         if (!detail) navigate("community", result.id);
       }
-      await load();
+      if(result.id)void loadProfiles(result.members?.map((m:Member)=>m.id)||[]);
+      else await load();
       setArmed("");
       setFirst("");
     } catch (e) {
@@ -541,7 +526,7 @@ export default function Community() {
                 </Button>
               </Card>
               <Card>
-                <h2>Open rooms</h2>
+                <div className="card-heading"><h2>Open rooms</h2><Button className="text-button" onClick={()=>void load()}>Refresh</Button></div>
                 <div className="room-list">
                   {rooms
                     .filter((r) => r.status !== "finished")
@@ -560,7 +545,7 @@ export default function Community() {
                                 : r.mode === "team"
                                   ? "Team Chess"
                                   : "Chess"}{" "}
-                            · {r.members.length} players
+                            · {r.member_count} players
                           </small>
                         </span>
                         <Chevron />

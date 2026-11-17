@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { online, useOnlineSession } from "../lib/online";
+import { useEffect, useState } from "react";
+import { online, useOnlineSession, onlineAuthOptions } from "../lib/online";
 import { useApp } from "../lib/context";
 import { Button, Card, Field } from "./UI";
 export default function OnlineAccount() {
   const { session } = useOnlineSession(),
     { notify } = useApp();
+  const [providers,setProviders]=useState<("google"|"github")[]>([]);
+  const [emailEnabled,setEmailEnabled]=useState(true);
+  useEffect(()=>{let active=true;void onlineAuthOptions().then(p=>{if(active){setProviders(p.providers as ("google"|"github")[]);setEmailEnabled(p.emailEnabled);}}).catch(()=>{});return()=>{active=false;};},[]);
   const [signup, setSignup] = useState(false),
     [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
@@ -32,6 +35,10 @@ export default function OnlineAccount() {
   return (
     <Card className="account-form">
       <h2>{signup ? "Create account" : "Sign in"}</h2>
+      {providers.length>0 && <div className="oauth-buttons">{providers.map(provider=><Button key={provider} className="secondary" disabled={busy} onClick={async()=>{
+        setBusy(true);try{const {error}=await online!.auth.signInWithOAuth({provider,options:{redirectTo:location.origin+location.pathname}});if(error)notify(error.message);}catch{notify("Sign-in could not start. Try again.");}finally{setBusy(false);}
+      }}>Continue with {provider==="google"?"Google":"GitHub"}</Button>)}</div>}
+      {emailEnabled && <>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -77,6 +84,8 @@ export default function OnlineAccount() {
       <button className="text-link" onClick={() => setSignup((v) => !v)}>
         {signup ? "Already have an account?" : "Create an account"}
       </button>
+      </>}
+      {!emailEnabled && !providers.length && <p className="caption">Sign-in is temporarily unavailable.</p>}
     </Card>
   );
 }
