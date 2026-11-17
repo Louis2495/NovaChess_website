@@ -1,3 +1,4 @@
+import MultiplayerPicture from "../components/MultiplayerPicture";
 import DailyMeme from "../components/DailyMeme";
 import { useMemo, useState } from "react";
 import { ArrowRight, Check, ChevronRight, RotateCcw } from "lucide-react";
@@ -31,7 +32,9 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <PageTitle title="Home" />
-      <section className="new-game-section" aria-label="New game">
+      <section className="new-game-section home-welcome" aria-label="New game">
+        <div className="home-welcome-art" aria-hidden="true"><MultiplayerPicture mode="team" /></div>
+        <div className="home-welcome-actions">
         <Button className="new-game-primary" onClick={() => navigate("play")}>
           New game
         </Button>
@@ -44,6 +47,7 @@ export default function HomePage() {
             Resume saved game
           </button>
         )}
+        </div>
       </section>
       <div className="home-practice-grid">
         <section

@@ -21,10 +21,10 @@ function fitChat(box: ChatBox): ChatBox {
 }
 export default function GlobalChat() {
   const [box, setBox] = useState<ChatBox>(() => fitChat({left:innerWidth>1000?220:12,top:40,width:440,height:760}));
-  const moving = useRef<(ChatBox & { kind:"move"|"size"; x:number; y:number }) | null>(null);
+  const moving = useRef<(ChatBox & { kind:string; x:number; y:number }) | null>(null);
   const panel = useRef<HTMLElement>(null);
   useEffect(() => { const resize = () => setBox(b => fitChat(b)); window.addEventListener("resize",resize); return () => window.removeEventListener("resize",resize); },[]);
-  function begin(e: React.PointerEvent<HTMLElement>, kind: "move"|"size") {
+  function begin(e: React.PointerEvent<HTMLElement>, kind: string) {
     if(e.button!==0 || kind==="move" && (e.target as HTMLElement).closest("button")) return;
     e.preventDefault(); e.stopPropagation();
     const r=panel.current!.getBoundingClientRect();
@@ -34,7 +34,15 @@ export default function GlobalChat() {
   function motion(e: React.PointerEvent<HTMLElement>) {
     const r=moving.current; if(!r) return; e.preventDefault(); e.stopPropagation();
     const dx=e.clientX-r.x,dy=e.clientY-r.y;
-    setBox(fitChat(r.kind==="move" ? {...r,left:r.left+dx,top:r.top+dy} : {...r,width:Math.min(innerWidth-r.left-12,r.width+dx),height:Math.min(innerHeight-r.top-(innerWidth<=1000?80:12),r.height+dy)}));
+    if (r.kind === "move") { setBox(fitChat({...r,left:r.left+dx,top:r.top+dy})); return; }
+    const bottom = innerHeight-(innerWidth<=1000?80:12);
+    const minW=Math.min(280,innerWidth-24), minH=Math.min(320,bottom-12);
+    let left=r.left, top=r.top, right=r.left+r.width, end=r.top+r.height;
+    if(r.kind.includes("w")) left=Math.max(12,Math.min(right-minW,r.left+dx));
+    if(r.kind.includes("e") || r.kind==="size") right=Math.min(innerWidth-12,Math.max(left+minW,r.left+r.width+dx));
+    if(r.kind.includes("n")) top=Math.max(12,Math.min(end-minH,r.top+dy));
+    if(r.kind.includes("s") || r.kind==="size") end=Math.min(bottom,Math.max(top+minH,r.top+r.height+dy));
+    setBox({left,top,width:right-left,height:end-top});
   }
   function end(e: React.PointerEvent<HTMLElement>) { moving.current=null; if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId); }
   const { library, navigate } = useApp(),
@@ -278,6 +286,8 @@ export default function GlobalChat() {
               <Send size={18} />
             </IconButton>
           </form>
+          {["n","e","s","w","ne","nw","sw"].map(edge => <div key={edge} className={`chat-edge chat-edge-${edge}`} aria-hidden="true"
+            onPointerDown={e=>begin(e,edge)} onPointerMove={motion} onPointerUp={end} onPointerCancel={end} />)}
           <div className="chat-resize-handle" role="slider" aria-label="Resize chat" aria-valuemin={Math.min(320,innerHeight-92)} aria-valuemax={innerHeight} aria-valuenow={Math.round(box.height)} aria-valuetext={`${Math.round(box.width)} by ${Math.round(box.height)} pixels`} tabIndex={0}
             onPointerDown={e=>begin(e,"size")} onPointerMove={motion} onPointerUp={end} onPointerCancel={end}
             onKeyDown={e=>{if(!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key))return;e.preventDefault();e.stopPropagation();setBox(b=>fitChat({...b,width:b.width+(e.key==="ArrowRight"?20:e.key==="ArrowLeft"?-20:0),height:b.height+(e.key==="ArrowDown"?20:e.key==="ArrowUp"?-20:0)}));}}><ArrowDownRight size={17}/></div>

@@ -379,7 +379,7 @@ export function Board({
       style={
         {
           maxWidth: compact ? undefined : viewportLimit !== null ? `${viewportLimit}px` : "max(160px, calc(100dvh - 230px))",
-          ...((resizePreview ?? manualBoardSize) ? { width: `min(100%, ${resizePreview ?? manualBoardSize}px)`, flex: "0 1 auto" } : {}),
+          ...(!compact && (resizePreview ?? manualBoardSize) ? { width: `min(100%, ${resizePreview ?? manualBoardSize}px)`, flex: "0 1 auto" } : {}),
         }
       }
     >
@@ -647,7 +647,7 @@ export function Board({
         </svg>
 
       </div>
-        <div
+        {!compact && <div
           className="board-resize-handle"
           role="slider"
           aria-label="Resize board"
@@ -733,7 +733,7 @@ export function Board({
               strokeLinecap="round"
             />
           </svg>
-        </div>
+        </div>}
       {imbalance > 0 && (
         <div
           className={`material-imbalance ${compact ? "compact-material" : ""}`}

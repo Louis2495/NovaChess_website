@@ -67,7 +67,7 @@ test("game setup offers two strength choices, defaults to rated, searches openin
     const section = page.locator(".new-game-section");
     await expect(section).toHaveCSS("background-image", "none");
     const r = (await resume.boundingBox())!,
-      s = (await section.boundingBox())!;
+      s = (await (route === "home" ? page.locator(".home-welcome-actions") : section).boundingBox())!;
     expect(Math.abs(r.x + r.width / 2 - s.x - s.width / 2)).toBeLessThan(2);
     expect(r.width).toBeLessThan(280);
   }

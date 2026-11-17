@@ -4343,3 +4343,41 @@ select.theme-select {
 }
 .sidebar nav button.active { color:var(--text); }
 .chat-dock-messages { align-content:start; }
+
+/* Compact preview cards and balanced puzzle controls. */
+.puzzle-layout { --puzzle-rail-space:0px; }
+.puzzle-board-area { display:block; }
+.puzzle-actions-right { display:flex; flex-direction:column; gap:10px; width:100%; }
+.puzzle-actions-right > .btn { width:100%; justify-content:center; }
+.puzzle-actions-right .puzzle-action-label { display:inline; }
+.saved-game-card { display:flex; flex-direction:column; min-width:0; }
+.saved-game-card .saved-board-button { max-width:240px; width:100%; }
+.saved-game-card .saved-board-button .board-frame { width:100%; }
+.saved-game-card h3 { overflow-wrap:anywhere; }
+.saved-game-card .pill { flex-shrink:0; }
+.saved-game-card .button-row { margin-top:auto; padding-top:16px; min-height:56px; }
+.saved-game-card .library-delete { background:transparent; border-color:transparent; color:#ff8598; }
+.saved-game-card .library-delete:hover { background:#b52c431c; color:#ffa5b3; }
+.home-page .home-welcome { display:grid; grid-template-columns:minmax(150px,240px) minmax(0,1fr); gap:24px; align-items:center; }
+.home-welcome-art .multiplayer-picture { width:100%; max-width:240px; border-radius:var(--radius); }
+.home-welcome-actions { min-width:0; }
+.learn-groups { display:grid; gap:22px; }
+.learn-group-title { font-size:1rem; margin:0 0 12px; color:var(--muted); }
+.learn-group .learn-hub { grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.learn-group .learn-tile { padding:16px; min-height:110px; }
+.learn-group .learn-tile h2 { font-size:1rem; }
+.chat-edge { position:absolute; touch-action:none; z-index:3; }
+.chat-edge-n,.chat-edge-s { left:10px; right:10px; height:8px; cursor:ns-resize; }
+.chat-edge-n { top:-4px; } .chat-edge-s { bottom:-4px; }
+.chat-edge-e,.chat-edge-w { top:10px; bottom:10px; width:8px; cursor:ew-resize; }
+.chat-edge-e { right:-4px; } .chat-edge-w { left:-4px; }
+.chat-edge-ne,.chat-edge-nw,.chat-edge-sw { width:14px; height:14px; }
+.chat-edge-ne { right:-4px; top:-4px; cursor:nesw-resize; }
+.chat-edge-nw { left:-4px; top:-4px; cursor:nwse-resize; }
+.chat-edge-sw { left:-4px; bottom:-4px; cursor:nesw-resize; }
+@media(max-width:600px){
+ .home-page .home-welcome { grid-template-columns:100px minmax(0,1fr); gap:14px; }
+ .home-welcome .new-game-primary { min-height:100px; padding:16px; }
+ .learn-group .learn-hub { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .learn-group .learn-tile { padding:12px; }
+}

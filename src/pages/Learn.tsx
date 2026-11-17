@@ -78,14 +78,7 @@ export default function Learn() {
         )}
       </>
     );
-  return (
-    <>
-      <PageTitle
-        title="Learn"
-        subtitle="Repertoire, openings and chess knowledge"
-      />
-      <div className="learn-hub">
-        {[
+  const tiles = [
           {
             id: "traps",
             title: "Opening traps",
@@ -163,7 +156,19 @@ export default function Learn() {
             icon: History,
             color: "purple",
           },
-        ].map(({ id, title, text, icon: Icon, color }) => (
+        ];
+  return (
+    <>
+      <PageTitle title="Learn" />
+      <div className="learn-groups">
+        {[
+          {title:"Lessons & practice", ids:["lessons","traps","endgames","train","repertoire"]},
+          {title:"Explore chess", ids:["famous","encyclopedia","history"]},
+          {title:"Just for fun", ids:["quizzes","trivia","facts"]},
+        ].map(group => <section className="learn-group" key={group.title}>
+          <h2 className="learn-group-title">{group.title}</h2>
+          <div className="learn-hub">
+          {group.ids.map(id => tiles.find(tile => tile.id === id)!).map(({ id, title, text, icon: Icon, color }) => (
           <button
             className={`card learn-tile ${color}`}
             key={id}
@@ -177,6 +182,8 @@ export default function Learn() {
             <ChevronRight size={19} />
           </button>
         ))}
+          </div>
+        </section>)}
       </div>
     </>
   );

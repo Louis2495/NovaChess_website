@@ -261,36 +261,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
       >
         <div className="board-column">
           <div className="puzzle-board-area">
-          <div className="puzzle-actions-left">
-            <Button
-              className="hint-button" aria-label="Hint" title="Hint"
-              disabled={done || c.turn() !== learner}
-              onClick={() => {
-                grade(false);
-                const m = new Chess(fen).move(puzzle.moves[cursor]);
-                setHint(m.from);
-                setMessage(`Try ${m.san}.`);
-              }}
-            >
-              <Lightbulb size={17} />
-              <span className="puzzle-action-label">Hint</span>
-            </Button>
-            <Button
-              aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
-              title={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
-              onClick={() => {
-                if (daily) {
-                  load(puzzle);
-                } else {
-                  if (!done) grade(false);
-                  load(choose(puzzle.id));
-                }
-              }}
-            >
-              {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
-              <span className="puzzle-action-label">{daily ? "Replay" : done ? "Next puzzle" : "Skip"}</span>
-            </Button>
-          </div>
           <div
             ref={puzzleBoardRef}
             className={`puzzle-board ${wrong ? "wrong" : ""} ${done ? "solved" : ""}`}
@@ -361,6 +331,36 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               </Field>
             </Card>
           )}
+          <div className="puzzle-actions-right">
+            <Button
+              className="hint-button" aria-label="Hint" title="Hint"
+              disabled={done || c.turn() !== learner}
+              onClick={() => {
+                grade(false);
+                const m = new Chess(fen).move(puzzle.moves[cursor]);
+                setHint(m.from);
+                setMessage(`Try ${m.san}.`);
+              }}
+            >
+              <Lightbulb size={17} />
+              <span className="puzzle-action-label">Hint</span>
+            </Button>
+            <Button
+              aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
+              title={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
+              onClick={() => {
+                if (daily) {
+                  load(puzzle);
+                } else {
+                  if (!done) grade(false);
+                  load(choose(puzzle.id));
+                }
+              }}
+            >
+              {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
+              <span className="puzzle-action-label">{daily ? "Replay" : done ? "Next puzzle" : "Skip"}</span>
+            </Button>
+          </div>
           {played.length > 0 && (
             <Card className="puzzle-moves">
               <div className="card-heading">
