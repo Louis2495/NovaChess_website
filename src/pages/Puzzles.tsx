@@ -44,6 +44,8 @@ function ClassicPuzzles() {
 function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
   const { library, setLibrary, detail, navigate, appearance } = useApp();
   const daily = detail === "daily";
+  const [mobile,setMobile]=useState(()=>matchMedia("(max-width:1000px)").matches);
+  useEffect(()=>{const query=matchMedia("(max-width:1000px)");const change=()=>setMobile(query.matches);query.addEventListener("change",change);return()=>query.removeEventListener("change",change);},[]);
   const [theme, setTheme] = useState("All themes");
   const pool = useMemo(
     () =>
@@ -230,6 +232,38 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     () => [...new Set(puzzles.flatMap((p) => p.themes))].sort(),
     [puzzles],
   );
+  const actions = (
+<div className="puzzle-actions-right">
+            <Button
+              className="hint-button" aria-label="Hint" title="Hint"
+              disabled={done || c.turn() !== learner}
+              onClick={() => {
+                grade(false);
+                const m = new Chess(fen).move(puzzle.moves[cursor]);
+                setHint(m.from);
+                setMessage(`Try ${m.san}.`);
+              }}
+            >
+              <Lightbulb size={17} />
+              <span className="puzzle-action-label">Hint</span>
+            </Button>
+            <Button
+              aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
+              title={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
+              onClick={() => {
+                if (daily) {
+                  load(puzzle);
+                } else {
+                  if (!done) grade(false);
+                  load(choose(puzzle.id));
+                }
+              }}
+            >
+              {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
+              <span className="puzzle-action-label">{daily ? "Replay" : done ? "Next puzzle" : "Skip"}</span>
+            </Button>
+          </div>
+  );
   return (
     <>
       <PageTitle
@@ -281,6 +315,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             />
           </div>
           </div>
+          {mobile && actions}
           <PremoveQueue
             moves={premove.queue}
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
@@ -331,36 +366,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               </Field>
             </Card>
           )}
-          <div className="puzzle-actions-right">
-            <Button
-              className="hint-button" aria-label="Hint" title="Hint"
-              disabled={done || c.turn() !== learner}
-              onClick={() => {
-                grade(false);
-                const m = new Chess(fen).move(puzzle.moves[cursor]);
-                setHint(m.from);
-                setMessage(`Try ${m.san}.`);
-              }}
-            >
-              <Lightbulb size={17} />
-              <span className="puzzle-action-label">Hint</span>
-            </Button>
-            <Button
-              aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
-              title={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
-              onClick={() => {
-                if (daily) {
-                  load(puzzle);
-                } else {
-                  if (!done) grade(false);
-                  load(choose(puzzle.id));
-                }
-              }}
-            >
-              {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
-              <span className="puzzle-action-label">{daily ? "Replay" : done ? "Next puzzle" : "Skip"}</span>
-            </Button>
-          </div>
+          {!mobile && actions}
           {played.length > 0 && (
             <Card className="puzzle-moves">
               <div className="card-heading">
