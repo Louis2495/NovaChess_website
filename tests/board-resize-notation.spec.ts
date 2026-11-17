@@ -70,7 +70,7 @@ test("boards can be resized in puzzles, play and readonly quizzes, and only Blin
   expect(
     (await page.locator(".analysis-layout .board").boundingBox())!.width,
   ).toBeLessThanOrEqual(540);
-  await page.goto("/#play");
+  await page.goto("/#variants");
   await page.getByRole("button", { name: "Game options", exact: true }).click();
   await page.getByLabel("Variant", { exact: true }).selectOption("blindtext");
   await page.getByRole("button", { name: "Start game", exact: true }).click();

@@ -484,6 +484,8 @@ test("default dark views and customization dialog pass automated WCAG checks", a
     "/#puzzles",
     "/#learn",
     "/#community",
+    "/#play",
+    "/#variants",
     "/#stats",
   ]) {
     await page.goto(route);
@@ -550,11 +552,11 @@ for (const variant of [
     test.setTimeout(45000);
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.goto("/#play");
+    await page.goto(variant === "chess" ? "/#play" : "/#variants");
     await page
       .getByRole("button", { name: "Game options", exact: true })
       .click();
-    await page.getByLabel("Variant", { exact: true }).selectOption(variant);
+    if(variant !== "chess") await page.getByLabel("Variant", { exact: true }).selectOption(variant);
     await page.getByRole("button", { name: "Start game", exact: true }).click();
     await expect(
       page.getByRole("group", { name: "Chessboard", exact: true }).first(),
@@ -755,7 +757,7 @@ test("simplified Home has one large New Game action and no repeated tool or stat
   expect((await start.boundingBox())!.height).toBeGreaterThanOrEqual(58);
   await expect(page.locator(".variant-grid")).toHaveCount(0);
   await page.getByRole("button", { name: "Game options", exact: true }).click();
-  await expect(page.getByLabel("Variant", { exact: true })).toHaveCount(1);
+  await expect(page.getByLabel("Variant", { exact: true })).toHaveCount(0);
 });
 
 test("Home keeps the unlabelled meme beside the puzzle and opening lessons remain in Learn", async ({

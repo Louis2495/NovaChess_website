@@ -3,7 +3,7 @@ import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } f
 import { createRoot } from "react-dom/client";
 import {
   Home,
-  Users,
+  Shapes,
   ScanLine,
   MonitorPlay,
   Puzzle,
@@ -49,7 +49,7 @@ import HomePage from "./pages/Home";
 import "./styles.css";
 import "./redesign.css";
 const Analysis = lazy(() => import("./pages/Analysis")),
-  Play = lazy(() => import("./pages/Play")),
+  Play = lazy(() => import("./pages/PlayHub")),
   Puzzles = lazy(() => import("./pages/Puzzles")),
   Research = lazy(() => import("./pages/Research")),
   ProfilePage = lazy(() => import("./pages/Profile")),
@@ -61,10 +61,10 @@ const mainNav = [
   { id: "home", label: "Home", icon: Home },
   { id: "analysis", label: "Analysis", icon: ScanLine },
   { id: "play", label: "Play", icon: MonitorPlay },
+  { id: "variants", label: "Variants", icon: Shapes },
   { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
   { id: "research", label: "Research", icon: Search },
-  { id: "community", label: "Multiplayer", icon: Users },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
   { id: "library", label: "Library", icon: FolderOpen },
 ] as const;
@@ -456,7 +456,9 @@ function App() {
     ) : tab === "analysis" ? (
       <Analysis />
     ) : tab === "play" ? (
-      <Play />
+      <Play key="standard" />
+    ) : tab === "variants" ? (
+      <Play key="variants" variants />
     ) : tab === "puzzles" ? (
       <Puzzles />
     ) : tab === "learn" ? (
@@ -597,7 +599,7 @@ function App() {
           </main>
         </div>
         <nav className="mobile-tabs" aria-label="App tabs">
-          {mainNav.filter(v => v.id !== "community").map(({ id, label, icon: Icon }) => (
+          {mainNav.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               className={tab === id ? "active" : ""}

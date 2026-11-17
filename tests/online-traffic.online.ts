@@ -3,7 +3,7 @@ import {Chess} from 'chess.js';
 const uid='11111111-1111-4111-8111-111111111111',peer='22222222-2222-4222-8222-222222222222',roomId='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 async function connected(page:Page){
  const c=new Chess(),initial=c.fen();const room:any={id:roomId,name:'Live room',mode:'standard',variant:'chess',state:{fen:initial,positions:[initial],moves:[],notation:[],result:'*'},members:[{id:uid,team:'w'},{id:peer,team:'b'}],queue:[],settings:{bot:false},status:'playing',revision:0,marks:[],deadline:null};
- const requests:URL[]=[],joins:any[]=[],sockets:any[]=[];
+ const requests:URL[]=[],joins:any[]=[],sockets:any[]=[],actions:any[]=[];
  await page.addInitScript(({uid})=>{const payload=btoa(JSON.stringify({sub:uid,role:'authenticated',exp:Math.floor(Date.now()/1000)+3600}));localStorage.setItem('sb-abcdefghijklmnopqrst-auth-token',JSON.stringify({access_token:`e30.${payload}.test`,refresh_token:'refresh',expires_at:Math.floor(Date.now()/1000)+3600,token_type:'bearer',user:{id:uid,email:'player@example.test',app_metadata:{provider:'email'},user_metadata:{},aud:'authenticated',created_at:new Date().toISOString()}}));},{uid});
  await page.route('https://abcdefghijklmnopqrst.supabase.co/**',async route=>{
   const url=new URL(route.request().url());requests.push(url);let data:any=[];
@@ -11,9 +11,9 @@ async function connected(page:Page){
   else if(url.pathname.endsWith('/user'))data={id:uid,email:'player@example.test'};
   else if(url.pathname.includes('/rpc/is_chat_moderator'))data=false;
   else if(url.pathname.includes('/rpc/'))data=0;
-  else if(url.pathname.endsWith('/functions/v1/chess')){const body=route.request().postDataJSON();if(body.action==='move'){const move=c.move(body.move);room.state={...room.state,fen:c.fen(),moves:[...room.state.moves,body.move],notation:[...room.state.notation,move.san],positions:[...room.state.positions,c.fen()]};room.revision++;}data=room;}
+  else if(url.pathname.endsWith('/functions/v1/chess')){const body=route.request().postDataJSON();actions.push(body);if(body.action==='move'){const move=c.move(body.move);room.state={...room.state,fen:c.fen(),moves:[...room.state.moves,body.move],notation:[...room.state.notation,move.san],positions:[...room.state.positions,c.fen()]};room.revision++;}data=room;}
   else if(url.pathname.endsWith('/profiles')){const ids=url.searchParams.get('id')||'';const people=[{id:uid,username:'Player',avatar:'',bio:'',country:'US'},{id:peer,username:'Opponent',avatar:'',country:'CA'}].filter(p=>!ids||ids.includes(p.id));data=route.request().headers().accept?.includes('vnd.pgrst.object')?people[0]:people;}
-  else if(url.pathname.endsWith('/room_lobby'))data=[{id:roomId,name:room.name,mode:room.mode,variant:room.variant,status:room.status,member_count:2}];
+  else if(url.pathname.endsWith('/room_lobby'))data=[{id:roomId,name:room.name,mode:room.mode,variant:room.variant,status:room.status,member_count:room.members.length}];
   else if(url.pathname.endsWith('/rooms'))data=url.searchParams.has('id')?room:[room];
   else if(url.pathname.endsWith('/messages'))data=[{id:1,user_id:peer,body:'Initial message',created_at:new Date().toISOString()}];
   await route.fulfill({json:data});
@@ -25,11 +25,11 @@ async function connected(page:Page){
   });
  });
  function emit(table:string,next:any,type='UPDATE'){const join=joins.find(j=>j.payload.config.postgres_changes.some((p:any)=>p.table===table));if(!join)throw Error('No '+table+' subscription');join.ws.send(JSON.stringify([null,null,join.topic,'postgres_changes',{ids:[1],data:{schema:'public',table,commit_timestamp:new Date().toISOString(),type,columns:[],record:next,old_record:{id:next.id},errors:null}}]));}
- return {requests,joins,sockets,room,emit,c};
+ return {requests,joins,sockets,room,emit,c,actions};
 }
 test('lobby stays light and live games subscribe only to their room without reloading room lists',async({page})=>{
- const env=await connected(page);await page.goto('/#community');await expect(page.getByText('Live room',{exact:true})).toBeVisible();expect(env.sockets).toHaveLength(0);const lobby=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(lobby.searchParams.get('select')).not.toContain('state');expect(env.requests.filter(u=>u.pathname.endsWith('/profiles'))).toHaveLength(0);
- await page.getByText('Live room',{exact:true}).click();await expect(page.locator('.chess-layout .board').first()).toBeVisible();await expect.poll(()=>env.joins.length).toBe(1);expect(env.joins[0].payload.config.postgres_changes[0].filter).toBe('id=eq.'+roomId);await page.waitForTimeout(100);const reads=env.requests.filter(u=>u.pathname.endsWith('/rooms')).length;await page.getByRole('button',{name:'e2, white pawn',exact:true}).click();await page.getByRole('button',{name:'e4, empty',exact:true}).click();await expect(page.getByRole('button',{name:'e4, white pawn',exact:true})).toBeVisible();expect(env.requests.filter(u=>u.pathname.endsWith('/rooms')).length).toBe(reads);env.c.move('e5');env.emit('rooms',{...env.room,revision:2,state:{...env.room.state,fen:env.c.fen(),moves:['e2e4','e7e5'],notation:['e4','e5'],positions:[...env.room.state.positions,env.c.fen()]}});await expect(page.getByRole('button',{name:'e5, black pawn',exact:true})).toBeVisible();env.emit('rooms',{...env.room,revision:1});await expect(page.getByRole('button',{name:'e5, black pawn',exact:true})).toBeVisible();expect(env.requests.filter(u=>u.pathname.endsWith('/rooms')).length).toBe(reads);
+ const env=await connected(page);await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();expect(env.sockets).toHaveLength(0);await expect(page.getByText('Room name',{exact:true})).toHaveCount(0);await page.getByRole('button',{name:'Play online',exact:true}).click();const lobby=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(lobby.searchParams.get('select')).not.toContain('state');
+ await expect(page.locator('.chess-layout .board').first()).toBeVisible();await expect.poll(()=>env.joins.length).toBe(1);expect(env.joins[0].payload.config.postgres_changes[0].filter).toBe('id=eq.'+roomId);await page.waitForTimeout(100);const reads=env.requests.filter(u=>u.pathname.endsWith('/rooms')).length;await page.getByRole('button',{name:'e2, white pawn',exact:true}).click();await page.getByRole('button',{name:'e4, empty',exact:true}).click();await expect(page.getByRole('button',{name:'e4, white pawn',exact:true})).toBeVisible();expect(env.requests.filter(u=>u.pathname.endsWith('/rooms')).length).toBe(reads);env.c.move('e5');env.emit('rooms',{...env.room,revision:2,state:{...env.room.state,fen:env.c.fen(),moves:['e2e4','e7e5'],notation:['e4','e5'],positions:[...env.room.state.positions,env.c.fen()]}});await expect(page.getByRole('button',{name:'e5, black pawn',exact:true})).toBeVisible();env.emit('rooms',{...env.room,revision:1});await expect(page.getByRole('button',{name:'e5, black pawn',exact:true})).toBeVisible();expect(env.requests.filter(u=>u.pathname.endsWith('/rooms')).length).toBe(reads);
 });
 test('chat applies incoming messages without reloading history or all user profiles',async({page})=>{
  const env=await connected(page);await page.goto('/');await page.getByRole('button',{name:'Open global chat',exact:true}).click();await expect(page.getByText('Initial message',{exact:true})).toBeVisible();await expect.poll(()=>env.joins.length).toBe(1);await page.waitForTimeout(100);const history=env.requests.filter(u=>u.pathname.endsWith('/messages')).length,profiles=env.requests.filter(u=>u.pathname.endsWith('/profiles')).length;env.emit('messages',{id:2,user_id:peer,body:'One incremental message',created_at:new Date().toISOString()},'INSERT');await expect(page.getByText('One incremental message',{exact:true})).toBeVisible();expect(env.requests.filter(u=>u.pathname.endsWith('/messages')).length).toBe(history);expect(env.requests.filter(u=>u.pathname.endsWith('/profiles')).length).toBe(profiles);expect(env.requests.filter(u=>u.pathname.endsWith('/profiles')).every(u=>u.searchParams.has('id'))).toBe(true);
@@ -50,4 +50,19 @@ test('a message arriving during history loading survives the older snapshot resp
 
 test('Vote Chess keeps its ballot subscriptions stable and ignores old ballot deletion traffic',async({page})=>{
  const env=await connected(page);env.room.mode='vote';env.room.deadline=new Date(Date.now()+86400000).toISOString();await page.goto('/#community/'+roomId);await expect.poll(()=>env.joins.length).toBe(2);const bindings=env.joins.find(j=>j.topic.includes('votes-')).payload.config.postgres_changes;expect(bindings.map((b:any)=>b.event)).toEqual(['INSERT','UPDATE']);env.emit('rooms',{...env.room,revision:1});await page.waitForTimeout(100);expect(env.joins).toHaveLength(2);
+});
+
+
+test('Play online directly joins a waiting standard opponent without a room form',async({page})=>{
+ const env=await connected(page);env.room.members=[{id:peer,team:'w'}];env.room.status='waiting';
+ await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();await page.getByRole('button',{name:'Play online',exact:true}).click();
+ await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'join',room:roomId});
+ const query=env.requests.find(u=>u.pathname.endsWith('/room_lobby'))!;expect(query.searchParams.get('mode')).toBe('eq.standard');expect(query.searchParams.get('variant')).toBe('eq.chess');
+ await expect(page.getByLabel('Room name',{exact:true})).toHaveCount(0);
+});
+
+test('Play online starts a waiting game when no opponent is available',async({page})=>{
+ const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>r.fulfill({json:[]}));
+ await page.goto('/#play');await page.getByRole('button',{name:'Online',exact:true}).click();await page.getByRole('button',{name:'Play online',exact:true}).click();
+ await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',name:'Standard'});
 });

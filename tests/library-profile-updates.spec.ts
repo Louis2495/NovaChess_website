@@ -102,7 +102,7 @@ test("profile photo is inside the cover with a small accessible upload icon and 
   ).toHaveCount(1);
   await expect(page.locator(".app")).toHaveCSS("--button", "#add9ed");
   await expect(
-    page.locator(".sidebar nav").getByRole("button", { name: "Multiplayer", exact: true, includeHidden: true }),
+    page.locator(".sidebar nav").getByRole("button", { name: "Variants", exact: true, includeHidden: true }),
   ).toHaveCount(1);
   const tabs = await page
     .locator(".sidebar nav")

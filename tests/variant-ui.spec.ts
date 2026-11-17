@@ -8,23 +8,23 @@ async function move(page: Page, m: string) {
   await square(page, m.slice(0, 2)).click();
   await square(page, m.slice(2, 4)).click();
 }
-test("illustrated modes put Standard first and show distinct artwork for all 18 variants", async ({
+test("Variants has distinct artwork and keeps Standard in Play", async ({
   page,
 }) => {
-  await page.goto("/#play");
+  await page.goto("/#variants");
   await expect(
     page.getByRole("heading", { name: "Play", exact: true }),
   ).toHaveCount(0);
   await expect(page.locator(".page-title")).toHaveCount(0);
   const cards = page.locator(".variant-gallery>button");
-  await expect(cards).toHaveCount(19);
-  await expect(cards.first()).toHaveText("Standard");
+  await expect(cards).toHaveCount(18);
+  await expect(cards.first()).toHaveText("Dropping Squares");
   await expect(cards.first()).toHaveAttribute("aria-pressed", "true");
   const tiles = page.locator(".variant-gallery .variant-picture");
   const positions = await tiles.evaluateAll((es) =>
     es.map((e) => getComputedStyle(e).backgroundPosition),
   );
-  expect(new Set(positions).size).toBe(18);
+  expect(new Set(positions).size).toBe(17);
   await expect(tiles.first()).toHaveCSS(
     "background-image",
     /illustrations\.webp/,

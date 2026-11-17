@@ -43,7 +43,7 @@ export default function HomePage() {
         {resumable && (
           <button
             className="resume-link resume-game-button"
-            onClick={() => navigate("play", "resume")}
+            onClick={() => navigate(library.activeGame?.variant !== "chess" || library.activeGame?.speedrun ? "variants" : "play", "resume")}
           >
             <RotateCcw size={15} />
             Resume saved game

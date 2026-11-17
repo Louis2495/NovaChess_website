@@ -1,12 +1,8 @@
-import MultiplayerPicture from "../components/MultiplayerPicture";
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Chess } from "chess.js";
 import {
-  Crown,
-  Users,
-  Vote,
   ArrowRight,
   Copy,
   Flag,
@@ -38,17 +34,15 @@ type Room = {
   marks: BoardMark[];
   settings: { bot: boolean };
 };
-type RoomSummary = Pick<Room,"id"|"name"|"mode"|"variant"|"status"> & {member_count:number};
 type Profile = { id: string; username: string };
-export default function Community() {
+export default function Community({presetMode = "standard", presetVariant = "chess"}: {presetMode?: string; presetVariant?: string}) {
   const { session } = useOnlineSession(),
-    { detail, navigate, notify, appearance } = useApp();
-  const [rooms, setRooms] = useState<RoomSummary[]>([]),
-    [room, setRoom] = useState<Room | null>(null),
+    { tab, detail, navigate, notify, appearance } = useApp();
+  const [room, setRoom] = useState<Room | null>(null),
     [profiles, setProfiles] = useState<Profile[]>([]),
-    [mode, setMode] = useState("throne"),
-    [name, setName] = useState(""),
-    [variant, setVariant] = useState("chess"),
+    [mode] = useState(presetMode),
+    [name] = useState(presetMode === "standard" ? ({chess:"Standard",dropping:"Dropping Squares",chaos:"Chaos chess",random:"Random"}[presetVariant] || "Standard") : presetMode === "vote" ? "Vote Chess" : presetMode === "team" ? "Team Chess" : "Throne"),
+    [variant] = useState(presetVariant),
     [bot, setBot] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -58,7 +52,7 @@ export default function Community() {
     [armed, setArmed] = useState<"" | "freeze" | "swap">(""),
     [first, setFirst] = useState("");
   const uid = session?.user.id;
-  const [roomId, inviteQuery = ""] = detail.split("?");
+  const [roomId, inviteQuery = ""] = detail.replace(/^online\//, "").split("?");
   const inviteTeam = new URLSearchParams(inviteQuery).get("team");
   const username = (id: string) =>
     profiles.find((p) => p.id === id)?.username || "Player";
@@ -79,24 +73,20 @@ export default function Community() {
       if(error){setError(error.message);return;}
       if(data){setRoom(current=>current && current.id===data.id && current.revision>data.revision?current:data);void loadProfiles(data.members.map((m:Member)=>m.id));}
     }else{
-      const {data,error}=await online.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at").order("updated_at",{ascending:false}).limit(40);
-      if(routeRef.current!==roomId)return;
-      if(error){setError(error.message);return;}
-      setRooms(data||[]);setRoom(null);
+      setRoom(null);
     }
   },[uid,roomId,loadProfiles]);
   useEffect(()=>{
     void load();if(!online || !uid)return;
     const refresh=()=>{if(document.visibilityState!=="hidden")void load();};
     window.addEventListener("online",refresh);window.addEventListener("focus",refresh);
-    // The lobby has no global move subscription. Only an opened room is live.
-    const poll=roomId?undefined:setInterval(refresh,30000);
+    // Only an opened game subscribes to live updates; matchmaking reads on demand.
     const channel=roomId?online.channel("room-"+roomId).on("postgres_changes",{event:"UPDATE",schema:"public",table:"rooms",filter:`id=eq.${roomId}`},payload=>{
       const next=payload.new as Room;
       setRoom(current=>current && current.id===next.id && current.revision>=next.revision?current:next);
       void loadProfiles(next.members.map(m=>m.id));
     }).subscribe(status=>{if(status==="SUBSCRIBED")void load();}):null;
-    return()=>{if(poll)clearInterval(poll);if(channel)void online!.removeChannel(channel);window.removeEventListener("online",refresh);window.removeEventListener("focus",refresh);};
+    return()=>{if(channel)void online!.removeChannel(channel);window.removeEventListener("online",refresh);window.removeEventListener("focus",refresh);};
   },[uid,roomId,load,loadProfiles]);
   useEffect(() => {
     if (!online || !room || room.mode !== "vote") return;
@@ -134,7 +124,7 @@ export default function Community() {
       });
       if (result.id) {
         setRoom(result);
-        if (!detail) navigate("community", result.id);
+        if (!roomId) navigate(result.mode === "standard" && result.variant === "chess" ? "play" : "variants", "online/"+result.id);
       }
       if(result.id)void loadProfiles(result.members?.map((m:Member)=>m.id)||[]);
       else await load();
@@ -180,26 +170,11 @@ export default function Community() {
   ).sort((a, b) => b[1] - a[1]);
   return (
     <>
-      <PageTitle title="Multiplayer">
-        {room && (
-          <Button className="secondary" onClick={() => navigate("community")}>
-            Lobby
-          </Button>
-        )}
-      </PageTitle>
+      {!room && tab === "community" && <PageTitle title="Play" />}
+      {room && <PageTitle title={room.mode === "standard" && room.variant === "chess" ? "Play" : "Variants"}><Button className="secondary" onClick={() => navigate(room.mode === "standard" && room.variant === "chess" ? "play" : "variants")}>Back</Button></PageTitle>}
       {!online || !uid ? (
         <>
-          <div className="multiplayer-modes" role="group" aria-label="Multiplayer modes">
-            {[["throne","Throne"],["vote","Vote Chess"],["team","Team Chess"]].map(([id,title])=>{
-              return <button key={id as string} aria-pressed={mode===id} onClick={()=>setMode(id as string)}><MultiplayerPicture mode={id as string}/>{title as string}</button>;
-            })}
-          </div>
-          <Card className="multiplayer-preview">
-            <h2>{mode === "throne" ? "Throne" : mode === "vote" ? "Vote Chess" : "Team Chess"}</h2>
-            <p>{mode === "throne" ? "Winner stays. Queue to challenge. Finish gives up your seat." : mode === "vote" ? "Even teams. One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>
-            {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>setBot(e.target.value==="bot")}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
-            <Button disabled>{mode === "throne" ? "Join queue" : "Create room"}</Button>
-          </Card>
+          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Play online"}</Button></Card>
           <OnlineAccount />
         </>
       ) : (
@@ -341,7 +316,7 @@ export default function Community() {
                     className="secondary"
                     onClick={async () => {
                       const invite = new URL(location.href);
-                      invite.hash = "community/"+room.id+(room.mode === "team" && me?.team ? "?team="+me.team : "");
+                      invite.hash = (room.mode === "standard" && room.variant === "chess" ? "play/online/" : "variants/online/")+room.id+(room.mode === "team" && me?.team ? "?team="+me.team : "");
                       const ok = await copyText(invite.href);
                       notify(ok ? "Invite link copied." : invite.href);
                     }}
@@ -453,115 +428,24 @@ export default function Community() {
               </div>
             </div>
           ) : (
-            <div className="online-lobby">
-              <Card>
-                <h2>New room</h2>
-                <div className="multiplayer-modes">
-                  {[
-                    ["standard", "Chess", Users],
-                    ["throne", "Throne", Crown],
-                    ["vote", "Vote Chess", Vote],
-                    ["team", "Team Chess", Users],
-                  ].map(([id, title, Icon]) => {
-                    const I = Icon as typeof Users;
-                    return (
-                      <button
-                        key={id as string}
-                        aria-pressed={mode === id}
-                        onClick={() => setMode(id as string)}
-                      >
-                        {id === "standard" ? <I size={24} /> : <MultiplayerPicture mode={id as string}/>}
-                        {title as string}
-                      </button>
-                    );
-                  })}
-                </div>
-                <Field label="Room name">
-                  <input
-                    maxLength={80}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Chess room"
-                  />
-                </Field>
-                {mode !== "vote" && (
-                  <Field label="Variant">
-                    <ChoiceSelect
-                      value={variant}
-                      onChange={(e) => setVariant(e.target.value)}
-                    >
-                      <option value="chess">Standard</option>
-                      <option value="dropping">Dropping Squares</option>
-                      <option value="chaos">Chaos chess</option>
-                      <option value="random">Random</option>
-                    </ChoiceSelect>
-                  </Field>
-                )}
-                {mode === "team" && (
-                  <Field label="Opponent">
-                    <ChoiceSelect
-                      value={bot ? "bot" : "friends"}
-                      onChange={(e) => setBot(e.target.value === "bot")}
-                    >
-                      <option value="friends">Another team</option>
-                      <option value="bot">Computer · standard</option>
-                    </ChoiceSelect>
-                  </Field>
-                )}
-                <Button
-                  disabled={busy}
-                  onClick={() =>
-                    mode === "throne" && rooms.some(r => r.mode === "throne" && r.status !== "finished")
-                      ? void act("join", { room: rooms.find(r => r.mode === "throne" && r.status !== "finished")!.id })
-                      : void act("create", {
-                      mode,
-                      name,
-                      variant: mode === "vote" || mode === "team" && bot ? "chess" : variant,
-                      bot: mode === "team" && bot,
-                    })
-                  }
-                >
-                  {mode === "throne" ? "Join queue" : "Create room"}
-                  <ArrowRight size={16} />
-                </Button>
-              </Card>
-              <Card>
-                <div className="card-heading"><h2>Open rooms</h2><Button className="text-button" onClick={()=>void load()}>Refresh</Button></div>
-                <div className="room-list">
-                  {rooms
-                    .filter((r) => r.status !== "finished")
-                    .map((r) => (
-                      <button
-                        key={r.id}
-                        onClick={() => navigate("community", r.id)}
-                      >
-                        <span>
-                          <b>{r.name}</b>
-                          <small>
-                            {r.mode === "throne"
-                              ? "Throne"
-                              : r.mode === "vote"
-                                ? "Vote Chess"
-                                : r.mode === "team"
-                                  ? "Team Chess"
-                                  : "Chess"}{" "}
-                            · {r.member_count} players
-                          </small>
-                        </span>
-                        <Chevron />
-                      </button>
-                    ))}
-                  {!rooms.length && <p className="caption">No rooms yet.</p>}
-                </div>
-              </Card>
-            </div>
+            <Card className="quick-online-play">
+              {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>setBot(e.target.value==="bot")}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
+              <Button className="new-game-primary" disabled={busy} onClick={async()=>{
+                setBusy(true);setError("");
+                try {
+                  const {data,error}=await online!.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at").eq("mode",mode).eq("variant",variant).order("updated_at",{ascending:true}).limit(40);
+                  if(error)throw error;
+                  const available=(data||[]).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count === 1));
+                  if(available && !(mode === "team" && bot)) await act("join",{room:available.id});
+                  else await act("create",{mode,name,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
+                }catch(e){setError((e as Error).message);}finally{setBusy(false);}
+              }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Play online"}</Button>
+              <p className="caption">{mode === "standard" ? "Join an opponent, or wait for the next player." : mode === "throne" ? "Winner stays. Queue to challenge." : mode === "vote" ? "One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>
+            </Card>
           )}
 
         </>
       )}
     </>
   );
-}
-function Chevron() {
-  return <ArrowRight size={17} />;
 }

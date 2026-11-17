@@ -90,8 +90,8 @@ If you prefer email/password instead, configure a real SMTP provider for public 
 Use two separate browsers/profiles with **two different accounts**:
 
 1. Sign in from Profile and save a unique username and country.
-2. Open Multiplayer in the left sidebar. On a phone, use the navigation menu.
-3. Create a standard room, copy its URL, and open it from the other account. Join the room and play moves. Confirm both boards update and still match after refreshing.
+2. Open Play → Online. Other game types are in Variants; Throne, Vote Chess and Team Chess are under Variants → Online.
+3. Click Play online from both accounts to join a waiting game. You can also use Invite friends to share a direct game link. Play moves and confirm both boards still match after refreshing.
 4. Test resigning, drawing, and an illegal/out-of-turn move. Test chat from both accounts.
 5. Use a third account to test Throne's queue. Test Team Chess invitations/arrows. Vote Chess closes votes on the one-minute scheduler after its 24-hour period.
 

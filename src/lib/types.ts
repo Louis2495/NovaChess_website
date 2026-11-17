@@ -6,6 +6,7 @@ export type Tab =
   | "learn"
   | "library"
   | "stats"
+  | "variants"
   | "community"
   | "research"
   | "profile"

@@ -334,7 +334,7 @@ for (const variant of ["dropping", "chaos", "random"])
   test(`new ${variant} variant plays legal moves against the computer`, async ({
     page,
   }) => {
-    await page.goto("/#play");
+    await page.goto("/#variants");
     await protectNativeEngine(page);
     await page
       .getByRole("button", { name: "Game options", exact: true })

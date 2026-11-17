@@ -110,13 +110,13 @@ function variantMove(
     worker.postMessage({ variant, initial, moves, budget });
   });
 }
-export default function Play() {
+export default function Play({variantsOnly = false, onPlayingChange}: {variantsOnly?: boolean; onPlayingChange?: (playing:boolean)=>void}) {
   const { library, setLibrary, appearance, navigate, detail, notify } =
     useApp();
   const [ff, setFF] = useState<FairyStockfish | null>(null),
     [error, setError] = useState(""),
     [playing, setPlaying] = useState(detail === "resume"),
-    [variant, setVariant] = useState("chess"),
+    [variant, setVariant] = useState(variantsOnly ? variantList.find(v=>v.id!=="chess")!.id : "chess"),
     [speedrunMode, setSpeedrunMode] = useState(false),
     [speedrunRating, setSpeedrunRating] = useState(1000),
     [clockNow, setClockNow] = useState(Date.now()),
@@ -146,6 +146,7 @@ export default function Play() {
     [busy, setBusy] = useState(false);
   const { data: openings } = useData<Opening[]>("openings");
   const game = library.activeGame;
+  useEffect(()=>onPlayingChange?.(playing || !!special),[playing,special,onPlayingChange]);
   useEffect(() => { if (!game?.speedrun || game.result !== "*") return; const tick=setInterval(()=>setClockNow(Date.now()),100); return ()=>clearInterval(tick); },[game?.id,game?.result]);
   const live = useRef(game);
   live.current = game;
@@ -585,6 +586,7 @@ export default function Play() {
         human={game?.special ? game.human : human}
         dropCount={game?.special?.dropCount || dropCount}
         onBack={() => {
+          if(detail === "resume"){navigate("variants");return;}
           setVariant(special);
           setSpecial(null);
           setPlaying(false);
@@ -633,12 +635,12 @@ export default function Play() {
               )}
             </div>
           </section>
-          <div
+          {variantsOnly && <div
             className="variant-gallery"
             role="group"
             aria-label="Choose variant"
           >
-            {variantList.map((v) => (
+            {variantList.filter(v=>v.id!=="chess").map((v) => (
               <button
                 key={v.id}
                 aria-pressed={!speedrunMode && variant === v.id}
@@ -649,7 +651,7 @@ export default function Play() {
               </button>
             ))}
             <button aria-pressed={speedrunMode} onClick={()=>{setVariant("chess");setSpeedrunMode(true);}}><img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/><span>Speedrun</span></button>
-          </div>
+          </div>}
           {speedrunMode && <Card className="speedrun-setup"><Field label="Computer Elo"><input type="number" min={100} max={3000} step={50} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(Math.max(100,Math.min(3000,Math.round((speedrunRating||100)/50)*50)))}/></Field></Card>}
           <Card className="game-settings-card">
             <button
@@ -662,18 +664,18 @@ export default function Play() {
             </button>
             {options && (
               <div className="game-options">
-                <Field label="Variant">
+                {variantsOnly && <Field label="Variant">
                   <ChoiceSelect
                     value={variant}
                     onChange={(e) => {setVariant(e.target.value);setSpeedrunMode(false);}}
                   >
-                    {variantList.map((v) => (
+                    {variantList.filter(v=>v.id!=="chess").map((v) => (
                       <option key={v.id} value={v.id}>
                         {v.name}
                       </option>
                     ))}
                   </ChoiceSelect>
-                </Field>
+                </Field>}
                 <div className="variant-summary">
                   <VariantIcon id={variant} />
                   <span>{variantList.find((v) => v.id === variant)?.name}</span>
