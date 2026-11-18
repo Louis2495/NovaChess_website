@@ -5233,3 +5233,32 @@ html { scrollbar-gutter:stable; }
 /* Give Home equal breathing room on both sides of its full-width content. */
 .workspace:has(.home-page) { padding-inline:clamp(16px,5vw,40px); }
 @media(min-width:1001px) { .workspace:has(.home-page) { padding-inline:clamp(40px,5vw,96px); } }
+
+/* Memes keep their own proportions rather than sharing the puzzle's frame. */
+.home-page .home-practice-grid { align-items:center; }
+.home-page .home-practice-grid .home-puzzle { height:auto; min-height:0; }
+.home-page .home-practice-grid .home-puzzle-content > .daily-board-preview { width:min(100%,360px); }
+.home-page .home-practice-grid .daily-meme { width:fit-content; max-width:100%; height:auto; min-height:0; padding:0; justify-self:center; align-self:center; background:transparent; border:0; box-shadow:none; }
+.home-page .home-practice-grid .daily-meme-image { display:block; width:auto; height:auto; max-width:100%; max-height:min(560px,65dvh); object-fit:contain; border-radius:12px; }
+.home-recent .recent-game-entry { --recent-color:#fff; background:var(--recent-color); border:2px solid var(--recent-color); border-radius:14px; margin-block:12px; overflow:visible; }
+.home-recent .recent-game-entry.result-win { --recent-color:#39ed83; }
+.home-recent .recent-game-entry.result-loss { --recent-color:#ff5364; }
+.home-recent .recent-game-entry.result-draw { --recent-color:#e1e7ed; }
+.home-recent .recent-game-row { background:transparent; width:100%; padding:18px 16px; color:#152d3e; }
+.home-recent .recent-game-info b,.home-recent .recent-game-info small,.home-recent .game-result-label,.home-recent .recent-versus { color:#152d3e; }
+.home-recent .recent-game-info small { opacity:.8; }
+.home-recent .recent-game-row:hover { background:#ffffff25; }
+.daily-puzzle-layout .puzzle-actions-right { display:flex; flex-direction:row; gap:12px; width:var(--actual-board-width,100%); max-width:100%; margin-top:12px; }
+.daily-puzzle-layout .puzzle-actions-right .btn { flex:1; }
+.daily-puzzle-layout .puzzle-chat { min-width:0; }
+.daily-puzzle-layout .puzzle-chat .room-chat-messages { min-height:240px; max-height:440px; }
+@media(min-width:1001px) {
+ .workspace .daily-puzzle-layout { grid-template-columns:minmax(0,var(--auto-board-limit,var(--board-max))) minmax(260px,1fr); padding-right:0; gap:24px; }
+ .daily-puzzle-layout > .board-column { grid-column:1; grid-row:1; }
+ .daily-puzzle-layout > .side-panels { grid-column:2; padding-top:22px; width:100%; }
+}
+@media(min-width:1001px) {
+ .workspace .puzzle-layout { grid-template-columns:minmax(0,1fr) minmax(0,var(--puzzle-board-width,var(--board-max))) minmax(0,1fr); gap:0; padding-right:0; }
+ .puzzle-layout > .board-column { grid-column:2; grid-row:1; }
+ .workspace .puzzle-layout > .side-panels { grid-column:3; width:calc(100% - 24px); max-width:320px; justify-self:center; min-width:0; }
+}

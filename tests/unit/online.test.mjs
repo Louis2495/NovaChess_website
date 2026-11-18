@@ -165,6 +165,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180007_delegated_admins.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180008_account_activity.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180009_account_presence_counts.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180010_daily_puzzle_chat.sql','utf8').replace('alter publication supabase_realtime add table public.puzzle_messages;',''));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -500,7 +501,7 @@ test("Throne counts completed incumbent games once, including loss and draw",asy
 });
 
 test("online deployment schedules voting and bounded chat/vote retention",async()=>{
- const jobs=await pg.query('select * from cron.test_jobs order by name');assert.equal(jobs.rows.length,5);const votes=jobs.rows.find(j=>j.name==='novachess-votes');assert.equal(votes.schedule,'* * * * *');assert.match(votes.command,/close_due_votes/);assert.match(jobs.rows.find(j=>j.name==='novachess-chat-retention').command,/30 days/);
+ const jobs=await pg.query('select * from cron.test_jobs order by name');assert.equal(jobs.rows.length,6);const votes=jobs.rows.find(j=>j.name==='novachess-votes');assert.equal(votes.schedule,'* * * * *');assert.match(votes.command,/close_due_votes/);assert.match(jobs.rows.find(j=>j.name==='novachess-chat-retention').command,/30 days/);
 });
 
 test('public lobby projection excludes full board histories and private-size queues',async()=>{
@@ -700,4 +701,18 @@ test('account heartbeats are self-only and online status is restricted to admini
  try{assert.deepEqual((await pg.query('select admin_online_accounts($1) as ids',[[users[1]]])).rows[0].ids,[]);}finally{await pg.exec('reset role');}
  await pg.exec("set role anon;set request.jwt.claim.sub='';");
  try{await assert.rejects(()=>pg.query('select account_heartbeat()'),/permission denied/);}finally{await pg.exec('reset role');}
+});
+
+test('daily puzzle chat scopes posts, enforces identity and blocks direct inserts',async()=>{
+ await pg.exec('delete from room_chat_throttle');await pg.query('update profiles set banned=false where id=$1',[users[1]]);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
+ try{
+  const sent=(await pg.query("select * from post_puzzle_message('2026-11-18/puzzle-one','  Good puzzle!  ')")).rows[0];assert.equal(sent.user_id,users[1]);assert.equal(sent.body,'Good puzzle!');assert.equal(sent.puzzle_key,'2026-11-18/puzzle-one');
+  assert.equal((await pg.query("select count(*) from puzzle_messages where puzzle_key='2026-11-18/other'")).rows[0].count,0);
+  await assert.rejects(()=>pg.query("select post_puzzle_message('bad-key','Hi')"),/Invalid puzzle/);
+  await assert.rejects(()=>pg.query("select post_puzzle_message('2026-11-18/puzzle-one','')"),/1–600/);
+  await assert.rejects(()=>pg.query("insert into puzzle_messages(puzzle_key,user_id,body)values('other',$1,'Spoof')",[users[0]]),/permission denied|row-level security/);
+ }finally{await pg.exec('reset role');}
+ await pg.query('update profiles set banned=true where id=$1',[users[1]]);await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
+ try{await assert.rejects(()=>pg.query("select post_puzzle_message('2026-11-18/puzzle-one','Blocked')"),/Sign in/);}finally{await pg.exec('reset role');await pg.query('update profiles set banned=false where id=$1',[users[1]]);}
 });

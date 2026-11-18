@@ -1,4 +1,5 @@
 import { usePremoves } from "../lib/usePremoves";
+import PuzzleChat from "../components/PuzzleChat";
 import PremoveQueue from "../components/PremoveQueue";
 import { humanTheme } from "../lib/moves";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -195,7 +196,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
       setCursor(cursor + 1);
       setWrong(false);
       setHint("");
-      setMessage("Correct.");
+      setMessage("");
       if (cursor + 1 >= puzzle.moves.length || ch.isCheckmate()) complete();
     } catch {}
   }
@@ -245,7 +246,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               <Lightbulb size={17} />
               <span className="puzzle-action-label">Hint</span>
             </Button>}
-            <Button
+            {(!daily || done) && <Button
               className={done && !daily ? "puzzle-next-button" : undefined}
               aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
               title={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
@@ -260,14 +261,13 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             >
               {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
               <span className="puzzle-action-label">{daily ? "Replay" : done ? "Next puzzle" : "Skip"}</span>
-            </Button>
+            </Button>}
           </div>
   );
   return (
     <>
       <PageTitle
         title={daily ? "Daily puzzle" : "Puzzles"}
-        subtitle={daily ? new Date().toLocaleDateString() : undefined}
       >
         <Button
           className="secondary"
@@ -284,7 +284,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
         </Button>
       </PageTitle>
       <div
-        className="chess-layout puzzle-layout"
+        className={`chess-layout puzzle-layout ${daily ? "daily-puzzle-layout" : ""}`}
         ref={layoutRef}
         style={
           {
@@ -319,12 +319,14 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
             clear={premove.clear}
           />
+          {daily && actions}
           <div className="puzzle-feedback" role="status">
             {message}
           </div>
 
         </div>
         <div className="side-panels">
+          {daily ? <PuzzleChat key={`${today()}/${puzzle.id}`} puzzleKey={`${today()}/${puzzle.id}`}/> : <>
           <Card>
             <div className="large-metric puzzle-rating">
               {Math.round(library.progress.rating)}
@@ -376,6 +378,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             </Card>
           )}
           {actions}
+          </>}
         </div>
       </div>
     </>

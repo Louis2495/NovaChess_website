@@ -76,7 +76,7 @@ test("game setup offers two strength choices, defaults to rated, searches openin
   }
 });
 
-test("desktop daily puzzle and meme share their top and bottom, and Analysis starts at a screen-friendly board size", async ({
+test("desktop meme keeps its own proportions beside the puzzle, and Analysis starts at a screen-friendly board size", async ({
   page,
   isMobile,
 }) => {
@@ -87,8 +87,9 @@ test("desktop daily puzzle and meme share their top and bottom, and Analysis sta
     .evaluate((image: HTMLImageElement) => image.decode());
   const puzzle = (await page.locator(".home-puzzle").boundingBox())!,
     meme = (await page.locator(".daily-meme").boundingBox())!;
-  expect(Math.abs(puzzle.y - meme.y)).toBeLessThan(1);
-  expect(Math.abs(puzzle.height - meme.height)).toBeLessThan(1);
+  expect(Math.abs(puzzle.y+puzzle.height/2-meme.y-meme.height/2)).toBeLessThan(2);
+  const aspect=await page.locator('.daily-meme-image').evaluate((image:HTMLImageElement)=>image.naturalWidth/image.naturalHeight);
+  expect(Math.abs(meme.width/meme.height-aspect)).toBeLessThan(.02);
   await page.goto("/#analysis");
   const board = (await page.locator(".analysis-layout .board").boundingBox())!;
   const panels = (await page

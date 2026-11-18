@@ -313,3 +313,11 @@ for(const modeOrVariant of [...variantList.map(v=>v.id),'speedrun','throne','tea
   await expect.poll(()=>env.actions.some(a=>a.move===move)).toBe(true);await expect(page.locator('.queued-moves')).toHaveCount(0);
  });
 }
+
+test('daily puzzle chat loads and sends only messages for the selected daily puzzle',async({page})=>{
+ const env=await connected(page);let sent:any;
+ await page.route('**/rest/v1/puzzle_messages?*',route=>{const key=new URL(route.request().url()).searchParams.get('puzzle_key')!.slice(3);return route.fulfill({json:[{id:1,puzzle_key:key,user_id:peer,body:'Nice daily puzzle',created_at:new Date().toISOString()}]});});
+ await page.route('**/rest/v1/rpc/post_puzzle_message',async route=>{sent=route.request().postDataJSON();await route.fulfill({json:{id:2,puzzle_key:sent.p_puzzle,user_id:uid,body:sent.p_body,created_at:new Date().toISOString()}});});
+ await page.goto('/#puzzles/daily');const log=page.getByRole('log',{name:'Daily puzzle chat',exact:true});await expect(log).toContainText('Nice daily puzzle');await expect(log).toContainText('Opponent');
+ await page.getByLabel('Puzzle chat message',{exact:true}).fill('Good luck everyone');await page.getByRole('button',{name:'Send puzzle message',exact:true}).click();await expect(log).toContainText('Good luck everyone');expect(sent.p_puzzle).toMatch(/^\d{4}-\d{2}-\d{2}\//);expect(env.requests.some(url=>url.pathname.endsWith('/room_messages'))).toBe(false);
+});

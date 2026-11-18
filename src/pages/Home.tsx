@@ -2,7 +2,7 @@ import {screenName} from "../lib/screenName";
 import { variantList } from "../lib/variants";
 import { duration } from "../lib/speedrun";
 import DailyMeme from "../components/DailyMeme";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowRight, Check, ChevronRight, RotateCcw } from "lucide-react";
 import { useApp } from "../lib/context";
 import { useData, today, dateLabel, base } from "../lib/store";
@@ -22,14 +22,6 @@ export function dailyPuzzle(puzzles: PuzzleData[]) {
 export default function HomePage() {
   const { library, navigate, appearance } = useApp();
   const { data } = useData<PuzzleData[]>("puzzles");
-  const mediaRef=useRef<HTMLDivElement>(null);
-  const [memeAspect,setMemeAspect]=useState(1),[mediaHeight,setMediaHeight]=useState(420);
-  useLayoutEffect(()=>{
-    const parent=mediaRef.current?.parentElement;if(!parent)return;
-    const measure=()=>{if(innerWidth<=1000)return;const width=parent.clientWidth;setMediaHeight(Math.min(560,Math.max(300,innerHeight-260),appearance.showMemes?(width-24)/(1+memeAspect):width));};
-    const observer=new ResizeObserver(measure);observer.observe(parent);window.addEventListener('resize',measure);measure();
-    return()=>{observer.disconnect();window.removeEventListener('resize',measure);};
-  },[memeAspect,appearance.showMemes]);
   const puzzle = useMemo(() => (data ? dailyPuzzle(data) : null), [data]);
   let fen = "";
   if (puzzle) {
@@ -59,7 +51,7 @@ export default function HomePage() {
         )}
         </div>
       </section>
-      <div className="home-practice-grid" ref={mediaRef} style={{"--home-card-height":`${mediaHeight}px`,"--home-meme-aspect":memeAspect} as React.CSSProperties}>
+      <div className="home-practice-grid">
         <section
           className="home-puzzle"
           aria-labelledby="daily-title"
@@ -97,7 +89,7 @@ export default function HomePage() {
             )}
           </div>
         </section>
-        {appearance.showMemes && <DailyMeme onAspectChange={setMemeAspect}/>}
+        {appearance.showMemes && <DailyMeme/>}
       </div>
       {library.games.length > 0 && (
         <section className="home-recent">
@@ -121,7 +113,7 @@ function RecentGame({ game: g, open }: { game: SavedGame; open: () => void }) {
   const {library}=useApp();
   const [preview, setPreview] = useState<number | null>(null);
   const positions = g.positions.length ? g.positions : [g.initial];
-  const result = g.result === "*" || g.result === "1/2-1/2" ? "draw" :
+  const result = g.result === "*" ? "unfinished" : g.result === "1/2-1/2" ? "draw" :
     (g.result === "1-0") === (g.human === "w") ? "win" : "loss";
   return <div className={`recent-game-entry result-${result}`}>
     <button className="recent-game-row" onClick={open}>

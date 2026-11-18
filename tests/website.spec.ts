@@ -243,10 +243,16 @@ test("all 4,000 puzzles load; adaptive solution, grading, hints and daily replay
   await page.getByRole("button", { name: "Hint", exact: true }).click();
   expect((await stored(page)).progress.streak).toBe(0);
   await page.goto("/#puzzles/daily");
-  await expect(
-    page.getByRole("button", { name: "Replay", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Replay", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Hint", exact: true }).click();
+  const dailyId=Object.values((await stored(page)).progress.daily).at(-1).id;
+  const daily=list.find(p=>p.id===dailyId);
+  for(let i=1;i<daily.moves.length;i+=2){
+    const move=daily.moves[i];await uiMove(page,move);
+    if(move.length===5)await page.getByRole('button',{name:`Promote to ${{q:'queen',r:'rook',b:'bishop',n:'knight'}[move[4]]}`,exact:true}).click();
+    if(i+2<daily.moves.length)await expect(page.getByRole('button',{name:'Hint',exact:true})).toBeEnabled();
+  }
+  await expect(page.getByRole('button',{name:'Replay',exact:true})).toBeVisible();
   const attempts = (await stored(page)).progress.attempts;
   await page.getByRole("button", { name: "Replay", exact: true }).click();
   await page.getByRole("button", { name: "Hint", exact: true }).click();
