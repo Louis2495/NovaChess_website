@@ -1,6 +1,7 @@
 import type { SavedGame } from './types';
-export function duration(ms: number) {
+export function duration(ms: number, omitZeroMinutes = false) {
  const seconds=Math.floor(Math.max(0,ms)/1000);
+ if(omitZeroMinutes && seconds<60)return `${seconds}.${Math.floor(Math.max(0,ms)%1000/100)}`;
  return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}.${Math.floor(ms%1000/100)}`;
 }
 export function speedrunBests(games: SavedGame[]) {

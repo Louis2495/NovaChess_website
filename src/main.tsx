@@ -70,8 +70,8 @@ const mainNav = [
   { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
   { id: "research", label: "Research", icon: Glasses },
-  { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
   { id: "library", label: "Library", icon: FolderOpen },
+  { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
 ] as const;
 const validTabs = new Set<string>([
   "profile",

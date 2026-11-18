@@ -86,5 +86,7 @@ test('Crazyhouse previews keep promoted markers and return a captured promotion 
  const preview=previewPremoves('4k3/8/8/8/8/q~7/8/R3K3[] b - - 0 1',['a1a3'],'w','crazyhouse');assert.ok(preview.includes('[P]'));assert.ok(!preview.includes('[Q]'));
  assert.ok(previewPremoves('4k3/8/8/8/8/Q~7/8/4K3[] b - - 0 1',['a3b3'],'w','crazyhouse').includes('1Q~6'));
 });
-import {throneDuration} from '../../src/lib/speedrun.ts';
+import {duration,throneDuration} from '../../src/lib/speedrun.ts';
 test('Throne time always includes hours and rolls over minutes correctly',()=>{assert.equal(throneDuration(0),'0:00:00');assert.equal(throneDuration(3723000),'1:02:03');assert.equal(throneDuration(90000000),'25:00:00');});
+
+test('Speedrun stats omit zero minutes and keep minutes for longer runs',()=>{assert.equal(duration(9000,true),'9.0');assert.equal(duration(59999,true),'59.9');assert.equal(duration(60000,true),'1:00.0');assert.equal(duration(72300,true),'1:12.3');assert.equal(duration(9000),'0:09.0');});
