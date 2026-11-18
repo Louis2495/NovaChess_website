@@ -8,8 +8,8 @@ import { createRoot } from "react-dom/client";
 import {
   Home,
   Shapes,
-  ScanLine,
-  MonitorPlay,
+  BrainCircuit,
+  Swords,
   Puzzle,
   BookOpen,
   FolderOpen,
@@ -64,8 +64,8 @@ const SignIn = lazy(() => import("./pages/SignIn")),
   Community = lazy(() => import("./pages/Community"));
 const mainNav = [
   { id: "home", label: "Home", icon: Home },
-  { id: "analysis", label: "Analysis", icon: ScanLine },
-  { id: "play", label: "Play", icon: MonitorPlay },
+  { id: "analysis", label: "Analysis", icon: BrainCircuit },
+  { id: "play", label: "Play", icon: Swords },
   { id: "variants", label: "Variants", icon: Shapes },
   { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
@@ -542,6 +542,7 @@ function App() {
             {mainNav.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
+                data-nav={id}
                 className={tab === id ? "active" : ""}
                 aria-current={tab === id ? "page" : undefined}
                 onClick={() => navigate(id)}
@@ -618,6 +619,7 @@ function App() {
           {mainNav.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
+              data-nav={id}
               className={tab === id ? "active" : ""}
               onClick={() => navigate(id)}
             >

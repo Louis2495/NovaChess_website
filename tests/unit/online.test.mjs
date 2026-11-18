@@ -164,6 +164,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180006_increment_matchmaking.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180007_delegated_admins.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180008_account_activity.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180009_account_presence_counts.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -683,15 +684,17 @@ test('only the pinned owner can grant admin access to confirmed active accounts 
 });
 
 test('account heartbeats are self-only and online status is restricted to administrators',async()=>{
+ const accountCount=Number((await pg.query('select count(*) from auth.users')).rows[0].count);
  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
  try{
   await pg.query('select account_heartbeat()');
   await assert.rejects(()=>pg.query('select * from account_activity'),/permission denied/);
   await assert.rejects(()=>pg.query('select admin_online_accounts($1)',[[users[1]]]),/Administrator access required/);
+  await assert.rejects(()=>pg.query('select admin_presence_counts()'),/Administrator access required/);
  }finally{await pg.exec('reset role');}
  assert.equal((await pg.query('select user_id from account_activity')).rows[0].user_id,users[1]);
  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
- try{assert.deepEqual((await pg.query('select admin_online_accounts($1) as ids',[[users[1],users[3]]])).rows[0].ids,[users[1]]);}finally{await pg.exec('reset role');}
+ try{assert.deepEqual((await pg.query('select admin_online_accounts($1) as ids',[[users[1],users[3]]])).rows[0].ids,[users[1]]);assert.deepEqual((await pg.query('select admin_presence_counts() as counts')).rows[0].counts,{online:1,offline:accountCount-1});}finally{await pg.exec('reset role');}
  await pg.query("update account_activity set seen_at=now()-interval '151 seconds'");
  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
  try{assert.deepEqual((await pg.query('select admin_online_accounts($1) as ids',[[users[1]]])).rows[0].ids,[]);}finally{await pg.exec('reset role');}

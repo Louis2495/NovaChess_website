@@ -272,9 +272,12 @@ test('admin accounts show recent online status and separate hash/reset actions',
  await connected(page);await page.route('**/rest/v1/rpc/is_site_admin',r=>r.fulfill({json:true}));await page.route('**/rest/v1/rpc/is_site_owner',r=>r.fulfill({json:true}));
  await page.route('**/rest/v1/rpc/admin_accounts',r=>r.fulfill({json:{total:2,users:[{id:uid,screen_name:'Active player',email:'active@example.test'},{id:peer,screen_name:'Away player',email:'away@example.test'}]}}));
  await page.route('**/rest/v1/rpc/admin_online_accounts',r=>r.fulfill({json:[uid]}));
+ await page.route('**/rest/v1/rpc/admin_presence_counts',r=>r.fulfill({json:{online:8,offline:43}}));
  const beat=page.waitForRequest(r=>r.url().endsWith('/rpc/account_heartbeat'));
  await page.goto('/#profile/admin');await beat;
  await expect(page.getByText('The account must already exist and have a confirmed email.',{exact:true})).toHaveCount(0);
+ await expect(page.getByText('Administrator email',{exact:true})).toHaveCount(0);await expect(page.getByLabel('Administrator email',{exact:true})).toBeVisible();
+ await expect(page.getByLabel('Account activity totals',{exact:true})).toHaveText('8 online | 43 offline');
  const active=page.getByRole('row').filter({hasText:'Active player'}),away=page.getByRole('row').filter({hasText:'Away player'});
  await expect(active.getByRole('img',{name:'Online',exact:true})).toHaveCSS('background-color','rgb(99, 220, 155)');
  await expect(away.getByRole('img',{name:'Offline',exact:true})).toHaveCSS('background-color','rgb(239, 119, 125)');
