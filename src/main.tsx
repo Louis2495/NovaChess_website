@@ -8,7 +8,7 @@ import { createRoot } from "react-dom/client";
 import {
   Home,
   Shapes,
-  BrainCircuit,
+  Binoculars,
   Swords,
   Puzzle,
   BookOpen,
@@ -64,12 +64,12 @@ const SignIn = lazy(() => import("./pages/SignIn")),
   Community = lazy(() => import("./pages/Community"));
 const mainNav = [
   { id: "home", label: "Home", icon: Home },
-  { id: "analysis", label: "Analysis", icon: BrainCircuit },
+  { id: "analysis", label: "Analysis", icon: Search },
   { id: "play", label: "Play", icon: Swords },
   { id: "variants", label: "Variants", icon: Shapes },
   { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
-  { id: "research", label: "Research", icon: Search },
+  { id: "research", label: "Research", icon: Binoculars },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
   { id: "library", label: "Library", icon: FolderOpen },
 ] as const;
