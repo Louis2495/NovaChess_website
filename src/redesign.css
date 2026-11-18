@@ -5094,3 +5094,4 @@ html { scrollbar-gutter:stable; }
  .standard-play-hub > .quick-online-play { margin-top:0; padding-top:0; }
  .standard-play-hub > .quick-online-play .new-game-primary { margin-top:0; }
 }
+.standard-play-hub > .play-hub-heading .play-opponent-toggle { margin-inline:auto; }
