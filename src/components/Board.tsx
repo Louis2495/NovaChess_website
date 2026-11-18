@@ -376,14 +376,17 @@ export function Board({
           const style = getComputedStyle(workspace);
           const right = parseFloat(style.paddingRight);
           const availableWidth = workspace.clientWidth - parseFloat(style.paddingLeft) - right;
-          const boardWidth = Math.min(requestedBoardSize.current ?? heightLimit, availableWidth - 198);
-          const panelWidth = Math.max(150, (availableWidth - boardWidth - 32) * .525);
-          const gap = Math.max(24, (availableWidth + right - boardWidth - panelWidth) / 2);
+          // Reserve equal columns on either side of the board so the board
+          // itself stays centered, independently of the right-hand controls.
+          const gap = 24;
+          const preferredBoardWidth = requestedBoardSize.current ?? heightLimit;
+          const panelWidth = Math.max(150, (availableWidth - preferredBoardWidth - gap * 2) / 2);
+          const boardWidth = Math.min(preferredBoardWidth, availableWidth - (panelWidth + gap) * 2);
           for (const [name, value] of Object.entries({
             "--puzzle-board-width": boardWidth,
             "--puzzle-panel-width": panelWidth,
             "--puzzle-panel-gap": gap,
-            "--puzzle-end-padding": Math.max(0, gap - right),
+            "--puzzle-end-padding": 0,
           })) layout.style.setProperty(name, `${value}px`);
         }
       }

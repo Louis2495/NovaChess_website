@@ -5095,3 +5095,10 @@ html { scrollbar-gutter:stable; }
  .standard-play-hub > .quick-online-play .new-game-primary { margin-top:0; }
 }
 .standard-play-hub > .play-hub-heading .play-opponent-toggle { margin-inline:auto; }
+
+.variants-hub > .quick-online-play:has(+ .online-variant-gallery) { margin-bottom:32px; }
+@media(min-width:1001px) {
+ .workspace .puzzle-layout { grid-template-columns:minmax(0,var(--puzzle-panel-width,150px)) minmax(0,var(--puzzle-board-width,var(--board-max))) minmax(0,var(--puzzle-panel-width,150px)); padding-right:0; }
+ .puzzle-layout > .board-column { grid-column:2; }
+ .puzzle-layout > .side-panels { grid-column:3; }
+}
