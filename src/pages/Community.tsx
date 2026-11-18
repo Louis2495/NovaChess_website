@@ -40,7 +40,7 @@ type Room = {
   name: string;
   mode: string;
   variant: string;
-  state: SpecialState & { gameKey?:string; lastWinner?: string; lastResult?: string; lastGame?:LastGame; clock?:{remaining:{w:number;b:number};startedAt:number|null}; initial:string; partner?:OnlinePosition; speedrun?:OnlinePosition["speedrun"] };
+  state: SpecialState & { drawOffer?:"w"|"b"; gameKey?:string; lastWinner?: string; lastResult?: string; lastGame?:LastGame; clock?:{remaining:{w:number;b:number};startedAt:number|null}; initial:string; partner?:OnlinePosition; speedrun?:OnlinePosition["speedrun"] };
   members: Member[];
   queue: string[];
   status: string;
@@ -422,16 +422,17 @@ export default function Community({presetMode = "standard", presetVariant = "che
               </div>
               <div className="side-panels">
               <aside className="online-match-actions" aria-label="Game actions">
-                  {me?.team && room.settings.bot && (
+                  {me?.team && room.mode !== "vote" && (
                     <Button
                       className="draw-button"
-                      disabled={busy || room.state.result !== "*"}
+                      disabled={busy || room.status !== "playing" || room.state.result !== "*" || room.state.drawOffer === me.team}
                       onClick={() => void act("draw")}
                     >
                       <Handshake size={16} />
-                      Draw
+                      {room.state.drawOffer === me.team ? "Draw offered" : room.state.drawOffer ? "Accept draw" : "Offer draw"}
                     </Button>
                   )}
+                  {me?.team && room.state.drawOffer && room.state.drawOffer !== me.team && <Button className="secondary" disabled={busy} onClick={() => void act("decline_draw")}>Decline draw</Button>}
                   {me?.team && room.mode !== "vote" && (
                     <Button
                       className="resign-button"

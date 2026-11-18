@@ -262,13 +262,13 @@ Deno.serve(async (req) => {
     }
     if (
       !me.team ||
-      (!["resign", "draw", "claim_timeout"].includes(action) && me.team !== turn) ||
+      (!["resign", "draw", "decline_draw", "claim_timeout"].includes(action) && me.team !== turn) ||
       status !== "playing" ||
       state.result !== "*"
     )
       throw Error("It is not your team’s turn.");
     if (
-      !finishing && ["move", "vote", "resign", "draw"].includes(action) &&
+      !finishing && ["move", "vote", "resign", "draw", "decline_draw"].includes(action) &&
       body.revision !== r.revision
     )
       throw Error("Position changed. Try again.");
@@ -297,13 +297,20 @@ Deno.serve(async (req) => {
         if (error) throw error;
         return json({ voted: true });
       }
-      state = next;
+      state = {...next,drawOffer:state.drawOffer === me.team ? state.drawOffer : undefined};
       if(clock)state={...state,clock:{incrementMs:clock.incrementMs||0,remaining:{...clock.remaining,[turn]:Math.max(0,clock.remaining[turn]-Math.max(0,receivedAt-clock.startedAt))+(clock.incrementMs||0)},startedAt:state.result==="*"?Date.now():null}};
       marks = [];
     } else if (action === "draw") {
-      if (!r.settings.bot || r.mode !== "team")
-        throw Error("Draw offers are available against the computer.");
-      state = { ...state, result: "1/2-1/2" };
+      if (r.mode === "vote") throw Error("Draw offers are not available during a move ballot.");
+      if (r.settings.bot || (state.drawOffer && state.drawOffer !== me.team)) {
+        state = { ...state, drawOffer:undefined, result:"1/2-1/2" };
+      } else {
+        if (state.drawOffer === me.team) throw Error("Your draw offer is still pending.");
+        state = { ...state, drawOffer:me.team };
+      }
+    } else if (action === "decline_draw") {
+      if (!state.drawOffer || state.drawOffer === me.team) throw Error("There is no opponent draw offer to decline.");
+      state = { ...state, drawOffer:undefined };
     } else if (action === "resign") {
       state = { ...state, result: (me.team === "w") !== (r.variant === "bughouse" && me.board === 1) ? "0-1" : "1-0" };
     } else throw Error("Unknown action.");

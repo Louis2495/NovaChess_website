@@ -215,7 +215,7 @@ test('online clocks align right, identities align left and actions sit in the ri
  await expect(page.locator('.player-top').getByRole('timer',{name:'White clock',exact:true})).toBeVisible();await expect(page.locator('.player-bottom').getByRole('timer',{name:'Black clock',exact:true})).toBeVisible();
  const board=(await page.locator('.board').boundingBox())!,top=(await page.locator('.player-top').boundingBox())!,bottom=(await page.locator('.player-bottom').boundingBox())!,actions=(await page.getByRole('complementary',{name:'Game actions'}).boundingBox())!;
  const layout=(await page.locator('.online-match').boundingBox())!;
- expect(Math.abs(board.x+board.width/2-layout.x-layout.width/2)).toBeLessThan(2);
+ expect(Math.abs(board.x-layout.x)).toBeLessThan(2);
  expect(Math.abs(actions.y-board.y)).toBeLessThan(2);
  expect(Math.abs(top.x-board.x)).toBeLessThan(2);expect(Math.abs(bottom.x-board.x)).toBeLessThan(2);expect(top.y+top.height).toBeLessThanOrEqual(board.y);expect(bottom.y).toBeGreaterThanOrEqual(board.y+board.height);expect(actions.x).toBeGreaterThanOrEqual(board.x+board.width);
  for (const strip of [page.locator('.player-top'), page.locator('.player-bottom')]) {
@@ -247,4 +247,23 @@ test('Throne review opens the completed round after a reset',async({page})=>{
  env.room.mode='throne';env.room.state.lastGame={id:'finished-round',result:'1-0',white:uid,black:peer,reason:'resignation',resignedBy:peer,position:finished};
  await page.goto('/#variants/online/'+roomId);await page.getByRole('button',{name:'Game review',exact:true}).click();await expect(page).toHaveURL(/#library\//);
  const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).games[0]);expect(game.moves).toEqual(['e2e4']);expect(game.initial).toBe(initial);
+});
+
+test('human games show Offer draw beside Resign and allow accepting an opponent offer',async({page})=>{
+ const env=await connected(page);
+ await page.route('**/functions/v1/chess',async route=>{
+   const action=route.request().postDataJSON();env.actions.push(action);
+   if(action.action==='draw'){
+     if(env.room.state.drawOffer==='b'){env.room.state.result='1/2-1/2';env.room.status='finished';delete env.room.state.drawOffer;}
+     else env.room.state.drawOffer='w';
+   }
+   env.room.revision++;await route.fulfill({json:env.room});
+ });
+ await page.goto('/#play/online/'+roomId);
+ const offer=page.getByRole('button',{name:'Offer draw',exact:true}),resign=page.getByRole('button',{name:'Resign',exact:true});
+ const a=(await offer.boundingBox())!,b=(await resign.boundingBox())!;expect(Math.abs(a.y-b.y)).toBeLessThan(2);expect(a.x+a.width).toBeLessThanOrEqual(b.x);
+ await offer.click();await expect(page.getByRole('button',{name:'Draw offered',exact:true})).toBeDisabled();expect(env.actions[0].action).toBe('draw');
+ await expect.poll(()=>env.joins.length).toBeGreaterThan(0);
+ env.room.state.drawOffer='b';env.room.revision++;env.emit('rooms',structuredClone(env.room));
+ await expect(page.getByRole('button',{name:'Decline draw',exact:true})).toBeVisible();await page.getByRole('button',{name:'Accept draw',exact:true}).click();await expect(page.locator('.game-result-banner strong')).toHaveText('Draw');
 });

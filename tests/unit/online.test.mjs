@@ -292,7 +292,7 @@ test("Team chess lets teammates move and draw shared arrows, and the server play
   const c = new Chess();
   for (const move of r.data.state.moves) c.move(move);
 });
-test("only computer team games accept a draw, and draws finish the game", async () => {
+test("computer draws finish immediately; human draws require an opponent acceptance", async () => {
   const computer = await room("team", { bot: true });
   let result = await command(users[0], computer, "draw");
   assert.equal(result.status, 200, JSON.stringify(result.data));
@@ -301,7 +301,19 @@ test("only computer team games accept a draw, and draws finish the game", async 
   const humans = await room();
   const joined = await command(users[1], humans, "join");
   result = await command(users[0], joined.data, "draw");
-  assert.notEqual(result.status, 200);
+  assert.equal(result.status, 200);
+  assert.equal(result.data.state.result, "*");
+  assert.equal(result.data.state.drawOffer, "w");
+  assert.notEqual((await command(users[0],result.data,"draw")).status,200);
+  assert.notEqual((await command(users[0],result.data,"decline_draw")).status,200);
+  const declined = await command(users[1],result.data,"decline_draw");
+  assert.equal(declined.status,200);
+  assert.ok(!declined.data.state.drawOffer);
+  const offered = await command(users[1],declined.data,"draw");
+  const accepted = await command(users[0],offered.data,"draw");
+  assert.equal(accepted.status,200);
+  assert.equal(accepted.data.state.result,"1/2-1/2");
+  assert.equal(accepted.data.status,"finished");
 });
 test("ratings count each validated game once and expose country/global percentiles after five games", async () => {
   const game = await room();

@@ -5150,13 +5150,13 @@ html { scrollbar-gutter:stable; }
 .online-player-clock { order:2; margin-left:auto; font-size:1.65rem; font-weight:700; font-variant-numeric:tabular-nums; flex:none; }
 .online-player-identity { min-width:0; }
 .online-player-identity > div { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
-.online-match-actions { display:flex; flex-direction:column; gap:12px; align-self:start; padding-top:0; }
-.online-match-actions .btn { width:100%; }
+.online-match-actions { display:flex; flex-direction:row; flex-wrap:wrap; gap:12px; align-self:start; padding-top:0; }
+.online-match-actions .btn { flex:1; min-width:0; padding-inline:8px; }
 .quick-online-play .invite-friends-option { margin-top:12px; }
 @media(min-width:1001px) {
- .workspace .online-match.chess-layout { grid-template-columns:minmax(180px,240px) minmax(0,1fr) minmax(180px,240px); gap:12px; padding-left:0; align-items:start; box-sizing:border-box; }
- .online-match > .board-column { min-width:0; grid-column:2; grid-row:1; }
- .online-match > .side-panels { min-width:0; grid-column:3; grid-row:1; padding-top:70px; }
+ .workspace .online-match.chess-layout { grid-template-columns:minmax(0,min(var(--auto-board-limit,var(--board-max)),calc(100% - 504px))) minmax(180px,240px); gap:12px; padding-left:0; align-items:start; box-sizing:border-box; }
+ .online-match > .board-column { min-width:0; grid-column:1; grid-row:1; }
+ .online-match > .side-panels { min-width:0; grid-column:2; grid-row:1; padding-top:70px; }
  .online-match .board-frame,.online-match .online-player-strip { margin-inline:auto; }
  .play-match > .match-sidebar { grid-column:1; grid-row:1; }
  .play-match > .board-column { grid-column:2; grid-row:1; }
