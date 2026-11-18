@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useApp } from "../../lib/context";
 import { initialFen, download } from "../../lib/store";
+import { useEngine, useSettledEvaluation, scoreLabel } from "../../lib/engine";
 import { Board } from "../../components/Board";
 import { Card, Button } from "../../components/UI";
 type PublicGame = {
@@ -44,7 +45,7 @@ function parsePGN(text: string, username = ""): PublicGame | null {
   }
 }
 export default function Research() {
-  const { appearance, library } = useApp();
+  const { appearance, library, tab } = useApp();
   const [site, setSite] = useState("Chess.com"),
     [username, setUsername] = useState(""),
     [identity, setIdentity] = useState(""),
@@ -58,6 +59,9 @@ export default function Research() {
   useEffect(() => () => controller.current?.abort(), []);
   const c = new Chess();
   path.forEach((m) => c.move(m));
+  const engine = useEngine(c.fen(), tab === "research");
+  const evaluation = useSettledEvaluation(c.fen(), engine.lines[0]);
+  const white = evaluation?.score || 0;
   const matching = useMemo(
     () =>
       games.filter(
@@ -230,6 +234,55 @@ export default function Research() {
   }
   return (
     <>
+      <div className="chess-layout research-layout">
+        <div className="board-column">
+          <div className="board-with-eval research-board-with-eval">
+            <div className="eval-meter" role="img" aria-label={`Evaluation ${scoreLabel(evaluation)}`}>
+              <div style={{height:`${50 + Math.tanh(white / 450) * 46}%`}}/>
+            </div>
+          <Board
+            fen={c.fen()}
+            guides={branches.map((b) => ({
+              from: b.move.slice(0, 2),
+              to: b.move.slice(2, 4),
+              color: appearance.accent,
+              opacity:
+                0.2 +
+                (0.75 * b.count) / Math.max(1, ...branches.map((m) => m.count)),
+            }))}
+            onMove={(from, to, promotion) => {
+              try {
+                const m = new Chess(c.fen()).move({
+                  from,
+                  to,
+                  promotion: promotion || "q",
+                });
+                setPath((v) => [...v, m.from + m.to + (m.promotion || "")]);
+              } catch {}
+            }}
+          />
+          </div>
+          <div className="board-navigation">
+            <Button
+              className="secondary"
+              disabled={!path.length}
+              onClick={() => setPath((v) => v.slice(0, -1))}
+            >
+              <ChevronLeft size={15} />
+              Back
+            </Button>
+            <span>{Math.ceil(path.length / 2)} moves</span>
+            <Button
+              className="secondary"
+              disabled={!path.length}
+              onClick={() => setPath([])}
+            >
+              <RotateCcw size={15} />
+              Reset
+            </Button>
+          </div>
+        </div>
+        <div className="side-panels research-panels">
       <Card className="research-form">
         <div className="research-fields">
           <div className="research-source field">
@@ -315,49 +368,6 @@ export default function Research() {
           </p>
         )}
       </Card>
-      <div className="chess-layout research-layout">
-        <div className="board-column">
-          <Board
-            fen={c.fen()}
-            guides={branches.map((b) => ({
-              from: b.move.slice(0, 2),
-              to: b.move.slice(2, 4),
-              color: appearance.accent,
-              opacity:
-                0.2 +
-                (0.75 * b.count) / Math.max(1, ...branches.map((m) => m.count)),
-            }))}
-            onMove={(from, to, promotion) => {
-              try {
-                const m = new Chess(c.fen()).move({
-                  from,
-                  to,
-                  promotion: promotion || "q",
-                });
-                setPath((v) => [...v, m.from + m.to + (m.promotion || "")]);
-              } catch {}
-            }}
-          />
-          <div className="board-navigation">
-            <Button
-              className="secondary"
-              disabled={!path.length}
-              onClick={() => setPath((v) => v.slice(0, -1))}
-            >
-              <ChevronLeft size={15} />
-              Back
-            </Button>
-            <span>{Math.ceil(path.length / 2)} moves</span>
-            <Button
-              className="secondary"
-              disabled={!path.length}
-              onClick={() => setPath([])}
-            >
-              <RotateCcw size={15} />
-              Reset
-            </Button>
-          </div>
-        </div>
         <Card>
           <div className="card-heading">
             <h2>{identity || "Opening explorer"}</h2>
@@ -408,6 +418,7 @@ export default function Research() {
             </Button>
           )}
         </Card>
+        </div>
       </div>
     </>
   );

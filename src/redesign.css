@@ -5019,3 +5019,17 @@ html { scrollbar-gutter:stable; }
  .workspace:has(.variants-hub) { padding-block:24px; }
  .variants-hub > .quick-online-play { width:min(560px,calc(100% - 440px)); max-width:none; margin:0 auto 16px; }
 }
+
+/* Research keeps its search tools beside the board, not above it. */
+.workspace .research-layout { --board-rail:29px; }
+.research-board-with-eval { display:flex; gap:10px; }
+.research-board-with-eval > .eval-meter { width:19px; flex:none; height:var(--actual-board-width); min-height:0; max-height:var(--actual-board-width); margin-top:var(--board-surface-inset,22px); margin-bottom:0; overflow:hidden; }
+.research-layout .board-navigation { width:var(--actual-board-width,calc(100% - 29px)); max-width:calc(100% - 29px); margin:18px 0 0 29px; }
+.research-panels .research-form { width:100%; max-width:none; margin:0; padding:20px; }
+.research-panels .research-fields { grid-template-columns:minmax(0,1fr); gap:16px; }
+.research-panels .research-fields > .field { width:100%; min-width:0; height:auto; }
+.research-panels .research-fields > .btn { width:100%; }
+@media(min-width:1001px) {
+ .workspace .research-layout { grid-template-columns:minmax(0,calc(var(--auto-board-limit,var(--board-max)) + 29px)) minmax(310px,1fr); }
+ .manual-boards .workspace .research-layout { grid-template-columns:minmax(0,calc(var(--board-max) + 29px)) minmax(310px,1fr); }
+}
