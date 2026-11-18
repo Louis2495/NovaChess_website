@@ -214,6 +214,9 @@ test('online clocks align right, identities align left and actions sit in the ri
  await expect(page.locator('.player-top')).toContainText('Opponent');await expect(page.locator('.player-bottom')).toContainText('Player');
  await expect(page.locator('.player-top').getByRole('timer',{name:'White clock',exact:true})).toBeVisible();await expect(page.locator('.player-bottom').getByRole('timer',{name:'Black clock',exact:true})).toBeVisible();
  const board=(await page.locator('.board').boundingBox())!,top=(await page.locator('.player-top').boundingBox())!,bottom=(await page.locator('.player-bottom').boundingBox())!,actions=(await page.getByRole('complementary',{name:'Game actions'}).boundingBox())!;
+ const layout=(await page.locator('.online-match').boundingBox())!;
+ expect(Math.abs(board.x+board.width/2-layout.x-layout.width/2)).toBeLessThan(2);
+ expect(Math.abs(actions.y-board.y)).toBeLessThan(2);
  expect(Math.abs(top.x-board.x)).toBeLessThan(2);expect(Math.abs(bottom.x-board.x)).toBeLessThan(2);expect(top.y+top.height).toBeLessThanOrEqual(board.y);expect(bottom.y).toBeGreaterThanOrEqual(board.y+board.height);expect(actions.x).toBeGreaterThanOrEqual(board.x+board.width);
  for (const strip of [page.locator('.player-top'), page.locator('.player-bottom')]) {
    const clock=(await strip.getByRole('timer').boundingBox())!,identity=(await strip.locator('.online-player-identity').boundingBox())!;

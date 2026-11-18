@@ -5154,9 +5154,10 @@ html { scrollbar-gutter:stable; }
 .online-match-actions .btn { width:100%; }
 .quick-online-play .invite-friends-option { margin-top:12px; }
 @media(min-width:1001px) {
- .online-match.chess-layout { grid-template-columns:minmax(0,1fr) minmax(240px,300px); gap:12px; padding-left:clamp(120px,14vw,200px); align-items:start; box-sizing:border-box; }
- .online-match > .board-column { min-width:0; }
- .online-match > .side-panels { min-width:0; }
+ .workspace .online-match.chess-layout { grid-template-columns:minmax(180px,240px) minmax(0,1fr) minmax(180px,240px); gap:12px; padding-left:0; align-items:start; box-sizing:border-box; }
+ .online-match > .board-column { min-width:0; grid-column:2; grid-row:1; }
+ .online-match > .side-panels { min-width:0; grid-column:3; grid-row:1; padding-top:70px; }
+ .online-match .board-frame,.online-match .online-player-strip { margin-inline:auto; }
  .play-match > .match-sidebar { grid-column:1; grid-row:1; }
  .play-match > .board-column { grid-column:2; grid-row:1; }
  .play-match.chess-layout { grid-template-columns:220px minmax(0,min(var(--play-board-size,650px),calc(100% - 240px))); }
