@@ -46,12 +46,11 @@ export default function Learn() {
     {id:"train",title:"Train an opening",text:"Practice the next move",tile:3},
     {id:"history",title:"History",text:"Famous games, champions & milestones",tile:4},
     {id:"encyclopedia",title:"Encyclopedia",text:"Motifs, players, events & more",tile:5},
-    {id:"quizzes",title:"Quizzes",text:"Choose moves, find your style",tile:6},
+    {id:"quizzes",title:"Funny quizzes",text:"Choose moves, find your style",tile:6},
     {id:"trivia",title:"Trivia",text:"Test your chess knowledge",tile:7},
   ];
   return <><PageTitle title="Learn"/><div className="learn-groups">{[
     {title:"Lessons & practice",ids:["repertoire","lessons","endgames","train"]},
-    {title:"Explore chess",ids:["history","encyclopedia"]},
-    {title:"Just for fun",ids:["quizzes","trivia"]},
+    {title:"Explore chess",ids:["history","encyclopedia","trivia","quizzes"]},
   ].map(group=><section className="learn-group" key={group.title}><h2 className="learn-group-title">{group.title}</h2><div className="learn-hub">{group.ids.map(id=>tiles.find(t=>t.id===id)!).map(t=><button className="card learn-tile" key={t.id} onClick={()=>navigate("learn",t.id)}><span className="learn-picture" aria-hidden="true" style={{backgroundImage:`url("${base}learn/${t.tile===3?'illustrations.webp':'subjects.webp'}")`,backgroundSize:"400% 200%",backgroundPosition:`${(t.tile%4)*100/3}% ${Math.floor(t.tile/4)*100}%`}}/><h2>{t.title}</h2><p>{t.text}</p></button>)}</div></section>)}</div></>;
 }
