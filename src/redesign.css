@@ -5185,15 +5185,15 @@ html { scrollbar-gutter:stable; }
 
 /* Distinct navigation colors and silhouettes make each destination recognizable. */
 [data-nav="home"] { --nav-color:#ffdd57; }
-[data-nav="analysis"] { --nav-color:#a47bff; }
+[data-nav="analysis"] { --nav-color:#f8efd6; }
 [data-nav="play"] { --nav-color:#49df83; }
 [data-nav="variants"] { --nav-color:#ff9c43; }
 [data-nav="puzzles"] { --nav-color:#ff6868; }
 [data-nav="learn"] { --nav-color:#479fff; }
-[data-nav="research"] { --nav-color:#f8efd6; }
-[data-nav="stats"] { --nav-color:#aab4c2; }
+[data-nav="research"] { --nav-color:#f66fce; }
+[data-nav="stats"] { --nav-color:#a47bff; }
 [data-nav="library"] { --nav-color:#45deef; }
-.sidebar nav #sidebar-chat button { --nav-color:#f66fce; }
+.sidebar nav #sidebar-chat button { --nav-color:#aab4c2; }
 .sidebar nav button { gap:11px; color:var(--text); }
 .sidebar nav button > svg {
  width:32px; height:32px; padding:6px; box-sizing:border-box; flex:none;
