@@ -49,7 +49,7 @@ type Room = {
   settings: { bot: boolean };
 };
 type Profile = { id: string; username: string;screen_name?:string };
-export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0, children}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number; children?:ReactNode}) {
+export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0, children, headerControls}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number; children?:ReactNode; headerControls?:ReactNode}) {
   const { session } = useOnlineSession(),
     { tab, detail, navigate, notify, appearance } = useApp();
   const [confirmed, setConfirmed] = useState<Room | null>(null),
@@ -256,7 +256,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div><Button className="secondary" onClick={()=>navigate(room.mode==='standard' && room.variant==='chess'?'play':'variants')}>Back</Button></div>}
       {!online || !uid ? (
         <>
-          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button></Card>
+          <Card className={`quick-online-play${headerControls ? " variant-online-controls" : ""}`}>{headerControls}<Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button></Card>
           {children}
           <OnlineAccount />
         </>
@@ -498,7 +498,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
               </div>
             </div>
           ) : (
-            <Card className="quick-online-play">
+            <Card className={`quick-online-play${headerControls ? " variant-online-controls" : ""}`}>{headerControls}
               {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>setBot(e.target.value==="bot")}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 setBusy(true);setError("");
@@ -513,7 +513,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
               }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>
-              {mode !== "standard" && <p className="caption">{ mode === "throne" ? "Winner stays. Queue to challenge." : mode === "vote" ? "One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>}
+              {mode !== "standard" && <p className="caption">{ mode === "throne" ? "Winner stays. Queue to challenge." : mode === "vote" ? "One day per move, Most voted move is played." : "Invite friends to your side. Anyone can move."}</p>}
             </Card>
           )}
           {!room && children}
