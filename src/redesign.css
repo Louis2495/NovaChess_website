@@ -5341,3 +5341,6 @@ html { scrollbar-gutter:stable; }
 }
 .home-page .home-welcome { width:100%; box-sizing:border-box; }
 @media(min-width:1001px) { .home-page:has(.home-recent):not(.memes-hidden) > .home-recent { padding:12px; } }
+
+.board-square.selected:after { background:#f4c84255; }
+.board-square.light.selected:after { background:#e5b62f70; }

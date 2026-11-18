@@ -24,3 +24,10 @@ test('daily puzzle Hint fits above the bottom navigation on short screens',async
   await expect.poll(async()=>{const h=(await hint.boundingBox())!,tabs=page.locator('.mobile-tabs');const bottom=await tabs.isVisible()?(await tabs.boundingBox())!.y:height;return h.y+h.height-bottom;}).toBeLessThanOrEqual(-8);
  }
 });
+
+test('first Hint highlights the piece; second Hint draws its move arrow and a move clears it',async({page})=>{
+ await page.route('**/data/puzzles.json',r=>r.fulfill({json:[puzzle]}));await page.goto('/#puzzles/daily');const board=page.locator('.daily-puzzle-layout .board'),hint=page.getByRole('button',{name:'Hint',exact:true}),move=puzzle.moves[1];
+ await hint.click();await expect(board.locator('.hinted')).toHaveAttribute('aria-label',new RegExp('^'+move.slice(0,2)+','));await expect(board.locator('.board-marks line,.board-marks polyline')).toHaveCount(0);
+ await hint.click();await expect(board.locator('.board-marks line,.board-marks polyline')).toHaveCount(1);await expect(board.locator('.board-marks g')).toHaveAttribute('stroke','#42d9ec');
+ for(const square of [move.slice(0,2),move.slice(2,4)])await board.getByRole('button',{name:new RegExp('^'+square+',')}).click();await expect(board.locator('.board-marks line,.board-marks polyline')).toHaveCount(0);
+});

@@ -1,4 +1,6 @@
 import {test,expect} from '@playwright/test';
-test('selected squares have a subtle yellow overlay without hiding pieces',async({page})=>{
- await page.goto('/#analysis');const square=page.getByRole('button',{name:'e2, white pawn',exact:true});await square.click();await expect(square).toHaveAttribute('aria-pressed','true');const style=await square.evaluate(el=>({display:getComputedStyle(el,'::after').display,background:getComputedStyle(el,'::after').backgroundColor}));expect(style.display).toBe('block');expect(style.background).toBe('rgba(255, 226, 138, 0.19)');await expect(square.locator('.piece')).toBeVisible();
+test('selected squares have visible yellow overlays with extra contrast on light squares',async({page})=>{
+ await page.goto('/#analysis');const dark=page.getByRole('button',{name:'d2, white pawn',exact:true});await dark.click();await expect(dark).toHaveAttribute('aria-pressed','true');
+ const darkColor=await dark.evaluate(el=>{const s=getComputedStyle(el,'::after');return {display:s.display,values:s.backgroundColor.match(/[\d.]+/g)!.map(Number)};});expect(darkColor.display).toBe('block');expect(darkColor.values.slice(0,3)).toEqual([244,200,66]);expect(darkColor.values[3]).toBeGreaterThan(.3);
+ const light=page.getByRole('button',{name:'e2, white pawn',exact:true});await light.click();const color=await light.evaluate(el=>getComputedStyle(el,'::after').backgroundColor.match(/[\d.]+/g)!.map(Number));expect(color.slice(0,3)).toEqual([229,182,47]);expect(color[3]).toBeGreaterThan(darkColor.values[3]);await expect(light.locator('.piece')).toBeVisible();
 });

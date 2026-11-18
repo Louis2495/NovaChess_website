@@ -29,7 +29,7 @@ test("account legal-move preference persists and removes move dots everywhere", 
 test("solid square colors preserve pieces and player bars track a resized game board", async ({page}) => {
   await page.goto("/#analysis");
   await square(page,"e2").click({button:"right"});
-  await expect(square(page,"e2")).toHaveCSS("background-color","rgb(31, 186, 98)");
+  await expect(square(page,"e2")).toHaveCSS("background-color","rgb(66, 217, 236)");
   await expect(square(page,"e2").locator(".piece")).toBeVisible();
   await page.goto("/#play");await page.getByRole("button",{name:"Computer",exact:true}).click();await page.getByRole("button",{name:"Start game",exact:true}).click();
   const resize=page.getByRole("slider",{name:"Resize board",exact:true}).first();await resize.focus();await resize.press("ArrowLeft");await resize.press("ArrowLeft");

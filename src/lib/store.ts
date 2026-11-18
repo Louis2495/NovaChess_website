@@ -56,8 +56,9 @@ export const backgrounds = [
   "Custom",
   "Flag",
 ];
+export const hintColor = "#42d9ec";
 export const annotationColors = {
-  green: "#1fba62",
+  green: hintColor,
   blue: "#2684ff",
   red: "#f04461",
   gold: "#ff9c16",

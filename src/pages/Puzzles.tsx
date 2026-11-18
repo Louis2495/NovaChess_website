@@ -6,11 +6,11 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { Lightbulb, ArrowRight, RotateCcw, Calendar } from "lucide-react";
 import { useApp } from "../lib/context";
-import { useData, today } from "../lib/store";
+import { useData, today, hintColor } from "../lib/store";
 import type { PuzzleData } from "../lib/types";
 import GuessEval from "./GuessEval";
 import { dailyPuzzle } from "./Home";
-import { Board } from "../components/Board";
+import { Board, type BoardMark } from "../components/Board";
 import {
   ChoiceSelect,
   PageTitle,
@@ -83,6 +83,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     [message, setMessage] = useState(""),
     [done, setDone] = useState(false),
     [hint, setHint] = useState(""),
+    [hintArrow,setHintArrow] = useState<BoardMark|null>(null),
     [wrong, setWrong] = useState(false),
     [played, setPlayed] = useState<string[]>([]);
   const layoutRef = useRef<HTMLDivElement>(null),
@@ -174,7 +175,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     setCursor(1);
     setDone(false);
     setMessage("");
-    setHint("");
+    setHint("");setHintArrow(null);
     setWrong(false);
     setPlayed([]);
     graded.current = daily && !!library.progress.daily[today()];
@@ -195,7 +196,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
       setPlayed((p) => [...p, m.san]);
       setCursor(cursor + 1);
       setWrong(false);
-      setHint("");
+      setHint("");setHintArrow(null);
       setMessage("");
       if (cursor + 1 >= puzzle.moves.length || ch.isCheckmate()) complete();
     } catch {}
@@ -239,8 +240,14 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               onClick={() => {
                 grade(false);
                 const m = new Chess(fen).move(puzzle.moves[cursor]);
-                setHint(m.from);
-                setMessage(`Try ${m.san}.`);
+                if(hint===m.from){
+                  setHintArrow({from:m.from,to:m.to,color:hintColor});
+                  setMessage("Follow the arrow.");
+                }else{
+                  setHint(m.from);
+                  setHintArrow(null);
+                  setMessage("Try moving the highlighted piece.");
+                }
               }}
             >
               <Lightbulb size={17} />
@@ -311,6 +318,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               disabled={done || (c.turn() !== learner && !appearance.premoves)}
               flipped={learner === "b"}
               hint={hint}
+              guides={hintArrow?[hintArrow]:[]}
             />
           </div>
           </div>
