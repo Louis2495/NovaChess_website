@@ -112,15 +112,15 @@ function variantMove(
     worker.postMessage({ variant, initial, moves, budget });
   });
 }
-export default function Play({variantsOnly = false, onPlayingChange}: {variantsOnly?: boolean; onPlayingChange?: (playing:boolean)=>void}) {
+export default function Play({variantsOnly = false, onPlayingChange, speedrunElo}: {variantsOnly?: boolean; onPlayingChange?: (playing:boolean)=>void; speedrunElo?:number}) {
   const { library, setLibrary, appearance, navigate, detail, notify } =
     useApp();
   const [ff, setFF] = useState<FairyStockfish | null>(null),
     [error, setError] = useState(""),
     [playing, setPlaying] = useState(detail === "resume"),
     [variant, setVariant] = useState(variantsOnly ? variantList.find(v=>v.id!=="chess")!.id : "chess"),
-    [speedrunMode, setSpeedrunMode] = useState(false),
-    [speedrunRating, setSpeedrunRating] = useState(1000),
+    [speedrunMode, setSpeedrunMode] = useState(speedrunElo !== undefined),
+    [speedrunRating, setSpeedrunRating] = useState(speedrunElo ?? 1000),
     [clockNow, setClockNow] = useState(Date.now()),
     [special, setSpecial] = useState<SpecialVariant | null>(
       detail === "resume" && library.activeGame?.special
@@ -561,6 +561,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
     };
   }, [ff, game?.partner?.positions, playing, game?.result]);
   const premove = usePremoves({
+    variant:game?.variant,
     fen: valid?.fen || "8/8/8/8/8/8/8/8 w - - 0 1",
     side: game?.human || "w",
     legal: valid?.legal || [],
@@ -578,6 +579,10 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
     setConfirm(false);
     setPremoves([]);
   }
+  const launchedSpeedrun = useRef(false);
+  useEffect(()=>{
+    if(speedrunElo !== undefined && ff && !launchedSpeedrun.current){launchedSpeedrun.current=true;start();}
+  },[ff,speedrunElo]);
   if (!ff && !error) return <Loading />;
   if (special)
     return (
@@ -854,7 +859,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
               />
               <Pocket
                 value={
-                  game.human === "w" ? valid.whitePocket : valid.blackPocket
+                  valid.turn === game.human ? (game.human === "w" ? valid.whitePocket : valid.blackPocket) : (premove.preview.match(/\[([^\]]*)\]/)?.[1] || "").split("").filter(p => (p === p.toUpperCase() ? "w" : "b") === game.human).join("")
                 }
                 enabled={
                   (valid.turn === game.human || appearance.premoves) &&

@@ -17,8 +17,8 @@ test('Speedrun ratings run from 100 to 3000 in one horizontally scrolling row',a
  await page.goto('/#stats');
  const grid=page.getByRole('list',{name:'Fastest wins by computer rating'}),cards=grid.getByRole('listitem');
  await expect(cards).toHaveCount(59);
- await expect(cards.first()).toHaveAttribute('aria-label','100 Elo: No win yet');
- await expect(cards.last()).toHaveAttribute('aria-label','3000 Elo: No win yet');
+ await expect(cards.first().getByRole('button')).toHaveAttribute('aria-label','Play Speedrun at 100 Elo');
+ await expect(cards.last().getByRole('button')).toHaveAttribute('aria-label','Play Speedrun at 3000 Elo');
  const layout=await grid.evaluate(el=>({width:el.clientWidth,scrollWidth:el.scrollWidth,tops:[...el.children].map(c=>c.getBoundingClientRect().top)}));
  expect(new Set(layout.tops).size).toBe(1);expect(layout.scrollWidth).toBeGreaterThan(layout.width);
  await grid.scrollIntoViewIfNeeded();

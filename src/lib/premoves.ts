@@ -20,6 +20,7 @@ function encode(
   p: Record<string, string>,
   fields: string[],
   side: PremoveSide,
+  promoted = new Set<string>(),
 ) {
   let board = "";
   for (let r = 8; r >= 1; r--) {
@@ -29,7 +30,7 @@ function encode(
       if (v) {
         if (empty) board += empty;
         empty = 0;
-        board += v;
+        board += v + (promoted.has(f+r)?"~":"");
       } else empty++;
     }
     if (empty) board += empty;
@@ -42,15 +43,28 @@ export function previewPremoves(
   fen: string,
   moves: string[],
   side: PremoveSide,
+  variant = "chess",
 ) {
   const p = squares(fen),
     fields = fen.split(" ");
+  let pocket = fields[0].match(/\[([^\]]*)\]/)?.[1] || "";
+  const hasPockets = /\[/.test(fields[0]);
+  const promoted = new Set<string>();
+  let squareIndex=0;
+  for(const ch of fields[0].replace(/\[.*\]/,"")) {
+    if(ch==="~")promoted.add("abcdefgh"[(squareIndex-1)%8]+(8-Math.floor((squareIndex-1)/8)));
+    else if(ch!=="/")squareIndex+=/\d/.test(ch)?Number(ch):1;
+  }
+  const pocketPiece = (piece: string) => side === "w" ? piece.toUpperCase() : piece.toLowerCase();
   for (const move of moves) {
     const main = move.split(",")[0];
     if (main.includes("@")) {
       const to = main.slice(-2);
       if (p[to]) continue;
-      p[to] = side === "w" ? main[0].toUpperCase() : main[0].toLowerCase();
+      const piece = pocketPiece(main[0]), index = pocket.indexOf(piece);
+      if (index < 0) continue;
+      pocket = pocket.slice(0,index) + pocket.slice(index+1);
+      p[to] = piece;
     } else {
       const from = main.slice(0, 2),
         to = main.slice(2, 4),
@@ -71,6 +85,11 @@ export function previewPremoves(
         p[rookTo] = rook;
         continue;
       }
+      const captured = p[to] || (piece.toLowerCase() === "p" && from[0] !== to[0] ? p[to[0] + from[1]] : undefined);
+      if (variant === "crazyhouse" && captured && captured !== "*" && captured.toLowerCase() !== "k") pocket += pocketPiece(promoted.has(to)?"p":captured);
+      const wasPromoted=promoted.has(from);
+      promoted.delete(from);promoted.delete(to);
+      if(wasPromoted || (main[4] && hasPockets))promoted.add(to);
       delete p[from];
       if (piece.toLowerCase() === "p" && from[0] !== to[0] && !p[to])
         delete p[to[0] + from[1]];
@@ -94,13 +113,15 @@ export function previewPremoves(
       p[move.slice(-2)] = "*";
     }
   }
-  return encode(p, fields, side);
+  if (hasPockets) fields[0] = fields[0].replace(/\[[^\]]*\]/, "["+pocket+"]");
+  return encode(p, fields, side, promoted);
 }
 export function premoveOptions(
   fen: string,
   side: PremoveSide,
   chaos = false,
   blocked: string[] = [],
+  variant = "chess",
 ) {
   const p = squares(fen),
     out: string[] = [];
@@ -148,7 +169,7 @@ export function premoveOptions(
           kind === "p" &&
           dx === 0 &&
           dy === dir * 2 &&
-          (chaos || y === (side === "w" ? 1 : 6))
+          (chaos || y === (side === "w" ? 1 : 6) || (variant === "horde" && side === "w" && y === 0))
         ) {
           const mid = from[0] + (y + dir + 1);
           possible = !p[mid] && !blocked.includes(mid);
@@ -179,8 +200,8 @@ export function premoveOptions(
           }
           if (!clear) continue;
         }
-        if (kind === "p" && (ty === 0 || ty === 7))
-          for (const promotion of ["q", "r", "b", "n"])
+        if (kind === "p" && (ty === 0 || ty === 7) && variant !== "cvpawnrace")
+          for (const promotion of variant === "antichess" ? ["q", "r", "b", "n", "k"] : ["q", "r", "b", "n"])
             out.push(from + to + promotion);
         else out.push(from + to);
       }

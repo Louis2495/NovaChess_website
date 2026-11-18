@@ -91,7 +91,7 @@ test("Controls remove unused bindings and migrate first/last defaults to Up and 
   await page.evaluate(() => (location.hash = "#analysis"));
   await move(page, "e2e4");
   await move(page, "e7e5");
-  await page.locator("h1").click();
+  await page.locator("#workspace").focus();
   await page.keyboard.press("ArrowUp");
   await expect(square(page, "e2")).toHaveAttribute("aria-label", /white pawn/);
   await page.keyboard.press("ArrowDown");

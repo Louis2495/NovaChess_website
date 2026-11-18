@@ -65,6 +65,26 @@ test("Chess960 premoves preserve both castling pieces and pocket drops", () => {
       "4k3/8/8/8/8/8/8/4K3[N] b - - 0 1",
       ["N@c3", "c3d5"],
       "w",
-    ).startsWith("4k3/8/8/3N4/8/8/8/4K3[N]"),
+    ).startsWith("4k3/8/8/3N4/8/8/8/4K3[]"),
   );
 });
+
+test('premove geometry follows Horde, Antichess and Pawn race rules',()=>{
+ assert.ok(premoveOptions('7k/8/8/8/8/8/8/P7 b - - 0 1','w',false,[],'horde').includes('a1a3'));
+ assert.ok(!premoveOptions('7k/8/8/8/8/8/8/P7 b - - 0 1','w').includes('a1a3'));
+ assert.ok(premoveOptions('7k/P7/8/8/8/8/8/7K b - - 0 1','w',false,[],'antichess').includes('a7a8k'));
+ const race=premoveOptions('8/P7/8/8/8/8/8/8 b - - 0 1','w',false,[],'cvpawnrace');assert.ok(race.includes('a7a8'));assert.ok(!race.includes('a7a8q'));
+});
+test('queued pocket drops consume inventory and planned captures add Crazyhouse pieces',()=>{
+ const fen='4k3/8/8/8/8/8/8/4K3[NN] b - - 0 1';
+ assert.ok(previewPremoves(fen,['N@c3'],'w','crazyhouse').includes('[N]'));
+ assert.ok(previewPremoves(fen,['N@c3','N@d5'],'w','crazyhouse').includes('[]'));
+ const captured=previewPremoves('4k3/8/8/8/8/n7/8/R3K3[] b - - 0 1',['a1a3','N@d5'],'w','crazyhouse');assert.ok(captured.includes('3N4'));assert.ok(captured.includes('[]'));
+});
+
+test('Crazyhouse previews keep promoted markers and return a captured promotion as a pawn',()=>{
+ const preview=previewPremoves('4k3/8/8/8/8/q~7/8/R3K3[] b - - 0 1',['a1a3'],'w','crazyhouse');assert.ok(preview.includes('[P]'));assert.ok(!preview.includes('[Q]'));
+ assert.ok(previewPremoves('4k3/8/8/8/8/Q~7/8/4K3[] b - - 0 1',['a3b3'],'w','crazyhouse').includes('1Q~6'));
+});
+import {throneDuration} from '../../src/lib/speedrun.ts';
+test('Throne time always includes hours and rolls over minutes correctly',()=>{assert.equal(throneDuration(0),'0:00:00');assert.equal(throneDuration(3723000),'1:02:03');assert.equal(throneDuration(90000000),'25:00:00');});

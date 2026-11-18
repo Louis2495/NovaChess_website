@@ -10,6 +10,7 @@ export function usePremoves({
   identity,
   execute,
   chaos = false,
+  variant = "chess",
   blocked = [],
 }: {
   fen: string;
@@ -20,6 +21,7 @@ export function usePremoves({
   identity?: string;
   execute: (move: string) => void | Promise<unknown>;
   chaos?: boolean;
+  variant?: string;
   blocked?: string[];
 }) {
   const { appearance, notify } = useApp();
@@ -77,7 +79,7 @@ export function usePremoves({
   const pending = sent?.fen === fen ? [sent.move, ...queue] : queue,
     preview =
       allowed && (pending.length || turn !== side)
-        ? previewPremoves(fen, pending, side)
+        ? previewPremoves(fen, pending, side, variant)
         : fen;
   return {
     queue,
@@ -93,7 +95,7 @@ export function usePremoves({
       setQueue((q) => (q.length < 32 ? [...q, m] : q));
     },
     preview,
-    options: premoveOptions(preview, side, chaos, blocked),
+    options: premoveOptions(preview, side, chaos, blocked, variant),
     clear: () => {
       setQueue([]);
       setSent(null);

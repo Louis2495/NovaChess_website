@@ -208,12 +208,13 @@ export default function Community({presetMode = "standard", presetVariant = "che
     return legal;
   },[room?.state,room?.variant,me?.board,ff]);
   const premove = usePremoves({
+    variant:room?.variant,
     fen: position?.fen || "8/8/8/8/8/8/8/8 w - - 0 1",
     side: me?.team || "w",
     legal,
     enabled: !!me?.team,
     active: room?.status === "playing" && room.state.result === "*",
-    identity: room?.id+":"+room?.state.gameKey,
+    identity: room?.id+":"+room?.state.gameKey+":"+me?.team+":"+me?.board,
     execute: (move) =>
       act(room?.mode === "vote" ? "vote" : "move", { move }, true),
     chaos: room?.variant === "chaos",
@@ -236,7 +237,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
     }
     if(choices[0])void submitMove(choices[0]).catch(()=>{});
   }
-  const pocketPieces=(position?.fen.match(/\[([^\]]*)\]/)?.[1]||"").split("").filter(p=>me?.team && (p===p.toUpperCase()?"w":"b")===me.team);
+  const pocketPieces=((canMove ? position?.fen : premove.preview)?.match(/\[([^\]]*)\]/)?.[1]||"").split("").filter(p=>me?.team && (p===p.toUpperCase()?"w":"b")===me.team);
   const totals = Object.entries(
     votes.reduce(
       (acc, v) => ({ ...acc, [v.move]: (acc[v.move] || 0) + 1 }),
@@ -327,7 +328,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
               <div className="board-column">
                 {playerStrip(me?.team === "b" ? "w" : "b", "top")}
                 {room.state.speedrun && me?.team && <div className="speedrun-clock" role="timer" aria-label="Your move time">{duration(room.state.speedrun.elapsed[me.team]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}</div>}
-                {room.variant === "blindtext" ? <form onSubmit={e=>{e.preventDefault();if(!ff || !position)return;const b=new ff.Board("chess",position.fen);try{const move=matchTypedMove(typed,legal.map(m=>({uci:m,san:b.sanMove(m)})));if(move)void submitMove(move).then(()=>setTyped("")).catch(()=>{});}finally{b.delete();}}}><Field label="Blindfold move"><input value={typed} onChange={e=>setTyped(e.target.value)} autoComplete="off" disabled={!canMove || busy}/></Field><Button disabled={!canMove || busy}>Move</Button></form> : <Board
+                {room.variant === "blindtext" ? <form onSubmit={e=>{e.preventDefault();if(!ff || !position || (!canMove && !appearance.premoves))return;const b=new ff.Board("chess",canMove?position.fen:premove.preview);try{const move=matchTypedMove(typed,(canMove?legal:premove.options).map(m=>{let san=m;try{san=b.sanMove(m);}catch{}return {uci:m,san};}));if(move){if(canMove)void submitMove(move).then(()=>setTyped("")).catch(()=>{});else{premove.enqueue(move);setTyped("");}}}finally{b.delete();}}}><Field label="Blindfold move"><input value={typed} onChange={e=>setTyped(e.target.value)} autoComplete="off" disabled={room.status!=="playing" || room.state.result!=="*" || !me?.team || (!canMove && !appearance.premoves)}/></Field><Button disabled={room.status!=="playing" || room.state.result!=="*" || !me?.team || (!canMove && !appearance.premoves)}>{canMove?"Move":"Queue premove"}</Button></form> : <Board
                   fen={duck?.fen || premove.preview}
                   hidden={room.variant === "blind"}
                   visible={room.variant === "cvfog" ? fog(position!.fen,me?.team || "w") : undefined}

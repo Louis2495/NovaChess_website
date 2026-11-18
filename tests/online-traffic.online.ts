@@ -73,9 +73,9 @@ test('Play online starts a waiting game when no opponent is available',async({pa
  await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',name:'Standard'});
 });
 
-test('bottom-right Sign in opens the account form and disappears after authentication',async({page})=>{
- await connected(page);await page.goto('/#profile');await expect(page.locator('.floating-sign-in')).toHaveCount(0);await page.getByRole('button',{name:'Sign out',exact:true}).click();
- const action=page.locator('.floating-sign-in');await expect(action).toBeVisible();await expect(action).toHaveCSS('position','fixed');await action.click();
+test('sidebar Sign in sits above the username and opens the account form',async({page})=>{
+ await connected(page);await page.goto('/#profile');await expect(page.locator('.sidebar-sign-in')).toHaveCount(0);await page.getByRole('button',{name:'Sign out',exact:true}).click();
+ const action=page.locator('.sidebar-sign-in');await expect(action).toBeVisible();const signIn=(await action.boundingBox())!,profile=(await page.locator('.account-stamp').boundingBox())!;expect(signIn.y+signIn.height).toBeLessThanOrEqual(profile.y);await expect(page.locator('.floating-sign-in')).toHaveCount(0);await action.click();
  await expect(page).toHaveURL(/#signin/);await expect(page.getByRole('heading',{name:'Sign in',level:1})).toBeVisible();await expect(page.getByRole('button',{name:'Create an account',exact:true})).toBeVisible();await page.getByRole('button',{name:'Create an account',exact:true}).click();await expect(page.getByRole('button',{name:'Create account',exact:true})).toBeVisible();
 });
 
@@ -284,3 +284,32 @@ test('admin accounts show recent online status and separate hash/reset actions',
  const reset=(await active.getByRole('button',{name:'Send password reset to Active player'}).boundingBox())!,hash=(await active.getByRole('button',{name:'Show password hash for Active player'}).boundingBox())!;
  expect(hash.x-reset.x-reset.width).toBeGreaterThanOrEqual(19);
 });
+
+// Exercise each rule set through the same interactive queue and server update path.
+import {variantList} from '../src/lib/variantCatalog';
+import {onlineLegal,nativeVariant} from '../src/lib/onlineVariants';
+import {premoveOptions,previewPremoves} from '../src/lib/premoves';
+import {newSpecial,specialLegal,specialApply} from '../src/lib/specialRules';
+for(const modeOrVariant of [...variantList.map(v=>v.id),'speedrun','throne','team','vote']) {
+ const mode=['throne','team','vote'].includes(modeOrVariant)?modeOrVariant:'standard',variant=mode==='standard'?modeOrVariant:'chess';
+ test(`premove executes after the opponent reply in ${modeOrVariant}`,async({page})=>{
+  const env=await connected(page),ff=await native(),special=['dropping','chaos','random'].includes(variant);
+  const getLegal=(state:any)=>special?specialLegal(state):onlineLegal(ff,variant,state);
+  const apply=(state:any,move:string)=>special?{...specialApply(state,{type:'move',move}),initial:state.initial}:applyOnline(ff,variant,state,move);
+  let state:any=special?newSpecial(variant as any,5):freshOnline(ff,variant);state.initial ||= state.fen;
+  state=apply(state,getLegal(state)[0]);
+  const reply=getLegal(state)[0],after=apply(state,reply),preview=previewPremoves(state.fen,[],'w',variant),options=premoveOptions(preview,'w',variant==='chaos',state.blocked||[],variant);
+  let beforeDuck:Set<string>|undefined;
+  if(variant==='duck'){const board=new ff.Board('duck',preview);try{beforeDuck=new Set(board.legalMoves().trim().split(/\s+/));}finally{board.delete();}}
+  const move=getLegal(after).find((m:string)=>/^[a-h][1-8][a-h][1-8](?:,.*)?$/.test(m) && options.includes(m.split(',')[0]) && (!beforeDuck || beforeDuck.has(m)));
+  expect(move,`queueable move for ${variant}`).toBeTruthy();
+  env.room.mode=mode;env.room.variant=variant;env.room.state=state;
+  await page.route('**/functions/v1/chess',async r=>{const body=r.request().postDataJSON();env.actions.push(body);env.room.state=apply(env.room.state,body.move);env.room.revision++;await r.fulfill({json:env.room});});
+  await page.goto('/#variants/online/'+roomId);await expect.poll(()=>env.joins.length).toBeGreaterThan(0);
+  if(variant==='blindtext'){const input=page.getByLabel('Blindfold move',{exact:true});await expect(input).toBeEnabled();await input.fill(move!);await input.press('Enter');}
+  else{const board=page.locator('.chess-layout .board').first();for(const square of [move!.slice(0,2),move!.slice(2,4),...(variant==='duck'?[move!.slice(-2)]:[])])await board.getByRole('button',{name:new RegExp('^'+square+',')}).click();}
+  await expect(page.locator('.queued-moves')).toBeVisible();expect(env.actions).toHaveLength(0);
+  env.room.state=after;env.room.revision++;env.emit('rooms',structuredClone(env.room));
+  await expect.poll(()=>env.actions.some(a=>a.move===move)).toBe(true);await expect(page.locator('.queued-moves')).toHaveCount(0);
+ });
+}

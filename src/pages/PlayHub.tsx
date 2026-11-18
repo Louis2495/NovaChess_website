@@ -20,6 +20,8 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
     [playing, setPlaying] = useState(false),[timeControl,setTimeControl]=useState("180:0");
   const online = opponent === "online";
   if (detail.startsWith("online/")) return <Community />;
+  const speedrunMatch = /^speedrun\/(\d+)$/.exec(detail);
+  if(speedrunMatch)return <Play speedrunElo={Math.max(100,Math.min(3000,Math.round(Number(speedrunMatch[1])/50)*50))}/>;
   if (detail === "resume") return <Play variantsOnly={variants} />;
   return <div className={`play-hub ${variants ? "variants-hub" : "standard-play-hub"} ${playing ? "match-active" : "setup-active"} ${online ? "online-opponent" : "computer-opponent"}`}>
     {!playing && <div className="play-hub-heading">

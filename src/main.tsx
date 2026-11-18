@@ -2,14 +2,14 @@ import {online} from "./lib/online";
 import {screenName} from "./lib/screenName";
 import {useOnlineSession,useRecoveryState} from "./lib/online";
 import AccountPresence from "./components/AccountPresence";
-import JigsawPiece from "./components/JigsawPiece";
-import FrontBinoculars from "./components/FrontBinoculars";
 import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Home,
   Dices,
+  Glasses,
+  Puzzle,
   Swords,
   BookOpen,
   FolderOpen,
@@ -64,12 +64,12 @@ const SignIn = lazy(() => import("./pages/SignIn")),
   Community = lazy(() => import("./pages/Community"));
 const mainNav = [
   { id: "home", label: "Home", icon: Home },
-  { id: "analysis", label: "Analysis", icon: Search },
   { id: "play", label: "Play", icon: Swords },
   { id: "variants", label: "Variants", icon: Dices },
-  { id: "puzzles", label: "Puzzles", icon: JigsawPiece },
+  { id: "analysis", label: "Analysis", icon: Search },
+  { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
-  { id: "research", label: "Research", icon: FrontBinoculars },
+  { id: "research", label: "Research", icon: Glasses },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
   { id: "library", label: "Library", icon: FolderOpen },
 ] as const;
@@ -524,7 +524,6 @@ function App() {
         <div className="site-background" aria-hidden="true" />
         <AccountPresence userId={session?.user.id} />
         <GlobalChat />
-        {authReady && !session && tab !== "signin" && !focusMode && <button className="floating-sign-in btn" onClick={()=>navigate("signin")}>Sign in</button>}
         <a className="skip-link" href="#workspace">
           Skip to workspace
         </a>
@@ -555,6 +554,7 @@ function App() {
             <div id="sidebar-chat" />
           </nav>
           <div className="sidebar-bottom">
+            {authReady && !session && tab !== "signin" && <button className="sidebar-sign-in btn" onClick={()=>navigate("signin")}>Sign in</button>}
             <button
               className="account-stamp"
               onClick={() => navigate("profile")}

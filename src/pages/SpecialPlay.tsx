@@ -123,6 +123,7 @@ export default function SpecialPlay({
         }
       : undefined;
   const premove = usePremoves({
+    variant,
     fen: state.fen,
     side,
     legal,

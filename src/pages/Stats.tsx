@@ -1,4 +1,5 @@
-import { duration, speedrunBests } from "../lib/speedrun";
+import { variantList } from "../lib/variantCatalog";
+import { duration, speedrunBests, throneDuration } from "../lib/speedrun";
 import { online, useOnlineSession } from "../lib/online";
 import { isStudy } from "../lib/library";
 import Rankings from "./Rankings";
@@ -234,14 +235,28 @@ export default function Stats() {
     </div>
   );
 }
-function CompetitionStats() {
- const {library}=useApp(), {session}=useOnlineSession();
+function CompetitionStats({games}: {games:SavedGame[]}) {
+ const {library,navigate}=useApp(), {session}=useOnlineSession();
  const [total,setTotal]=useState(0),[throneGames,setThroneGames]=useState(0),[metric,setMetric]=useState("Time"),[error,setError]=useState("");
  useEffect(()=>{setTotal(0);setThroneGames(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_stats");if(active){setTotal(Number(r.data?.timeMs)||0);setThroneGames(Number(r.data?.games)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id]);
  const bests=new Map(speedrunBests(library.games));
  return <div className="stats-competition-grid">
-  <Card className="throne-stat"><div className="card-heading"><h2><Crown size={21}/>On the Throne</h2><div className="segmented" role="group" aria-label="Throne metric">{["Time","Games"].map(m=><button key={m} aria-pressed={metric===m} className={metric===m?"active":""} onClick={()=>setMetric(m)}>{m}</button>)}</div></div><strong className="competition-total">{metric==="Time" ? duration(total) : throneGames}</strong>{error && <p className="caption">{error}</p>}</Card>
-  <Card className="speedrun-stats"><h2><Timer size={21}/>Speedrun</h2><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating" tabIndex={0}>{Array.from({length:59},(_,i)=>100+i*50).map(elo=>{const game=bests.get(elo);return <div role="listitem" className={`speedrun-rating ${game?"has-record":""}`} key={elo} aria-label={`${elo} Elo: ${game?duration(game.speedrun!.elapsedMs):"No win yet"}`}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs):"—"}</strong></div>;})}</div></Card>
+      <Card className="variant-breakdown-card">
+        <div className="variant-breakdown">
+          <h2>Variant breakdown</h2>
+          {[...new Set(games.map((g) => g.variant))].map((v) => (
+            <Bar
+              key={v}
+              label={variantList.find(variant=>variant.id===v)?.name || ({throne:"Throne",vote:"Vote Chess",team:"Team Chess",speedrun:"Speedrun"} as Record<string,string>)[v] || v}
+              value={games.filter((g) => g.variant === v).length}
+              total={games.length}
+            />
+          ))}
+          {!games.length && <p className="caption">No completed games.</p>}
+        </div>
+      </Card>
+  <Card className="throne-stat"><div className="card-heading"><h2><Crown size={21}/>On the Throne</h2><div className="segmented" role="group" aria-label="Throne metric">{["Time","Games"].map(m=><button key={m} aria-pressed={metric===m} className={metric===m?"active":""} onClick={()=>setMetric(m)}>{m}</button>)}</div></div><strong className="competition-total">{metric==="Time" ? throneDuration(total) : throneGames}</strong>{error && <p className="caption">{error}</p>}</Card>
+  <Card className="speedrun-stats"><h2><Timer size={21}/>Speedrun</h2><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating" tabIndex={0}>{Array.from({length:59},(_,i)=>100+i*50).map(elo=>{const game=bests.get(elo);return <div role="listitem" key={elo}><button type="button" className={`speedrun-rating ${game?"has-record":""}`} aria-label={`Play Speedrun at ${elo} Elo${game?`, best ${duration(game.speedrun!.elapsedMs)}`:""}`} onClick={()=>navigate("play",`speedrun/${elo}`)}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs):"—"}</strong></button></div>;})}</div></Card>
  </div>;
 }
 
@@ -463,21 +478,8 @@ function StatsOverview({
           <div className="color-results-key"><span><i className="outcome-win"/>Wins</span><span><i className="outcome-loss"/>Losses</span><span><i className="outcome-draw"/>Draws</span></div>
         </Card>
       </div>
-      <CompetitionStats />
-      <Card className="variant-breakdown-card">
-        <div className="variant-breakdown">
-          <h2>Variant breakdown</h2>
-          {[...new Set(games.map((g) => g.variant))].map((v) => (
-            <Bar
-              key={v}
-              label={v}
-              value={games.filter((g) => g.variant === v).length}
-              total={games.length}
-            />
-          ))}
-          {!games.length && <p className="caption">No completed games.</p>}
-        </div>
-      </Card>
+      <CompetitionStats games={games} />
+
     </div>
   );
 }
