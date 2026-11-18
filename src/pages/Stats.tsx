@@ -177,7 +177,7 @@ export default function Stats() {
     ),
   ];
   return (
-    <>
+    <div className="stats-page">
       <PageTitle title="Stats" />
       <div className="segmented page-segments">
         {["Overview", "Rankings", "Achievements", "World map"].map((t) => (
@@ -231,7 +231,7 @@ export default function Stats() {
           losses={losses}
         />
       )}
-    </>
+    </div>
   );
 }
 function CompetitionStats() {
@@ -341,7 +341,7 @@ function StatsOverview({
               aria-label={`${wins} wins, ${draws} draws, ${losses} losses`}
               style={{
                 background: games.length
-                  ? `conic-gradient(#39ed83 0% ${winStop}%, #e1e7ed ${winStop}% ${drawStop}%, #ff5364 ${drawStop}% 100%)`
+                  ? `conic-gradient(var(--stat-win) 0% ${winStop}%, var(--stat-draw) ${winStop}% ${drawStop}%, var(--stat-loss) ${drawStop}% 100%)`
                   : "var(--border)",
               }}
             >
@@ -352,9 +352,9 @@ function StatsOverview({
             </div>
             <div className="results-legend">
               {[
-                ["Wins", wins, "#39ed83"],
-                ["Draws", draws, "#e1e7ed"],
-                ["Losses", losses, "#ff5364"],
+                ["Wins", wins, "var(--stat-win)"],
+                ["Draws", draws, "var(--stat-draw)"],
+                ["Losses", losses, "var(--stat-loss)"],
               ].map(([label, value, color]) => (
                 <div key={label}>
                   <i style={{ background: String(color) }} />

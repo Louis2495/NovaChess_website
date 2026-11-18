@@ -4737,69 +4737,77 @@ html { scrollbar-gutter:stable; }
 }
 .quick-online-play:has(+ .variant-gallery) { padding:0; border:0; background:transparent; box-shadow:none; margin:8px auto 16px; }
 
-/* Saturated, polished Stats surfaces with a consistent visual hierarchy. */
-.stats-overview { margin-top:18px; }
-.stats-overview .stats-metrics { gap:14px; margin-bottom:20px; padding:0; }
-.stats-overview .stats-metrics > div { position:relative; padding:20px; gap:20px; border:1px solid #ffffff66; border-radius:20px; color:#fff; box-shadow:inset 0 2px 0 #ffffff70,0 9px 24px #071b3a30; background-image:linear-gradient(125deg,#ffffff40,transparent 65%); }
-.stats-overview .stats-metrics > div:nth-child(1) { background-color:#087deb; color:#fff; border-top-color:#9bdcff; }
-.stats-overview .stats-metrics > div:nth-child(2) { background-color:#4c47d8; color:#fff; border-top-color:#c4c1ff; }
-.stats-overview .stats-metrics > div:nth-child(3) { background-color:#a32fe0; color:#fff; border-top-color:#edb1ff; }
-.stats-overview .stats-metrics > div:nth-child(4) { background-color:#ed6718; color:#fff; border-top-color:#ffe2a4; }
-.stats-overview .stats-metrics b { font-size:clamp(2.1rem,3.5vw,3.2rem); font-weight:900; letter-spacing:-.04em; text-shadow:0 2px 0 #0002; }
-.stats-overview .stat-metric-label { font-size:.8rem; gap:10px; }
-.stats-overview .stat-metric-label svg { width:30px; height:30px; padding:6px; border-radius:10px; background:#ffffff29; stroke-width:2.5; }
-.stats-overview .card { border:1px solid #ffffff3b; border-radius:20px; box-shadow:inset 0 1px 0 #ffffff50,0 10px 26px #071b3a26; }
-.stats-overview h2 { font-size:1.2rem; letter-spacing:0; }
-.stats-overview .stats-visual-grid { grid-template-columns:minmax(0,.95fr) minmax(0,1.2fr); gap:20px; margin-top:20px; }
-.stats-overview .results-card { background:linear-gradient(140deg,#285391,#142c52); border-top:3px solid #66c3ff; }
-.stats-overview .activity-card { background:linear-gradient(135deg,#087f91,#08435b); border-top:3px solid #40ffe0; }
-.stats-overview .results-content { gap:24px; justify-content:space-between; margin-top:24px; }
-.stats-overview .results-ring { width:170px; height:170px; box-shadow:0 0 0 5px #ffffff12,0 8px 22px #0004; }
-.stats-overview .results-ring > div { width:132px; height:132px; background:linear-gradient(145deg,#244f85,#142c52); }
-.stats-overview .results-ring strong { color:#fff; font-size:2.2rem; font-weight:900; }
-.stats-overview .results-ring > div > span,.stats-overview .results-legend > div { color:#e2f3ff; }
-.stats-overview .results-legend { gap:14px; }
-.stats-overview .results-legend > div { padding:9px 10px; border-radius:10px; background:#ffffff0e; }
-.stats-overview .results-legend i { width:10px; height:10px; border-radius:50%; }
-.stats-overview .results-legend b { color:#fff; font-size:1.15rem; }
+/* Stats: quiet surfaces, readable figures, and a few playful accents. */
+.stats-page { --stat-win:#86cbb5; --stat-draw:#8296ab; --stat-loss:#d38e95; }
+.stats-page .page-segments { width:fit-content; max-width:100%; padding:5px; border:1px solid var(--border); border-radius:14px; background:var(--panel); margin-bottom:24px; }
+.stats-page .page-segments button { border-radius:10px; padding:10px 18px; color:var(--muted); }
+.stats-page .segmented.page-segments > button.active { background:var(--accent-soft); color:var(--accent); box-shadow:none; border-color:transparent; }
+.stats-overview { margin-top:0; }
+.stats-overview .stats-metrics { gap:16px; margin:0 0 24px; padding:0; }
+.stats-overview .stats-metrics > div:nth-child(n) { --metric-accent:#9ec5eb; display:flex; flex-direction:column; align-items:flex-start; gap:18px; padding:22px 24px; border:1px solid var(--border); border-radius:16px; background:color-mix(in srgb,var(--panel-solid) 96%,var(--metric-accent)); color:var(--text); box-shadow:none; }
+.stats-overview .stats-metrics > div:nth-child(2) { --metric-accent:#c0ade4; }
+.stats-overview .stats-metrics > div:nth-child(3) { --metric-accent:#8dceb6; }
+.stats-overview .stats-metrics > div:nth-child(4) { --metric-accent:#e3bd86; }
+.stats-overview .stats-metrics b { font-size:clamp(1.9rem,2.6vw,2.7rem); font-weight:700; letter-spacing:-.04em; text-shadow:none; font-variant-numeric:tabular-nums; }
+.stats-overview .stats-metrics .stat-metric-label { font-size:.8rem; gap:10px; color:var(--muted); font-weight:500; font-family:inherit; }
+.stats-overview .stat-metric-label svg { width:32px; height:32px; padding:7px; border-radius:10px; color:var(--metric-accent); background:color-mix(in srgb,var(--metric-accent) 12%,transparent); stroke-width:2; }
+.stats-overview .card { background:var(--panel); color:var(--text); border:1px solid var(--border); border-radius:18px; box-shadow:none; padding:24px; }
+.stats-overview h2 { font-size:1.05rem; font-weight:650; letter-spacing:-.015em; color:var(--text); }
+.stats-overview h2 svg,.stats-overview .card-heading > svg { color:var(--accent); }
+.stats-overview .stats-visual-grid { grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr); gap:20px; margin-top:0; }
+.stats-overview .results-content { gap:24px; margin-top:24px; justify-content:space-around; }
+.stats-overview .results-ring { width:158px; height:158px; box-shadow:none; flex:none; }
+.stats-overview .results-ring > div { width:132px; height:132px; background:var(--panel-solid); }
+.stats-overview .results-ring strong { font-size:2rem; font-weight:700; color:var(--text); }
+.stats-overview .results-ring > div > span { color:var(--muted); font-size:.75rem; }
+.stats-overview .results-legend { gap:16px; min-width:130px; }
+.stats-overview .results-legend > div { color:var(--muted); padding:0; background:none; }
+.stats-overview .results-legend i { width:8px; height:8px; border-radius:50%; }
+.stats-overview .results-legend b { color:var(--text); font-size:1rem; font-weight:650; }
 .stats-overview .activity-chart { margin-top:24px; }
-.stats-overview .activity-track { border-radius:10px; background:#001e3650; box-shadow:inset 0 1px 4px #0002; }
-.stats-overview .activity-track > span { border-radius:10px 10px 5px 5px; background:linear-gradient(90deg,#00cba8,#6dffe3 50%,#00c6ab); box-shadow:inset 0 2px 0 #c6fff6; }
-.stats-overview .activity-day small,.stats-overview .activity-empty { color:#dcfff7; }
-.stats-overview .activity-range select,.stats-overview .activity-range input { background:#003446; color:#e9fffb; border-color:#63d7db; }
-.stats-overview .stats-detail-grid { gap:20px; margin-top:20px; }
-.stats-overview .training-stat { background:linear-gradient(130deg,#daef54,#9dc431); border-top:3px solid #f5ffb2; color:#203512; }
-.stats-overview .training-stat h2,.stats-overview .training-stat .stat-bar span,.stats-overview .training-stat .stat-bar b,.stats-overview .stats-training-footer { color:#203512; }
-.stats-overview .training-stat .stat-bar > div { background:#476b2a30; }
-.stats-overview .training-stat .stat-bar i { background:linear-gradient(90deg,#456b19,#729518); box-shadow:inset 0 1px 0 #b6d875; }
-.stats-overview .playing-color-stat { background:linear-gradient(135deg,#435e92,#243a65); border-top:3px solid #b0c7ff; color:#fff; }
-.stats-overview .playing-color-label,.stats-overview .color-results-key { color:#edf4ff; }
-.stats-overview .playing-color-stack { height:32px; box-shadow:inset 0 1px 4px #0003; }
-.stats-overview .stats-competition-grid { gap:20px; margin-top:20px; }
-.stats-overview .throne-stat { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px 20px; padding:24px; background:linear-gradient(125deg,#ffe889,#ffc62f 65%,#f3ac08); color:#4a3005; border-top:3px solid #fff5be; }
+.stats-overview .activity-track { background:color-mix(in srgb,var(--base) 50%,transparent); border-radius:6px; box-shadow:none; }
+.stats-overview .activity-track > span { background:var(--stat-win); border-radius:6px 6px 2px 2px; box-shadow:none; }
+.stats-overview .activity-day small,.stats-overview .activity-empty { color:var(--muted); }
+.stats-overview .activity-range select,.stats-overview .activity-range input { background:var(--input); color:var(--text); border-color:var(--border); border-radius:10px; }
+.stats-overview .stats-detail-grid,.stats-overview .stats-competition-grid { gap:20px; margin-top:20px; }
+.stats-overview .training-stat .stat-bar span,.stats-overview .training-stat .stat-bar b { color:var(--text); }
+.stats-overview .stat-bar > div { height:7px; background:var(--input); }
+.stats-overview .stat-bar i { background:var(--accent); box-shadow:none; }
+.stats-overview .stats-training-footer,.stats-overview .playing-color-label,.stats-overview .color-results-key { color:var(--muted); }
+.stats-overview .playing-color-stack { height:24px; box-shadow:none; background:var(--input); border-radius:6px; }
+.stats-overview .outcome-win { background:var(--stat-win); color:#153b30; }
+.stats-overview .outcome-loss { background:var(--stat-loss); color:#3e1b22; }
+.stats-overview .outcome-draw { background:var(--stat-draw); color:#172e40; }
+.stats-overview .throne-stat { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px 20px; }
 .stats-overview .throne-stat .card-heading { display:contents; }
-.stats-overview .throne-stat h2 { grid-column:1; grid-row:1; margin:0; color:#4a3005; }
-.stats-overview .throne-stat .segmented { grid-column:2; grid-row:1/3; align-self:center; border-color:#90621166; background:#fff6; }
-.stats-overview .throne-stat .competition-total { grid-column:1; grid-row:2; font-size:2.5rem; font-weight:900; text-shadow:0 2px 0 #fff7; }
-.stats-overview .throne-stat .segmented button { color:#493103; }
-.stats-overview .throne-stat .segmented button.active { background:#664304; color:#fff; box-shadow:inset 0 1px 0 #ffffff4d; }
-.stats-overview .speedrun-stats { background:linear-gradient(125deg,#6df4ff,#16d2ed 75%,#05b7d4); color:#073f53; border-top:3px solid #c5ffff; }
-.stats-overview .speedrun-stats h2 { color:#073f53; }
-.stats-overview .speedrun-rating { background:#05677e; color:#edffff; border-color:#a0f7ff88; box-shadow:inset 0 1px 0 #ffffff50; padding-block:14px; }
-.stats-overview .speedrun-rating.has-record { background:#fff; color:#034c64; border-color:#087d94; box-shadow:0 4px 10px #00677e33; }
-.stats-overview .variant-breakdown-card { margin-top:20px; background:linear-gradient(140deg,#334c74,#223653); border-top:3px solid #8ca6d6; }
-.stats-overview .variant-breakdown summary { color:#edf4ff; font-weight:800; }
-@media(max-width:1100px){ .stats-overview .results-content { gap:16px; flex-wrap:wrap; justify-content:center; }.stats-overview .results-legend { min-width:130px; } }
-@media(max-width:760px){
+.stats-overview .throne-stat h2 { grid-column:1; grid-row:1; margin:0; }
+.stats-overview .throne-stat h2 svg { color:#e3bd86; }
+.stats-overview .throne-stat .segmented { grid-column:2; grid-row:1/3; align-self:center; background:var(--input); border-color:var(--border); }
+.stats-overview .throne-stat .competition-total { grid-column:1; grid-row:2; font-size:2rem; font-weight:700; text-shadow:none; font-variant-numeric:tabular-nums; }
+.stats-overview .throne-stat .segmented button { color:var(--muted); }
+.stats-overview .throne-stat .segmented button.active { background:var(--button); color:var(--button-text); box-shadow:none; }
+.stats-overview .speedrun-stats h2 { font-weight:650; }
+.stats-overview .speedrun-rating { background:var(--input); color:var(--muted); border:1px solid var(--border); border-radius:10px; box-shadow:none; padding:12px; }
+.stats-overview .speedrun-rating strong { font-weight:600; }
+.stats-overview .speedrun-rating.has-record { background:var(--accent-soft); color:var(--accent); border-color:color-mix(in srgb,var(--accent) 40%,var(--border)); box-shadow:none; }
+.stats-overview .variant-breakdown-card { margin-top:20px; }
+.stats-overview .variant-breakdown { border:0; padding:0; margin:0; }
+.stats-overview .variant-breakdown summary { color:var(--text); font-weight:600; }
+.stats-page .achievement { background:var(--panel); border:1px solid var(--border); box-shadow:none; }
+.stats-page .achievement-icon { color:var(--muted); background:var(--input); }
+.stats-page .achievement.unlocked .achievement-icon { color:#e3bd86; background:#e3bd8618; }
+@media(max-width:1100px) { .stats-overview .results-content { flex-wrap:wrap; justify-content:center; } }
+@media(max-width:760px) {
+ .stats-page .page-segments { width:100%; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .stats-page .page-segments button { padding:9px 10px; }
  .stats-overview .stats-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
- .stats-overview .stats-metrics > div { padding:16px; gap:14px; }
- .stats-overview .stat-metric-label { font-size:.72rem; gap:6px; }
+ .stats-overview .stats-metrics > div { padding:16px; gap:12px; }
+ .stats-overview .stat-metric-label { font-size:.72rem; gap:7px; }
  .stats-overview .stats-visual-grid,.stats-overview .stats-detail-grid { grid-template-columns:1fr; }
- .stats-overview .results-content { flex-wrap:nowrap; }
- .stats-overview .results-ring { width:150px; height:150px; }.stats-overview .results-ring > div { width:116px; height:116px; }
- .stats-overview .results-legend { min-width:0; }
- .stats-overview .throne-stat { padding:20px; gap:8px; }
- .stats-overview .throne-stat .segmented button { padding:7px 9px; }
+ .stats-overview .card { padding:20px; }
+ .stats-overview .results-content { flex-wrap:nowrap; gap:20px; }
+ .stats-overview .results-legend { min-width:100px; }
+ .stats-overview .throne-stat { gap:10px; }
 }
 
 /* Keep the welcome illustration genuinely transparent and let each meme set its frame. */
@@ -4820,12 +4828,6 @@ html { scrollbar-gutter:stable; }
 .home-recent { margin-top:24px; }
 @media(max-width:1000px){ .home-practice-grid .daily-meme { width:100%; max-width:560px; justify-self:center; border-radius:14px; }.home-practice-grid .daily-meme-image { border:0; border-radius:0; } }
 @media(max-width:600px){ .home-page .home-welcome { grid-template-columns:94px minmax(0,1fr); gap:14px; min-height:110px; margin-bottom:18px; }.home-welcome-art .home-team-cutout { width:94px; }.home-welcome .new-game-primary { min-height:68px; } }
-.stats-overview .stats-metrics > div:nth-child(n) { background-image:linear-gradient(125deg,#ffffff26,transparent 65%); }
-.stats-overview .stats-metrics > div:nth-child(1) { background-color:#0865cc; }
-.stats-overview .stats-metrics > div:nth-child(4) { background-color:#ff8f24; color:#3b1d04; }
-.stats-overview .throne-stat h2 svg,.stats-overview .training-stat .card-heading > svg { color:inherit; }
-.stats-overview .variant-breakdown-card .variant-breakdown { border:0; padding:0; margin:0; }
-
 /* Page names belong in navigation; keep only useful page-level tools. */
 .page-title.page-title-compact { display:flex; align-items:center; flex-wrap:wrap; gap:10px; min-height:0; margin:0 0 10px; }
 .page-title.page-title-empty { display:block; height:0; margin:0; padding:0; }
