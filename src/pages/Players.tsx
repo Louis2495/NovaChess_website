@@ -22,7 +22,7 @@ export default function Players(){
  {list.error&&<p role="alert">{list.error}</p>}{requests.error&&section==='friends'&&<p role="alert">{requests.error}</p>}
  <h2>{section==='friends'?'Your friends':'Everyone'}</h2>
  {list.loading?<p role="status">Loading players…</p>:list.players.length?<div className="player-grid">{list.players.map(row)}</div>:<Card><p>{query?'No players match your search.':section==='friends'?'No friends yet. Find someone in Everyone to send a request.':'No players found.'}</p></Card>}
- <div className="button-row players-pagination"><Button className="secondary" disabled={page===0||list.loading} onClick={()=>setPage(n=>n-1)}>Previous</Button><span>Page {page+1}</span><Button className="secondary" disabled={list.players.length<50||list.loading} onClick={()=>setPage(n=>n+1)}>Next</Button></div>
+ {section==='everyone'&&<div className="button-row players-pagination"><Button className="secondary" disabled={page===0||list.loading} onClick={()=>setPage(n=>n-1)}>Previous</Button><span>Page {page+1}</span><Button className="secondary" disabled={list.players.length<50||list.loading} onClick={()=>setPage(n=>n+1)}>Next</Button></div>}
  </>}
  </div>;
 }

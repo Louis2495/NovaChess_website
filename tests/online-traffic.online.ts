@@ -227,8 +227,8 @@ test('online clocks align right, identities align left and actions sit in the ri
 });
 
 test('Play a Friend chooses an accepted friend and creates a reserved game without matchmaking',async({page})=>{
- const env=await connected(page);await page.route('**/rest/v1/rpc/player_directory',r=>r.fulfill({json:[{id:peer,screen_name:'Chess buddy',rating:1400,relationship:'friends',online:true}]}));await page.goto('/#play');const friendButton=page.getByRole('button',{name:'Play a Friend',exact:true}),start=page.getByRole('button',{name:'Start',exact:true});await expect(friendButton).toBeEnabled();await expect(start).toBeVisible();const f=(await friendButton.boundingBox())!,s=(await start.boundingBox())!;expect(f.y+f.height).toBeLessThan(s.y);await friendButton.click();await page.getByRole('dialog').getByRole('button',{name:/Chess buddy/}).click();
- await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',bot:false,friend:peer});expect(env.requests.some(u=>u.pathname.endsWith('/room_lobby'))).toBe(false);
+ const env=await connected(page);await page.route('**/rest/v1/rpc/player_directory',r=>r.fulfill({json:[{id:peer,screen_name:'Chess buddy',rating:1400,relationship:'friends',online:true}]}));await page.goto('/#play');const friendButton=page.getByRole('button',{name:'Play a Friend',exact:true}),start=page.getByRole('button',{name:'Start',exact:true});await expect(friendButton).toBeEnabled();await expect(start).toBeVisible();const f=(await friendButton.boundingBox())!,s=(await start.boundingBox())!;expect(f.y+f.height).toBeLessThan(s.y);await friendButton.click();await page.getByRole('dialog').getByRole('button',{name:/Chess buddy/}).click();await expect(page.getByText('Selected friend:',{exact:false})).toContainText('Chess buddy');expect(env.actions).toHaveLength(0);await expect(page).toHaveURL(/#play$/);await page.getByRole('group',{name:'Time control',exact:true}).getByRole('button',{name:'5',exact:true}).click();await expect(page.getByText('Selected friend:',{exact:false})).toContainText('Chess buddy');await start.click();
+ await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',bot:false,friend:peer,timeControlSeconds:300});expect(env.requests.some(u=>u.pathname.endsWith('/room_lobby'))).toBe(false);
 });
 
 test('finished game has a sad king, paired notation, review and outside-board dismissal',async({page})=>{
@@ -333,4 +333,12 @@ test('Players directory searches, sends requests, accepts incoming requests and 
 test('game invitations can be accepted from another page',async({page})=>{
  const env=await connected(page);let pending=true;await page.route('**/rest/v1/rpc/friend_game_invitations',r=>r.fulfill({json:pending?[{id:'invite-test',room_id:roomId,screen_name:'Chess buddy',name:'Friendly game',variant:'chess',time_control:180}]:[]}));await page.route('**/rest/v1/rpc/respond_friend_game',async r=>{expect(r.request().postDataJSON()).toEqual({p_invite:'invite-test',p_accept:true});pending=false;await r.fulfill({json:null});});
  await page.goto('/#stats');await page.getByRole('button',{name:'Accept game',exact:true}).click();await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'join',room:roomId});
+});
+
+test('Friends loads beyond fifty people without pagination controls',async({page})=>{
+ await connected(page);const friends=Array.from({length:51},(_,i)=>({id:`00000000-0000-4000-8000-${String(i+100).padStart(12,'0')}`,screen_name:`Friend ${i+1}`,rating:1200,relationship:'friends',online:false}));
+ await page.route('**/rest/v1/rpc/player_directory',async r=>{const body=r.request().postDataJSON();await r.fulfill({json:body.p_section==='requests'?[]:friends.slice(body.p_page*50,body.p_page*50+50)});});
+ await page.goto('/#players');await expect(page.getByRole('heading',{name:'Friend 51',exact:true})).toBeVisible();await expect(page.locator('.players-pagination')).toHaveCount(0);
+ await page.getByRole('button',{name:'Everyone',exact:true}).click();await expect(page.locator('.players-pagination')).toBeVisible();
+ await page.goto('/#play');await page.getByRole('button',{name:'Play a Friend',exact:true}).click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:/^Friend 51 /})).toBeVisible();await expect(dialog.getByRole('button',{name:'Previous',exact:true})).toHaveCount(0);await expect(dialog.getByRole('button',{name:'Next',exact:true})).toHaveCount(0);
 });

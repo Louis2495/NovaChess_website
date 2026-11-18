@@ -35,7 +35,7 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
     </div>}
 
 
-    {online ? <Community key={variants ? mode : "standard"+timeControl}
+    {online ? <Community key={variants ? mode : "standard"}
       timeControlSeconds={+timeControl.split(":")[0]} incrementSeconds={+timeControl.split(":")[1]}
       presetMode={variants && teamModes.includes(mode) ? mode : "standard"}
       presetVariant={variants && !teamModes.includes(mode) ? mode : "chess"}>

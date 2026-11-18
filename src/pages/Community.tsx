@@ -1,5 +1,6 @@
 import type { SavedGame } from "../lib/types";
 import type {ReactNode} from "react";
+import type {Player} from "../lib/players";
 import FriendPicker from "../components/FriendPicker";
 import MultiplayerPicture from "../components/MultiplayerPicture";
 import VariantIcon from "../components/VariantIcon";
@@ -288,7 +289,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {!members.length && !(side === "b" && room.settings.bot) && <b>Waiting for opponent</b>}</div>
     </div>;
   }
-  const [choosingFriend,setChoosingFriend]=useState(false);
+  const [choosingFriend,setChoosingFriend]=useState(false),[selectedFriend,setSelectedFriend]=useState<Player|null>(null);
   async function inviteFriends(friend:string) {
     setBusy(true); setError("");
     try {
@@ -305,7 +306,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
     : variantList.find(v => v.id === variant)?.description;
   return (
     <>
-      {choosingFriend && <FriendPicker onClose={()=>setChoosingFriend(false)} onChoose={inviteFriends} busy={busy}/>}
+      {choosingFriend && <FriendPicker onClose={()=>setChoosingFriend(false)} onChoose={player=>{setSelectedFriend(player);setChoosingFriend(false);}} busy={busy}/>}
       {!room && tab === "community" && <PageTitle title="Play" />}
       {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div></div>}
       {!online || !uid ? (
@@ -552,7 +553,9 @@ export default function Community({presetMode = "standard", presetVariant = "che
             <Card className="quick-online-play">
               {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>setBot(e.target.value==="bot")}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
               {mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled={busy} onClick={() => setChoosingFriend(true)}><Users size={16}/>Play a Friend</Button>}
+              {selectedFriend && <div className="selected-friend-opponent"><span>Selected friend: <strong>{screenName(selectedFriend)}</strong></span><Button className="text-button" disabled={busy} onClick={()=>setSelectedFriend(null)}>Play online instead</Button></div>}
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
+                if(selectedFriend){await inviteFriends(selectedFriend.id);return;}
                 setBusy(true);setError("");
                 try {
                   const listing=online!.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at,time_control,increment_seconds").eq("mode",mode).eq("variant",variant).order("status",{ascending:true}).order("updated_at",{ascending:true}).limit(40);
