@@ -277,7 +277,7 @@ test('admin accounts show recent online status and separate hash/reset actions',
  await page.goto('/#profile/admin');await beat;
  await expect(page.getByText('The account must already exist and have a confirmed email.',{exact:true})).toHaveCount(0);
  await expect(page.getByText('Administrator email',{exact:true})).toHaveCount(0);await expect(page.getByLabel('Administrator email',{exact:true})).toBeVisible();
- await expect(page.getByLabel('Account activity totals',{exact:true})).toHaveText('8 online | 43 offline');
+ await expect(page.getByLabel('Account activity totals',{exact:true}).locator('span')).toHaveText(['8 online','43 offline']);
  const active=page.getByRole('row').filter({hasText:'Active player'}),away=page.getByRole('row').filter({hasText:'Away player'});
  await expect(active.getByRole('img',{name:'Online',exact:true})).toHaveCSS('background-color','rgb(99, 220, 155)');
  await expect(away.getByRole('img',{name:'Offline',exact:true})).toHaveCSS('background-color','rgb(239, 119, 125)');

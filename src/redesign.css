@@ -5181,7 +5181,7 @@ html { scrollbar-gutter:stable; }
 .account-status-dot.online { background:#63dc9b; }
 .account-status-dot.offline { background:#ef777d; }
 .admin-password-actions { display:flex; align-items:center; gap:20px; }
-.admin-presence-counts { margin:0 0 18px; font-size:.85rem; color:var(--muted); }
+.admin-presence-counts { display:flex; flex-direction:column; gap:4px; margin:0 0 18px; font-size:.85rem; color:var(--muted); }
 .admin-presence-counts > span:first-child { color:#63dc9b; }
 .admin-presence-counts > span:last-child { color:#ef777d; }
 
