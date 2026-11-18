@@ -5081,7 +5081,7 @@ html { scrollbar-gutter:stable; }
 .analysis-engine-label { margin:0; color:var(--muted); font-size:.78rem; line-height:1.5; }
 .analysis-summary-row .analysis-tools-menu { margin:0; }
 @media(min-width:1001px) {
- .standard-play-hub.setup-active > .play-hub-heading { top:calc(50dvh - 209px); gap:12px; }
+ .standard-play-hub.setup-active > .play-hub-heading { top:calc(50dvh - 227px); gap:18px; }
 }
 @media(max-width:600px) {
  .analysis-summary-row { grid-template-columns:auto minmax(0,1fr); gap:12px; }
@@ -5090,7 +5090,7 @@ html { scrollbar-gutter:stable; }
 }
 .analysis-layout .engine-line th { white-space:nowrap; }
 @media(max-width:1000px) {
- .standard-play-hub > .play-hub-heading { margin-bottom:28px; }
+ .standard-play-hub > .play-hub-heading { margin-bottom:40px; gap:18px; }
  .standard-play-hub > .quick-online-play { margin-top:0; padding-top:0; }
  .standard-play-hub > .quick-online-play .new-game-primary { margin-top:0; }
 }
