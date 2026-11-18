@@ -388,14 +388,18 @@ export function Board({
           const style = getComputedStyle(workspace);
           const right = parseFloat(style.paddingRight);
           const availableWidth = workspace.clientWidth - parseFloat(style.paddingLeft) - right;
-          // Reserve equal columns on either side of the board so the board
-          // itself stays centered, independently of the right-hand controls.
+          // Center the actual board in the page, including the space occupied
+          // by the sidebar, and keep the right controls independent of it.
           const gap = 24;
           const preferredBoardWidth = requestedBoardSize.current ?? heightLimit;
           const panelWidth = Math.max(layout.classList.contains("daily-puzzle-layout") ? 240 : 150, (availableWidth - preferredBoardWidth - gap * 2) / 2);
-          const boardWidth = Math.min(preferredBoardWidth, availableWidth - (panelWidth + gap) * 2);
+          const layoutRect=layout.getBoundingClientRect();
+          const pageCenter=document.documentElement.clientWidth/2;
+          const centerOffset=layoutRect.left+layoutRect.width/2-pageCenter;
+          const boardWidth = Math.max(80,Math.min(preferredBoardWidth, availableWidth - (panelWidth + gap) * 2,2*(pageCenter-layoutRect.left)));
           for (const [name, value] of Object.entries({
             "--puzzle-board-width": boardWidth,
+            "--puzzle-center-offset": centerOffset,
             "--puzzle-panel-width": panelWidth,
             "--puzzle-panel-gap": gap,
             "--puzzle-end-padding": 0,

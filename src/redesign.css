@@ -5258,7 +5258,10 @@ html { scrollbar-gutter:stable; }
  .daily-puzzle-layout > .side-panels { grid-column:2; padding-top:22px; width:100%; }
 }
 @media(min-width:1001px) {
- .workspace .puzzle-layout { grid-template-columns:minmax(0,1fr) minmax(0,var(--puzzle-board-width,var(--board-max))) minmax(0,1fr); gap:0; padding-right:0; }
+ .workspace .chess-layout.puzzle-layout { grid-template-columns:minmax(0,max(0px,calc((100% - var(--puzzle-board-width,var(--board-max))) / 2 - var(--puzzle-center-offset,0px)))) minmax(0,var(--puzzle-board-width,var(--board-max))) minmax(0,1fr); gap:0; padding-right:0; }
  .puzzle-layout > .board-column { grid-column:2; grid-row:1; }
  .workspace .puzzle-layout > .side-panels { grid-column:3; width:calc(100% - 24px); max-width:320px; justify-self:center; min-width:0; }
 }
+
+.puzzle-layout .board-frame { margin-inline:auto; }
+.daily-puzzle-layout .puzzle-actions-right { margin-inline:auto; }
