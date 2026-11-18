@@ -5188,11 +5188,11 @@ html { scrollbar-gutter:stable; }
 [data-nav="analysis"] { --nav-color:#f8efd6; }
 [data-nav="play"] { --nav-color:#49df83; }
 [data-nav="variants"] { --nav-color:#ff9c43; }
-[data-nav="puzzles"] { --nav-color:#ff6868; }
-[data-nav="learn"] { --nav-color:#479fff; }
-[data-nav="research"] { --nav-color:#f66fce; }
-[data-nav="stats"] { --nav-color:#a47bff; }
-[data-nav="library"] { --nav-color:#45deef; }
+[data-nav="puzzles"] { --nav-color:#479fff; }
+[data-nav="learn"] { --nav-color:#f66fce; }
+[data-nav="research"] { --nav-color:#45deef; }
+[data-nav="stats"] { --nav-color:#ff6868; }
+[data-nav="library"] { --nav-color:#a47bff; }
 .sidebar nav #sidebar-chat button { --nav-color:#aab4c2; }
 .sidebar nav button { gap:11px; color:var(--text); }
 .sidebar nav button > svg {
