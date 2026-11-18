@@ -57,11 +57,10 @@ export function PageTitle({
   subtitle?: string;
   children?: ReactNode;
 }) {
-  const compact = ["Home", "Analysis", "Puzzles", "Learn", "Research", "Stats", "Library"].includes(title);
   return (
-    <div className={`page-title${compact ? " page-title-compact" : ""}${compact && !subtitle && !children ? " page-title-empty" : ""}`}>
+    <div className="page-title">
       <div>
-        <h1 className={compact ? "sr-only" : undefined}>{title}</h1>
+        <h1>{title}</h1>
         {subtitle && <p>{subtitle}</p>}
       </div>
       <div className="title-actions">{children}</div>

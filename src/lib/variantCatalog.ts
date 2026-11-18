@@ -111,11 +111,3 @@ export function chess960() {
     .join("");
   return `${rank.toLowerCase()}/pppppppp/8/8/8/8/PPPPPPPP/${rank} w ${rights}${rights.toLowerCase()} - 0 1`;
 }
-
-export function variantDescription(id: string) {
-  if (id === "throne") return "Winner stays. Queue to challenge.";
-  if (id === "vote") return "One day per move, Most voted move is played.";
-  if (id === "team") return "Invite friends to your side. Anyone can move.";
-  if (id === "speedrun") return "Beat the computer to climb in 50-point rating steps.";
-  return variantList.find(variant => variant.id === id)?.description || "";
-}

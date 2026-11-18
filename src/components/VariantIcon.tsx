@@ -28,7 +28,6 @@ export default function VariantIcon({
   id: string;
   size?: number;
 }) {
-  const standalone = id === "horde" || id === "bughouse";
   const index = Math.max(0, tiles.indexOf(id));
   return (
     <span
@@ -37,10 +36,10 @@ export default function VariantIcon({
       style={
         {
           "--variant-size": `${size}px`,
-          backgroundImage: `url("${base}variants/${id === "bughouse" ? "bughouse.png" : id === "horde" ? "horde.webp" : "illustrations.webp"}")`,
-          backgroundSize: standalone ? "100% 100%" : undefined,
+          backgroundImage: `url("${base}variants/${id === "horde" ? "horde.webp" : "illustrations.webp"}")`,
+          backgroundSize: id === "horde" ? "100% 100%" : undefined,
           backgroundPosition:
-            standalone
+            id === "horde"
               ? "center"
               : `${(index % 6) * 20}% ${Math.floor(index / 6) * 50}%`,
         } as CSSProperties

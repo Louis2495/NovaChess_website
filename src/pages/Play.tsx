@@ -648,7 +648,6 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
               >
                 {v.id==="speedrun"?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={v.id} size={160} />}
                 <span>{v.name}</span>
-                <small className="variant-description">{v.description || "Beat the computer to climb in 50-point rating steps."}</small>
               </button>
             ))}
 
