@@ -5079,7 +5079,6 @@ html { scrollbar-gutter:stable; }
 @media(min-width:1001px) {
  /* Reserve stable space so engine updates never move the board mid-gesture. */
  .analysis-layout .engine-line { height:280px; overflow:auto; }
- .analysis-layout .positional-insights { height:250px; overflow:auto; }
 }
 @media(max-width:1000px) {
  .workspace:has(> [data-research-view]:not([hidden])) { padding-bottom:100px; }
@@ -5199,8 +5198,8 @@ html { scrollbar-gutter:stable; }
 .sidebar nav button { gap:11px; color:var(--text); }
 .sidebar nav button > svg {
  width:32px; height:32px; padding:6px; box-sizing:border-box; flex:none;
- color:var(--nav-color,var(--accent)); stroke-width:2.4;
- background:color-mix(in srgb,var(--nav-color,var(--accent)) 17%,transparent);
+ color:#172d3e; stroke-width:2.4;
+ background:var(--nav-color,var(--accent));
  border-radius:9px;
 }
 .sidebar nav button:hover { background:color-mix(in srgb,var(--nav-color,var(--accent)) 12%,transparent); }
@@ -5213,3 +5212,9 @@ html { scrollbar-gutter:stable; }
 .sidebar nav button.active > svg { background:var(--nav-color,var(--accent)); color:#172d3e; }
 .mobile-tabs button > svg { color:var(--nav-color,var(--accent)); stroke-width:2.4; }
 @media(max-height:750px) { .sidebar nav button > svg { width:26px; height:26px; padding:4px; border-radius:7px; } }
+
+/* Insights reserve only two text lines and grow naturally with their content. */
+.analysis-layout .positional-insights { height:auto; overflow:visible; }
+.analysis-layout .positional-insights .insights { min-height:2lh; line-height:1.5; }
+.analysis-layout .positional-insights .insights p { margin:6px 0 0; }
+.analysis-layout .positional-insights .insights p:first-child { margin-top:0; }
