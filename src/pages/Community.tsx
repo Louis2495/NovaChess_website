@@ -250,13 +250,18 @@ export default function Community({presetMode = "standard", presetVariant = "che
     const key=room.id+':'+room.revision;if((timeoutRequested.current.key===key && Date.now()-timeoutRequested.current.at<2000) || pending.current)return;timeoutRequested.current={key,at:Date.now()};
     void act('claim_timeout');
   },[clock,room?.revision,gameClock?.startedAt]);
+  const selectedDescription = mode === "throne" ? "Winner stays. Queue to challenge."
+    : mode === "vote" ? "One day per move. Earliest vote breaks a tie."
+    : mode === "team" ? "Invite friends to your side. Share moves and arrows."
+    : variant === "speedrun" ? "Beat the computer to climb in 50-point rating steps."
+    : variantList.find(v => v.id === variant)?.description;
   return (
     <>
       {!room && tab === "community" && <PageTitle title="Play" />}
       {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div><Button className="secondary" onClick={()=>navigate(room.mode==='standard' && room.variant==='chess'?'play':'variants')}>Back</Button></div>}
       {!online || !uid ? (
         <>
-          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button></Card>
+          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>{selectedDescription && <p className="caption">{selectedDescription}</p>}</Card>
           {children}
           <OnlineAccount />
         </>
@@ -513,7 +518,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
               }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>
-              {mode !== "standard" && <p className="caption">{ mode === "throne" ? "Winner stays. Queue to challenge." : mode === "vote" ? "One day per move. Earliest vote breaks a tie." : "Invite friends to your side. Share moves and arrows."}</p>}
+              {selectedDescription && <p className="caption">{selectedDescription}</p>}
             </Card>
           )}
           {!room && children}
