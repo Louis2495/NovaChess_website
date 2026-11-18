@@ -636,7 +636,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
             </div>
           </section>
           {variantsOnly && <div
-            className="variant-gallery"
+            className="variant-gallery computer-variant-gallery"
             role="group"
             aria-label="Choose variant"
           >

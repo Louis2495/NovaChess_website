@@ -4721,6 +4721,7 @@ html { scrollbar-gutter:stable; }
 @media(min-width:1001px){
  .workspace:has(.variant-gallery) { max-width:none; padding-inline:24px; }
  .variant-gallery { grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; }
+ .computer-variant-gallery { grid-template-columns:repeat(6,minmax(0,1fr)); }
  .variant-gallery button { min-width:0; }
  .variant-gallery .variant-picture,.variant-gallery .multiplayer-picture,.variant-gallery .speedrun-picture { width:min(100%,160px); }
 }
