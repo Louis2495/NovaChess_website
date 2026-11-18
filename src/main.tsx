@@ -441,10 +441,10 @@ function App() {
     "--board-max": manualBoardSize ? `${manualBoardSize}px` : "max(220px, calc(100dvh - 96px))",
     "--analysis-board-size": manualBoardSize
       ? `${manualBoardSize}px`
-      : "max(220px, calc(100dvh - 190px))",
+      : "max(220px, calc(100dvh - 96px))",
     "--play-board-size": manualBoardSize
       ? `${manualBoardSize}px`
-      : "calc(100dvh - 150px)",
+      : "max(220px, calc(100dvh - 96px))",
     "--background-dim": `${appearance.backgroundDim / 100}`,
     "--background-blur": `${appearance.backgroundBlur}px`,
     "--background-image":

@@ -4824,3 +4824,44 @@ html { scrollbar-gutter:stable; }
 .stats-overview .stats-metrics > div:nth-child(4) { background-color:#ff8f24; color:#3b1d04; }
 .stats-overview .throne-stat h2 svg,.stats-overview .training-stat .card-heading > svg { color:inherit; }
 .stats-overview .variant-breakdown-card .variant-breakdown { border:0; padding:0; margin:0; }
+
+/* Page names belong in navigation; keep only useful page-level tools. */
+.page-title.page-title-compact { display:flex; align-items:center; flex-wrap:wrap; gap:10px; min-height:0; margin:0 0 10px; }
+.page-title.page-title-empty { display:block; height:0; margin:0; padding:0; }
+.page-title-compact .page-subtitle { margin:0; color:var(--muted); font-size:.85rem; }
+.page-title-compact .title-actions { margin-left:auto; }
+.learn-page-heading { margin-bottom:10px; }
+.learn-page-heading > .page-title-empty { flex:0; }
+.play-hub-heading { justify-content:flex-end; margin-bottom:12px; }
+@media(min-width:1001px) {
+ .workspace-shell > .topbar { display:none; }
+ .workspace { width:100%; max-width:none; padding:16px 24px 24px; box-sizing:border-box; }
+ .workspace .chess-layout { --board-rail:0px; grid-template-columns:minmax(0,calc(var(--auto-board-limit,var(--board-max)) + var(--board-rail))) minmax(250px,310px); gap:20px; max-width:none; justify-content:start; }
+ .workspace .analysis-layout,.workspace .game-review-layout { --board-rail:29px; }
+ .workspace .chess-layout > .board-column { width:100%; max-width:none; }
+ .manual-boards .workspace .chess-layout { grid-template-columns:minmax(0,calc(var(--board-max) + var(--board-rail))) minmax(250px,310px); }
+ .workspace .lesson-workspace { grid-template-columns:minmax(260px,310px) minmax(0,1fr); max-height:none; gap:20px; }
+ .workspace .lesson-board-area { max-width:var(--board-max); justify-self:start; }
+ .workspace .learning-layout { grid-template-columns:minmax(250px,310px) minmax(0,var(--board-max)); gap:20px; }
+ .workspace .learning-layout > .board-column { max-width:none; }
+}
+@media(max-width:1000px) {
+ .workspace { padding-inline:12px; }
+ .workspace .chess-layout > .board-column { max-width:100%; }
+ .page-title-compact .title-actions { flex-wrap:wrap; }
+}
+
+@media(max-width:1000px) {
+ .workspace .learning-layout { grid-template-columns:1fr; }
+ .workspace .learning-layout > .board-column { grid-row:1; max-width:100%; }
+}
+@media(max-width:800px) {
+ .workspace .lesson-workspace { height:auto; max-height:none; grid-template-rows:auto; }
+ .workspace .lesson-board-area { width:100%; max-width:100%; }
+ .workspace .lesson-sidebar { max-height:none; }
+ .workspace .lesson-board-area .lesson-bar { display:flex; }
+}
+@media(max-width:800px) {
+ .workspace .trap-board,.workspace .master-replay { grid-row:1; width:100%; max-width:100%; }
+ .workspace .trap-catalog { grid-row:auto; }
+}

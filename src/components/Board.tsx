@@ -363,6 +363,14 @@ export function Board({
       const heightLimit = top < window.innerHeight - 80
         ? Math.max(80,available)
         : Math.max(80,window.innerHeight - reserve - 100);
+      // Let the layout place its controls immediately beside the largest
+      // board that fits vertically, rather than reserving an oversized column.
+      if (!compact) {
+        const layout = el.closest<HTMLElement>(".chess-layout");
+        const nextLimit = `${Math.floor(heightLimit)}px`;
+        if (layout && layout.style.getPropertyValue("--auto-board-limit") !== nextLimit)
+          layout.style.setProperty("--auto-board-limit", nextLimit);
+      }
       const widthLimit = Math.max(0, window.innerWidth - rect.left - 12);
       const limit = Math.floor(Math.min(heightLimit,widthLimit));
       if (!resizeGesture.current) setViewportLimit(previous => previous === limit ? previous : limit);

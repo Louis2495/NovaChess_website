@@ -23,7 +23,7 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
   if (detail === "resume") return <Play variantsOnly={variants} />;
   return <>
     {!playing && <div className="play-hub-heading">
-      {online ? <h1 className={variants ? "" : "sr-only"}>{variants ? "Variants" : "Play"}</h1> : <h2 className={variants ? "" : "sr-only"}>{variants ? "Variants" : "Play"}</h2>}
+      {online ? <h1 className="sr-only">{variants ? "Variants" : "Play"}</h1> : <h2 className="sr-only">{variants ? "Variants" : "Play"}</h2>}
       <div className="play-opponent-toggle" role="group" aria-label="Opponent">
         {[["online", "Online"], ["computer", "Computer"]].map(([id, label]) =>
           <button key={id} aria-pressed={opponent === id} onClick={() => setOpponent(id)}>{label}</button>)}

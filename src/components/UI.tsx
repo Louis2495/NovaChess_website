@@ -57,16 +57,16 @@ export function PageTitle({
   subtitle?: string;
   children?: ReactNode;
 }) {
+  const hasActions = Children.count(children) > 0;
   return (
-    <div className="page-title">
-      <div>
-        <h1>{title}</h1>
-        {subtitle && <p>{subtitle}</p>}
-      </div>
-      <div className="title-actions">{children}</div>
+    <div className={`page-title page-title-compact${!subtitle && !hasActions ? " page-title-empty" : ""}`}>
+      <h1 className="sr-only">{title}</h1>
+      {subtitle && <p className="page-subtitle">{subtitle}</p>}
+      {hasActions && <div className="title-actions">{children}</div>}
     </div>
   );
 }
+
 type ChoiceChange = {
   target: { value: string };
   currentTarget: { value: string };
