@@ -2,11 +2,13 @@ import {online} from "./lib/online";
 import {screenName} from "./lib/screenName";
 import {useOnlineSession,useRecoveryState} from "./lib/online";
 import AccountPresence from "./components/AccountPresence";
+import FriendGameInvites from "./components/FriendGameInvites";
 import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Home,
+  Users,
   Dices,
   Glasses,
   Puzzle,
@@ -52,6 +54,7 @@ import Appearance from "./components/Appearance";
 import HomePage from "./pages/Home";
 import "./styles.css";
 import "./redesign.css";
+const PlayersPage = lazy(() => import("./pages/Players"));
 const SignIn = lazy(() => import("./pages/SignIn")),
   Analysis = lazy(() => import("./pages/Analysis")),
   Play = lazy(() => import("./pages/PlayHub")),
@@ -72,6 +75,7 @@ const mainNav = [
   { id: "research", label: "Research", icon: Glasses },
   { id: "library", label: "Library", icon: FolderOpen },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
+  { id: "players", label: "Players", icon: Users },
 ] as const;
 const validTabs = new Set<string>([
   "profile",
@@ -481,7 +485,7 @@ function App() {
       <ProfilePage />
     ) : tab === "library" ? (
       <LibraryPage />
-    ) : tab === "stats" ? (
+    ) : tab === "players" ? (<PlayersPage/>) : tab === "stats" ? (
       <Stats />
     ) : tab === "community" ? (
       <Community />
@@ -524,6 +528,7 @@ function App() {
         <div className="site-background" aria-hidden="true" />
         <AccountPresence userId={session?.user.id} />
         <GlobalChat />
+        <FriendGameInvites userId={session?.user.id}/>
         <a className="skip-link" href="#workspace">
           Skip to workspace
         </a>

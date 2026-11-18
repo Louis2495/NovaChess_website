@@ -1543,7 +1543,8 @@ h3 {
   touch-action: none;
 }
 .board-square.selected:after {
-  display: none;
+  display:block;
+  background:#ffe28a30;
 }
 .board-square:not(:disabled):hover {
   box-shadow: none;
@@ -5302,3 +5303,41 @@ html { scrollbar-gutter:stable; }
  .home-page:has(.home-recent):not(.memes-hidden) .recent-game-info small { margin-top:4px; font-size:.7rem; line-height:1.4; }
  .home-page:has(.home-recent):not(.memes-hidden) .game-result-label { font-size:.72rem; }
 }
+[data-nav="players"] { --nav-color:#bd9678; }
+.players-page > h1 { font-size:1.6rem; margin:0 0 20px; }
+.players-page .page-segments { width:fit-content; margin-bottom:20px; }
+.players-page > .field { max-width:460px; margin-bottom:24px; }
+.player-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:16px; margin-bottom:24px; }
+.player-identity { display:flex; gap:12px; align-items:center; margin-bottom:18px; }
+.player-identity h3 { margin:0 0 5px; }
+.player-identity p { margin:0; }
+.player-card .button-row { flex-wrap:wrap; }
+.players-pagination { align-items:center; margin-top:20px; }
+.friend-picker-list { display:flex; flex-direction:column; gap:12px; margin:20px 0; max-height:50dvh; overflow:auto; }
+.friend-picker-list > .btn { justify-content:flex-start; }
+.friend-picker-list small { margin-left:auto; }
+.friend-game-invite { position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:100; width:min(420px,calc(100vw - 32px)); padding:20px; background:var(--panel-solid); color:var(--text); border:2px solid var(--accent); border-radius:16px; box-shadow:0 12px 40px #0005; }
+.home-page .home-welcome { margin-top:16px; margin-bottom:100px; }
+@media(max-width:600px) { .home-page .home-welcome { margin-top:16px; margin-bottom:80px; } }
+/* Keep the launch controls in normal flow so extra friend options never overlap. */
+@media(min-width:1001px) {
+ .standard-play-hub.setup-active { display:flex; flex-direction:column; align-items:center; min-height:calc(100dvh - 40px); padding-top:clamp(40px,12dvh,140px); box-sizing:border-box; }
+ .standard-play-hub.setup-active > .play-hub-heading { position:static; width:100%; margin:0 0 216px; }
+ .standard-play-hub.setup-active > .quick-online-play { min-height:0; width:min(100%,560px); gap:28px; }
+ .standard-play-hub.setup-active > .quick-online-play .invite-friends-option { width:100%; margin:0; min-height:48px; }
+ .standard-play-hub.setup-active .setup-launch { height:auto; min-height:0; }
+}
+@media(max-width:1000px) {
+ .standard-play-hub > .play-hub-heading { margin-bottom:156px; }
+ .standard-play-hub > .quick-online-play { display:flex; flex-direction:column; gap:24px; }
+ .standard-play-hub > .quick-online-play .invite-friends-option { width:100%; margin:0; order:-1; }
+}
+
+@media(min-width:1001px) {
+ .home-page:has(.home-recent):not(.memes-hidden) .daily-meme-image { max-height:min(380px,calc(100dvh - 370px)); }
+ .home-page:has(.home-recent):not(.memes-hidden) .recent-game-entry { margin-block:8px; }
+ .home-page:has(.home-recent):not(.memes-hidden) .recent-game-row { padding:10px; }
+ .home-page:has(.home-recent):not(.memes-hidden) .recent-game-info small { line-height:1.25; }
+}
+.home-page .home-welcome { width:100%; box-sizing:border-box; }
+@media(min-width:1001px) { .home-page:has(.home-recent):not(.memes-hidden) > .home-recent { padding:12px; } }

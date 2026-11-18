@@ -1,5 +1,6 @@
 import type { SavedGame } from "../lib/types";
 import type {ReactNode} from "react";
+import FriendPicker from "../components/FriendPicker";
 import MultiplayerPicture from "../components/MultiplayerPicture";
 import VariantIcon from "../components/VariantIcon";
 import RoomChat from "../components/RoomChat";
@@ -18,7 +19,7 @@ import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { Chess } from "chess.js";
 import {
   ArrowRight,
-  Copy,
+  Users,
   Flag,
   Handshake,
   Snowflake,
@@ -27,7 +28,7 @@ import {
 } from "lucide-react";
 import { online, onlineAction, useOnlineSession, roomBroadcastReady, onlineNow, syncOnlineClock } from "../lib/online";
 import { useApp } from "../lib/context";
-import { copyText,base } from "../lib/store";
+import { base } from "../lib/store";
 import { specialLegal, type SpecialState } from "../lib/specialRules";
 import { Board, Piece, type BoardMark } from "../components/Board";
 import OnlineAccount from "../components/OnlineAccount";
@@ -287,16 +288,14 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {!members.length && !(side === "b" && room.settings.bot) && <b>Waiting for opponent</b>}</div>
     </div>;
   }
-  async function inviteFriends() {
+  const [choosingFriend,setChoosingFriend]=useState(false);
+  async function inviteFriends(friend:string) {
     setBusy(true); setError("");
     try {
-      const result = await onlineAction({action:"create", mode, name, variant, timeControlSeconds, incrementSeconds, bot:false});
-      const invite = new URL(location.href);
-      invite.hash = (mode === "standard" && variant === "chess" ? "play/online/" : "variants/online/") + result.id + (mode === "team" ? "?team=w" : "");
-      const copied = await copyText(invite.href);
-      notify(copied ? "Invite link copied." : invite.href);
+      const result = await onlineAction({action:"create", mode, name, variant, timeControlSeconds, incrementSeconds, bot:false,friend});
+      notify("Game invitation sent.");setChoosingFriend(false);
       navigate(mode === "standard" && variant === "chess" ? "play" : "variants", "online/" + result.id);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError((e as Error).message);notify((e as Error).message); }
     finally { setBusy(false); }
   }
   const selectedDescription = mode === "throne" ? "Winner stays. Queue to challenge."
@@ -306,12 +305,12 @@ export default function Community({presetMode = "standard", presetVariant = "che
     : variantList.find(v => v.id === variant)?.description;
   return (
     <>
+      {choosingFriend && <FriendPicker onClose={()=>setChoosingFriend(false)} onChoose={inviteFriends} busy={busy}/>}
       {!room && tab === "community" && <PageTitle title="Play" />}
       {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div></div>}
       {!online || !uid ? (
         <>
-          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>{selectedDescription && <p className="caption">{selectedDescription}</p>}</Card>
-          {mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled><Copy size={16}/>Invite friends</Button>}
+          <Card className="quick-online-play">{mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled><Users size={16}/>Play a Friend</Button>}<Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>{selectedDescription && <p className="caption">{selectedDescription}</p>}</Card>
           {children}
           <OnlineAccount />
         </>
@@ -552,6 +551,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
           ) : (
             <Card className="quick-online-play">
               {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>setBot(e.target.value==="bot")}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
+              {mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled={busy} onClick={() => setChoosingFriend(true)}><Users size={16}/>Play a Friend</Button>}
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 setBusy(true);setError("");
                 try {
@@ -565,7 +565,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
               }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>
-              {mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled={busy} onClick={() => void inviteFriends()}><Copy size={16}/>Invite friends</Button>}
+
               {selectedDescription && <p className="caption">{selectedDescription}</p>}
             </Card>
           )}

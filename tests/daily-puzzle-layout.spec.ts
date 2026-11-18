@@ -17,3 +17,10 @@ test('recent games use bright full-row colors for each result',async({page})=>{
  const c=new Chess(),initial=c.fen();c.move('e4');await page.addInitScript(games=>localStorage.setItem('novachess-library-v2',JSON.stringify({games})),['*','1/2-1/2','1-0','0-1'].map((result,i)=>({id:String(i),title:'Game',initial,positions:[initial,c.fen()],moves:['e2e4'],notation:['e4'],human:'w',variant:'chess',created:Date.now(),result})));
  await page.goto('/');await expect(page.locator('.recent-game-entry.result-unfinished')).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(page.locator('.recent-game-entry.result-draw')).toHaveCSS('background-color','rgb(225, 231, 237)');await expect(page.locator('.recent-game-entry.result-win')).toHaveCSS('background-color','rgb(57, 237, 131)');
 });
+
+test('daily puzzle Hint fits above the bottom navigation on short screens',async({page})=>{
+ for(const [width,height] of [[1440,700],[390,664]]){
+  await page.setViewportSize({width,height});await page.goto('/#puzzles/daily');const hint=page.getByRole('button',{name:'Hint',exact:true});await expect(hint).toBeVisible();
+  await expect.poll(async()=>{const h=(await hint.boundingBox())!,tabs=page.locator('.mobile-tabs');const bottom=await tabs.isVisible()?(await tabs.boundingBox())!.y:height;return h.y+h.height-bottom;}).toBeLessThanOrEqual(-8);
+ }
+});

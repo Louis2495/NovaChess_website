@@ -124,6 +124,10 @@ Deno.serve(async (req) => {
       const timed=body.mode==="standard" && variant==="chess" && [180,300,600].includes(body.timeControlSeconds);
       const initial=await fresh(variant,Math.max(1,Math.min(4,+body.dropCount||2)));
       if(timed)initial.clock={incrementMs:increment*1000,remaining:{w:body.timeControlSeconds*1000,b:body.timeControlSeconds*1000},startedAt:null};
+      if(body.friend){
+        const {data,error}=await db.rpc("create_friend_game",{p_host:uid,p_friend:body.friend,p_mode:body.mode,p_variant:variant,p_name:String(body.name||"Friendly game").trim().slice(0,80)||"Friendly game",p_state:initial,p_settings:{bot:false,dropCount:Math.max(1,Math.min(4,+body.dropCount||2)),timeControlSeconds:timed?body.timeControlSeconds:0,incrementSeconds:timed?increment:0}});
+        if(error)throw error;return json(data);
+      }
       const { data, error } = await db
         .from("rooms")
         .insert({
@@ -178,6 +182,7 @@ Deno.serve(async (req) => {
       return data;
     }
     if (action === "join") {
+      if(r.settings.invitedFriend && r.settings.invitedFriend!==uid && !me)throw Error("This game is reserved for an invited friend.");
       if (me && r.mode !== "throne") return json(r);
       if (
         me &&

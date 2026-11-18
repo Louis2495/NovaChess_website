@@ -182,7 +182,7 @@ export function Board({
     } catch {
       moves = [];
     }
-  const active = externalSelected ?? selected,
+  const active = externalSelected ?? drag?.from ?? selected,
     targets = active
       ? moves.filter((m) => m.startsWith(active)).map((m) => m.slice(2, 4))
       : [];
@@ -372,7 +372,7 @@ export function Board({
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
       const top = rect.top + window.scrollY;
-      const reserve = tab === "puzzles" ? (window.innerWidth <= 1000 ? 158 : 56) : 90;
+      const reserve = tab === "puzzles" ? (el.closest(".daily-puzzle-layout") ? (window.innerWidth <= 1000 ? 185 : 125) : (window.innerWidth <= 1000 ? 158 : 56)) : 90;
       const available = window.innerHeight - top - reserve;
       let heightLimit = top < window.innerHeight - 80
         ? Math.max(80,available)

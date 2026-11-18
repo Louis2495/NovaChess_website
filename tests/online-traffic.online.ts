@@ -226,9 +226,9 @@ test('online clocks align right, identities align left and actions sit in the ri
  await expect(page.getByRole('button',{name:'Invite friends',exact:true})).toHaveCount(0);
 });
 
-test('Invite friends creates a room from the start page without matchmaking',async({page})=>{
- const env=await connected(page);await page.goto('/#play');await page.getByRole('button',{name:'Invite friends',exact:true}).click();
- await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',bot:false});expect(env.requests.some(u=>u.pathname.endsWith('/room_lobby'))).toBe(false);
+test('Play a Friend chooses an accepted friend and creates a reserved game without matchmaking',async({page})=>{
+ const env=await connected(page);await page.route('**/rest/v1/rpc/player_directory',r=>r.fulfill({json:[{id:peer,screen_name:'Chess buddy',rating:1400,relationship:'friends',online:true}]}));await page.goto('/#play');const friendButton=page.getByRole('button',{name:'Play a Friend',exact:true}),start=page.getByRole('button',{name:'Start',exact:true});await expect(friendButton).toBeEnabled();await expect(start).toBeVisible();const f=(await friendButton.boundingBox())!,s=(await start.boundingBox())!;expect(f.y+f.height).toBeLessThan(s.y);await friendButton.click();await page.getByRole('dialog').getByRole('button',{name:/Chess buddy/}).click();
+ await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',bot:false,friend:peer});expect(env.requests.some(u=>u.pathname.endsWith('/room_lobby'))).toBe(false);
 });
 
 test('finished game has a sad king, paired notation, review and outside-board dismissal',async({page})=>{
@@ -320,4 +320,17 @@ test('daily puzzle chat loads and sends only messages for the selected daily puz
  await page.route('**/rest/v1/rpc/post_puzzle_message',async route=>{sent=route.request().postDataJSON();await route.fulfill({json:{id:2,puzzle_key:sent.p_puzzle,user_id:uid,body:sent.p_body,created_at:new Date().toISOString()}});});
  await page.goto('/#puzzles/daily');const log=page.getByRole('log',{name:'Daily puzzle chat',exact:true});await expect(log).toContainText('Nice daily puzzle');await expect(log).toContainText('Opponent');
  await page.getByLabel('Puzzle chat message',{exact:true}).fill('Good luck everyone');await page.getByRole('button',{name:'Send puzzle message',exact:true}).click();await expect(log).toContainText('Good luck everyone');expect(sent.p_puzzle).toMatch(/^\d{4}-\d{2}-\d{2}\//);expect(env.requests.some(url=>url.pathname.endsWith('/room_messages'))).toBe(false);
+});
+
+test('Players directory searches, sends requests, accepts incoming requests and removes friends',async({page})=>{
+ await connected(page);let relationship='none';const queries:any[]=[],actions:any[]=[];
+ await page.route('**/rest/v1/rpc/player_directory',async r=>{const body=r.request().postDataJSON();queries.push(body);const player={id:peer,screen_name:'Friendly Knight',rating:1450,country:'CA',online:true,relationship};await r.fulfill({json:body.p_section==='everyone'?[player]:body.p_section==='requests'?relationship==='incoming'?[player]:[]:relationship==='friends'?[player]:[]});});
+ await page.route('**/rest/v1/rpc/friend_action',async r=>{const body=r.request().postDataJSON();actions.push(body);relationship=body.p_action==='send'?'outgoing':body.p_action==='accept'?'friends':'none';await r.fulfill({json:null});});
+ await page.goto('/#players');await page.getByRole('button',{name:'Everyone',exact:true}).click();await page.getByLabel('Search players',{exact:true}).fill('Knight');await expect.poll(()=>queries.some(q=>q.p_query==='Knight')).toBe(true);
+ await page.getByRole('button',{name:'Add friend',exact:true}).click();await expect(page.getByRole('button',{name:'Cancel request',exact:true})).toBeVisible();expect(actions[0]).toEqual({p_player:peer,p_action:'send'});
+ relationship='incoming';await page.reload();await page.getByRole('button',{name:'Accept',exact:true}).click();await expect(page.getByRole('button',{name:'Remove friend',exact:true})).toBeVisible();await page.getByRole('button',{name:'Remove friend',exact:true}).click();await expect(page.getByText('No friends yet. Find someone in Everyone to send a request.',{exact:true})).toBeVisible();
+});
+test('game invitations can be accepted from another page',async({page})=>{
+ const env=await connected(page);let pending=true;await page.route('**/rest/v1/rpc/friend_game_invitations',r=>r.fulfill({json:pending?[{id:'invite-test',room_id:roomId,screen_name:'Chess buddy',name:'Friendly game',variant:'chess',time_control:180}]:[]}));await page.route('**/rest/v1/rpc/respond_friend_game',async r=>{expect(r.request().postDataJSON()).toEqual({p_invite:'invite-test',p_accept:true});pending=false;await r.fulfill({json:null});});
+ await page.goto('/#stats');await page.getByRole('button',{name:'Accept game',exact:true}).click();await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'join',room:roomId});
 });

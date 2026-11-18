@@ -1,0 +1,28 @@
+import {useState} from 'react';
+import {UserPlus,Check,X,UserMinus} from 'lucide-react';
+import {useApp} from '../lib/context';
+import {online,useOnlineSession} from '../lib/online';
+import {usePlayers,type Player} from '../lib/players';
+import {screenName} from '../lib/screenName';
+import {PageTitle,Card,Button,Field} from '../components/UI';
+export default function Players(){
+ const {session}=useOnlineSession(),{navigate}=useApp();
+ const [section,setSection]=useState('friends'),[query,setQuery]=useState(''),[page,setPage]=useState(0),[busy,setBusy]=useState(''),[error,setError]=useState('');
+ const list=usePlayers(query,section,page,!!session),requests=usePlayers('','requests',0,!!session);
+ async function action(player:Player,act:string){setBusy(player.id);setError('');try{const {error}=await online!.rpc('friend_action',{p_player:player.id,p_action:act});if(error)throw error;list.refresh();requests.refresh();}catch(e){setError((e as Error).message);}finally{setBusy('');}}
+ function row(player:Player){return <Card className="player-card" key={player.id}><div className="player-identity"><span className={`account-status-dot ${player.online?'online':'offline'}`} role="img" aria-label={player.online?'Online':'Offline'}/><div><h3>{screenName(player)}</h3><p className="caption">{player.rating} Elo{player.country?` · ${player.country}`:''}</p></div></div><div className="button-row">
+ {player.relationship==='incoming'?<><Button disabled={!!busy} onClick={()=>void action(player,'accept')}><Check size={16}/>Accept</Button><Button className="secondary" disabled={!!busy} onClick={()=>void action(player,'remove')}><X size={16}/>Decline</Button></>:player.relationship==='friends'?<Button className="secondary" disabled={!!busy} onClick={()=>void action(player,'remove')}><UserMinus size={16}/>Remove friend</Button>:player.relationship==='outgoing'?<Button className="secondary" disabled={!!busy} onClick={()=>void action(player,'remove')}>Cancel request</Button>:<Button disabled={!!busy} onClick={()=>void action(player,'send')}><UserPlus size={16}/>Add friend</Button>}
+ </div></Card>;}
+ return <div className="players-page"><PageTitle title="Players"/><h1>Players</h1>
+ {!online||!session?<Card><p>Sign in to find players and manage your friends.</p><Button onClick={()=>navigate('signin')}>Sign in</Button></Card>:<>
+ <div className="segmented page-segments" aria-label="Player sections">{[['friends','Friends'],['everyone','Everyone']].map(([id,label])=><button key={id} className={section===id?'active':''} aria-pressed={section===id} onClick={()=>{setSection(id);setPage(0);}}>{label}</button>)}</div>
+ <Field label="Search players"><input type="search" value={query} maxLength={100} placeholder="Search by name" onChange={e=>{setQuery(e.target.value);setPage(0);}}/></Field>
+ {error&&<p role="alert">{error}</p>}
+ {section==='friends'&&requests.players.length>0&&<section><h2>Friend requests</h2><div className="player-grid">{requests.players.map(row)}</div></section>}
+ {list.error&&<p role="alert">{list.error}</p>}{requests.error&&section==='friends'&&<p role="alert">{requests.error}</p>}
+ <h2>{section==='friends'?'Your friends':'Everyone'}</h2>
+ {list.loading?<p role="status">Loading players…</p>:list.players.length?<div className="player-grid">{list.players.map(row)}</div>:<Card><p>{query?'No players match your search.':section==='friends'?'No friends yet. Find someone in Everyone to send a request.':'No players found.'}</p></Card>}
+ <div className="button-row players-pagination"><Button className="secondary" disabled={page===0||list.loading} onClick={()=>setPage(n=>n-1)}>Previous</Button><span>Page {page+1}</span><Button className="secondary" disabled={list.players.length<50||list.loading} onClick={()=>setPage(n=>n+1)}>Next</Button></div>
+ </>}
+ </div>;
+}

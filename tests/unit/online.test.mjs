@@ -166,6 +166,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180008_account_activity.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180009_account_presence_counts.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180010_daily_puzzle_chat.sql','utf8').replace('alter publication supabase_realtime add table public.puzzle_messages;',''));
+  await pg.exec(readFileSync('supabase/migrations/202611180011_players_friends.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -715,4 +716,17 @@ test('daily puzzle chat scopes posts, enforces identity and blocks direct insert
  }finally{await pg.exec('reset role');}
  await pg.query('update profiles set banned=true where id=$1',[users[1]]);await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
  try{await assert.rejects(()=>pg.query("select post_puzzle_message('2026-11-18/puzzle-one','Blocked')"),/Sign in/);}finally{await pg.exec('reset role');await pg.query('update profiles set banned=false where id=$1',[users[1]]);}
+});
+
+test('friend requests need acceptance and friend games are reserved and absent from matchmaking',async()=>{
+ await pg.exec('delete from friendships');await pg.query('update profiles set banned=false where id=any($1::uuid[])',[users]);await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{await pg.query('select friend_action($1,$2)',[users[1],'send']);const rows=(await pg.query("select player_directory('','everyone',0) as players")).rows[0].players;assert.equal(rows.find(p=>p.id===users[1]).relationship,'outgoing');assert.ok(rows.every(p=>!('email' in p)&&!('encrypted_password' in p)));await assert.rejects(()=>pg.query('select friend_action($1,$2)',[users[1],'accept']),/No incoming/);await assert.rejects(()=>pg.query('select friend_action($1,$2)',[users[0],'send']),/unavailable/);}finally{await pg.exec('reset role');}
+ assert.equal((await call(users[0],{action:'create',mode:'standard',variant:'chess',friend:users[2]})).status,400);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
+ try{assert.equal((await pg.query("select player_directory('','requests',0) as players")).rows[0].players[0].id,users[0]);await pg.query('select friend_action($1,$2)',[users[0],'accept']);}finally{await pg.exec('reset role');}
+ const created=await call(users[0],{action:'create',mode:'standard',variant:'chess',name:'Friendly game',friend:users[1],timeControlSeconds:180});assert.equal(created.status,200,JSON.stringify(created.data));const game=created.data;
+ assert.equal(game.settings.invitedFriend,users[1]);assert.equal((await pg.query('select count(*) from room_lobby where id=$1',[game.id])).rows[0].count,0);
+ assert.equal((await command(users[2],game,'join')).status,400);assert.equal((await command(users[1],game,'join')).status,200);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
+ try{await assert.rejects(()=>pg.query("insert into friendships(sender,recipient) values($1,$2)",[users[1],users[2]]),/permission denied/);await pg.query('select friend_action($1,$2)',[users[0],'remove']);assert.deepEqual((await pg.query("select player_directory('','friends',0) as players")).rows[0].players,[]);}finally{await pg.exec('reset role');}
 });

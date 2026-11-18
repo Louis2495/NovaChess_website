@@ -12,7 +12,8 @@ export type Tab =
   | "signin"
   | "profile"
   | "controls"
-  | "rankings";
+  | "rankings"
+  | "players";
 export type Opening = {
   id: string;
   eco: string;
