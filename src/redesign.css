@@ -5264,5 +5264,5 @@ html { scrollbar-gutter:stable; }
 }
 
 .puzzle-layout .board-frame { margin-inline:auto; }
-.daily-puzzle-layout .puzzle-actions-right { margin-inline:auto; }
-.daily-puzzle-layout .board-column > .puzzle-actions-right > .hint-button { flex:0 0 auto; width:auto; padding-inline:22px; }
+.daily-puzzle-layout .puzzle-actions-right { margin-inline:auto; justify-content:center; }
+.daily-puzzle-layout .board-column > .puzzle-actions-right > .hint-button { flex:0 0 auto; width:auto; min-width:120px; padding-inline:28px; }
