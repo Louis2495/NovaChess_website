@@ -8,7 +8,7 @@ test("Analysis fills available space while staying inside the screen and support
   expect(before.width).toBeLessThan((await page.viewportSize())!.width);
   expect(before.width).toBeGreaterThan((await page.viewportSize())!.width>1000?600:240);
   expect(before.y + before.height).toBeLessThan(
-    (await page.viewportSize())!.height - 50,
+    (await page.viewportSize())!.height - 20,
   );
   const handle = page.getByRole("slider", {
     name: "Resize board",

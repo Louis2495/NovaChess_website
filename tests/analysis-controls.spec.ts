@@ -4,7 +4,7 @@ const square = (page: any, s: string) =>
     .getByRole("group", { name: "Chessboard", exact: true })
     .first()
     .getByRole("button", { name: new RegExp("^" + s + ",") });
-test("analysis starts with closed notation and three adjustable engine lines, names only when saving, and aligns navigation to the board", async ({
+test("analysis starts with closed notation and three adjustable engine lines, names only when saving, and keeps navigation with the right-side tools", async ({
   page,
 }) => {
   await page.goto("/#analysis");
@@ -19,8 +19,11 @@ test("analysis starts with closed notation and three adjustable engine lines, na
   await expect(page.locator(".engine-line")).toHaveCount(2);
   const board = (await page.locator(".analysis-layout .board").boundingBox())!,
     bar = (await page.locator(".analysis-navigation").boundingBox())!;
-  expect(Math.abs(board.width - bar.width)).toBeLessThan(1);
-  expect(Math.abs(board.x - bar.x)).toBeLessThan(1);
+  const panel = (await page.locator(".analysis-layout > .side-panels").boundingBox())!;
+  expect(Math.abs(panel.width - bar.width)).toBeLessThan(1);
+  expect(Math.abs(panel.x - bar.x)).toBeLessThan(1);
+  await expect(page.locator(".analysis-layout > .board-column > .board-with-eval")).toHaveCount(1);
+  await expect(page.locator(".analysis-layout > .board-column .analysis-navigation")).toHaveCount(0);
   await square(page, "e2").click();
   await square(page, "e4").click();
   await page.getByRole("button", { name: "Notation", exact: true }).click();

@@ -4878,3 +4878,48 @@ html { scrollbar-gutter:stable; }
 }
 .puzzle-layout .puzzle-actions-right > .puzzle-next-button { min-height:68px; padding:18px 24px; font-size:1.2rem; font-weight:800; }
 .puzzle-next-button > svg { width:23px; height:23px; }
+
+/* Keep the board alone on the Analysis side; tools and evaluation live together. */
+.workspace .analysis-layout { --board-rail:0px; }
+.analysis-layout .board-with-eval { display:block; }
+.analysis-layout .side-panels .board-topline { margin:0; }
+.analysis-layout .side-panels .analysis-navigation { width:100%; margin:0; }
+.analysis-layout .side-panels .analysis-notation { width:100%; max-width:none; margin:0; }
+.analysis-evaluation-bar .eval-meter { width:100%; height:14px; min-height:14px; margin:0; position:relative; }
+.analysis-evaluation-bar .eval-meter > div { position:absolute; bottom:0; left:0; height:100%; }
+.analysis-layout:has(.material-top) > .side-panels { padding-top:0; }
+.puzzle-layout .side-panels > .card { background:#0878d1; color:#fff; border-color:#40b6ff; }
+.puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#7926d4; color:#fff; border-color:#b46cff; }
+.puzzle-layout .side-panels > .card:has(.theme-select) { background:#078147; color:#fff; border-color:#21d583; }
+.puzzle-layout .side-panels .field > span { color:#fff; }
+.puzzle-layout .theme-select { background:#fff; color:#104c30; }
+.puzzle-layout .move-chips > * { background:#0056a3; color:#fff; }
+.play-hub { position:relative; }
+@media(min-width:1001px) {
+ .workspace .puzzle-layout > .side-panels { width:75%; justify-self:start; }
+ .workspace .puzzle-layout { column-gap:32px; }
+ .standard-play-hub.setup-active > .play-hub-heading { position:absolute; top:calc(50dvh - 155px); left:0; right:0; z-index:2; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; margin:0; }
+ .standard-play-hub > .play-hub-heading .time-control-toggle { grid-column:2; grid-row:1; margin:0; }
+ .standard-play-hub > .play-hub-heading .play-opponent-toggle { grid-column:3; grid-row:1; justify-self:end; }
+ .standard-play-hub.setup-active > .quick-online-play { min-height:calc(100dvh - 32px); margin:0; padding:0; border:0; background:none; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+ .standard-play-hub.setup-active .setup-launch { min-height:calc(100dvh - 32px); margin:0; display:flex; align-items:center; justify-content:center; }
+ .standard-play-hub .quick-online-play .new-game-primary { margin:0; }
+ .variants-hub.setup-active > .play-hub-heading { position:absolute; top:0; right:0; z-index:2; margin:0; }
+ .variants-hub > .quick-online-play { width:calc(100% - 235px); margin:0 0 16px; padding:0; border:0; background:none; box-shadow:none; }
+ .variants-hub > .quick-online-play .new-game-primary { margin-top:0; }
+ .variants-hub > .game-setup-page .setup-launch { margin-top:0; padding-top:0; }
+}
+.puzzle-layout .puzzle-actions-right .hint-button { background:#ffd21c; color:#382800; border-color:#ffdf52; }
+.puzzle-layout .puzzle-actions-right > .btn:not(.hint-button) { background:#7428df; color:#fff; border-color:#a36aff; }
+@media(min-width:1001px) {
+ .standard-play-hub.setup-active > .quick-online-play { width:100%; max-width:none; }
+ .standard-play-hub .quick-online-play .new-game-primary { width:min(100%,560px); }
+ .standard-play-hub.setup-active .setup-launch { width:100%; max-width:none; }
+ .standard-play-hub .setup-launch .play-feature-copy { width:min(100%,560px); margin-inline:auto; }
+}
+@media(min-width:1001px) {
+ .standard-play-hub.setup-active .setup-launch { height:calc(100dvh - 32px); box-sizing:border-box; padding:0; }
+}
+@media(min-width:1001px) {
+ .standard-play-hub .setup-launch .new-game-primary { margin:0; }
+}

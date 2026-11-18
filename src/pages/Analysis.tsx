@@ -204,6 +204,27 @@ export default function Analysis() {
   const white = settledEvaluation?.score || 0;
   return (
     <>
+      <div className="chess-layout analysis-layout">
+        <div className="board-column">
+          <div className="board-with-eval">
+            <Board
+              fen={fen}
+              onMove={play}
+              flipped={flipped}
+              onFlip={() => setFlipped((v) => !v)}
+              highlights={
+                cursor
+                  ? [
+                      moves[cursor - 1].slice(0, 2),
+                      moves[cursor - 1].slice(2, 4),
+                    ]
+                  : []
+              }
+            />
+          </div>
+
+        </div>
+        <div className="side-panels">
       <PageTitle
         title="Analysis"
         subtitle={`Stockfish 19 Lite · Depth ${engine.lines[0]?.depth ?? 0}`}
@@ -236,31 +257,14 @@ export default function Analysis() {
           />
         </div>
       </div>
-      <div className="chess-layout analysis-layout">
-        <div className="board-column">
-          <div className="board-with-eval">
-            <div
+          <div className="analysis-evaluation-bar">            <div
               className="eval-meter"
               role="img"
               aria-label={`Evaluation ${scoreLabel(settledEvaluation)}`}
             >
-              <div style={{ height: `${50 + Math.tanh(white / 450) * 46}%` }} />
+              <div style={{ width: `${50 + Math.tanh(white / 450) * 46}%` }} />
             </div>
-            <Board
-              fen={fen}
-              onMove={play}
-              flipped={flipped}
-              onFlip={() => setFlipped((v) => !v)}
-              highlights={
-                cursor
-                  ? [
-                      moves[cursor - 1].slice(0, 2),
-                      moves[cursor - 1].slice(2, 4),
-                    ]
-                  : []
-              }
-            />
-          </div>
+</div>
           <div className="board-navigation analysis-navigation">
             <IconButton
               label="First position"
@@ -386,8 +390,6 @@ export default function Analysis() {
               )}
             </div>
           </Card>
-        </div>
-        <div className="side-panels">
           <Card className="positional-insights">
             <div className="card-heading">
               <h2>Positional insights</h2>

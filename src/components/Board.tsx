@@ -358,7 +358,7 @@ export function Board({
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
       const top = rect.top + window.scrollY;
-      const reserve = tab === "puzzles" ? (window.innerWidth <= 1000 ? 158 : 56) : 90;
+      const reserve = tab === "puzzles" ? (window.innerWidth <= 1000 ? 158 : 56) : tab === "analysis" ? 24 : 90;
       const available = window.innerHeight - top - reserve;
       const heightLimit = top < window.innerHeight - 80
         ? Math.max(80,available)
