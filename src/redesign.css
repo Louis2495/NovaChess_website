@@ -5074,3 +5074,23 @@ html { scrollbar-gutter:stable; }
 @media(max-width:1000px) {
  .workspace:has(> [data-research-view]:not([hidden])) { padding-bottom:100px; }
 }
+
+/* One compact Analysis summary lets the result panels begin higher up. */
+.analysis-summary-row { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:16px; min-width:0; }
+.analysis-summary-row .analysis-position-meta { gap:8px; }
+.analysis-engine-label { margin:0; color:var(--muted); font-size:.78rem; line-height:1.5; }
+.analysis-summary-row .analysis-tools-menu { margin:0; }
+@media(min-width:1001px) {
+ .standard-play-hub.setup-active > .play-hub-heading { top:calc(50dvh - 209px); gap:12px; }
+}
+@media(max-width:600px) {
+ .analysis-summary-row { grid-template-columns:auto minmax(0,1fr); gap:12px; }
+ .analysis-summary-row .analysis-tools-menu { grid-column:1/-1; justify-self:end; }
+ .standard-play-hub > .play-hub-heading { margin-bottom:24px; }
+}
+.analysis-layout .engine-line th { white-space:nowrap; }
+@media(max-width:1000px) {
+ .standard-play-hub > .play-hub-heading { margin-bottom:28px; }
+ .standard-play-hub > .quick-online-play { margin-top:0; padding-top:0; }
+ .standard-play-hub > .quick-online-play .new-game-primary { margin-top:0; }
+}

@@ -24,11 +24,12 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
   return <div className={`play-hub ${variants ? "variants-hub" : "standard-play-hub"} ${playing ? "match-active" : "setup-active"} ${online ? "online-opponent" : "computer-opponent"}`}>
     {!playing && <div className="play-hub-heading">
       {online ? <h1 className="sr-only">{variants ? "Variants" : "Play"}</h1> : <h2 className="sr-only">{variants ? "Variants" : "Play"}</h2>}
+      {!variants && online && <div className="time-control-toggle" role="group" aria-label="Time control">{[["180:0","3"],["180:2","3|2"],["300:0","5"],["600:0","10"]].map(([id,label])=><button key={id} aria-pressed={timeControl===id} onClick={()=>setTimeControl(id)}>{label}</button>)}</div>}
       <div className="play-opponent-toggle" role="group" aria-label="Opponent">
         {[["online", "Online"], ["computer", "Computer"]].map(([id, label]) =>
           <button key={id} aria-pressed={opponent === id} onClick={() => setOpponent(id)}>{label}</button>)}
       </div>
-      {!variants && online && <div className="time-control-toggle" role="group" aria-label="Time control">{[["180:0","3"],["180:2","3|2"],["300:0","5"],["600:0","10"]].map(([id,label])=><button key={id} aria-pressed={timeControl===id} onClick={()=>setTimeControl(id)}>{label}</button>)}</div>}
+
     </div>}
 
 

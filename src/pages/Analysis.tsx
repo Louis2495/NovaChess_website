@@ -33,7 +33,6 @@ import {
   Card,
   Button,
   IconButton,
-  PageTitle,
   Modal,
   Field,
 } from "../components/UI";
@@ -265,23 +264,8 @@ export default function Analysis() {
           </div>
         </div>
         <div className="side-panels">
-      <PageTitle
-        title="Analysis"
-        subtitle={`Stockfish 19 Lite · Depth ${engine.lines[0]?.depth ?? 0}`}
-      >
-        <div className="analysis-tools-menu" role="group" aria-label="Analysis actions">
-          <button aria-label="Save study" title="Save study" onClick={() => setSaving(true)}><Save size={18} /></button>
-          <button aria-label="Edit position" title="Set up position" onClick={() => setEditing(true)}><SlidersHorizontal size={18} /></button>
-          <button aria-label="Share position" title="Share" onClick={() => setSharing(true)}><Share2 size={18} /></button>
-          <button aria-label="Reset" title="Reset" onClick={() => reset(initialFen)}><RotateCcw size={18} /></button>
-        </div>
-      </PageTitle>
-      {engine.error && (
-        <p className="error" role="alert">
-          {engine.error}
-        </p>
-      )}
-      <div className="board-topline">
+          <h1 className="sr-only">Analysis</h1>
+          <div className="analysis-summary-row">
         <div className="analysis-position-meta">
           <span
             className="evaluation-readout"
@@ -296,7 +280,15 @@ export default function Analysis() {
             title={`${c.turn() === "w" ? "White" : "Black"} turn`}
           />
         </div>
-      </div>
+            <p className="analysis-engine-label">Stockfish 19 Lite · Depth {engine.lines[0]?.depth ?? 0}</p>
+        <div className="analysis-tools-menu" role="group" aria-label="Analysis actions">
+          <button aria-label="Save study" title="Save study" onClick={() => setSaving(true)}><Save size={18} /></button>
+          <button aria-label="Edit position" title="Set up position" onClick={() => setEditing(true)}><SlidersHorizontal size={18} /></button>
+          <button aria-label="Share position" title="Share" onClick={() => setSharing(true)}><Share2 size={18} /></button>
+          <button aria-label="Reset" title="Reset" onClick={() => reset(initialFen)}><RotateCcw size={18} /></button>
+        </div>
+          </div>
+          {engine.error && <p className="error" role="alert">{engine.error}</p>}
           <Card className="engine-top-lines">
             <div className="card-heading">
               <h2>Top lines</h2>
