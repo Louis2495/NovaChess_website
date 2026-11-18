@@ -79,7 +79,7 @@ function EvalGame({ puzzles }: { puzzles: PuzzleData[] }) {
     }));
   }
   return (
-    <div className="chess-layout">
+    <div className="chess-layout guess-eval-layout">
       <div className="board-column">
         <Board fen={fen} disabled />
       </div>

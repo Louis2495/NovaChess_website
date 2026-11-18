@@ -5266,3 +5266,12 @@ html { scrollbar-gutter:stable; }
 .puzzle-layout .board-frame { margin-inline:auto; }
 .daily-puzzle-layout .puzzle-actions-right { margin-inline:auto; justify-content:center; }
 .daily-puzzle-layout .board-column > .puzzle-actions-right > .hint-button { flex:0 0 auto; width:auto; min-width:120px; padding-inline:28px; }
+
+@media(min-width:1001px) {
+ .workspace .chess-layout.guess-eval-layout {
+  --eval-board-width:min(var(--auto-board-limit,var(--board-max)),var(--board-max));
+  grid-template-columns:minmax(0,var(--eval-board-width)) minmax(280px,360px);
+  gap:40px; width:min(100%,calc(var(--eval-board-width) + 400px)); margin-inline:auto;
+ }
+ .guess-eval-layout .eval-game-panel { margin-top:22px; width:100%; max-width:none; box-sizing:border-box; }
+}
