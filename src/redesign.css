@@ -5008,3 +5008,14 @@ html { scrollbar-gutter:stable; }
  .analysis-layout .engine-line { padding:7px; }
  .analysis-layout .engine-line table { font-size:.65rem; }
 }
+
+/* A centered queue introduction with balanced space around the gallery. */
+.variants-hub > .quick-online-play { text-align:center; }
+.variants-hub .online-variant-gallery { margin-bottom:24px; }
+.puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#c64b13; color:#fff; border-color:#ff975c; }
+.puzzle-layout .side-panels > .card:has(.theme-select) .field { margin-top:0; }
+.puzzle-layout .side-panels > .card:has(.theme-select) .field > span { font-size:1rem; font-weight:700; }
+@media(min-width:1001px) {
+ .workspace:has(.variants-hub) { padding-block:24px; }
+ .variants-hub > .quick-online-play { width:min(560px,calc(100% - 440px)); max-width:none; margin:0 auto 16px; }
+}

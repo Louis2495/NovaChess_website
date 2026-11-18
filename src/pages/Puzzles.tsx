@@ -232,7 +232,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
   );
   const actions = (
 <div className="puzzle-actions-right">
-            <Button
+            {!done && <Button
               className="hint-button" aria-label="Hint" title="Hint"
               disabled={done || c.turn() !== learner}
               onClick={() => {
@@ -244,7 +244,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             >
               <Lightbulb size={17} />
               <span className="puzzle-action-label">Hint</span>
-            </Button>
+            </Button>}
             <Button
               className={done && !daily ? "puzzle-next-button" : undefined}
               aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
@@ -332,7 +332,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           </Card>
           {!daily && (
             <Card>
-              <h2>Practice</h2>
               <Field label="Theme">
                 <ChoiceSelect
                   className="theme-select"
