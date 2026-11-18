@@ -44,8 +44,6 @@ function ClassicPuzzles() {
 function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
   const { library, setLibrary, detail, navigate, appearance } = useApp();
   const daily = detail === "daily";
-  const [mobile,setMobile]=useState(()=>matchMedia("(max-width:1000px)").matches);
-  useEffect(()=>{const query=matchMedia("(max-width:1000px)");const change=()=>setMobile(query.matches);query.addEventListener("change",change);return()=>query.removeEventListener("change",change);},[]);
   const [theme, setTheme] = useState("All themes");
   const pool = useMemo(
     () =>
@@ -315,7 +313,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             />
           </div>
           </div>
-          {mobile && actions}
           <PremoveQueue
             moves={premove.queue}
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
@@ -366,7 +363,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               </Field>
             </Card>
           )}
-          {!mobile && actions}
           {played.length > 0 && (
             <Card className="puzzle-moves">
               <div className="card-heading">
@@ -379,6 +375,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               </div>
             </Card>
           )}
+          {actions}
         </div>
       </div>
     </>
