@@ -52,7 +52,7 @@ export default function SpecialPlay({
     [busy, setBusy] = useState(false);
   const names = {
     dropping: "Dropping Squares",
-    chaos: "Chaos chess",
+    chaos: "Chaos",
     random: "Random",
   };
   function apply(action: Parameters<typeof specialApply>[1]) {

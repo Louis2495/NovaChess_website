@@ -7,22 +7,22 @@ export const variantList = [
     id: "dropping",
     name: "Dropping Squares",
     description:
-      "A square drops every five full moves. Dropped squares block movement.",
+      "A square drops away every five moves.",
   },
   {
     id: "chaos",
-    name: "Chaos chess",
-    description: "Two-step pawns, one freeze and one piece switch per player.",
+    name: "Chaos",
+    description: "Boosted pawns, one freeze, and one piece-switch per player.",
   },
   {
     id: "random",
     name: "Random",
-    description: "Each turn selects the piece you must move.",
+    description: "Each turn, a random piece is selected for you.",
   },
   {
     id: "blind",
-    name: "Blindfold · board",
-    description: "Hidden pieces. Legal moves by memory.",
+    name: "Blindfold-board",
+    description: "The pieces are hidden.",
   },
   {
     id: "blindtext",
@@ -32,12 +32,12 @@ export const variantList = [
   {
     id: "crazyhouse",
     name: "Crazyhouse",
-    description: "Drop captured pieces from your pocket.",
+    description: "Captured pieces become yours.",
   },
   {
     id: "duck",
-    name: "Duck chess",
-    description: "Move a piece, then place the duck. Capture the king.",
+    name: "Duck",
+    description: "Move a piece, then place the duck to block your opponent.",
   },
   {
     id: "atomic",
@@ -62,12 +62,12 @@ export const variantList = [
   {
     id: "horde",
     name: "Horde",
-    description: "White’s pawns against Black’s army.",
+    description: "White's horde of pawns against black's army.",
   },
   {
     id: "antichess",
     name: "Antichess",
-    description: "Captures are compulsory. Lose your army.",
+    description: "Captures are compulsory. Lose your entire army.",
   },
   {
     id: "cvpawns",
@@ -82,12 +82,12 @@ export const variantList = [
   {
     id: "chess960",
     name: "Chess960",
-    description: "Random back rank. Castle by moving king to rook.",
+    description: "Randomized back rank.",
   },
   {
     id: "bughouse",
     name: "Bughouse",
-    description: "Two boards. Captures supply your partner.",
+    description: "Two boards, four players. Captures supply your partner.",
   },
 ];
 export function chess960() {

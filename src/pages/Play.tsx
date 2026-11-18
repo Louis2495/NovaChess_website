@@ -652,7 +652,7 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
             ))}
 
           </div>}
-          {speedrunMode && <Card className="speedrun-setup"><p className="caption">Beat the computer to climb in 50-point rating steps.</p><Field label="Computer Elo"><input type="number" min={100} max={3000} step={50} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(Math.max(100,Math.min(3000,Math.round((speedrunRating||100)/50)*50)))}/></Field></Card>}
+          {speedrunMode && <Card className="speedrun-setup"><p className="caption">Beat the computer as fast as possible</p><Field label="Computer Elo"><input type="number" min={100} max={3000} step={50} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(Math.max(100,Math.min(3000,Math.round((speedrunRating||100)/50)*50)))}/></Field></Card>}
           <Card className="game-settings-card">
             <button
               className="options-toggle"

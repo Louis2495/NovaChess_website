@@ -253,7 +253,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
   const selectedDescription = mode === "throne" ? "Winner stays. Queue to challenge."
     : mode === "vote" ? "One day per move. Earliest vote breaks a tie."
     : mode === "team" ? "Invite friends to your side. Share moves and arrows."
-    : variant === "speedrun" ? "Beat the computer to climb in 50-point rating steps."
+    : variant === "speedrun" ? "Beat the computer as fast as possible"
     : variantList.find(v => v.id === variant)?.description;
   return (
     <>
