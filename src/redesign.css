@@ -4818,10 +4818,10 @@ html { scrollbar-gutter:stable; }
 }
 
 /* Keep the welcome illustration genuinely transparent and let each meme set its frame. */
-.home-page .home-welcome { grid-template-columns:136px minmax(0,1fr); max-width:740px; margin:0 auto 24px; padding:0; min-height:140px; background:none; border:0; box-shadow:none; }
+.home-page .home-welcome { grid-template-columns:136px minmax(0,1fr); max-width:none; margin:0 auto 24px; padding:0; min-height:140px; background:none; border:0; box-shadow:none; }
 .home-welcome-art .home-team-cutout { width:136px; max-width:100%; background-size:contain; background-position:center; background-repeat:no-repeat; border-radius:0; filter:drop-shadow(0 7px 9px #10263722); }
-.home-welcome-actions { display:flex; flex-direction:column; align-items:center; gap:10px; }
-.home-welcome .new-game-primary { max-width:340px; min-height:76px; width:100%; }
+.home-welcome-actions { display:flex; flex-direction:column; align-items:stretch; gap:10px; }
+.home-welcome .new-game-primary { max-width:none; min-height:76px; width:100%; }
 @media(min-width:1001px){
  .home-practice-grid { grid-template-columns:minmax(0,1fr) calc(var(--home-card-height) * var(--home-meme-aspect)); gap:24px; width:100%; max-width:calc(var(--home-card-height) + var(--home-card-height) * var(--home-meme-aspect) + 24px); margin:0 auto 24px; align-items:stretch; }
  .home-practice-grid .home-puzzle,.home-practice-grid .daily-meme { height:var(--home-card-height); width:100%; margin:0; min-height:0; }
@@ -5229,3 +5229,7 @@ html { scrollbar-gutter:stable; }
  .stats-overview .results-content { flex-wrap:wrap; gap:16px; }
 }
 @media(max-width:760px) { .stats-overview .stats-competition-grid { grid-template-columns:minmax(0,1fr); } }
+
+/* Give Home equal breathing room on both sides of its full-width content. */
+.workspace:has(.home-page) { padding-inline:clamp(16px,5vw,40px); }
+@media(min-width:1001px) { .workspace:has(.home-page) { padding-inline:clamp(40px,5vw,96px); } }
