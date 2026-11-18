@@ -246,6 +246,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               <span className="puzzle-action-label">Hint</span>
             </Button>
             <Button
+              className="puzzle-next-button"
               aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
               title={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
               onClick={() => {

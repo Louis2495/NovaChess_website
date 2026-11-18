@@ -4837,10 +4837,10 @@ html { scrollbar-gutter:stable; }
 @media(min-width:1001px) {
  .workspace-shell > .topbar { display:none; }
  .workspace { width:100%; max-width:none; padding:16px 24px 24px; box-sizing:border-box; }
- .workspace .chess-layout { --board-rail:0px; grid-template-columns:minmax(0,calc(var(--auto-board-limit,var(--board-max)) + var(--board-rail))) minmax(250px,310px); gap:20px; max-width:none; justify-content:start; }
+ .workspace .chess-layout { --board-rail:0px; grid-template-columns:minmax(0,calc(var(--auto-board-limit,var(--board-max)) + var(--board-rail))) minmax(250px,1fr); gap:20px; max-width:none; justify-content:start; }
  .workspace .analysis-layout,.workspace .game-review-layout { --board-rail:29px; }
  .workspace .chess-layout > .board-column { width:100%; max-width:none; }
- .manual-boards .workspace .chess-layout { grid-template-columns:minmax(0,calc(var(--board-max) + var(--board-rail))) minmax(250px,310px); }
+ .manual-boards .workspace .chess-layout { grid-template-columns:minmax(0,calc(var(--board-max) + var(--board-rail))) minmax(250px,1fr); }
  .workspace .lesson-workspace { grid-template-columns:minmax(260px,310px) minmax(0,1fr); max-height:none; gap:20px; }
  .workspace .lesson-board-area { max-width:var(--board-max); justify-self:start; }
  .workspace .learning-layout { grid-template-columns:minmax(250px,310px) minmax(0,var(--board-max)); gap:20px; }
@@ -4866,3 +4866,15 @@ html { scrollbar-gutter:stable; }
  .workspace .trap-board,.workspace .master-replay { grid-row:1; width:100%; max-width:100%; }
  .workspace .trap-catalog { grid-row:auto; }
 }
+
+/* Fill the workspace with useful panels instead of leaving a blank right edge. */
+@media(min-width:1001px) {
+ .workspace .chess-layout { width:100%; }
+ .workspace .chess-layout > .side-panels { width:100%; min-width:0; }
+ .analysis-layout .engine-lines { grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); }
+ .workspace .learning-layout { grid-template-columns:minmax(250px,1fr) minmax(0,var(--board-max)); }
+ .workspace .home-page .home-welcome { max-width:none; }
+ .workspace .home-practice-grid { max-width:none; grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+}
+.puzzle-layout .puzzle-actions-right > .puzzle-next-button { min-height:68px; padding:18px 24px; font-size:1.2rem; font-weight:800; }
+.puzzle-next-button > svg { width:23px; height:23px; }
