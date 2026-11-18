@@ -5282,6 +5282,23 @@ html { scrollbar-gutter:stable; }
 .saved-game-card .compact-frame > .material-imbalance { bottom:0; }
 
 .home-page .home-practice-grid .daily-meme { overflow:visible; }
-.home-page .home-practice-grid .daily-meme-image { outline:4px solid #fff; outline-offset:0; }
+.home-page .home-practice-grid .daily-meme-image { outline:8px solid #fff; outline-offset:0; }
 .home-page .home-welcome { margin-bottom:40px; }
 @media(max-width:600px) { .home-page .home-welcome { margin-bottom:32px; } }
+
+/* Keep Home's three summaries in the same desktop row. */
+@media(min-width:1001px) {
+ .home-page:has(.home-recent):not(.memes-hidden) { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1.15fr); column-gap:28px; align-items:start; }
+ .home-page:has(.home-recent):not(.memes-hidden) > .page-title,
+ .home-page:has(.home-recent):not(.memes-hidden) > .home-welcome { grid-column:1/-1; }
+ .home-page:has(.home-recent):not(.memes-hidden) > .home-practice-grid { display:contents; }
+ .home-page:has(.home-recent):not(.memes-hidden) .home-puzzle { grid-column:1; align-self:start; padding:18px; }
+ .home-page:has(.home-recent):not(.memes-hidden) .daily-meme { grid-column:2; align-self:start; }
+ .home-page:has(.home-recent):not(.memes-hidden) .daily-meme-image { max-height:min(420px,calc(100dvh - 310px)); }
+ .home-page:has(.home-recent):not(.memes-hidden) > .home-recent { grid-column:3; margin-top:0; min-width:0; }
+ .home-page:has(.home-recent):not(.memes-hidden) .recent-game-entry { margin-block:10px; }
+ .home-page:has(.home-recent):not(.memes-hidden) .recent-game-row { padding:12px 10px; gap:8px; }
+ .home-page:has(.home-recent):not(.memes-hidden) .recent-game-info b { font-size:.82rem; }
+ .home-page:has(.home-recent):not(.memes-hidden) .recent-game-info small { margin-top:4px; font-size:.7rem; line-height:1.4; }
+ .home-page:has(.home-recent):not(.memes-hidden) .game-result-label { font-size:.72rem; }
+}
