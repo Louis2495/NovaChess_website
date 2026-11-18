@@ -5146,16 +5146,17 @@ html { scrollbar-gutter:stable; }
 .stats-page .achievement .achievement-icon { color:var(--stat-panel-accent); }
 
 /* Keep player identities and clocks beside their own edge of the board. */
-.online-match .online-player-strip { width:var(--actual-board-width,100%); max-width:100%; display:flex; align-items:center; justify-content:flex-start; gap:16px; min-height:48px; padding:0; box-sizing:border-box; }
-.online-player-clock { font-size:1.65rem; font-weight:700; font-variant-numeric:tabular-nums; flex:none; }
+.online-match .online-player-strip { width:var(--actual-board-width,100%); max-width:100%; display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:48px; padding:0; box-sizing:border-box; }
+.online-player-clock { order:2; margin-left:auto; font-size:1.65rem; font-weight:700; font-variant-numeric:tabular-nums; flex:none; }
 .online-player-identity { min-width:0; }
 .online-player-identity > div { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
-.online-match-actions { display:flex; flex-direction:column; gap:12px; align-self:start; padding-top:48px; }
+.online-match-actions { display:flex; flex-direction:column; gap:12px; align-self:start; padding-top:0; }
 .online-match-actions .btn { width:100%; }
 .quick-online-play .invite-friends-option { margin-top:12px; }
 @media(min-width:1001px) {
- .online-match.chess-layout { grid-template-columns:150px minmax(0,1fr) minmax(220px,280px); gap:20px; align-items:start; }
+ .online-match.chess-layout { grid-template-columns:minmax(0,1fr) minmax(240px,300px); gap:12px; padding-left:clamp(120px,14vw,200px); align-items:start; box-sizing:border-box; }
  .online-match > .board-column { min-width:0; }
+ .online-match > .side-panels { min-width:0; }
  .play-match > .match-sidebar { grid-column:1; grid-row:1; }
  .play-match > .board-column { grid-column:2; grid-row:1; }
  .play-match.chess-layout { grid-template-columns:220px minmax(0,min(var(--play-board-size,650px),calc(100% - 240px))); }

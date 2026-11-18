@@ -465,8 +465,8 @@ function StatsOverview({
       </div>
       <CompetitionStats />
       <Card className="variant-breakdown-card">
-        <details className="variant-breakdown">
-          <summary>Variant breakdown</summary>
+        <div className="variant-breakdown">
+          <h2>Variant breakdown</h2>
           {[...new Set(games.map((g) => g.variant))].map((v) => (
             <Bar
               key={v}
@@ -476,7 +476,7 @@ function StatsOverview({
             />
           ))}
           {!games.length && <p className="caption">No completed games.</p>}
-        </details>
+        </div>
       </Card>
     </div>
   );

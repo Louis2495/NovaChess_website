@@ -208,13 +208,18 @@ test('held piece stays visible through an opponent update and can be dropped',as
  await page.mouse.up();await expect.poll(()=>env.actions.some(a=>a.move==='g1f3')).toBe(true);
 });
 
-test('online clocks follow player orientation and actions sit to the left',async({page})=>{
+test('online clocks align right, identities align left and actions sit in the right panel',async({page})=>{
  const env=await connected(page);env.room.members=[{id:uid,team:'b'},{id:peer,team:'w'}];env.room.state.clock={remaining:{w:180000,b:180000},startedAt:Date.now()};
  await page.goto('/#play/online/'+roomId);
  await expect(page.locator('.player-top')).toContainText('Opponent');await expect(page.locator('.player-bottom')).toContainText('Player');
  await expect(page.locator('.player-top').getByRole('timer',{name:'White clock',exact:true})).toBeVisible();await expect(page.locator('.player-bottom').getByRole('timer',{name:'Black clock',exact:true})).toBeVisible();
  const board=(await page.locator('.board').boundingBox())!,top=(await page.locator('.player-top').boundingBox())!,bottom=(await page.locator('.player-bottom').boundingBox())!,actions=(await page.getByRole('complementary',{name:'Game actions'}).boundingBox())!;
- expect(Math.abs(top.x-board.x)).toBeLessThan(2);expect(Math.abs(bottom.x-board.x)).toBeLessThan(2);expect(top.y+top.height).toBeLessThanOrEqual(board.y);expect(bottom.y).toBeGreaterThanOrEqual(board.y+board.height);expect(actions.x+actions.width).toBeLessThan(board.x);
+ expect(Math.abs(top.x-board.x)).toBeLessThan(2);expect(Math.abs(bottom.x-board.x)).toBeLessThan(2);expect(top.y+top.height).toBeLessThanOrEqual(board.y);expect(bottom.y).toBeGreaterThanOrEqual(board.y+board.height);expect(actions.x).toBeGreaterThanOrEqual(board.x+board.width);
+ for (const strip of [page.locator('.player-top'), page.locator('.player-bottom')]) {
+   const clock=(await strip.getByRole('timer').boundingBox())!,identity=(await strip.locator('.online-player-identity').boundingBox())!;
+   expect(Math.abs(clock.x+clock.width-board.x-board.width)).toBeLessThan(2);
+   expect(Math.abs(identity.x-board.x)).toBeLessThan(2);
+ }
  await expect(page.getByRole('button',{name:'Invite friends',exact:true})).toHaveCount(0);
 });
 

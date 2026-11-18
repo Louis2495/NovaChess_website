@@ -323,29 +323,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
           )}
           {room ? (
             <div className="chess-layout online-match">
-              <aside className="online-match-actions" aria-label="Game actions">
-                  {me?.team && room.settings.bot && (
-                    <Button
-                      className="draw-button"
-                      disabled={busy || room.state.result !== "*"}
-                      onClick={() => void act("draw")}
-                    >
-                      <Handshake size={16} />
-                      Draw
-                    </Button>
-                  )}
-                  {me?.team && room.mode !== "vote" && (
-                    <Button
-                      className="resign-button"
-                      disabled={busy || room.state.result !== "*"}
-                      onClick={() => void act("resign")}
-                    >
-                      <Flag size={16} />
-                      Resign
-                    </Button>
-                  )}
 
-              </aside>
               <div className="board-column">
                 {playerStrip(me?.team === "b" ? "w" : "b", "top")}
                 {room.state.speedrun && me?.team && <div className="speedrun-clock" role="timer" aria-label="Your move time">{duration(room.state.speedrun.elapsed[me.team]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}</div>}
@@ -443,6 +421,29 @@ export default function Community({presetMode = "standard", presetVariant = "che
                 </div>
               </div>
               <div className="side-panels">
+              <aside className="online-match-actions" aria-label="Game actions">
+                  {me?.team && room.settings.bot && (
+                    <Button
+                      className="draw-button"
+                      disabled={busy || room.state.result !== "*"}
+                      onClick={() => void act("draw")}
+                    >
+                      <Handshake size={16} />
+                      Draw
+                    </Button>
+                  )}
+                  {me?.team && room.mode !== "vote" && (
+                    <Button
+                      className="resign-button"
+                      disabled={busy || room.state.result !== "*"}
+                      onClick={() => void act("resign")}
+                    >
+                      <Flag size={16} />
+                      Resign
+                    </Button>
+                  )}
+
+              </aside>
                 {room.mode==='throne' && <RoomChat roomId={room.id} uid={uid!} nameFor={username} loadProfiles={loadProfiles}/>}
                 <Card>
                   <h2>
