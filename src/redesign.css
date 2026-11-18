@@ -5280,3 +5280,8 @@ html { scrollbar-gutter:stable; }
 .saved-game-card .compact-frame { padding-block:22px; }
 .saved-game-card .compact-frame > .material-top { top:0; }
 .saved-game-card .compact-frame > .material-imbalance { bottom:0; }
+
+.home-page .home-practice-grid .daily-meme { overflow:visible; }
+.home-page .home-practice-grid .daily-meme-image { outline:4px solid #fff; outline-offset:0; }
+.home-page .home-welcome { margin-bottom:40px; }
+@media(max-width:600px) { .home-page .home-welcome { margin-bottom:32px; } }
