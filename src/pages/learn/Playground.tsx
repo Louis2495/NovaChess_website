@@ -1,6 +1,6 @@
 import {quizArtwork} from "../../lib/quizArtwork";
 import { useState } from "react";
-import { ArrowRight, RotateCcw, Check, ArrowUpRight } from "lucide-react";
+import { ArrowRight, RotateCcw, Check, ArrowUpRight, Trophy, Sparkles, CheckCircle2 } from "lucide-react";
 import { base, useData } from "../../lib/store";
 import { useApp } from "../../lib/context";
 import { Board } from "../../components/Board";
@@ -54,8 +54,32 @@ export default function Playground({ trivia = false }: { trivia?: boolean }) {
     <Personality scenarios={scenarios} />
   );
 }
+function QuizOutcome({id, title, text, outcomes, scores, onBack, onRetake}: {
+  id:string; title:string; text:string; outcomes:{title:string;text:string}[];
+  scores:number[]; onBack:()=>void; onRetake:()=>void;
+}) {
+  const total = scores.reduce((sum, score) => sum + score, 0);
+  const winner = scores.indexOf(Math.max(...scores));
+  const tied = scores.filter(score => score === scores[winner]).length > 1;
+  return <Card className="quiz-result results-screen">
+    <div className="result-banner"><span><CheckCircle2 size={16}/>Quiz complete</span><span>{total} choices explored</span></div>
+    <div className="result-hero">
+      <div className="result-art"><QuizPicture {...quizArtwork(id,winner)} label={title} result/></div>
+      <div className="result-introduction"><span className="result-eyebrow"><Sparkles size={16}/> Your result</span><h2 tabIndex={-1} autoFocus>{title}</h2><p>{text}</p><div className="result-seal">A new side of your chess personality</div></div>
+    </div>
+    <div className="result-details">
+      <section className="result-breakdown"><h3>Your mix</h3><p>Every choice adds to the picture. Here’s how yours came together.</p>
+        <div className="result-distribution">{outcomes.map((outcome,index)=><div key={outcome.title} className={index===winner?"result-trait leading":"result-trait"}>
+          <div><span>{outcome.title}</span><b>{scores[index]} / {total}</b></div><div className="result-track"><span style={{width:`${total?scores[index]/total*100:0}%`}}/></div>
+        </div>)}</div>
+        {tied && <p className="result-tie">A close call: your top outcomes tied. The first matching result is shown.</p>}
+      </section>
+      <section className="result-next"><span className="result-eyebrow">The next move</span><h3>There’s more to discover</h3><p>Try another theme to see a different side of your choices, or retake this quiz and explore a different path.</p><div className="result-actions"><Button onClick={onBack}>Try another quiz<ArrowRight size={18}/></Button><Button className="secondary" onClick={onRetake}><RotateCcw size={16}/>Retake quiz</Button></div></section>
+    </div>
+  </Card>;
+}
 function Trivia({ questions }: { questions: Question[] }) {
-  const { library, setLibrary } = useApp();
+  const { library, setLibrary, navigate } = useApp();
   const [deck, setDeck] = useState(() => shuffle(questions)),
     [round, setRound] = useState(0),
     [choice, setChoice] = useState<string | null>(null),
@@ -64,12 +88,16 @@ function Trivia({ questions }: { questions: Question[] }) {
     [answers, setAnswers] = useState(() =>
       shuffle(questions.find((q) => q.id === deck[0].id)!.answers),
     ),
-    [done, setDone] = useState(false);
+    [done, setDone] = useState(false),
+    [review, setReview] = useState<{question:Question; selected:string; correct:boolean}[]>([]),
+    [bestStreak, setBestStreak] = useState(0);
   const q = deck[round];
   function pick(a: string) {
     if (choice) return;
     setChoice(a);
     const correct = a === q.answers[q.correct];
+    setReview(previous => [...previous, {question:q, selected:a, correct}]);
+    if (correct) setBestStreak(previous => Math.max(previous, streak + 1));
     if (correct) {
       const next = score + 100 + Math.min(50, streak * 10);
       setScore(next);
@@ -84,28 +112,20 @@ function Trivia({ questions }: { questions: Question[] }) {
       }));
     } else setStreak(0);
   }
+  const correctCount = review.filter(answer => answer.correct).length;
   return (
-    <Card className="trivia-game">
+    <Card className={done ? "trivia-game quiz-result results-screen" : "trivia-game"}>
       {done ? (
         <>
-          <QuizPicture tile={7} result />
-          <h2>{score} points</h2>
-          <p className="caption">Best: {library.progress.triviaBest || 0}</p>
-          <Button
-            onClick={() => {
-              const next = shuffle(questions);
-              setDeck(next);
-              setRound(0);
-              setScore(0);
-              setChoice(null);
-              setStreak(0);
-              setAnswers(shuffle(next[0].answers));
-              setDone(false);
-            }}
-          >
-            <RotateCcw size={16} />
-            Play again
-          </Button>
+          <div className="result-banner"><span><CheckCircle2 size={16}/>Round complete</span><span>10 questions explored</span></div>
+          <div className="result-hero"><div className="result-art"><QuizPicture tile={7} result/></div><div className="result-introduction"><span className="result-eyebrow"><Trophy size={16}/>Your trivia result</span><h2>{score} points</h2><p>{correctCount===10?"A perfect round. You know your chess facts inside out.":correctCount>=7?"A strong round. Your chess knowledge is paying off.":correctCount>=4?"A solid foundation, with a few new discoveries along the way.":"Every round is a chance to discover something new. Keep your curiosity in play."}</p><div className="result-seal">Best: {library.progress.triviaBest || 0}</div></div></div>
+          <div className="result-metrics"><div><strong>{correctCount}<small> / 10</small></strong><span>Correct answers</span></div><div><strong>{correctCount*10}%</strong><span>Accuracy</span></div><div><strong>{bestStreak}</strong><span>Best streak this round</span></div></div>
+          <section className="result-review"><h3>Your round, revisited</h3><p>Take the answers—and the stories behind them—into your next round.</p>{review.map((answer,index)=><details key={answer.question.id} className={answer.correct?"review-correct":"review-incorrect"}><summary><span className="review-number">{index+1}</span><span>{answer.question.prompt}{answer.question.clue && <small className="review-clue">{answer.question.clue}</small>}</span><span className="review-verdict">{answer.correct?"Correct":"Review"}</span></summary><div className="review-answer">{!answer.correct&&<p>Your answer: {answer.selected}</p>}<p><b>Correct answer:</b> {answer.question.answers[answer.question.correct]}</p><p>{answer.question.explanation}</p><a className="external" href={answer.question.source} target="_blank" rel="noreferrer">Read the source<ArrowUpRight size={14}/></a></div></details>)}</section>
+          <div className="result-footer"><div><h3>Ready for another round?</h3><p>Ten more questions. A new chance to beat your best.</p></div><div className="result-actions"><Button onClick={() => {
+      const next = shuffle(questions); setDeck(next); setRound(0); setScore(0);
+      setChoice(null); setStreak(0); setBestStreak(0); setReview([]);
+      setAnswers(shuffle(next[0].answers)); setDone(false);
+    }}><RotateCcw size={16}/>Play again</Button><Button className="secondary" onClick={()=>navigate("learn")}>Explore Learn<ArrowRight size={16}/></Button></div></div>
         </>
       ) : (
         <>
@@ -232,10 +252,11 @@ function ExtraQuiz({quiz,onBack}:{quiz:FunQuiz;onBack:()=>void}){
  const done=answers.length===quiz.questions.length;
  const winner=scores.indexOf(Math.max(...scores));
  const question=quiz.questions[answers.length];
- return <Card className={done?"quiz-result":"personality-question fun-quiz"}>
- <div className="game-score-row"><span>{done?"Your result":`${answers.length+1} / ${quiz.questions.length}`}</span><button onClick={onBack}>Quizzes</button></div>
- <QuizPicture {...quizArtwork(quiz.id,done?winner:undefined)} label={done?quiz.results[winner].title:undefined} result={done}/>
- {done?<><h2>{quiz.results[winner].title}</h2><p>{quiz.results[winner].text}</p><Button onClick={onBack}><RotateCcw size={16}/>Try another quiz</Button><Button className="secondary" onClick={()=>setAnswers([])}>Retake quiz</Button></>:<><h2>{question.prompt}</h2><div className="quiz-moves">{question.answers.map(a=><button key={a.label} onClick={()=>setAnswers(prev=>[...prev,a.score])}>{a.label}</button>)}</div>{answers.length>0 && <Button className="text-button" onClick={()=>setAnswers(prev=>prev.slice(0,-1))}>Previous</Button>}</>}
+ if(done)return <QuizOutcome id={quiz.id} title={quiz.results[winner].title} text={quiz.results[winner].text} outcomes={quiz.results} scores={scores} onBack={onBack} onRetake={()=>setAnswers([])}/>;
+ return <Card className="personality-question fun-quiz">
+ <div className="game-score-row"><span>{answers.length+1} / {quiz.questions.length}</span><button onClick={onBack}>Quizzes</button></div>
+ <QuizPicture {...quizArtwork(quiz.id)}/>
+ <h2>{question.prompt}</h2><div className="quiz-moves">{question.answers.map(a=><button key={a.label} onClick={()=>setAnswers(prev=>[...prev,a.score])}>{a.label}</button>)}</div>{answers.length>0 && <Button className="text-button" onClick={()=>setAnswers(prev=>prev.slice(0,-1))}>Previous</Button>}
  </Card>;
 }
 function Personality({ scenarios }: { scenarios: Scenario[] }) {
@@ -267,23 +288,9 @@ function Personality({ scenarios }: { scenarios: Scenario[] }) {
   if (step === scenarios.length) {
     const index = scores.indexOf(Math.max(...scores)),
       [title, text] = results[quiz][index];
-    return (
-      <Card className="quiz-result">
-        <QuizPicture {...quizArtwork(quiz,index)} label={title} result />
-        <h2>{title}</h2>
-        <p>{text}</p>
-        <Button
-          onClick={() => {
-            setStep(0);
-            setScores([0, 0, 0, 0]);
-            setQuiz(null);
-          }}
-        >
-          <RotateCcw size={16} />
-          Try another quiz
-        </Button>
-      </Card>
-    );
+    return <QuizOutcome id={quiz} title={title} text={text} outcomes={results[quiz].map(([title,text])=>({title,text}))} scores={scores}
+      onBack={()=>{setStep(0);setScores([0,0,0,0]);setQuiz(null);}}
+      onRetake={()=>{setStep(0);setScores([0,0,0,0]);}}/>;
   }
   const scenario = scenarios[step];
   return (
