@@ -2,13 +2,13 @@ import {online} from "./lib/online";
 import {screenName} from "./lib/screenName";
 import {useOnlineSession,useRecoveryState} from "./lib/online";
 import AccountPresence from "./components/AccountPresence";
+import FrontBinoculars from "./components/FrontBinoculars";
 import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Home,
-  Shapes,
-  Binoculars,
+  Dices,
   Swords,
   Puzzle,
   BookOpen,
@@ -66,10 +66,10 @@ const mainNav = [
   { id: "home", label: "Home", icon: Home },
   { id: "analysis", label: "Analysis", icon: Search },
   { id: "play", label: "Play", icon: Swords },
-  { id: "variants", label: "Variants", icon: Shapes },
+  { id: "variants", label: "Variants", icon: Dices },
   { id: "puzzles", label: "Puzzles", icon: Puzzle },
   { id: "learn", label: "Learn", icon: BookOpen },
-  { id: "research", label: "Research", icon: Binoculars },
+  { id: "research", label: "Research", icon: FrontBinoculars },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
   { id: "library", label: "Library", icon: FolderOpen },
 ] as const;
