@@ -207,6 +207,14 @@ export default function Analysis() {
       <div className="chess-layout analysis-layout">
         <div className="board-column">
           <div className="board-with-eval">
+            <div
+              className="eval-meter"
+              role="img"
+              aria-label={`Evaluation ${scoreLabel(settledEvaluation)}`}
+            >
+              <div style={{ height: `${50 + Math.tanh(white / 450) * 46}%` }} />
+            </div>
+
             <Board
               fen={fen}
               onMove={play}
@@ -222,7 +230,39 @@ export default function Analysis() {
               }
             />
           </div>
-
+          <div className="board-navigation analysis-navigation">
+            <IconButton
+              label="First position"
+              disabled={!cursor}
+              onClick={() => setCursor(0)}
+            >
+              <ChevronsLeft size={18} />
+            </IconButton>
+            <IconButton
+              label="Previous position"
+              disabled={!cursor}
+              onClick={() => setCursor(cursor - 1)}
+            >
+              <ChevronLeft size={20} />
+            </IconButton>
+            <span>
+              {Math.ceil(cursor / 2)} / {Math.ceil(moves.length / 2)}
+            </span>
+            <IconButton
+              label="Next position"
+              disabled={cursor === moves.length}
+              onClick={() => setCursor(cursor + 1)}
+            >
+              <ChevronRight size={20} />
+            </IconButton>
+            <IconButton
+              label="Last position"
+              disabled={cursor === moves.length}
+              onClick={() => setCursor(moves.length)}
+            >
+              <ChevronsRight size={18} />
+            </IconButton>
+          </div>
         </div>
         <div className="side-panels">
       <PageTitle
@@ -257,150 +297,6 @@ export default function Analysis() {
           />
         </div>
       </div>
-          <div className="analysis-evaluation-bar">            <div
-              className="eval-meter"
-              role="img"
-              aria-label={`Evaluation ${scoreLabel(settledEvaluation)}`}
-            >
-              <div style={{ width: `${50 + Math.tanh(white / 450) * 46}%` }} />
-            </div>
-</div>
-          <div className="board-navigation analysis-navigation">
-            <IconButton
-              label="First position"
-              disabled={!cursor}
-              onClick={() => setCursor(0)}
-            >
-              <ChevronsLeft size={18} />
-            </IconButton>
-            <IconButton
-              label="Previous position"
-              disabled={!cursor}
-              onClick={() => setCursor(cursor - 1)}
-            >
-              <ChevronLeft size={20} />
-            </IconButton>
-            <span>
-              {Math.ceil(cursor / 2)} / {Math.ceil(moves.length / 2)}
-            </span>
-            <IconButton
-              label="Next position"
-              disabled={cursor === moves.length}
-              onClick={() => setCursor(cursor + 1)}
-            >
-              <ChevronRight size={20} />
-            </IconButton>
-            <IconButton
-              label="Last position"
-              disabled={cursor === moves.length}
-              onClick={() => setCursor(moves.length)}
-            >
-              <ChevronsRight size={18} />
-            </IconButton>
-          </div>
-          <Card className="analysis-notation">
-            <div className="card-heading">
-              <button
-                className="notation-toggle"
-                aria-expanded={notationOpen}
-                aria-controls="analysis-notation"
-                onClick={() => setNotationOpen((v) => !v)}
-              >
-                <h2>Notation</h2>
-                <ChevronDown size={17} />
-              </button>
-              <div className="button-row">
-                <span className="pill">
-                  {Math.ceil(moves.length / 2)} moves
-                </span>
-                {!followNotation && (
-                  <IconButton
-                    label="Follow current move"
-                    onClick={() => setFollowNotation(true)}
-                  >
-                    <LocateFixed size={17} />
-                  </IconButton>
-                )}
-              </div>
-            </div>
-            <div
-              className="notation-table"
-              id="analysis-notation"
-              hidden={!notationOpen}
-              ref={notationRef}
-              tabIndex={0}
-              aria-label="Game notation"
-              onWheel={() => {
-                const l = notationRef.current;
-                if (l && l.scrollHeight > l.clientHeight)
-                  setFollowNotation(false);
-              }}
-              onTouchMove={() => {
-                const l = notationRef.current;
-                if (l && l.scrollHeight > l.clientHeight)
-                  setFollowNotation(false);
-              }}
-              onPointerDown={(e) => {
-                if (e.target === e.currentTarget) setFollowNotation(false);
-              }}
-              onKeyDown={(e) => {
-                if (
-                  [
-                    "ArrowUp",
-                    "ArrowDown",
-                    "PageUp",
-                    "PageDown",
-                    "Home",
-                    "End",
-                  ].includes(e.key)
-                ) {
-                  setFollowNotation(false);
-                  e.stopPropagation();
-                }
-              }}
-            >
-              <div>
-                <span>#</span>
-                <span>White</span>
-                <span>Black</span>
-              </div>
-              {Array.from(
-                { length: Math.ceil(notation.length / 2) },
-                (_, i) => (
-                  <div key={i}>
-                    <span>{i + 1}</span>
-                    {[0, 1].map((k) => (
-                      <button
-                        key={k}
-                        disabled={!notation[i * 2 + k]}
-                        className={cursor === i * 2 + k + 1 ? "current" : ""}
-                        onClick={() => {
-                          setCursor(i * 2 + k + 1);
-                          setFollowNotation(true);
-                        }}
-                      >
-                        {notation[i * 2 + k] || "—"}
-                      </button>
-                    ))}
-                  </div>
-                ),
-              )}
-              {!moves.length && (
-                <p className="muted">Play a move on the board.</p>
-              )}
-            </div>
-          </Card>
-          <Card className="positional-insights">
-            <div className="card-heading">
-              <h2>Positional insights</h2>
-              <Lightbulb size={18} />
-            </div>
-            <div className="insights" aria-live="polite">
-              {insights.map((text) => (
-                <p key={text}>{text}</p>
-              ))}
-            </div>
-          </Card>
           <Card className="engine-top-lines">
             <div className="card-heading">
               <h2>Top lines</h2>
@@ -502,6 +398,110 @@ export default function Analysis() {
               </div>
             )}
           </Card>
+          <Card className="positional-insights">
+            <div className="card-heading">
+              <h2>Positional insights</h2>
+              <Lightbulb size={18} />
+            </div>
+            <div className="insights" aria-live="polite">
+              {insights.map((text) => (
+                <p key={text}>{text}</p>
+              ))}
+            </div>
+          </Card>
+          <Card className="analysis-notation">
+            <div className="card-heading">
+              <button
+                className="notation-toggle"
+                aria-expanded={notationOpen}
+                aria-controls="analysis-notation"
+                onClick={() => setNotationOpen((v) => !v)}
+              >
+                <h2>Notation</h2>
+                <ChevronDown size={17} />
+              </button>
+              <div className="button-row">
+                <span className="pill">
+                  {Math.ceil(moves.length / 2)} moves
+                </span>
+                {!followNotation && (
+                  <IconButton
+                    label="Follow current move"
+                    onClick={() => setFollowNotation(true)}
+                  >
+                    <LocateFixed size={17} />
+                  </IconButton>
+                )}
+              </div>
+            </div>
+            <div
+              className="notation-table"
+              id="analysis-notation"
+              hidden={!notationOpen}
+              ref={notationRef}
+              tabIndex={0}
+              aria-label="Game notation"
+              onWheel={() => {
+                const l = notationRef.current;
+                if (l && l.scrollHeight > l.clientHeight)
+                  setFollowNotation(false);
+              }}
+              onTouchMove={() => {
+                const l = notationRef.current;
+                if (l && l.scrollHeight > l.clientHeight)
+                  setFollowNotation(false);
+              }}
+              onPointerDown={(e) => {
+                if (e.target === e.currentTarget) setFollowNotation(false);
+              }}
+              onKeyDown={(e) => {
+                if (
+                  [
+                    "ArrowUp",
+                    "ArrowDown",
+                    "PageUp",
+                    "PageDown",
+                    "Home",
+                    "End",
+                  ].includes(e.key)
+                ) {
+                  setFollowNotation(false);
+                  e.stopPropagation();
+                }
+              }}
+            >
+              <div>
+                <span>#</span>
+                <span>White</span>
+                <span>Black</span>
+              </div>
+              {Array.from(
+                { length: Math.ceil(notation.length / 2) },
+                (_, i) => (
+                  <div key={i}>
+                    <span>{i + 1}</span>
+                    {[0, 1].map((k) => (
+                      <button
+                        key={k}
+                        disabled={!notation[i * 2 + k]}
+                        className={cursor === i * 2 + k + 1 ? "current" : ""}
+                        onClick={() => {
+                          setCursor(i * 2 + k + 1);
+                          setFollowNotation(true);
+                        }}
+                      >
+                        {notation[i * 2 + k] || "—"}
+                      </button>
+                    ))}
+                  </div>
+                ),
+              )}
+              {!moves.length && (
+                <p className="muted">Play a move on the board.</p>
+              )}
+            </div>
+          </Card>
+
         </div>
       </div>
       {saving && (

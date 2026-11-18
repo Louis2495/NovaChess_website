@@ -120,7 +120,7 @@ test("top lines have individual White/Black move tables, including Black-to-play
   if (!isMobile) {
     const a = (await tables.nth(0).boundingBox())!,
       b = (await tables.nth(1).boundingBox())!;
-    expect(b.y).toBeGreaterThan(a.y + a.height);
-    expect(Math.abs(b.x-a.x)).toBeLessThan(2);
+    expect(Math.abs(b.y-a.y)).toBeLessThan(2);
+    expect(b.x).toBeGreaterThan(a.x + a.width);
   }
 });

@@ -4985,3 +4985,26 @@ html { scrollbar-gutter:stable; }
 }
 
 .review-clue { display:block; color:var(--muted); font-size:.78rem; line-height:1.6; margin-top:4px; }
+
+/* Analysis: vertical evaluation beside the board, playback directly beneath it. */
+.workspace .analysis-layout { --board-rail:29px; }
+.analysis-layout .board-with-eval { display:flex; gap:10px; }
+.analysis-layout .board-with-eval > .eval-meter { width:19px; flex:none; }
+.analysis-layout > .board-column > .analysis-navigation { width:var(--actual-board-width,calc(100% - 29px)); max-width:calc(100% - 29px); margin:18px 0 0 29px; }
+.analysis-layout .engine-lines { display:grid; grid-template-columns:repeat(var(--engine-columns,3),minmax(0,1fr)); gap:10px; }
+.analysis-layout .engine-line { padding:10px; }
+.analysis-layout .side-panels > .analysis-notation { width:100%; max-width:none; margin:0; }
+@media(min-width:1001px) {
+ .workspace .analysis-layout { grid-template-columns:minmax(0,calc(var(--auto-board-limit,var(--board-max)) + 29px)) minmax(440px,1fr); }
+ .manual-boards .workspace .analysis-layout { grid-template-columns:minmax(0,calc(var(--board-max) + 29px)) minmax(440px,1fr); }
+ .standard-play-hub.setup-active > .play-hub-heading { top:calc(50dvh - 225px); display:flex; flex-direction:column; justify-content:center; gap:12px; }
+ .standard-play-hub > .play-hub-heading .play-opponent-toggle { order:2; align-self:center; }
+ .standard-play-hub > .play-hub-heading .time-control-toggle { order:1; width:276px; max-width:100%; }
+}
+@media(max-width:1000px) {
+ .standard-play-hub > .play-hub-heading { display:flex; flex-direction:column; align-items:center; gap:12px; }
+ .standard-play-hub > .play-hub-heading .play-opponent-toggle { order:2; }
+ .standard-play-hub > .play-hub-heading .time-control-toggle { order:1; width:min(276px,100%); margin:0; }
+ .analysis-layout .engine-line { padding:7px; }
+ .analysis-layout .engine-line table { font-size:.65rem; }
+}
