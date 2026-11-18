@@ -2,6 +2,7 @@ import {online} from "./lib/online";
 import {screenName} from "./lib/screenName";
 import {useOnlineSession,useRecoveryState} from "./lib/online";
 import AccountPresence from "./components/AccountPresence";
+import JigsawPiece from "./components/JigsawPiece";
 import FrontBinoculars from "./components/FrontBinoculars";
 import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -10,7 +11,6 @@ import {
   Home,
   Dices,
   Swords,
-  Puzzle,
   BookOpen,
   FolderOpen,
   ChartNoAxesCombined,
@@ -67,7 +67,7 @@ const mainNav = [
   { id: "analysis", label: "Analysis", icon: Search },
   { id: "play", label: "Play", icon: Swords },
   { id: "variants", label: "Variants", icon: Dices },
-  { id: "puzzles", label: "Puzzles", icon: Puzzle },
+  { id: "puzzles", label: "Puzzles", icon: JigsawPiece },
   { id: "learn", label: "Learn", icon: BookOpen },
   { id: "research", label: "Research", icon: FrontBinoculars },
   { id: "stats", label: "Stats", icon: ChartNoAxesCombined },
