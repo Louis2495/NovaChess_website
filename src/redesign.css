@@ -5275,3 +5275,8 @@ html { scrollbar-gutter:stable; }
  }
  .guess-eval-layout .eval-game-panel { margin-top:22px; width:100%; max-width:none; box-sizing:border-box; }
 }
+
+/* Reserve material space inside Library previews so card padding stays even. */
+.saved-game-card .compact-frame { padding-block:22px; }
+.saved-game-card .compact-frame > .material-top { top:0; }
+.saved-game-card .compact-frame > .material-imbalance { bottom:0; }
