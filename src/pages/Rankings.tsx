@@ -60,7 +60,7 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
       : "https://www.uschess.org/msa/MbrDtlMain.php?" +
         encodeURIComponent(memberId);
   return (
-    <>
+    <div className="rankings-page">
       {!embedded && <PageTitle title="Rankings" />}
       <FederationCards />
       <div className="rank-summary">
@@ -162,7 +162,7 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
           )}
         </div>
       </Card>
-    </>
+    </div>
   );
 }
 function flag(code: string) {

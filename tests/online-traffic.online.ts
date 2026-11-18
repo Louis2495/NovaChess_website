@@ -194,3 +194,49 @@ test('the owner can grant administrator access by email, while delegated admins 
  await page.goto('/#profile/admin');await page.getByLabel('Administrator email',{exact:true}).fill('friend@example.test');await page.getByRole('button',{name:'Grant admin access',exact:true}).click();await expect(page.getByRole('status')).toContainText('Administrator access granted to friend@example.test');expect(grants).toEqual(['friend@example.test']);
  owner=false;await page.reload();await expect(page.getByRole('heading',{name:'Accounts',exact:true})).toBeVisible();await expect(page.getByLabel('Administrator email',{exact:true})).toHaveCount(0);
 });
+
+test('held piece stays visible through an opponent update and can be dropped',async({page})=>{
+ const env=await connected(page);env.c.move('e4');env.room.state={...env.room.state,fen:env.c.fen(),moves:['e2e4'],notation:['e4'],positions:[env.c.fen()]};
+ await page.goto('/#play/online/'+roomId);await expect.poll(()=>env.joins.length).toBeGreaterThan(0);
+ const knight=page.getByRole('button',{name:'g1, white knight',exact:true}),target=page.getByRole('button',{name:'f3, empty',exact:true});
+ const from=(await knight.boundingBox())!,to=(await target.boundingBox())!;
+ await page.mouse.move(from.x+from.width/2,from.y+from.height/2);await page.mouse.down();await page.mouse.move(to.x+to.width/2,to.y+to.height/2);
+ await expect(page.locator('.drag-piece')).toBeVisible();
+ await page.evaluate(()=>{(window as any).dragRemoved=false;new MutationObserver(records=>{for(const record of records)for(const node of record.removedNodes)if(node instanceof Element && (node.matches('.drag-piece')||node.querySelector('.drag-piece')))(window as any).dragRemoved=true;}).observe(document.body,{childList:true,subtree:true});});
+ env.c.move('e5');env.emit('rooms',{...env.room,revision:2,state:{...env.room.state,fen:env.c.fen(),moves:['e2e4','e7e5'],notation:['e4','e5']}});
+ await expect(page.getByRole('button',{name:'e5, black pawn',exact:true})).toBeVisible();await expect(page.locator('.drag-piece')).toBeVisible();expect(await page.evaluate(()=>(window as any).dragRemoved)).toBe(false);
+ await page.mouse.up();await expect.poll(()=>env.actions.some(a=>a.move==='g1f3')).toBe(true);
+});
+
+test('online clocks follow player orientation and actions sit to the left',async({page})=>{
+ const env=await connected(page);env.room.members=[{id:uid,team:'b'},{id:peer,team:'w'}];env.room.state.clock={remaining:{w:180000,b:180000},startedAt:Date.now()};
+ await page.goto('/#play/online/'+roomId);
+ await expect(page.locator('.player-top')).toContainText('Opponent');await expect(page.locator('.player-bottom')).toContainText('Player');
+ await expect(page.locator('.player-top').getByRole('timer',{name:'White clock',exact:true})).toBeVisible();await expect(page.locator('.player-bottom').getByRole('timer',{name:'Black clock',exact:true})).toBeVisible();
+ const board=(await page.locator('.board').boundingBox())!,top=(await page.locator('.player-top').boundingBox())!,bottom=(await page.locator('.player-bottom').boundingBox())!,actions=(await page.getByRole('complementary',{name:'Game actions'}).boundingBox())!;
+ expect(Math.abs(top.x-board.x)).toBeLessThan(2);expect(Math.abs(bottom.x-board.x)).toBeLessThan(2);expect(top.y+top.height).toBeLessThanOrEqual(board.y);expect(bottom.y).toBeGreaterThanOrEqual(board.y+board.height);expect(actions.x+actions.width).toBeLessThan(board.x);
+ await expect(page.getByRole('button',{name:'Invite friends',exact:true})).toHaveCount(0);
+});
+
+test('Invite friends creates a room from the start page without matchmaking',async({page})=>{
+ const env=await connected(page);await page.goto('/#play');await page.getByRole('button',{name:'Invite friends',exact:true}).click();
+ await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',bot:false});expect(env.requests.some(u=>u.pathname.endsWith('/room_lobby'))).toBe(false);
+});
+
+test('finished game has a sad king, paired notation, review and outside-board dismissal',async({page})=>{
+ const env=await connected(page);const initial=env.c.fen();env.c.move('e4');const afterWhite=env.c.fen();env.c.move('e5');
+ env.room.status='finished';env.room.state={...env.room.state,initial,fen:env.c.fen(),moves:['e2e4','e7e5'],notation:['e4','e5'],positions:[initial,afterWhite,env.c.fen()],result:'1-0'};
+ await page.goto('/#play/online/'+roomId);const message=page.locator('.game-result-banner');await expect(message.getByRole('img',{name:'Sad chess king'})).toBeVisible();await expect(message.getByRole('button',{name:'Game review',exact:true})).toBeVisible();
+ const notation=page.getByRole('table',{name:'Game notation'});await expect(notation.getByRole('columnheader')).toHaveText(['Move','White','Black']);await expect(notation.locator('tbody tr').first().getByRole('cell')).toHaveText(['e4','e5']);
+ await message.getByText('You won!',{exact:true}).click();await expect(message).toBeVisible();
+ const board=(await page.locator('.board').boundingBox())!;await page.mouse.click(board.x+8,board.y+8);await expect(message).toHaveCount(0);
+ await page.reload();await page.getByRole('button',{name:'Game review',exact:true}).click();await expect(page).toHaveURL(/#library\//);
+ const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).games[0]);expect(game.moves).toEqual(['e2e4','e7e5']);expect(game.result).toBe('1-0');
+});
+
+test('Throne review opens the completed round after a reset',async({page})=>{
+ const env=await connected(page);const initial=env.c.fen();env.c.move('e4');const finished={...env.room.state,initial,fen:env.c.fen(),moves:['e2e4'],notation:['e4'],positions:[initial,env.c.fen()],result:'1-0'};
+ env.room.mode='throne';env.room.state.lastGame={id:'finished-round',result:'1-0',white:uid,black:peer,reason:'resignation',resignedBy:peer,position:finished};
+ await page.goto('/#variants/online/'+roomId);await page.getByRole('button',{name:'Game review',exact:true}).click();await expect(page).toHaveURL(/#library\//);
+ const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).games[0]);expect(game.moves).toEqual(['e2e4']);expect(game.initial).toBe(initial);
+});

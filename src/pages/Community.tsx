@@ -1,3 +1,4 @@
+import type { SavedGame } from "../lib/types";
 import type {ReactNode} from "react";
 import MultiplayerPicture from "../components/MultiplayerPicture";
 import VariantIcon from "../components/VariantIcon";
@@ -33,7 +34,7 @@ import OnlineAccount from "../components/OnlineAccount";
 import GameResult from "../components/GameResult";
 import { ChoiceSelect, Button, Card, Field, PageTitle } from "../components/UI";
 type Member = { id: string; team: "w" | "b" | null; board?:number };
-type LastGame={id:string;result:string;white:string;black:string;reason:string;resignedBy?:string};
+type LastGame={id:string;result:string;white:string;black:string;reason:string;resignedBy?:string;position?:Room["state"]};
 type Room = {
   id: string;
   name: string;
@@ -48,10 +49,10 @@ type Room = {
   marks: BoardMark[];
   settings: { bot: boolean };
 };
-type Profile = { id: string; username: string;screen_name?:string };
+type Profile = { id: string; username: string;screen_name?:string; rating?:number };
 export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0, children}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number; children?:ReactNode}) {
   const { session } = useOnlineSession(),
-    { tab, detail, navigate, notify, appearance } = useApp();
+    { tab, detail, navigate, notify, appearance, setLibrary } = useApp();
   const [confirmed, setConfirmed] = useState<Room | null>(null),
     [profiles, setProfiles] = useState<Profile[]>([]),
     [mode] = useState(presetMode),
@@ -68,6 +69,11 @@ export default function Community({presetMode = "standard", presetVariant = "che
   const [prediction,setPrediction]=useState<{roomId:string;revision:number;state:Room['state']}|null>(null),[dismissed,setDismissed]=useState<Record<string,string>>({});
   const pending=useRef(false),confirmedRef=useRef(confirmed);confirmedRef.current=confirmed;
   const room=prediction && confirmed?.id===prediction.roomId && confirmed.revision===prediction.revision?{...confirmed,state:prediction.state}:confirmed;
+  const roundHistory = useRef(new Map<string, Room["state"]>());
+  if (room?.state.gameKey) {
+    roundHistory.current.set(room.state.gameKey, room.state);
+    if (roundHistory.current.size > 4) roundHistory.current.delete(roundHistory.current.keys().next().value!);
+  }
   const acceptRoom=useCallback((next:Room)=>{if(routeRef.current && routeRef.current!==next.id)return;setConfirmed(current=>current && current.id===next.id && current.revision>=next.revision?current:next);},[]);
   const pendingPrediction=useRef(false),requestId=useRef(0),submitted=useRef<{id:number;base:Room;move:string}|null>(null);
   const confirmedMove=(current:Room|null,base:Room,move:string)=>!!current && current.id===base.id && (
@@ -95,7 +101,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
   const loadProfiles=useCallback(async(ids:string[])=>{
     if(!online)return;const missing=[...new Set(ids)].filter(id=>!profileCache.current.has(id));
     if(!missing.length)return;
-    const {data}=await online.from("profiles").select("id,username,screen_name").in("id",missing);
+    const {data}=await online.from("profiles").select("id,username,screen_name,rating").in("id",missing);
     for(const p of data||[])profileCache.current.set(p.id,p);
     setProfiles([...profileCache.current.values()]);
   },[]);
@@ -250,6 +256,48 @@ export default function Community({presetMode = "standard", presetVariant = "che
     const key=room.id+':'+room.revision;if((timeoutRequested.current.key===key && Date.now()-timeoutRequested.current.at<2000) || pending.current)return;timeoutRequested.current={key,at:Date.now()};
     void act('claim_timeout');
   },[clock,room?.revision,gameClock?.startedAt]);
+  function reviewGame(previous = false) {
+    if (!room) return;
+    const state = previous && last ? last.position || roundHistory.current.get(last.id) : position;
+    if (!state) { notify("This older round has no recorded moves available for review."); return; }
+    const human = previous && last ? (last.white === uid ? "w" : "b") : me?.team || "w";
+    const id = `online-${room.id}-${previous && last ? last.id : state.gameKey || "game"}`;
+    const game: SavedGame = {
+      id, kind:"game", origin:"novachess", title:room.name, created:Date.now(),
+      initial:state.initial || state.positions[0] || state.fen,
+      variant:room.variant, moves:state.moves, notation:state.notation, positions:state.positions,
+      result:previous && last ? last.result : state.result, human, folder:"Games",
+      opponent:room.members.filter(m => m.team && m.team !== human).map(m => username(m.id)).join(", "),
+      ...(specialVariants.includes(room.variant) && "blocked" in state ? {special:state} : {}),
+    };
+    setLibrary(l => ({...l, games:[game,...l.games.filter(g => g.id !== id)]}));
+    navigate("library", id);
+  }
+  function playerStrip(side: "w" | "b", placement: "top" | "bottom") {
+    if (!room) return null;
+    const members = room.members.filter(m => m.team === side &&
+      (room.variant !== "bughouse" || (m.board || 0) === (me?.board || 0)));
+    return <div className={`online-player-strip player-${placement}`} aria-label={`${side === "w" ? "White" : "Black"} player`}>
+      {gameClock && <span className="online-player-clock" role="timer" aria-label={`${side === "w" ? "White" : "Black"} clock`}>{duration(remaining(side)).split('.')[0]}</span>}
+      <div className="online-player-identity">{members.map(member => {
+        const profile = profiles.find(p => p.id === member.id);
+        return <div key={member.id}><b>{username(member.id)}</b><span className="caption">{profile?.rating ?? "—"}</span></div>;
+      })}{side === "b" && room.settings.bot && <b>Computer</b>}
+      {!members.length && !(side === "b" && room.settings.bot) && <b>Waiting for opponent</b>}</div>
+    </div>;
+  }
+  async function inviteFriends() {
+    setBusy(true); setError("");
+    try {
+      const result = await onlineAction({action:"create", mode, name, variant, timeControlSeconds, incrementSeconds, bot:false});
+      const invite = new URL(location.href);
+      invite.hash = (mode === "standard" && variant === "chess" ? "play/online/" : "variants/online/") + result.id + (mode === "team" ? "?team=w" : "");
+      const copied = await copyText(invite.href);
+      notify(copied ? "Invite link copied." : invite.href);
+      navigate(mode === "standard" && variant === "chess" ? "play" : "variants", "online/" + result.id);
+    } catch (e) { setError((e as Error).message); }
+    finally { setBusy(false); }
+  }
   const selectedDescription = mode === "throne" ? "Winner stays. Queue to challenge."
     : mode === "vote" ? "One day per move. Earliest vote breaks a tie."
     : mode === "team" ? "Invite friends to your side. Share moves and arrows."
@@ -262,6 +310,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {!online || !uid ? (
         <>
           <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>{selectedDescription && <p className="caption">{selectedDescription}</p>}</Card>
+          {mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled><Copy size={16}/>Invite friends</Button>}
           {children}
           <OnlineAccount />
         </>
@@ -273,16 +322,41 @@ export default function Community({presetMode = "standard", presetVariant = "che
             </div>
           )}
           {room ? (
-            <div className="chess-layout">
+            <div className="chess-layout online-match">
+              <aside className="online-match-actions" aria-label="Game actions">
+                  {me?.team && room.settings.bot && (
+                    <Button
+                      className="draw-button"
+                      disabled={busy || room.state.result !== "*"}
+                      onClick={() => void act("draw")}
+                    >
+                      <Handshake size={16} />
+                      Draw
+                    </Button>
+                  )}
+                  {me?.team && room.mode !== "vote" && (
+                    <Button
+                      className="resign-button"
+                      disabled={busy || room.state.result !== "*"}
+                      onClick={() => void act("resign")}
+                    >
+                      <Flag size={16} />
+                      Resign
+                    </Button>
+                  )}
+
+              </aside>
               <div className="board-column">
-                {gameClock && <div className="online-clock-row" aria-label="Game clocks"><span role="timer" aria-label="White clock">{duration(remaining('w')).split('.')[0]}</span><span role="timer" aria-label="Black clock">{duration(remaining('b')).split('.')[0]}</span></div>}
+                {playerStrip(me?.team === "b" ? "w" : "b", "top")}
                 {room.state.speedrun && me?.team && <div className="speedrun-clock" role="timer" aria-label="Your move time">{duration(room.state.speedrun.elapsed[me.team]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}</div>}
                 {room.variant === "blindtext" ? <form onSubmit={e=>{e.preventDefault();if(!ff || !position)return;const b=new ff.Board("chess",position.fen);try{const move=matchTypedMove(typed,legal.map(m=>({uci:m,san:b.sanMove(m)})));if(move)void submitMove(move).then(()=>setTyped("")).catch(()=>{});}finally{b.delete();}}}><Field label="Blindfold move"><input value={typed} onChange={e=>setTyped(e.target.value)} autoComplete="off" disabled={!canMove || busy}/></Field><Button disabled={!canMove || busy}>Move</Button></form> : <Board
                   fen={duck?.fen || premove.preview}
                   hidden={room.variant === "blind"}
                   visible={room.variant === "cvfog" ? fog(position!.fen,me?.team || "w") : undefined}
                   highlights={[]}
-                  overlay={showLast && last ? <div className="throne-round-result"><GameResult result={last.result} human={uid===last.white?"w":"b"}/><p>{last.resignedBy?`${last.resignedBy===uid?"You":username(last.resignedBy)} ${last.reason==="left"?"left the game":"resigned"}.`:last.reason==="draw"?"Draw":"Checkmate"}</p><Button onClick={dismissResult}>Continue</Button></div> : <GameResult result={room.variant === "bughouse" && me?.board === 1 && ["1-0","0-1"].includes(room.state.result) ? (room.state.result === "1-0" ? "0-1" : "1-0") : room.state.result} human={me?.team}/>}
+                  overlay={showLast && last ? <div className="throne-round-result"><GameResult result={last.result} human={uid===last.white?"w":"b"} onReview={() => reviewGame(true)}/><p>{last.resignedBy?`${last.resignedBy===uid?"You":username(last.resignedBy)} ${last.reason==="left"?"left the game":"resigned"}.`:last.reason==="draw"?"Draw":"Checkmate"}</p><Button onClick={dismissResult}>Continue</Button></div> : <GameResult result={room.variant === "bughouse" && me?.board === 1 && ["1-0","0-1"].includes(room.state.result) ? (room.state.result === "1-0" ? "0-1" : "1-0") : room.state.result} human={me?.team} onReview={() => reviewGame()}/>}
+                  overlayId={showLast && last ? last.id : room.id + room.state.result}
+                  onDismissOverlay={showLast ? dismissResult : undefined}
                   materialFen={position?.fen}
                   onCancelPremoves={premove.cancelOnRightClick}
                   flipped={me?.team === "b"}
@@ -331,6 +405,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                       : undefined
                   }
                 />}
+                {playerStrip(me?.team === "b" ? "b" : "w", "bottom")}
                 {!!pocketPieces.length && <div className="pockets">{[...new Set(pocketPieces)].map(p=><button key={p} aria-label={`Drop ${p.toUpperCase()}`} disabled={!canMove && !appearance.premoves} onClick={()=>setPocket(pocket===p?"":p)}><Piece symbol={p}/><span>{pocketPieces.filter(c=>c===p).length}</span></button>)}</div>}
                 {room.variant === "bughouse" && room.state.partner && <Card><h2>Partner board</h2><Board compact fen={me?.board===1?room.state.fen:room.state.partner.fen} disabled flipped={me?.team!=="b"}/></Card>}
                 <div className="button-row">
@@ -365,38 +440,6 @@ export default function Community({presetMode = "standard", presetVariant = "che
                     undo={() => premove.setQueue((q) => q.slice(0, -1))}
                     clear={premove.clear}
                   />
-                  {me?.team && room.settings.bot && (
-                    <Button
-                      className="draw-button"
-                      disabled={busy || room.state.result !== "*"}
-                      onClick={() => void act("draw")}
-                    >
-                      <Handshake size={16} />
-                      Draw
-                    </Button>
-                  )}
-                  {me?.team && room.mode !== "vote" && (
-                    <Button
-                      className="resign-button"
-                      disabled={busy || room.state.result !== "*"}
-                      onClick={() => void act("resign")}
-                    >
-                      <Flag size={16} />
-                      Resign
-                    </Button>
-                  )}
-                  {room.mode!=="throne" && <Button
-                    className="secondary"
-                    onClick={async () => {
-                      const invite = new URL(location.href);
-                      invite.hash = (room.mode === "standard" && room.variant === "chess" ? "play/online/" : "variants/online/")+room.id+(room.mode === "team" && me?.team ? "?team="+me.team : "");
-                      const ok = await copyText(invite.href);
-                      notify(ok ? "Invite link copied." : invite.href);
-                    }}
-                  >
-                    <Copy size={16} />
-                    Invite friends
-                  </Button>}
                 </div>
               </div>
               <div className="side-panels">
@@ -409,7 +452,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                         ? "Game finished"
                         : room.mode === "vote" ? "Voting open" : "Playing"}
                   </h2>
-                  <div className="team-rosters">
+                  {room.mode !== "standard" && <div className="team-rosters">
                     {["w", "b"].map((team) => (
                       <div key={team}>
                         <b>{team === "w" ? "White" : "Black"}</b>
@@ -427,7 +470,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                         )}
                       </div>
                     ))}
-                  </div>
+                  </div>}
                   {!me && (
                     <Button disabled={busy} onClick={() => void act("join", room?.mode === "team" ? { team: inviteTeam } : {})}>
                       Join{room.mode === "throne" ? " the queue" : ""}
@@ -491,14 +534,15 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   )}
                 </Card>
                 <Card>
-                  <div className="move-chips">
-                    {(position?.notation || []).map((m, i) => (
-                      <span key={i}>
-                        {i % 2 === 0 ? `${Math.floor(i / 2) + 1}. ` : ""}
-                        {m}
-                      </span>
-                    ))}
-                  </div>
+                  <h2>Moves</h2>
+                  <table className="online-notation" aria-label="Game notation">
+                    <thead><tr><th scope="col">Move</th><th scope="col">White</th><th scope="col">Black</th></tr></thead>
+                    <tbody>{Array.from({length:Math.ceil(((position?.notation.length || 0) + (position?.initial?.split(" ")[1] === "b" ? 1 : 0))/2)},(_,row) => {
+                      const offset = position?.initial?.split(" ")[1] === "b" ? 1 : 0;
+                      const first = Number(position?.initial?.split(" ")[5]) || 1;
+                      return <tr key={row}><th scope="row">{first + row}.</th><td>{position?.notation[row*2-offset] || ""}</td><td>{position?.notation[row*2+1-offset] || ""}</td></tr>;
+                    })}</tbody>
+                  </table>
                 </Card>
               </div>
             </div>
@@ -518,6 +562,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
               }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>
+              {mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled={busy} onClick={() => void inviteFriends()}><Copy size={16}/>Invite friends</Button>}
               {selectedDescription && <p className="caption">{selectedDescription}</p>}
             </Card>
           )}

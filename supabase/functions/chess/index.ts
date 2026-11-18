@@ -320,7 +320,7 @@ Deno.serve(async (req) => {
       finishedMembers = members.map((m) => ({ ...m }));
     if (state.result !== "*") status = "finished";
     if (state.result !== "*" && r.mode === "throne" && state.result === "1/2-1/2") {
-      state = {...await fresh(r.variant,r.settings.dropCount),lastResult:finishedState.result,lastWinner:r.state.lastWinner,lastGame:{id:r.state.gameKey,result:finishedState.result,white:members.find(m=>m.team==="w")?.id,black:members.find(m=>m.team==="b")?.id,reason:"draw"}};
+      state = {...await fresh(r.variant,r.settings.dropCount),lastResult:finishedState.result,lastWinner:r.state.lastWinner,lastGame:{id:r.state.gameKey,position:{...finishedState,lastGame:undefined},result:finishedState.result,white:members.find(m=>m.team==="w")?.id,black:members.find(m=>m.team==="b")?.id,reason:"draw"}};
       status = members.filter(m=>m.team).length === 2 ? "playing" : "waiting";
       deadline=null; marks=[];
     }
@@ -342,7 +342,7 @@ Deno.serve(async (req) => {
         ...await fresh(r.variant, r.settings.dropCount),
         lastResult: finishedState.result,
         lastWinner: winner?.id,
-        lastGame:{id:r.state.gameKey,result:finishedState.result,white:finishedMembers.find(m=>m.team==="w")?.id,black:finishedMembers.find(m=>m.team==="b")?.id,reason:finishing?"left":action==="resign"?"resignation":"checkmate",resignedBy:action==="resign"?uid:undefined},
+        lastGame:{id:r.state.gameKey,position:{...finishedState,lastGame:undefined},result:finishedState.result,white:finishedMembers.find(m=>m.team==="w")?.id,black:finishedMembers.find(m=>m.team==="b")?.id,reason:finishing?"left":action==="resign"?"resignation":"checkmate",resignedBy:action==="resign"?uid:undefined},
       };
       status = next ? "playing" : "waiting";
       deadline = null;

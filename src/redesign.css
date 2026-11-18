@@ -5112,3 +5112,64 @@ html { scrollbar-gutter:stable; }
  .puzzle-layout > .board-column { grid-column:2; }
  .puzzle-layout > .side-panels { grid-column:3; }
 }
+
+/* Match each Stats surface with a brighter, full-width color outline. */
+.stats-overview .stats-metrics > div:nth-child(n) {
+ border:3px solid color-mix(in srgb,var(--metric-accent) 65%,#fff);
+}
+.stats-overview .card {
+ border:3px solid var(--stat-panel-accent);
+}
+.stats-page .achievement,
+.rank-summary > .card,
+.rank-table,
+.rating-lookup,
+.stats-page .world-map-card {
+ --stat-panel-accent:#81cfff;
+ background:color-mix(in srgb,var(--panel-solid) 78%,var(--stat-panel-accent));
+ border:3px solid var(--stat-panel-accent);
+}
+.stats-page .achievement:nth-child(3n+2),
+.rank-summary > .card:nth-child(2) { --stat-panel-accent:#c5a3ff; }
+.stats-page .achievement:nth-child(3n),
+.rank-summary > .card:nth-child(3),
+.rating-lookup { --stat-panel-accent:#ffdb74; }
+.stats-page .achievement.unlocked,
+.rank-table,
+.stats-page .world-map-card { --stat-panel-accent:#75e2b7; }
+.rankings-page > .card:not(.rank-table):not(.rating-lookup),
+.rankings-page .federation-cards > .card {
+ --stat-panel-accent:#c5a3ff;
+ background:color-mix(in srgb,var(--panel-solid) 78%,var(--stat-panel-accent));
+ border:3px solid var(--stat-panel-accent);
+}
+.stats-page .achievement .achievement-icon { color:var(--stat-panel-accent); }
+
+/* Keep player identities and clocks beside their own edge of the board. */
+.online-match .online-player-strip { width:var(--actual-board-width,100%); max-width:100%; display:flex; align-items:center; justify-content:flex-start; gap:16px; min-height:48px; padding:0; box-sizing:border-box; }
+.online-player-clock { font-size:1.65rem; font-weight:700; font-variant-numeric:tabular-nums; flex:none; }
+.online-player-identity { min-width:0; }
+.online-player-identity > div { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
+.online-match-actions { display:flex; flex-direction:column; gap:12px; align-self:start; padding-top:48px; }
+.online-match-actions .btn { width:100%; }
+.quick-online-play .invite-friends-option { margin-top:12px; }
+@media(min-width:1001px) {
+ .online-match.chess-layout { grid-template-columns:150px minmax(0,1fr) minmax(220px,280px); gap:20px; align-items:start; }
+ .online-match > .board-column { min-width:0; }
+ .play-match > .match-sidebar { grid-column:1; grid-row:1; }
+ .play-match > .board-column { grid-column:2; grid-row:1; }
+ .play-match.chess-layout { grid-template-columns:220px minmax(0,min(var(--play-board-size,650px),calc(100% - 240px))); }
+}
+@media(max-width:1000px) {
+ .online-match > .board-column { grid-row:1; }
+ .online-match-actions { flex-direction:row; flex-wrap:wrap; padding-top:0; }
+ .online-match-actions .btn { width:auto; flex:1; }
+}
+
+.game-result-banner { flex-direction:column; gap:14px; }
+.sad-king-picture { width:76px; height:84px; object-fit:contain; }
+.online-notation { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.online-notation th,.online-notation td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); }
+.online-notation th { color:var(--muted); font-size:.8rem; font-weight:600; }
+.online-notation td { width:42%; color:var(--text); }
+.online-notation tbody tr:last-child > * { border-bottom:0; }

@@ -62,8 +62,12 @@ export function Board({
   guides = [],
   badge,
   overlay,
+  overlayId,
+  onDismissOverlay,
 }: {
   overlay?: React.ReactNode;
+  overlayId?: string;
+  onDismissOverlay?: () => void;
   badge?: { square: string; content: React.ReactNode };
   fen: string;
   onMove?: (from: string, to: string, promotion?: string) => void;
@@ -102,6 +106,8 @@ export function Board({
   const [viewportLimit, setViewportLimit] = useState<number | null>(null);
   const boardRef = useRef<HTMLDivElement>(null),
     pointer = useRef({ x: 0, y: 0 });
+  const [overlayDismissed, setOverlayDismissed] = useState(false);
+  useEffect(() => setOverlayDismissed(false), [fen, overlayId]);
   const [selected, setSelected] = useState<string | null>(null),
     [flipOffset, setFlipOffset] = useState(false),
     [promotion, setPromotion] = useState<{
@@ -147,7 +153,7 @@ export function Board({
     }
   });
   useControl("clearArrows", () => {
-    if (!compact && !boardRef.current?.closest("[hidden]")) updateMarks(currentMarks.filter(m => m.from === m.to));
+    if (!compact && !boardRef.current?.closest("[hidden]")) updateMarks([]);
   });
   useControl("clearMarks", () => {
     updateMarks([]);
@@ -158,7 +164,13 @@ export function Board({
   useEffect(() => {
     setSelected(null);
     setPromotion(null);
-    setDrag(null);
+    setDrag(current => {
+      // An opponent move must not interrupt a piece held for a premove.
+      if (current && gesture.current && !gesture.current.right &&
+          squares(fen)[current.from] === current.symbol) return current;
+      gesture.current = null;
+      return null;
+    });
     setMarks([]);
   }, [fen]);
   let moves = legalMoves;
@@ -693,7 +705,15 @@ export function Board({
             );
           })}
         </svg>
-        {overlay && <div className="board-result-overlay">{overlay}</div>}
+        {overlay && !overlayDismissed && <div className="board-result-overlay"
+          onPointerDown={e => e.stopPropagation()}
+          onPointerUp={e => e.stopPropagation()}
+          onClick={e => {
+            e.stopPropagation();
+            if ((e.target as Element).closest(".game-result-banner, .throne-round-result")) return;
+            setOverlayDismissed(true);
+            onDismissOverlay?.();
+          }}>{overlay}</div>}
       </div>
         {!compact && <div
           className="board-resize-handle"

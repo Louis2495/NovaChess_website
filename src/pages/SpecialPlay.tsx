@@ -34,7 +34,7 @@ export default function SpecialPlay({
   dropCount: number;
   onBack: () => void;
 }) {
-  const { library, setLibrary, notify, appearance } = useApp();
+  const { library, setLibrary, notify, appearance, navigate } = useApp();
   const [saved, setSaved] = usePersistent<{
     id: string;
     state: SpecialState;
@@ -142,7 +142,8 @@ export default function SpecialPlay({
           </div>
           <Board
             fen={premove.preview}
-            overlay={<GameResult result={state.result} human={side}/>}
+            overlayId={saved.id + state.result}
+            overlay={<GameResult result={state.result} human={side} onReview={() => navigate("library", saved.id)}/>}
             materialFen={state.fen}
             onCancelPremoves={premove.cancelOnRightClick}
             flipped={side === "b"}

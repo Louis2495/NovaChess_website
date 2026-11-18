@@ -795,7 +795,8 @@ export default function Play({variantsOnly = false, onPlayingChange}: {variantsO
               />
               <Board
                 fen={duck?.fen || premove.preview}
-                overlay={<GameResult result={game.result} human={game.human}/>}
+                overlayId={game.id + game.result}
+                overlay={<GameResult result={game.result} human={game.human} onReview={() => navigate("library", game.id)}/>}
               materialFen={valid.fen}
                 onCancelPremoves={premove.cancelOnRightClick}
                 onMove={play}
