@@ -114,12 +114,8 @@ export default function LibraryPage() {
   if (g) return <GameViewer game={g} onClose={() => setSelected("")} />;
   return (
     <>
-      <PageTitle title="Library">
-        <Button className="secondary" onClick={() => setNewFolder(true)}>
-          <Plus size={16} />
-          Folder
-        </Button>
-      </PageTitle>
+      <PageTitle title="Library" />
+      <div className="library-header-row">
       <div
         className="library-categories"
         role="group"
@@ -137,6 +133,8 @@ export default function LibraryPage() {
             {value}
           </button>
         ))}
+      </div>
+        <Button className="secondary library-add-folder" onClick={() => setNewFolder(true)}><Plus size={16}/>Folder</Button>
       </div>
       <div className="section-toolbar">
         {library.folders.some((f) => !["Games", "Studies"].includes(f)) && (

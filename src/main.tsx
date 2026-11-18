@@ -604,7 +604,7 @@ function App() {
               </Suspense>
             </div>
             {(researchVisited || tab === "research") && (
-              <div key="research-view" hidden={tab !== "research"}>
+              <div key="research-view" data-research-view hidden={tab !== "research"}>
                 <Suspense fallback={<Loading />}>
                   <Research />
                 </Suspense>

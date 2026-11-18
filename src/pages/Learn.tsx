@@ -49,8 +49,8 @@ export default function Learn() {
     {id:"quizzes",title:"Funny quizzes",text:"Choose moves, find your style",tile:6},
     {id:"trivia",title:"Trivia",text:"Test your chess knowledge",tile:7},
   ];
-  return <><PageTitle title="Learn"/><div className="learn-groups">{[
+  return <div className="learn-landing"><PageTitle title="Learn"/><div className="learn-study-art"><img src={`${base}learn/studying-knight.webp`} alt="A knight wearing reading glasses studies an open book"/></div><div className="learn-groups">{[
     {title:"Lessons & practice",ids:["repertoire","lessons","endgames","train"]},
     {title:"Explore chess",ids:["history","encyclopedia","trivia","quizzes"]},
-  ].map(group=><section className="learn-group" key={group.title}><h2 className="learn-group-title">{group.title}</h2><div className="learn-hub">{group.ids.map(id=>tiles.find(t=>t.id===id)!).map(t=><button className="card learn-tile" key={t.id} onClick={()=>navigate("learn",t.id)}><span className="learn-picture" aria-hidden="true" style={{backgroundImage:`url("${base}learn/${t.tile===3?'illustrations.webp':'subjects.webp'}")`,backgroundSize:"400% 200%",backgroundPosition:`${(t.tile%4)*100/3}% ${Math.floor(t.tile/4)*100}%`}}/><h2>{t.title}</h2><p>{t.text}</p></button>)}</div></section>)}</div></>;
+  ].map(group=><section className="learn-group" key={group.title}><h2 className="learn-group-title">{group.title}</h2><div className="learn-hub">{group.ids.map(id=>tiles.find(t=>t.id===id)!).map(t=><button className="card learn-tile" key={t.id} onClick={()=>navigate("learn",t.id)}><span className="learn-picture" aria-hidden="true" style={{backgroundImage:`url("${base}learn/${t.tile===3?'illustrations.webp':'subjects.webp'}")`,backgroundSize:"400% 200%",backgroundPosition:`${(t.tile%4)*100/3}% ${Math.floor(t.tile/4)*100}%`}}/><h2>{t.title}</h2><p>{t.text}</p></button>)}</div></section>)}</div></div>;
 }

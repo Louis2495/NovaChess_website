@@ -368,7 +368,7 @@ export default function Research() {
           </p>
         )}
       </Card>
-        <Card>
+        {games.length > 0 && <Card>
           <div className="card-heading">
             <h2>{identity || "Opening explorer"}</h2>
             <span className="pill">{matching.length} games</span>
@@ -417,7 +417,7 @@ export default function Research() {
               Export games
             </Button>
           )}
-        </Card>
+        </Card>}
         </div>
       </div>
     </>

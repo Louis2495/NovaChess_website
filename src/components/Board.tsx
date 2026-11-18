@@ -96,6 +96,8 @@ export function Board({
     null,
   );
   const [resizePreview, setResizePreview] = useState<number | null>(null);
+  const requestedBoardSize = useRef(resizePreview ?? manualBoardSize);
+  requestedBoardSize.current = resizePreview ?? manualBoardSize;
   const [measuredSize, setMeasuredSize] = useState(appearance.boardSize);
   const [viewportLimit, setViewportLimit] = useState<number | null>(null);
   const boardRef = useRef<HTMLDivElement>(null),
@@ -360,9 +362,31 @@ export function Board({
       const top = rect.top + window.scrollY;
       const reserve = tab === "puzzles" ? (window.innerWidth <= 1000 ? 158 : 56) : 90;
       const available = window.innerHeight - top - reserve;
-      const heightLimit = top < window.innerHeight - 80
+      let heightLimit = top < window.innerHeight - 80
         ? Math.max(80,available)
         : Math.max(80,window.innerHeight - reserve - 100);
+      // Center these workspaces using a stable viewport budget, independent
+      // of the centered board's changing document position.
+      if (!compact && window.innerWidth > 1000 && (tab === "analysis" || tab === "research"))
+        heightLimit = Math.max(160, window.innerHeight - 166);
+      if (!compact && tab === "puzzles" && window.innerWidth > 1000) {
+        const layout = el.closest<HTMLElement>(".puzzle-layout");
+        const workspace = el.closest<HTMLElement>(".workspace");
+        if (layout && workspace) {
+          const style = getComputedStyle(workspace);
+          const right = parseFloat(style.paddingRight);
+          const availableWidth = workspace.clientWidth - parseFloat(style.paddingLeft) - right;
+          const boardWidth = Math.min(requestedBoardSize.current ?? heightLimit, availableWidth - 198);
+          const panelWidth = Math.max(150, (availableWidth - boardWidth - 32) * .525);
+          const gap = Math.max(24, (availableWidth + right - boardWidth - panelWidth) / 2);
+          for (const [name, value] of Object.entries({
+            "--puzzle-board-width": boardWidth,
+            "--puzzle-panel-width": panelWidth,
+            "--puzzle-panel-gap": gap,
+            "--puzzle-end-padding": Math.max(0, gap - right),
+          })) layout.style.setProperty(name, `${value}px`);
+        }
+      }
       // Let the layout place its controls immediately beside the largest
       // board that fits vertically, rather than reserving an oversized column.
       if (!compact) {

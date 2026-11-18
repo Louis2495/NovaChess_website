@@ -5033,3 +5033,44 @@ html { scrollbar-gutter:stable; }
  .workspace .research-layout { grid-template-columns:minmax(0,calc(var(--auto-board-limit,var(--board-max)) + 29px)) minmax(310px,1fr); }
  .manual-boards .workspace .research-layout { grid-template-columns:minmax(0,calc(var(--board-max) + 29px)) minmax(310px,1fr); }
 }
+
+/* Balanced desktop workspaces with room around the complete composition. */
+.learn-study-art { display:flex; justify-content:center; margin:0 0 24px; }
+.learn-study-art img { display:block; width:auto; height:clamp(160px,22dvh,230px); max-width:100%; object-fit:contain; }
+.puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#08090b; color:#fff; border-color:#444950; }
+@media(min-width:1001px) {
+ .workspace:has(.analysis-layout),.workspace:has(.variants-hub),.workspace:has(.learn-landing),.workspace:has(> [data-research-view]:not([hidden])) { min-height:100dvh; display:flex; flex-direction:column; justify-content:center; padding-block:24px; }
+ .workspace:has(.analysis-layout) > div,.workspace:has(.variants-hub) > div,.workspace:has(.learn-landing) > div { flex:none; width:100%; }
+ .workspace .analysis-layout { column-gap:24px; grid-template-columns:minmax(0,calc(var(--auto-board-limit,var(--board-max)) + 29px)) minmax(480px,1fr); }
+ .manual-boards .workspace .analysis-layout { grid-template-columns:minmax(0,calc(var(--board-max) + 29px)) minmax(480px,1fr); }
+ .analysis-layout .engine-line { padding:14px; }
+ .analysis-layout .engine-line table { font-size:.84rem; }
+ .analysis-layout .engine-line th,.analysis-layout .engine-line td { padding:7px 3px; }
+ .analysis-layout .pv-heading { font-size:.95rem; }
+ .workspace .puzzle-layout { grid-template-columns:minmax(0,var(--puzzle-board-width,var(--board-max))) minmax(0,var(--puzzle-panel-width,180px)); column-gap:var(--puzzle-panel-gap,24px); padding-right:var(--puzzle-end-padding,0px); box-sizing:border-box; }
+ .workspace .puzzle-layout > .side-panels { width:100%; }
+ .puzzle-layout .puzzle-actions-right > .puzzle-next-button { padding-inline:12px; }
+ .workspace .research-layout { column-gap:24px; }
+ .research-layout > .research-panels { padding-top:var(--research-board-inset,22px); }
+}
+@media(max-width:600px) {
+ .learn-study-art img { height:170px; }
+}
+
+.library-header-row { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px; }
+.library-header-row .library-categories { margin:0; }
+.library-add-folder { flex:none; }
+@media(max-width:600px) { .library-header-row { align-items:flex-start; gap:10px; } .library-header-row .library-categories { flex:1; } }
+
+.workspace .page-title.page-title-empty { margin:0; height:0; min-height:0; }
+@media(min-width:1001px) {
+ .research-layout:not(:has(.material-top)) { margin-top:-22px; }
+}
+@media(min-width:1001px) {
+ /* Reserve stable space so engine updates never move the board mid-gesture. */
+ .analysis-layout .engine-line { height:280px; overflow:auto; }
+ .analysis-layout .positional-insights { height:250px; overflow:auto; }
+}
+@media(max-width:1000px) {
+ .workspace:has(> [data-research-view]:not([hidden])) { padding-bottom:100px; }
+}
