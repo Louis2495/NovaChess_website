@@ -119,8 +119,8 @@ test('only administrators can open the account directory, search and send a rese
  await connected(page);await page.route('**/rest/v1/rpc/is_site_admin',r=>r.fulfill({json:true}));const queries:any[]=[];let sent:any;
  await page.route('**/rest/v1/rpc/admin_accounts',async r=>{const body=r.request().postDataJSON();queries.push(body);await r.fulfill({json:{total:51,users:[{id:peer,username:'player_internalhash',screen_name:body.p_page?'Second player':'Friend',email:'friend@example.test',created_at:'2026-01-01T00:00:00Z',last_sign_in_at:null,email_confirmed_at:'2026-01-01T00:00:00Z',provider:'email'}]}});});
  await page.route('**/auth/v1/recover*',async r=>{sent=r.request().postDataJSON();await r.fulfill({json:{}});});
- await page.goto('/#profile');await page.getByRole('button',{name:'Admin',exact:true}).click();await expect(page.getByRole('cell',{name:'Friend',exact:true})).toBeVisible();await page.getByRole('button',{name:'Send password reset to Friend',exact:true}).click();expect(sent.email).toBe('friend@example.test');await expect(page.getByRole('status')).toContainText('The user sets their own password');
- await page.getByRole('button',{name:'Next',exact:true}).click();await expect(page.getByRole('cell',{name:'Second player',exact:true})).toBeVisible();expect(queries.at(-1).p_page).toBe(1);await page.getByLabel('Search accounts',{exact:true}).fill('Friend');await page.getByRole('button',{name:'Search',exact:true}).click();await expect.poll(()=>queries.at(-1)).toMatchObject({p_query:'Friend',p_page:0});
+ await page.goto('/#profile');await page.getByRole('button',{name:'Admin',exact:true}).click();await expect(page.getByText('Friend',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Send password reset to Friend',exact:true}).click();expect(sent.email).toBe('friend@example.test');await expect(page.getByRole('status')).toContainText('The user sets their own password');
+ await page.getByRole('button',{name:'Next',exact:true}).click();await expect(page.getByText('Second player',{exact:true})).toBeVisible();expect(queries.at(-1).p_page).toBe(1);await page.getByLabel('Search accounts',{exact:true}).fill('Friend');await page.getByRole('button',{name:'Search',exact:true}).click();await expect.poll(()=>queries.at(-1)).toMatchObject({p_query:'Friend',p_page:0});
  await page.route('**/rest/v1/rpc/is_site_admin',r=>r.fulfill({json:false}));await page.reload();await expect(page.getByText('Administrator access required.',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Admin',exact:true})).toHaveCount(0);await expect(page.getByRole('cell',{name:'friend@example.test',exact:true})).toHaveCount(0);
 });
 
@@ -134,7 +134,7 @@ test('public player labels use screen names instead of generated account handles
 
 test('admin password hashes are not prefetched and hide on request',async({page})=>{
  await connected(page);await page.route('**/rest/v1/rpc/is_site_admin',r=>r.fulfill({json:true}));await page.route('**/rest/v1/rpc/admin_accounts',r=>r.fulfill({json:{total:1,users:[{id:peer,username:'player_internal',screen_name:'Fork Master',email:'friend@example.test',created_at:null,last_sign_in_at:null,email_confirmed_at:null,provider:'email'}]}}));let reads=0;const hash='$2b$12$test-hash-not-a-real-password';await page.route('**/rest/v1/rpc/admin_password_hash',async r=>{reads++;expect(r.request().postDataJSON()).toEqual({p_user:peer});await r.fulfill({json:hash});});
- await page.goto('/#profile/admin');await expect(page.getByRole('columnheader',{name:'Screen name',exact:true})).toBeVisible();await expect(page.getByRole('cell',{name:'Fork Master',exact:true})).toBeVisible();expect(reads).toBe(0);await expect(page.locator('body')).not.toContainText('player_internal');await page.getByRole('button',{name:'Show password hash for Fork Master',exact:true}).click();await expect(page.locator('.admin-password-hash')).toHaveText(hash);expect(reads).toBe(1);expect(await page.evaluate(()=>JSON.stringify(localStorage))).not.toContain(hash);await page.getByRole('button',{name:'Hide password hash for Fork Master',exact:true}).click();await expect(page.locator('.admin-password-hash')).toHaveCount(0);
+ await page.goto('/#profile/admin');await expect(page.getByRole('columnheader',{name:'Screen name',exact:true})).toBeVisible();await expect(page.getByText('Fork Master',{exact:true})).toBeVisible();expect(reads).toBe(0);await expect(page.locator('body')).not.toContainText('player_internal');await page.getByRole('button',{name:'Show password hash for Fork Master',exact:true}).click();await expect(page.locator('.admin-password-hash')).toHaveText(hash);expect(reads).toBe(1);expect(await page.evaluate(()=>JSON.stringify(localStorage))).not.toContain(hash);await page.getByRole('button',{name:'Hide password hash for Fork Master',exact:true}).click();await expect(page.locator('.admin-password-hash')).toHaveCount(0);
 });
 
 test('signup sends the chosen screen name to the server profile trigger',async({page})=>{
@@ -266,4 +266,18 @@ test('human games show Offer draw beside Resign and allow accepting an opponent 
  await expect.poll(()=>env.joins.length).toBeGreaterThan(0);
  env.room.state.drawOffer='b';env.room.revision++;env.emit('rooms',structuredClone(env.room));
  await expect(page.getByRole('button',{name:'Decline draw',exact:true})).toBeVisible();await page.getByRole('button',{name:'Accept draw',exact:true}).click();await expect(page.locator('.game-result-banner strong')).toHaveText('Draw');
+});
+
+test('admin accounts show recent online status and separate hash/reset actions',async({page})=>{
+ await connected(page);await page.route('**/rest/v1/rpc/is_site_admin',r=>r.fulfill({json:true}));await page.route('**/rest/v1/rpc/is_site_owner',r=>r.fulfill({json:true}));
+ await page.route('**/rest/v1/rpc/admin_accounts',r=>r.fulfill({json:{total:2,users:[{id:uid,screen_name:'Active player',email:'active@example.test'},{id:peer,screen_name:'Away player',email:'away@example.test'}]}}));
+ await page.route('**/rest/v1/rpc/admin_online_accounts',r=>r.fulfill({json:[uid]}));
+ const beat=page.waitForRequest(r=>r.url().endsWith('/rpc/account_heartbeat'));
+ await page.goto('/#profile/admin');await beat;
+ await expect(page.getByText('The account must already exist and have a confirmed email.',{exact:true})).toHaveCount(0);
+ const active=page.getByRole('row').filter({hasText:'Active player'}),away=page.getByRole('row').filter({hasText:'Away player'});
+ await expect(active.getByRole('img',{name:'Online',exact:true})).toHaveCSS('background-color','rgb(99, 220, 155)');
+ await expect(away.getByRole('img',{name:'Offline',exact:true})).toHaveCSS('background-color','rgb(239, 119, 125)');
+ const reset=(await active.getByRole('button',{name:'Send password reset to Active player'}).boundingBox())!,hash=(await active.getByRole('button',{name:'Show password hash for Active player'}).boundingBox())!;
+ expect(hash.x-reset.x-reset.width).toBeGreaterThanOrEqual(19);
 });

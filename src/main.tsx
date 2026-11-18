@@ -1,6 +1,7 @@
 import {online} from "./lib/online";
 import {screenName} from "./lib/screenName";
 import {useOnlineSession,useRecoveryState} from "./lib/online";
+import AccountPresence from "./components/AccountPresence";
 import GlobalChat from "./components/GlobalChat";
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -521,6 +522,7 @@ function App() {
           </button>
         )}
         <div className="site-background" aria-hidden="true" />
+        <AccountPresence userId={session?.user.id} />
         <GlobalChat />
         {authReady && !session && tab !== "signin" && !focusMode && <button className="floating-sign-in btn" onClick={()=>navigate("signin")}>Sign in</button>}
         <a className="skip-link" href="#workspace">

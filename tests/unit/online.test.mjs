@@ -163,6 +163,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180005_fast_rooms_chat_clocks.sql','utf8').replace('alter publication supabase_realtime add table public.room_messages;',''));
   await pg.exec(readFileSync('supabase/migrations/202611180006_increment_matchmaking.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180007_delegated_admins.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180008_account_activity.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -679,4 +680,21 @@ test('only the pinned owner can grant admin access to confirmed active accounts 
  }
  await pg.query('update auth.users set email_confirmed_at=now(),banned_until=null where id=$1',[users[2]]);
  await pg.query('delete from site_admins where user_id=$1',[users[2]]);
+});
+
+test('account heartbeats are self-only and online status is restricted to administrators',async()=>{
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
+ try{
+  await pg.query('select account_heartbeat()');
+  await assert.rejects(()=>pg.query('select * from account_activity'),/permission denied/);
+  await assert.rejects(()=>pg.query('select admin_online_accounts($1)',[[users[1]]]),/Administrator access required/);
+ }finally{await pg.exec('reset role');}
+ assert.equal((await pg.query('select user_id from account_activity')).rows[0].user_id,users[1]);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{assert.deepEqual((await pg.query('select admin_online_accounts($1) as ids',[[users[1],users[3]]])).rows[0].ids,[users[1]]);}finally{await pg.exec('reset role');}
+ await pg.query("update account_activity set seen_at=now()-interval '151 seconds'");
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try{assert.deepEqual((await pg.query('select admin_online_accounts($1) as ids',[[users[1]]])).rows[0].ids,[]);}finally{await pg.exec('reset role');}
+ await pg.exec("set role anon;set request.jwt.claim.sub='';");
+ try{await assert.rejects(()=>pg.query('select account_heartbeat()'),/permission denied/);}finally{await pg.exec('reset role');}
 });
