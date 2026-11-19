@@ -1,3 +1,4 @@
+import {createPortal} from "react-dom";
 import type { SavedGame } from "../lib/types";
 import type {ReactNode} from "react";
 import type {Player} from "../lib/players";
@@ -21,6 +22,7 @@ import { Chess } from "chess.js";
 import {
   ArrowRight,
   Users,
+  X,
   Flag,
   Handshake,
   Snowflake,
@@ -52,7 +54,7 @@ type Room = {
   settings: { bot: boolean };
 };
 type Profile = { id: string; username: string;screen_name?:string; rating?:number };
-export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0, children}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number; children?:ReactNode}) {
+export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0, children, friendSettingsHost}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number; children?:ReactNode; friendSettingsHost?:HTMLElement|null}) {
   const { session } = useOnlineSession(),
     { tab, detail, navigate, notify, appearance, setLibrary } = useApp();
   const [confirmed, setConfirmed] = useState<Room | null>(null),
@@ -304,14 +306,16 @@ export default function Community({presetMode = "standard", presetVariant = "che
     : mode === "team" ? "Invite friends to your side. Share moves and arrows."
     : variant === "speedrun" ? "Beat the computer as fast as possible"
     : variantList.find(v => v.id === variant)?.description;
+  const friendSettings = !room && mode !== "throne" && mode !== "vote" ? <div className="friend-game-settings">{selectedFriend ? <div className="friend-selection-field"><input aria-label="Selected friend" readOnly value={screenName(selectedFriend)}/><button type="button" aria-label="Remove selected friend" disabled={busy} onClick={()=>setSelectedFriend(null)}><X size={14}/></button></div> : <Button className="secondary invite-friends-option" disabled={busy || !online || !uid} onClick={()=>setChoosingFriend(true)}><Users size={16}/>Play a Friend</Button>}</div> : null;
   return (
     <>
+      {friendSettingsHost ? createPortal(friendSettings,friendSettingsHost) : friendSettings}
       {choosingFriend && <FriendPicker onClose={()=>setChoosingFriend(false)} onChoose={player=>{setSelectedFriend(player);setChoosingFriend(false);}} busy={busy}/>}
       {!room && tab === "community" && <PageTitle title="Play" />}
       {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div></div>}
       {!online || !uid ? (
         <>
-          <Card className="quick-online-play">{mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled><Users size={16}/>Play a Friend</Button>}<Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>{selectedDescription && <p className="caption">{selectedDescription}</p>}</Card>
+          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>{selectedDescription && <p className="caption">{selectedDescription}</p>}</Card>
           {children}
           <OnlineAccount />
         </>
@@ -552,8 +556,6 @@ export default function Community({presetMode = "standard", presetVariant = "che
           ) : (
             <Card className="quick-online-play">
               {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>setBot(e.target.value==="bot")}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
-              {mode !== "throne" && mode !== "vote" && <Button className="secondary invite-friends-option" disabled={busy} onClick={() => setChoosingFriend(true)}><Users size={16}/>Play a Friend</Button>}
-              {selectedFriend && <div className="selected-friend-opponent"><span>Selected friend: <strong>{screenName(selectedFriend)}</strong></span><Button className="text-button" disabled={busy} onClick={()=>setSelectedFriend(null)}>Play online instead</Button></div>}
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 if(selectedFriend){await inviteFriends(selectedFriend.id);return;}
                 setBusy(true);setError("");

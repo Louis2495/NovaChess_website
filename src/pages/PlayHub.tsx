@@ -18,6 +18,7 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
   const [opponent, setOpponent] = useState("online"),
     [mode, setMode] = useState("throne"),
     [playing, setPlaying] = useState(false),[timeControl,setTimeControl]=useState("180:0");
+  const [friendSettingsHost,setFriendSettingsHost]=useState<HTMLDivElement|null>(null);
   const online = opponent === "online";
   if (detail.startsWith("online/")) return <Community />;
   const speedrunMatch = /^speedrun\/(\d+)$/.exec(detail);
@@ -31,11 +32,12 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
         {[["online", "Online"], ["computer", "Computer"]].map(([id, label]) =>
           <button key={id} aria-pressed={opponent === id} onClick={() => setOpponent(id)}>{label}</button>)}
       </div>
-
+      {online && <div className="friend-settings-slot" ref={setFriendSettingsHost}/>}
     </div>}
 
 
     {online ? <Community key={variants ? mode : "standard"}
+      friendSettingsHost={friendSettingsHost}
       timeControlSeconds={+timeControl.split(":")[0]} incrementSeconds={+timeControl.split(":")[1]}
       presetMode={variants && teamModes.includes(mode) ? mode : "standard"}
       presetVariant={variants && !teamModes.includes(mode) ? mode : "chess"}>
