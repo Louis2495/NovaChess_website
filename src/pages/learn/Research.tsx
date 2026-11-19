@@ -1,3 +1,5 @@
+import {researchParser,cachedArchive,cacheArchive} from "../../lib/researchLoader";
+import type {ResearchGame as PublicGame} from "../../lib/researchGames";
 import ResearchLoadingAnimation from "../../components/ResearchLoadingAnimation";
 import {screenName} from "../../lib/screenName";
 import { isNovaChessGame } from "../../lib/library";
@@ -17,34 +19,6 @@ import { initialFen, download } from "../../lib/store";
 import { useEngine, useSettledEvaluation, scoreLabel } from "../../lib/engine";
 import { Board } from "../../components/Board";
 import { Card, Button } from "../../components/UI";
-type PublicGame = {
-  moves: string[];
-  result: string;
-  color: string;
-  pgn: string;
-};
-function parsePGN(text: string, username = ""): PublicGame | null {
-  try {
-    const c = new Chess();
-    c.loadPgn(text);
-    const h = c.getHeaders();
-    if (h.Variant && !["Standard", "chess"].includes(h.Variant)) return null;
-    const moves = c.history({ verbose: true });
-    if (!moves.length || moves[0].before !== initialFen) return null;
-    return {
-      moves: moves.slice(0, 40).map((m) => m.from + m.to + (m.promotion || "")),
-      result: h.Result || "*",
-      color: username
-        ? (h.White || "").toLowerCase() === username.toLowerCase()
-          ? "w"
-          : "b"
-        : "both",
-      pgn: text,
-    };
-  } catch {
-    return null;
-  }
-}
 export default function Research() {
   const { appearance, library, tab } = useApp();
   const [site, setSite] = useState("Chess.com"),
@@ -58,9 +32,8 @@ export default function Research() {
     [error, setError] = useState("");
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
-  const c = new Chess();
-  path.forEach((m) => c.move(m));
-  const engine = useEngine(c.fen(), tab === "research");
+  const c=useMemo(()=>{const board=new Chess();path.forEach(move=>board.move(move));return board;},[path]);
+  const engine = useEngine(c.fen(), tab === "research" && !busy);
   const evaluation = useSettledEvaluation(c.fen(), engine.lines[0]);
   const white = evaluation?.score || 0;
   const matching = useMemo(
@@ -112,15 +85,27 @@ export default function Research() {
     controller.current = ctrl;
     const loaded: PublicGame[] = [];
     const name = username.trim();
-    async function json(url: string) {
-      const r = await fetch(url, { signal: ctrl.signal });
-      if (!r.ok)
-        throw new Error(
-          r.status === 429
-            ? "Rate limit reached. Retry later."
-            : `Service returned HTTP ${r.status}.`,
-        );
-      return r.json();
+    let parser:ReturnType<typeof researchParser>|undefined;
+    const parse=(pgns:string[]) => (parser??=researchParser(ctrl.signal)).parse(pgns,name);
+    let retryAt=0;
+    const pause=(ms:number)=>new Promise<void>((resolve,reject)=>{
+      if(ctrl.signal.aborted){reject(new DOMException('Canceled','AbortError'));return;}
+      const abort=()=>{clearTimeout(timer);reject(new DOMException('Canceled','AbortError'));};
+      const timer=setTimeout(()=>{ctrl.signal.removeEventListener('abort',abort);resolve();},ms);
+      ctrl.signal.addEventListener('abort',abort,{once:true});
+    });
+    async function json(url:string){
+      for(let attempt=0;attempt<2;attempt++){
+        if(retryAt>Date.now())await pause(retryAt-Date.now());
+        const response=await fetch(url,{signal:ctrl.signal});
+        if(response.status===429&&attempt===0){
+          const header=response.headers.get('Retry-After');
+          const wait=header?(Number.isFinite(Number(header))?Number(header)*1000:Date.parse(header)-Date.now()):1000;
+          retryAt=Date.now()+Math.max(1000,Number.isFinite(wait)?wait:1000);continue;
+        }
+        if(!response.ok)throw new Error(response.status===429?'Rate limit reached. Retry later.':`Service returned HTTP ${response.status}.`);
+        return response.json();
+      }
     }
     try {
       if (site === "NovaChess") {
@@ -137,35 +122,43 @@ export default function Research() {
             ["chess", "blind", "blindtext"].includes(g.variant),
         )) {
           try {
-            const b = new Chess(g.initial);
-            for (const move of g.moves) b.move(move);
-            b.setHeader(
-              "White",
-              g.human === "w" ? name : screenName({name:g.opponent},g.opponent?"Opponent":"Computer"),
-            );
-            b.setHeader(
-              "Black",
-              g.human === "b" ? name : screenName({name:g.opponent},g.opponent?"Opponent":"Computer"),
-            );
-            b.setHeader("Result", g.result);
-            const parsed = parsePGN(b.pgn(), name);
-            if (parsed) loaded.push(parsed);
+            if(g.initial!==initialFen||!g.moves.length)continue;
+            const opponent=screenName({name:g.opponent},g.opponent?'Opponent':'Computer');
+            const white=g.human==='w'?name:opponent,black=g.human==='b'?name:opponent;
+            let pgn:string;
+            if(g.notation.length===g.moves.length){
+              const quote=(value:string)=>value.replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+              pgn=`[White "${quote(white)}"]\n[Black "${quote(black)}"]\n[Result "${g.result}"]\n\n${g.notation.map((san,i)=>(i%2?'':`${Math.floor(i/2)+1}. `)+san).join(' ')} ${g.result}`;
+            }else{
+              const board=new Chess(g.initial);g.moves.forEach(move=>board.move(move));board.setHeader('White',white);board.setHeader('Black',black);board.setHeader('Result',g.result);pgn=board.pgn();
+            }
+            loaded.push({moves:g.moves.slice(0,40),result:g.result,color:g.human,pgn});
           } catch {}
         }
       } else if (site === "Chess.com") {
         const archives = await json(
           `https://api.chess.com/pub/player/${encodeURIComponent(name)}/games/archives`,
         );
-        for (let i = 0; i < archives.archives.length; i++) {
-          setStatus(`${loaded.length} games loaded`);
-          const archive = await json(archives.archives[i]);
-          for (const game of archive.games || []) {
-            if (game.rules && game.rules !== "chess") continue;
-            const parsed = parsePGN(game.pgn || "", name);
-            if (parsed) loaded.push(parsed);
+        const urls:string[]=archives.archives;
+        const batches:PublicGame[][]=new Array(urls.length);let next=0,count=0;
+        const now=new Date(),currentMonth=`/${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}`;
+        await Promise.all(Array.from({length:Math.min(2,urls.length)},async()=>{
+          while(!ctrl.signal.aborted){
+            const index=next++;if(index>=urls.length)return;
+            const url=urls[index],key=`v1:${name.toLowerCase()}:${url}`;
+            const cached=url.endsWith(currentMonth)?null:await cachedArchive(key);
+            if(ctrl.signal.aborted)throw new DOMException('Canceled','AbortError');
+            let games=cached;
+            if(!games){
+              const archive=await json(url);
+              games=await parse((archive.games||[]).filter((g:{rules?:string})=>!g.rules||g.rules==='chess').map((g:{pgn?:string})=>g.pgn||''));
+              if(!url.endsWith(currentMonth))await cacheArchive(key,games);
+            }
+            batches[index]=games;count+=games.length;
+            if(!ctrl.signal.aborted)setStatus(`${count} games loaded`);
           }
-          setStatus(`${loaded.length} games loaded`);
-        }
+        }));
+        for(const batch of batches)for(const game of batch)loaded.push(game);
       } else {
         const r = await fetch(
           `https://lichess.org/api/games/user/${encodeURIComponent(name)}?moves=true&clocks=false&evals=false&opening=false`,
@@ -177,65 +170,47 @@ export default function Research() {
         const reader = r.body.getReader(),
           decoder = new TextDecoder();
         let buffer = "";
-        const add = (line: string) => {
-          if (!line.trim()) return;
-          const g = JSON.parse(line);
-          if (g.variant !== "standard" || !g.moves) return;
-          const ch = new Chess();
-          try {
-            ch.loadPgn(g.moves);
-          } catch {
-            return;
+        const add=async(lines:string[])=>{
+          const pgns:string[]=[];
+          for(const line of lines){
+            if(!line.trim())continue;
+            const g=JSON.parse(line);if(g.variant!=='standard'||!g.moves)continue;
+            const white=g.players?.white?.user?.name||g.players?.white?.user?.id||'';
+            const black=g.players?.black?.user?.name||g.players?.black?.user?.id||'';
+            const result=g.winner==='white'?'1-0':g.winner==='black'?'0-1':['draw','stalemate'].includes(g.status)?'1/2-1/2':'*';
+            const escape=(value:string)=>value.replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+            pgns.push(`[White "${escape(white)}"]\n[Black "${escape(black)}"]\n[Result "${result}"]\n\n${g.moves} ${result}`);
           }
-          const white =
-            g.players?.white?.user?.name || g.players?.white?.user?.id || "";
-          loaded.push({
-            moves: ch
-              .history({ verbose: true })
-              .slice(0, 40)
-              .map((m) => m.from + m.to + (m.promotion || "")),
-            result:
-              g.winner === "white"
-                ? "1-0"
-                : g.winner === "black"
-                  ? "0-1"
-                  : g.status === "draw" || g.status === "stalemate"
-                    ? "1/2-1/2"
-                    : "*",
-            color: white.toLowerCase() === name.toLowerCase() ? "w" : "b",
-            pgn: ch.pgn(),
-          });
+          if(pgns.length)loaded.push(...await parse(pgns));
+          if(!ctrl.signal.aborted)setStatus(`${loaded.length} games loaded`);
         };
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || "";
-          lines.forEach(add);
-          setStatus(`${loaded.length} games loaded`);
+        while(true){
+          const {value,done}=await reader.read();if(done)break;
+          buffer+=decoder.decode(value,{stream:true});const lines=buffer.split('\n');buffer=lines.pop()||'';
+          await add(lines);
         }
-        buffer += decoder.decode();
-        if (buffer.trim()) add(buffer);
+        buffer+=decoder.decode();if(buffer.trim())await add([buffer]);
       }
       setGames(loaded);
       setIdentity(`${site} · ${name}`);
       setPath([]);
       setStatus(`${loaded.length} games loaded`);
     } catch (e) {
+      ctrl.abort();
       setError(
         (e as Error).name === "AbortError"
           ? "Loading canceled. Previous results retained."
           : `${(e as Error).message}${site === "NovaChess" ? "" : " Public access or browser CORS may be unavailable; try again later."}`,
       );
     } finally {
+      parser?.close();
       setBusy(false);
       controller.current = null;
     }
   }
   return (
     <>
-      <div className={`chess-layout research-layout ${games.length ? "research-loaded" : ""}`}>
+      <div className={`chess-layout research-layout ${games.length && !busy ? "research-loaded" : ""}`}>
         <div className="board-column">
           <div className="board-with-eval research-board-with-eval">
             <div className="eval-meter" role="img" aria-label={`Evaluation ${scoreLabel(evaluation)}`}>
@@ -367,7 +342,7 @@ export default function Research() {
           </p>
         )}
       </Card>
-        {games.length > 0 && <Card>
+        {games.length > 0 && <Card className="research-results">
           <div className="card-heading">
             <h2>{identity || "Opening explorer"}</h2>
             <span className="pill">{matching.length} games</span>

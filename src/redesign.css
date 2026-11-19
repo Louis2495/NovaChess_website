@@ -5541,3 +5541,15 @@ html { scrollbar-gutter:stable; }
  .research-form.is-loading .research-reading-animation > video,
  .research-form.is-loading .research-reading-animation > img { width:100%; height:100%; max-width:360px; max-height:360px; object-fit:contain; }
 }
+.research-reading-animation > video,.research-reading-animation > img { width:min(100%,280px); height:210px; }
+@media(min-width:1001px) {
+ .research-form.is-loading .research-reading-animation > video,
+ .research-form.is-loading .research-reading-animation > img { max-width:300px; max-height:300px; width:88%; height:88%; }
+}
+@media(min-width:1001px) {
+ .workspace .research-layout.research-loaded,
+ .manual-boards .workspace .research-layout.research-loaded { grid-template-columns:minmax(0,1fr) minmax(220px,280px) minmax(220px,280px); column-gap:20px; }
+ .research-loaded > .research-panels { display:contents; }
+ .research-loaded .research-results { grid-column:2; grid-row:1; min-width:0; margin-top:var(--research-board-inset,22px); }
+ .research-loaded .research-form { grid-column:3; grid-row:1; min-width:0; margin-top:var(--research-board-inset,22px); }
+}
