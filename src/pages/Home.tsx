@@ -1,3 +1,4 @@
+import VariantIcon from "../components/VariantIcon";
 import {SavedBoardPlayer} from "../components/BoardPlayer";
 import {createPortal} from "react-dom";
 import {screenName} from "../lib/screenName";
@@ -127,6 +128,7 @@ function RecentGame({ game: g, open }: { game: SavedGame; open: () => void }) {
   return <div className={`recent-game-entry result-${result}`}>
     <button className="recent-game-row" onClick={open}>
       <span className="recent-players">{(['w','b'] as const).map((side,i)=><span className="recent-player" key={side}><span className={`recent-color-chip ${side==='w'?'white':'black'}`} aria-label={side==='w'?'White':'Black'}/><span className={`recent-player-score score-${scores[i]==='1'?'win':scores[i]==='0'?'loss':'draw'}`}>{scores[i]}</span><b>{side===g.human?yours:opponent} ({(side===g.human?yourRating:opponentRating) ?? "—"})</b></span>)}</span>
+      <span className="recent-variant-picture" role="img" aria-label={`${g.speedrun?'Speedrun':variantList.find(v=>v.id===g.variant)?.name || g.title} illustration`}>{g.speedrun ? <img src={`${base}variants/speedrun.webp`} alt=""/> : <VariantIcon id={g.variant} size={48}/>}</span>
       <span className="recent-game-details"><span>{g.speedrun ? "Speedrun" : variantList.find(v=>v.id===g.variant)?.name || g.title}</span><span>{moves} {moves===1?'move':'moves'}{g.timeControl ? ` · ${g.timeControl}` : ""}{g.speedrun ? ` · ${duration(g.speedrun.elapsedMs)}` : ""}</span><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})} · {new Date(g.created).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</time></span>
     </button>
     <div ref={scrubberRef} className="recent-game-scrubber" onPointerLeave={() => setPreview(null)}>
