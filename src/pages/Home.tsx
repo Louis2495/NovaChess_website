@@ -1,3 +1,4 @@
+import {SavedBoardPlayer} from "../components/BoardPlayer";
 import {createPortal} from "react-dom";
 import {screenName} from "../lib/screenName";
 import { variantList } from "../lib/variants";
@@ -119,13 +120,13 @@ function RecentGame({ game: g, open }: { game: SavedGame; open: () => void }) {
   const positions = g.positions.length ? g.positions : [g.initial];
   const result = g.result === "*" ? "unfinished" : g.result === "1/2-1/2" ? "draw" :
     (g.result === "1-0") === (g.human === "w") ? "win" : "loss";
-  const yours=screenName(library.profile,"You"),opponent=screenName({name:g.opponent},g.opponent || g.origin === "archive" ? "Opponent" : "Computer");
-  const yourRating=g.humanRating ?? library.localRating,opponentRating=g.opponentRating ?? g.botRating;
+  const yours=(g.human==='w'?g.whiteName:g.blackName) || screenName(library.profile,"You"),opponent=(g.human==='w'?g.blackName:g.whiteName) || screenName({name:g.opponent},g.opponent || g.origin === "archive" ? "Opponent" : "Computer");
+  const yourRating=g.humanRating ?? (g.origin==='archive'?undefined:library.localRating),opponentRating=g.opponentRating ?? g.botRating;
   const scores=g.result==='1-0'?['1','0']:g.result==='0-1'?['0','1']:g.result==='1/2-1/2'?['½','½']:['—','—'];
   const moves=Math.ceil(g.moves.length/2);
   return <div className={`recent-game-entry result-${result}`}>
     <button className="recent-game-row" onClick={open}>
-      <span className="recent-players">{(['w','b'] as const).map((side,i)=><span className="recent-player" key={side}><span className={`recent-color-chip ${side==='w'?'white':'black'}`} aria-label={side==='w'?'White':'Black'}/><b>{side===g.human?yours:opponent} ({side===g.human?yourRating:opponentRating ?? "—"})</b><span className={`recent-player-score score-${scores[i]==='1'?'win':scores[i]==='0'?'loss':'draw'}`}>{scores[i]}</span></span>)}</span>
+      <span className="recent-players">{(['w','b'] as const).map((side,i)=><span className="recent-player" key={side}><span className={`recent-color-chip ${side==='w'?'white':'black'}`} aria-label={side==='w'?'White':'Black'}/><b>{side===g.human?yours:opponent} ({(side===g.human?yourRating:opponentRating) ?? "—"})</b><span className={`recent-player-score score-${scores[i]==='1'?'win':scores[i]==='0'?'loss':'draw'}`}>{scores[i]}</span></span>)}</span>
       <span className="recent-game-details"><span>{g.speedrun ? "Speedrun" : variantList.find(v=>v.id===g.variant)?.name || g.title}</span><span>{moves} {moves===1?'move':'moves'}{g.timeControl ? ` · ${g.timeControl}` : ""}{g.speedrun ? ` · ${duration(g.speedrun.elapsedMs)}` : ""}</span><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})} · {new Date(g.created).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</time></span>
     </button>
     <div ref={scrubberRef} className="recent-game-scrubber" onPointerLeave={() => setPreview(null)}>
@@ -134,12 +135,12 @@ function RecentGame({ game: g, open }: { game: SavedGame; open: () => void }) {
         onFocus={() => setPreview(0)} onBlur={() => setPreview(null)}
         onPointerMove={e => { const r = e.currentTarget.getBoundingClientRect();
           setPreview(Math.max(0, Math.min(positions.length - 1, Math.round((e.clientX-r.left)/r.width*(positions.length-1))))); }} />
-      {preview !== null && <RecentGamePreview anchor={scrubberRef.current} fen={positions[preview] || g.initial} flipped={g.human === "b"}/>}
+      {preview !== null && <RecentGamePreview game={g} anchor={scrubberRef.current} fen={positions[preview] || g.initial} flipped={g.human === "b"}/>}
     </div>
   </div>;
 }
 
-function RecentGamePreview({anchor,fen,flipped}:{anchor:HTMLElement|null;fen:string;flipped:boolean}) {
+function RecentGamePreview({game,anchor,fen,flipped}:{game:SavedGame;anchor:HTMLElement|null;fen:string;flipped:boolean}) {
  const ref=useRef<HTMLDivElement>(null);
  const [position,setPosition]=useState({left:0,top:0});
  useLayoutEffect(()=>{
@@ -152,5 +153,5 @@ function RecentGamePreview({anchor,fen,flipped}:{anchor:HTMLElement|null;fen:str
   window.addEventListener('scroll',place,true);window.addEventListener('resize',place);
   return()=>{observer.disconnect();window.removeEventListener('scroll',place,true);window.removeEventListener('resize',place);};
  },[anchor]);
- return createPortal(<div ref={ref} className="recent-game-preview" style={{position:'fixed',left:position.left,top:position.top,bottom:'auto',right:'auto',zIndex:1000}} aria-live="off"><Board fen={fen} flipped={flipped} disabled compact/></div>,document.querySelector('.app') || document.body);
+ return createPortal(<div ref={ref} className="recent-game-preview" style={{position:'fixed',left:position.left,top:position.top,bottom:'auto',right:'auto',zIndex:1000}} aria-live="off"><SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/><Board fen={fen} flipped={flipped} disabled compact/><SavedBoardPlayer game={game} side={flipped?'b':'w'} placement="bottom"/></div>,document.querySelector('.app') || document.body);
 }

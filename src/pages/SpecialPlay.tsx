@@ -1,3 +1,4 @@
+import BoardPlayer from "../components/BoardPlayer";
 import {screenName} from "../lib/screenName";
 import { usePremoves } from "../lib/usePremoves";
 import PremoveQueue from "../components/PremoveQueue";
@@ -10,7 +11,7 @@ import {
   ArrowLeftRight,
 } from "lucide-react";
 import { useApp } from "../lib/context";
-import { usePersistent, uid, pieceUrl } from "../lib/store";
+import { usePersistent, uid } from "../lib/store";
 import {
   newSpecial,
   specialApply,
@@ -47,6 +48,7 @@ export default function SpecialPlay({
   });
   const state = saved.state,
     side = saved.human;
+  const [boardFlipped,setBoardFlipped]=useState(side==='b');
   const [armed, setArmed] = useState<"" | "freeze" | "swap">(""),
     [first, setFirst] = useState(""),
     [busy, setBusy] = useState(false);
@@ -138,16 +140,14 @@ export default function SpecialPlay({
       <h1 className="sr-only">{names[variant]}</h1>
       <div className="chess-layout play-match special-match">
         <div className="board-column">
-          <div className="player-strip">
-            <b>Computer</b>
-          </div>
+          <BoardPlayer placement="top" side={boardFlipped?'w':'b'} name={(boardFlipped?'w':'b')===side?screenName(library.profile):'Computer'} rating={(boardFlipped?'w':'b')===side?library.localRating:undefined} result={state.result}/>
           <Board
             fen={premove.preview}
             overlayId={saved.id + state.result}
             overlay={<GameResult result={state.result} human={side} onReview={() => navigate("library", saved.id)}/>}
             materialFen={state.fen}
             onCancelPremoves={premove.cancelOnRightClick}
-            flipped={side === "b"}
+            flipped={boardFlipped} onFlip={()=>setBoardFlipped(v=>!v)}
             legalMoves={turn === side ? legal : premove.options}
             blocked={state.blocked}
             selected={first || state.randomFrom || undefined}
@@ -169,15 +169,7 @@ export default function SpecialPlay({
                 : undefined
             }
           />
-          <div className="player-strip">
-            <span className="avatar">
-              <img
-                src={library.profile.avatar || pieceUrl("wP", "Chessnut")}
-                alt=""
-              />
-            </span>
-            <b>{screenName(library.profile)}</b>
-          </div>
+          <BoardPlayer placement="bottom" side={boardFlipped?'b':'w'} name={(boardFlipped?'b':'w')===side?screenName(library.profile):'Computer'} rating={(boardFlipped?'b':'w')===side?library.localRating:undefined} result={state.result}/>
           <PremoveQueue
             moves={premove.queue}
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
@@ -273,7 +265,7 @@ export default function SpecialPlay({
             </Button>
             <GameGIFButton
               positions={state.positions}
-              flipped={side === "b"}
+              flipped={boardFlipped}
               blocked={state.blocked}
             />
           </div>

@@ -365,12 +365,12 @@ export function Board({
         gesture.y = gesture.lastY;
         gesture.target = rect.width;
       }
-      const column=el.closest<HTMLElement>(".board-column");
+      const column=el.closest<HTMLElement>(".board-column,.master-replay");
       if(column)column.style.setProperty("--board-center-y",`${rect.top-column.getBoundingClientRect().top+rect.height/2}px`);
       el.parentElement?.style.setProperty("--board-top-offset", `${el.offsetTop}px`);
-      el.closest<HTMLElement>(".board-column")
+      el.closest<HTMLElement>(".board-column,.master-replay")
         ?.style.setProperty("--actual-board-width", `${rect.width}px`);
-      el.closest<HTMLElement>(".board-column")?.style.setProperty("--board-surface-inset", `${rect.top - el.parentElement!.getBoundingClientRect().top}px`);
+      el.closest<HTMLElement>(".board-column,.master-replay")?.style.setProperty("--board-surface-inset", `${rect.top - el.parentElement!.getBoundingClientRect().top}px`);
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
       const top = rect.top + window.scrollY;

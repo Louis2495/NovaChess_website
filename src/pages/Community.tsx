@@ -1,3 +1,4 @@
+import {GameScore} from "../components/BoardPlayer";
 import {createPortal} from "react-dom";
 import type { SavedGame } from "../lib/types";
 import type {ReactNode} from "react";
@@ -272,6 +273,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
       initial:state.initial || state.positions[0] || state.fen,
       variant:room.variant, moves:state.moves, notation:state.notation, positions:state.positions,
       result:previous && last ? last.result : state.result, human, folder:"Games",
+      whiteName:room.members.filter(m=>m.team==='w').map(m=>username(m.id)).join(", "),
+      blackName:room.members.filter(m=>m.team==='b').map(m=>username(m.id)).join(", "),
       humanRating:profiles.find(p=>p.id===uid)?.rating,
       opponentRating:profiles.find(p=>room.members.some(m=>m.id===p.id && m.team && m.team!==human))?.rating,
       opponent:room.members.filter(m => m.team && m.team !== human).map(m => username(m.id)).join(", "),
@@ -288,11 +291,13 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {gameClock && <span className="online-player-clock" role="timer" aria-label={`${side === "w" ? "White" : "Black"} clock`}>{duration(remaining(side)).split('.')[0]}</span>}
       <div className="online-player-identity">{members.map(member => {
         const profile = profiles.find(p => p.id === member.id);
-        return <div key={member.id}><b>{username(member.id)}</b><span className="caption">{profile?.rating ?? "—"}</span></div>;
+        return <div key={member.id}><b>{username(member.id)} <GameScore result={position?.result} side={side}/></b><span className="caption">{profile?.rating ?? "—"}</span></div>;
       })}{side === "b" && room.settings.bot && <b>Computer</b>}
       {!members.length && !(side === "b" && room.settings.bot) && <b>Waiting for opponent</b>}</div>
     </div>;
   }
+  const [boardFlipped,setBoardFlipped]=useState<boolean|null>(null);
+  const viewFlipped=boardFlipped ?? me?.team==='b';
   const [choosingFriend,setChoosingFriend]=useState(false),[selectedFriend,setSelectedFriend]=useState<Player|null>(null);
   async function inviteFriends(friend:string) {
     setBusy(true); setError("");
@@ -332,7 +337,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
             <div className="chess-layout online-match">
 
               <div className="board-column">
-                {playerStrip(me?.team === "b" ? "w" : "b", "top")}
+                {playerStrip(viewFlipped ? "w" : "b", "top")}
                 {room.state.speedrun && me?.team && <div className="speedrun-clock" role="timer" aria-label="Your move time">{duration(room.state.speedrun.elapsed[me.team]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}</div>}
                 {room.variant === "blindtext" ? <form onSubmit={e=>{e.preventDefault();if(!ff || !position || (!canMove && !appearance.premoves))return;const b=new ff.Board("chess",canMove?position.fen:premove.preview);try{const move=matchTypedMove(typed,(canMove?legal:premove.options).map(m=>{let san=m;try{san=b.sanMove(m);}catch{}return {uci:m,san};}));if(move){if(canMove)void submitMove(move).then(()=>setTyped("")).catch(()=>{});else{premove.enqueue(move);setTyped("");}}}finally{b.delete();}}}><Field label="Blindfold move"><input value={typed} onChange={e=>setTyped(e.target.value)} autoComplete="off" disabled={room.status!=="playing" || room.state.result!=="*" || !me?.team || (!canMove && !appearance.premoves)}/></Field><Button disabled={room.status!=="playing" || room.state.result!=="*" || !me?.team || (!canMove && !appearance.premoves)}>{canMove?"Move":"Queue premove"}</Button></form> : <Board
                   fen={duck?.fen || premove.preview}
@@ -344,7 +349,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   onDismissOverlay={showLast ? dismissResult : undefined}
                   materialFen={position?.fen}
                   onCancelPremoves={premove.cancelOnRightClick}
-                  flipped={me?.team === "b"}
+                  flipped={viewFlipped} onFlip={()=>setBoardFlipped(!viewFlipped)}
                   disabled={
                     (busy && !(pendingPrediction.current && !canMove && appearance.premoves)) ||
                     room.status !== "playing" ||
@@ -390,7 +395,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                       : undefined
                   }
                 />}
-                {playerStrip(me?.team === "b" ? "b" : "w", "bottom")}
+                {playerStrip(viewFlipped ? "b" : "w", "bottom")}
                 {!!pocketPieces.length && <div className="pockets">{[...new Set(pocketPieces)].map(p=><button key={p} aria-label={`Drop ${p.toUpperCase()}`} disabled={!canMove && !appearance.premoves} onClick={()=>setPocket(pocket===p?"":p)}><Piece symbol={p}/><span>{pocketPieces.filter(c=>c===p).length}</span></button>)}</div>}
                 {room.variant === "bughouse" && room.state.partner && <Card><h2>Partner board</h2><Board compact fen={me?.board===1?room.state.fen:room.state.partner.fen} disabled flipped={me?.team!=="b"}/></Card>}
                 <div className="button-row">

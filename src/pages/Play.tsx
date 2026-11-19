@@ -1,5 +1,5 @@
+import {SavedBoardPlayer} from "../components/BoardPlayer";
 import OpeningPicker from "../components/OpeningPicker";
-import {screenName} from "../lib/screenName";
 import { useReviewWarmup } from "../lib/useReviewWarmup";
 import { duration } from "../lib/speedrun";
 import { weakComputerMove } from "../lib/computerStrength";
@@ -15,7 +15,6 @@ import {
   Handshake,
   ChevronDown,
   ArrowRight,
-  MonitorPlay,
   Trash2,
 } from "lucide-react";
 import { useApp } from "../lib/context";
@@ -30,7 +29,7 @@ import {
   fog,
 } from "../lib/variants";
 import { search } from "../lib/engine";
-import { uid, useData, pieceUrl, base } from "../lib/store";
+import { uid, useData, base } from "../lib/store";
 import type { Opening, SavedGame } from "../lib/types";
 import { Board, Piece } from "../components/Board";
 import {
@@ -774,17 +773,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
         >
           <div className="board-column">
             {game.speedrun && <div className="speedrun-clock" role="timer" aria-label="Your move time"><Timer size={18}/>{duration(game.speedrun.elapsedMs + (game.result === "*" && game.speedrun.turnStartedAt !== null ? Math.max(0,clockNow-game.speedrun.turnStartedAt) : 0))}</div>}
-            <div
-              className={`player-strip ${valid.turn !== game.human ? "to-move" : ""}`}
-            >
-              <span className="avatar">
-                <MonitorPlay size={19} />
-              </span>
-              <div>
-                <b>{game.opponent}</b>
-                <small>{game.botRating}</small>
-              </div>
-            </div>
+            <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/>
             <>
               <Pocket
                 value={
@@ -870,20 +859,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 onSelect={setPocket}
               />
             </>
-            <div
-              className={`player-strip ${valid.turn === game.human ? "to-move" : ""}`}
-            >
-              <span className="avatar">
-                <img
-                  src={library.profile.avatar || pieceUrl("wP", "Chessnut")}
-                  alt=""
-                />
-              </span>
-              <div>
-                <b>{screenName(library.profile)}</b>
-                <small>{Math.round(library.localRating)}</small>
-              </div>
-            </div>
+            <SavedBoardPlayer game={game} side={flipped?'b':'w'} placement="bottom"/>
             <div className="game-message" role="status">
               {duck ? (
                 "Place the duck."

@@ -1,3 +1,4 @@
+import BoardPlayer from "../../components/BoardPlayer";
 import { useEffect, useMemo, useState } from "react";
 import {
   Search,
@@ -30,6 +31,8 @@ export type FamousGame = {
   id: string;
   title: string;
   white: string;
+  whiteRating?:number;
+  blackRating?:number;
   black: string;
   year: number;
   event: string;
@@ -128,6 +131,7 @@ function Archive({ games }: { games: FamousGame[] }) {
       kind: "game",
       origin: "archive",
       opponent: game.black,
+      whiteName:game.white,blackName:game.black,humanRating:game.whiteRating,opponentRating:game.blackRating,
     };
     setLibrary((l) => ({
       ...l,
@@ -153,7 +157,6 @@ function Archive({ games }: { games: FamousGame[] }) {
       setExporting(false);
     }
   }
-  const note = game.notes[String(cursor)];
   return (
     <div className="master-archive">
       <aside className="master-game-list card">
@@ -209,11 +212,7 @@ function Archive({ games }: { games: FamousGame[] }) {
             <h2>{game.title}</h2>
           </div>
         </div>
-        <p className="master-players">
-          {game.white}
-          <span>{game.result}</span>
-          {game.black}
-        </p>
+        <BoardPlayer placement="top" side={flipped?'w':'b'} name={flipped?game.white:game.black} rating={flipped?game.whiteRating:game.blackRating} result={game.result}/>
         <Board
           fen={game.positions[cursor]}
           disabled
@@ -228,6 +227,7 @@ function Archive({ games }: { games: FamousGame[] }) {
               : []
           }
         />
+        <BoardPlayer placement="bottom" side={flipped?'b':'w'} name={flipped?game.black:game.white} rating={flipped?game.blackRating:game.whiteRating} result={game.result}/>
         <div className="board-navigation">
           <IconButton
             label="First move"
@@ -297,45 +297,8 @@ function Archive({ games }: { games: FamousGame[] }) {
         </div>
       </div>
       <div className="master-notes">
-        <Card>
-          <span className="pill">{game.motif}</span>
-          <p>{game.intro}</p>
-          {note && (
-            <p className="master-current-note" role="status">
-              {note}
-            </p>
-          )}
-          <div className="key-moments">
-            <h3>Key moments</h3>
-            {Object.entries(game.notes).map(([ply, n]) => (
-              <button
-                key={ply}
-                className={+ply === cursor ? "active" : ""}
-                onClick={() => seek(+ply)}
-              >
-                <b>
-                  {Math.ceil(+ply / 2)}
-                  {+ply % 2 ? "." : "…"} {game.notation[+ply - 1]}
-                </b>
-                <span>{n}</span>
-              </button>
-            ))}
-          </div>
-        </Card>
         <Card className="master-score">
-          <div className="move-chips">
-            {game.notation.map((m, i) => (
-              <button
-                key={i}
-                className={cursor === i + 1 ? "current" : ""}
-                onClick={() => seek(i + 1)}
-                aria-label={`Move ${Math.floor(i / 2) + 1}, ${i % 2 ? "Black" : "White"}: ${m}`}
-              >
-                {i % 2 === 0 && <small>{i / 2 + 1}.</small>}
-                {m}
-              </button>
-            ))}
-          </div>
+          <table className="paired-game-moves" aria-label="Famous game moves"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead><tbody>{Array.from({length:Math.ceil(game.notation.length/2)},(_,row)=><tr key={row}><th scope="row">{row+1}.</th>{[0,1].map(side=>{const i=row*2+side;return <td key={side}>{game.notation[i] && <button className={cursor===i+1?'current':''} onClick={()=>seek(i+1)} aria-label={`Move ${row+1}, ${side?'Black':'White'}: ${game.notation[i]}`}>{game.notation[i]}</button>}</td>;})}</tr>)}</tbody></table>
         </Card>
         <div className="button-row">
           <Button className="secondary" disabled={exporting} onClick={gif}>

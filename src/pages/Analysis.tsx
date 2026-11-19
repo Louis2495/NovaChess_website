@@ -1,3 +1,4 @@
+import {SavedBoardPlayer} from "../components/BoardPlayer";
 import { engineMoveRows } from "../lib/engineNotation";
 import { positionInsights } from "../lib/positionInsights";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -205,6 +206,7 @@ export default function Analysis() {
     <>
       <div className="chess-layout analysis-layout">
         <div className="board-column">
+          {source && <SavedBoardPlayer game={source} side={flipped?'w':'b'} placement="top"/>}
           <div className="board-with-eval">
             <div
               className="eval-meter"
@@ -229,6 +231,7 @@ export default function Analysis() {
               }
             />
           </div>
+          {source && <SavedBoardPlayer game={source} side={flipped?'b':'w'} placement="bottom"/>}
           <div className="board-navigation analysis-navigation">
             <IconButton
               label="First position"

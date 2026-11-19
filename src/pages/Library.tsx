@@ -1,3 +1,4 @@
+import {SavedBoardPlayer} from "../components/BoardPlayer";
 import {screenName} from "../lib/screenName";
 import { cachedReview, cacheReview } from "../lib/reviewCache";
 import { classifyMove, performanceRating } from "../lib/gameReview";
@@ -78,6 +79,8 @@ export function parseGame(text: string): SavedGame {
     positions: [history[0].before, ...history.map((m) => m.after)],
     result: h.Result || "*",
     human: "w",
+    whiteName:h.White,blackName:h.Black,
+    humanRating:Number(h.WhiteElo)||undefined,opponentRating:Number(h.BlackElo)||undefined,
     folder: "Games",
     kind: "game",
     origin: "archive",
@@ -171,7 +174,9 @@ export default function LibraryPage() {
               className={`saved-game-card result-${g.result === "*" ? "study" : g.result === "1/2-1/2" ? "draw" : g.result === (g.human === "w" ? "1-0" : "0-1") ? "win" : "loss"}`}
             >
               <div className="saved-board-button">
+                <SavedBoardPlayer game={g} side={g.human==='w'?'b':'w'} placement="top"/>
                 <Board fen={g.positions.at(-1) || g.initial} flipped={g.human === "b"} disabled compact />
+                <SavedBoardPlayer game={g} side={g.human} placement="bottom"/>
               </div>
               <div className="card-heading">
                 <h3>{g.result === "*" && !isStudy(g) ? g.title.replace(/\s*(?:[·—–-]\s*)?\bunfinished\b/gi, "").trim() || "Game" : g.title}</h3>
@@ -388,7 +393,7 @@ function GameViewer({
     [reviewing, setReviewing] = useState(!game.special && game.moves.length > 0 && (game.review?.length !== game.moves.length || game.review.some(r=>r.afterScore===undefined))),
 
     [status, setStatus] = useState(""),
-    [flipped, setFlipped] = useState(game.initial.split(" ")[1] === "b"),
+    [flipped, setFlipped] = useState(game.human === "b"),
     [title, setTitle] = useState(game.title);
   useControl("next", () =>
     setCursor((n) => Math.min(game.moves.length, n + 1)),
@@ -618,6 +623,7 @@ function GameViewer({
       </Modal>}
       <div className="chess-layout game-review-layout">
         <div className="board-column">
+          <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/>
           {standard && (
             <div className="live-game-evaluation">
               <span>
@@ -655,6 +661,7 @@ function GameViewer({
             }
           />
           </div>
+          <SavedBoardPlayer game={game} side={flipped?'b':'w'} placement="bottom"/>
           <div className="board-navigation">
             <IconButton
               label="First move"
