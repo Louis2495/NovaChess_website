@@ -1,3 +1,4 @@
+import ResearchLoadingAnimation from "../../components/ResearchLoadingAnimation";
 import {screenName} from "../../lib/screenName";
 import { isNovaChessGame } from "../../lib/library";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -349,6 +350,8 @@ export default function Research() {
             </Button>
           )}
         </div>
+
+        {busy && <ResearchLoadingAnimation/>}
 
         {status && (
           <p role="status" className="feedback research-loading">
