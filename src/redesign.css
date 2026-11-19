@@ -5467,3 +5467,4 @@ html { scrollbar-gutter:stable; }
 @media(min-width:1201px) {
  .master-archive > .master-notes { padding-top:var(--replay-board-top,0px); }
 }
+.home-page { padding-top:96px; }
