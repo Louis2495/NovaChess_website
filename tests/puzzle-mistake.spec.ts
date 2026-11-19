@@ -8,4 +8,9 @@ for(const route of ['puzzles','puzzles/daily'])test(`${route} explains wrong mov
  const box=page.locator('.puzzle-mistake');await expect(box).toBeVisible();await expect(box).toContainText('Why d5 didn’t work');await expect(box).toContainText('White can respond with exd5');await expect(box).toContainText('2.0 pawns');
  await expect(square('d7')).toHaveAttribute('aria-label','d7, black pawn');
  await square('e7').click();await square('e5').click();await expect(box).toHaveCount(0);await expect(page.locator('.puzzle-board')).toHaveClass(/solved/);
+ if(route==='puzzles'){
+  const theme=page.locator('.card:has(.theme-select)');await expect(theme).toHaveCSS('background-color','rgb(189, 150, 120)');
+  const next=page.getByRole('button',{name:'Next puzzle',exact:true});await expect(next).toHaveCSS('background-color','rgb(238, 127, 32)');await expect(next.locator('svg')).toHaveCount(0);await next.hover();await expect(next).toHaveCSS('background-color','rgb(238, 127, 32)');
+ }
+
 });

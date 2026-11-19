@@ -5393,8 +5393,10 @@ html { scrollbar-gutter:stable; }
  .players-search-controls { width:min(100%,440px); }
  .players-page .players-search-controls .page-segments > button { font-size:1rem; min-height:52px; }
 }
-.puzzle-layout .side-panels > .card:has(.theme-select) { background:#805033; border-color:#cc9465; color:#fff; }
-.puzzle-layout .theme-select { background:#fff3e7; color:#57341e; }
-.puzzle-layout .theme-select > button[aria-pressed="true"] { background:#d5aa83; color:#392214; }
-.puzzle-layout .puzzle-actions-right > .puzzle-next-button { background:#ff942e; border-color:#ffb668; color:#301900; }
-.puzzle-layout .puzzle-actions-right > .puzzle-next-button:hover { background:#ffa64f; }
+.puzzle-layout .side-panels > .card:has(.theme-select) { background:#bd9678; border-color:#bd9678; color:#281b13; }
+.puzzle-layout .theme-select { background:#f2e9e2; color:#4b3527; }
+.puzzle-layout .theme-select > button[aria-pressed="true"] { background:#bd9678; color:#281b13; }
+.puzzle-layout .puzzle-actions-right > .btn.puzzle-next-button { background:#ee7f20; border-color:#f9a051; color:#301900; }
+.puzzle-layout .puzzle-actions-right > .btn.puzzle-next-button:hover { background:#ee7f20; }
+
+.puzzle-layout .side-panels > .card:has(.theme-select) .field > span { color:#281b13; }
