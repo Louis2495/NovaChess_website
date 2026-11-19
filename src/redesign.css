@@ -5407,3 +5407,19 @@ html { scrollbar-gutter:stable; }
  .speedrun-match > .match-sidebar { grid-column:3; margin-left:24px; }
  .speedrun-match .speedrun-clock { position:absolute; left:-152px; top:var(--board-center-y,50%); transform:translateY(-50%); width:128px; min-height:56px; display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; box-sizing:border-box; border:2px solid #ffdf00; border-radius:12px; background:var(--panel); color:#ffdf00; }
 }
+.home-page .home-puzzle.is-completed { outline:4px solid #ffdf00; outline-offset:0; }
+.home-page .home-practice-grid .daily-meme { height:var(--home-preview-height,360px); width:100%; box-sizing:border-box; border:8px solid #fff; border-radius:12px; overflow:hidden; }
+.home-page .home-practice-grid .daily-meme .daily-meme-image { width:100%; height:100%; max-width:none; max-height:none; outline:0; border-radius:0; object-fit:contain; }
+.home-page > .home-recent { height:var(--home-preview-height,360px); box-sizing:border-box; display:flex; flex-direction:column; min-height:0; }
+.home-recent-list { flex:1; min-height:0; overflow:auto; padding:0 2px; }
+.home-recent .recent-game-entry { background:color-mix(in srgb,var(--recent-color) 9%,var(--panel)); border-color:var(--recent-color); }
+.home-recent .recent-game-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); color:var(--text); align-items:center; }
+.recent-players { display:flex; flex-direction:column; gap:10px; min-width:0; }
+.recent-player { display:flex; align-items:center; gap:8px; min-width:0; }
+.recent-player b { flex:1; min-width:0; overflow-wrap:anywhere; font-size:.82rem; text-align:left; }
+.recent-player .recent-color-chip { width:10px; height:10px; flex:none; }
+.recent-player-score { font-weight:800; font-size:1rem; }
+.recent-player-score.score-win { color:#39ed83; }
+.recent-player-score.score-loss { color:#ff5364; }
+.recent-player-score.score-draw { color:#c9ced6; }
+.recent-game-details { display:flex; flex-direction:column; gap:5px; font-size:.7rem; line-height:1.35; text-align:right; overflow-wrap:anywhere; color:var(--muted); }

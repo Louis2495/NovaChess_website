@@ -2,10 +2,10 @@ import {screenName} from "../lib/screenName";
 import { variantList } from "../lib/variants";
 import { duration } from "../lib/speedrun";
 import DailyMeme from "../components/DailyMeme";
-import { useMemo, useState } from "react";
-import { ArrowRight, Check, ChevronRight, RotateCcw } from "lucide-react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 import { useApp } from "../lib/context";
-import { useData, today, dateLabel, base } from "../lib/store";
+import { useData, today, base } from "../lib/store";
 import type { PuzzleData, SavedGame } from "../lib/types";
 import { Chess } from "chess.js";
 import { Board } from "../components/Board";
@@ -29,10 +29,16 @@ export default function HomePage() {
     c.move(puzzle.moves[0]);
     fen = c.fen();
   }
+  const puzzleRef=useRef<HTMLElement>(null),homeRef=useRef<HTMLDivElement>(null);
+  useLayoutEffect(()=>{
+    const puzzle=puzzleRef.current,home=homeRef.current;if(!puzzle||!home)return;
+    const measure=()=>home.style.setProperty("--home-preview-height",`${puzzle.getBoundingClientRect().height}px`);
+    const observer=new ResizeObserver(measure);observer.observe(puzzle);measure();return()=>observer.disconnect();
+  },[]);
   const daily = !!library.progress.daily[today()]?.completed;
   const resumable = library.activeGame?.result === "*";
   return (
-    <div className={`home-page ${appearance.showMemes ? "" : "memes-hidden"}`}>
+    <div ref={homeRef} className={`home-page ${appearance.showMemes ? "" : "memes-hidden"}`}>
       <PageTitle title="Home" />
       <section className="new-game-section home-welcome" aria-label="New game">
         <div className="home-welcome-art" aria-hidden="true"><span className="multiplayer-picture home-team-cutout" style={{backgroundImage:`url("${base}home-team.webp")`}}/></div>
@@ -53,7 +59,8 @@ export default function HomePage() {
       </section>
       <div className="home-practice-grid">
         <section
-          className="home-puzzle"
+          ref={puzzleRef}
+          className={`home-puzzle${daily ? " is-completed" : ""}`}
           aria-labelledby="daily-title"
           role="link"
           tabIndex={0}
@@ -67,12 +74,7 @@ export default function HomePage() {
         >
           <div className="home-section-heading">
             <h2 id="daily-title">Daily puzzle</h2>
-            {daily && (
-              <span className="completion-label">
-                <Check size={14} />
-                Complete
-              </span>
-            )}
+
           </div>
           <div className="home-puzzle-content">
             {fen ? (
@@ -100,9 +102,9 @@ export default function HomePage() {
               <ArrowRight size={14} />
             </button>
           </div>
-          {library.games.slice(0, 3).map((g) => (
+          <div className="home-recent-list">{library.games.slice(0, 3).map((g) => (
             <RecentGame key={g.id} game={g} open={() => navigate("library", g.id)} />
-          ))}
+          ))}</div>
         </section>
       )}
     </div>
@@ -115,12 +117,13 @@ function RecentGame({ game: g, open }: { game: SavedGame; open: () => void }) {
   const positions = g.positions.length ? g.positions : [g.initial];
   const result = g.result === "*" ? "unfinished" : g.result === "1/2-1/2" ? "draw" :
     (g.result === "1-0") === (g.human === "w") ? "win" : "loss";
+  const yours=screenName(library.profile,"You"),opponent=screenName({name:g.opponent},g.opponent || g.origin === "archive" ? "Opponent" : "Computer");
+  const scores=g.result==='1-0'?['1','0']:g.result==='0-1'?['0','1']:g.result==='1/2-1/2'?['½','½']:['—','—'];
+  const moves=Math.ceil(g.moves.length/2);
   return <div className={`recent-game-entry result-${result}`}>
     <button className="recent-game-row" onClick={open}>
-      <span className={`recent-color-chip ${g.human === "w" ? "white" : "black"}`} title={`You played ${g.human === "w" ? "White" : "Black"}`} aria-label={`You played ${g.human === "w" ? "White" : "Black"}`} />
-      <span className="recent-game-info"><b>{screenName(library.profile,"You")} <span className="recent-versus">vs</span> {screenName({name:g.opponent},g.opponent || g.origin === "archive" ? "Opponent" : "Computer")}{g.botRating ? ` · ${g.botRating}` : ""}</b><small>{g.speedrun ? "Speedrun" : variantList.find(v=>v.id===g.variant)?.name || g.title} · {Math.ceil(g.moves.length / 2)} moves{g.timeControl ? ` · ${g.timeControl}` : ""}{g.speedrun ? ` · ${duration(g.speedrun.elapsedMs)}` : ""} · {dateLabel(g.created)}</small></span>
-      <span className="game-result-label">{g.result === "*" ? "Study" : g.result}</span>
-      <ChevronRight size={15} />
+      <span className="recent-players">{(['w','b'] as const).map((side,i)=><span className="recent-player" key={side}><span className={`recent-color-chip ${side==='w'?'white':'black'}`} aria-label={side==='w'?'White':'Black'}/><b>{side===g.human?yours:opponent}</b><span className={`recent-player-score score-${scores[i]==='1'?'win':scores[i]==='0'?'loss':'draw'}`}>{scores[i]}</span></span>)}</span>
+      <span className="recent-game-details"><span>{g.speedrun ? "Speedrun" : variantList.find(v=>v.id===g.variant)?.name || g.title}</span><span>{moves} {moves===1?'move':'moves'}{g.timeControl ? ` · ${g.timeControl}` : ""}{g.botRating ? ` · ${g.botRating} Elo` : ""}{g.speedrun ? ` · ${duration(g.speedrun.elapsedMs)}` : ""}</span><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})} · {new Date(g.created).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</time></span>
     </button>
     <div className="recent-game-scrubber" onPointerLeave={() => setPreview(null)}>
       <input type="range" min={0} max={positions.length - 1} value={preview ?? 0}
