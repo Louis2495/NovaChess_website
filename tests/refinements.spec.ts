@@ -152,10 +152,9 @@ test("puzzles show a clean rating, readable themes and yellow hints", async ({
   await expect(page.getByRole("link", { name: "Original game" })).toHaveCount(
     0,
   );
-  const options = await page
-    .getByLabel("Theme", { exact: true })
-    .locator("option")
-    .allTextContents();
+  await page.locator('.puzzle-theme-picker summary').click();
+  const options = await page.getByRole('option').allTextContents();
+  await page.locator('.puzzle-theme-picker summary').click();
   expect(options.every((t) => !/[a-z][A-Z]/.test(t))).toBeTruthy();
   await expect(
     page.getByRole("button", { name: "Hint", exact: true }),

@@ -1,9 +1,9 @@
+import PuzzleThemePicker from "../components/PuzzleThemePicker";
 import {useControl} from "../lib/controls";
 import PuzzleMistake, {type PuzzleMistakePosition} from "../components/PuzzleMistake";
 import { usePremoves } from "../lib/usePremoves";
 import PuzzleChat from "../components/PuzzleChat";
 import PremoveQueue from "../components/PremoveQueue";
-import { humanTheme } from "../lib/moves";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { Lightbulb, ArrowRight, RotateCcw, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
@@ -14,12 +14,10 @@ import GuessEval from "./GuessEval";
 import { dailyPuzzle } from "./Home";
 import { Board, type BoardMark } from "../components/Board";
 import {
-  ChoiceSelect,
   PageTitle,
   Card,
   Button,
   Loading,
-  Field,
 } from "../components/UI";
 export default function Puzzles() {
   const { detail: puzzleView, navigate: changePuzzleView } = useApp();
@@ -365,35 +363,12 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           </Card>
           {!daily && (
             <Card>
-              <Field label="Theme">
-                <ChoiceSelect
-                  className="theme-select"
-                  value={theme}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setTheme(value);
-                    const choices =
-                      value === "All themes"
-                        ? puzzles
-                        : puzzles.filter((p) => p.themes.includes(value));
-                    if (!done) grade(false);
-                    load(
-                      [...choices].sort(
-                        (a, b) =>
-                          Math.abs(a.sourceRating - library.progress.rating) -
-                          Math.abs(b.sourceRating - library.progress.rating),
-                      )[0],
-                    );
-                  }}
-                >
-                  <option>All themes</option>
-                  {themes.map((t) => (
-                    <option key={t} value={t}>
-                      {humanTheme(t)}
-                    </option>
-                  ))}
-                </ChoiceSelect>
-              </Field>
+              <PuzzleThemePicker value={theme} themes={themes} onChange={value=>{
+                setTheme(value);
+                const choices=value==='All themes'?puzzles:puzzles.filter(p=>p.themes.includes(value));
+                if(!done)grade(false);
+                load([...choices].sort((a,b)=>Math.abs(a.sourceRating-library.progress.rating)-Math.abs(b.sourceRating-library.progress.rating))[0]);
+              }}/>
             </Card>
           )}
           {played.length > 0 && (

@@ -5488,3 +5488,37 @@ html { scrollbar-gutter:stable; }
 .recent-variant-picture { width:48px; height:48px; display:grid; place-items:center; }
 .recent-variant-picture > img { display:block; width:100%; height:100%; object-fit:contain; }
 .recent-variant-picture .variant-picture { width:48px; height:48px; }
+.puzzle-layout .side-panels > .card:has(.puzzle-theme-picker) { padding:12px; }
+.puzzle-layout .puzzle-theme-picker { width:100%; background:transparent; color:#26143d; }
+.puzzle-theme-picker summary { display:flex; align-items:center; gap:12px; padding:4px; list-style:none; cursor:pointer; }
+.puzzle-theme-picker summary::-webkit-details-marker { display:none; }
+.puzzle-theme-picker summary > span { flex:1; min-width:0; }
+.puzzle-theme-picker summary small { display:block; font-size:.72rem; font-weight:600; opacity:.8; margin-bottom:3px; }
+.puzzle-theme-picker summary strong { display:block; font-size:.95rem; overflow-wrap:anywhere; }
+.theme-picker-chevron { flex:none; transition:transform .15s; }
+.puzzle-theme-picker[open] .theme-picker-chevron { transform:rotate(180deg); }
+.theme-picker-menu { margin-top:12px; padding-top:12px; border-top:1px solid #59318a55; }
+.theme-picker-search { display:flex; align-items:center; gap:8px; padding:0 10px; background:#f6efff; border-radius:9px; }
+.theme-picker-search input { width:100%; min-width:0; min-height:40px; padding:8px 0; background:transparent; border:0; color:#26143d; box-shadow:none; }
+.theme-picker-options { max-height:230px; overflow:auto; display:flex; flex-direction:column; gap:4px; margin-top:8px; scrollbar-width:thin; scrollbar-color:#59318a transparent; }
+.theme-picker-options > button { display:flex; align-items:center; justify-content:space-between; gap:8px; border:0; border-radius:8px; padding:10px; background:transparent; color:#26143d; text-align:left; cursor:pointer; font:inherit; font-size:.85rem; }
+.theme-picker-options > button[aria-selected="true"] { background:#f3eaff; font-weight:700; }
+.theme-picker-options > button:hover,.theme-picker-options > button:focus-visible { background:#ffffff66; outline:2px solid #59318a; outline-offset:-2px; }
+.theme-picker-empty { font-size:.85rem; padding:8px; }
+/* Fit all three recent games into the shared-height Home card. */
+.home-recent-list { display:flex; flex-direction:column; gap:8px; overflow:visible; }
+.home-page .home-recent .home-recent-list .recent-game-entry { margin:0; flex:1; min-height:0; display:flex; flex-direction:column; }
+.home-page .home-recent .home-recent-list .recent-game-row { flex:1; min-height:0; padding:6px 8px; gap:8px; }
+.home-recent .recent-players { gap:6px; }
+.home-recent .recent-player { gap:5px; }
+.home-recent .recent-player b { font-size:.76rem; line-height:1.2; }
+.home-recent .recent-game-details { gap:3px; font-size:.66rem; line-height:1.2; }
+.home-recent .recent-game-scrubber { flex:none; height:20px; padding:0 10px 4px; }
+.home-recent .recent-game-scrubber input { height:16px; }
+.home-recent-list { gap:6px; }
+.home-page .home-recent .home-recent-list .recent-game-row { padding-block:4px; }
+.home-recent .recent-game-scrubber { height:18px; padding-bottom:2px; }
+@media(min-width:1001px) and (max-width:1200px) {
+ .home-page:has(.home-recent):not(.memes-hidden) { grid-template-columns:minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.4fr); }
+ .home-page:has(.home-recent):not(.memes-hidden) .home-puzzle { min-height:336px; }
+}
