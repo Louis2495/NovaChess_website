@@ -1,3 +1,4 @@
+import PuzzleMistake, {type PuzzleMistakePosition} from "../components/PuzzleMistake";
 import { usePremoves } from "../lib/usePremoves";
 import PuzzleChat from "../components/PuzzleChat";
 import PremoveQueue from "../components/PremoveQueue";
@@ -86,6 +87,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     [hintArrow,setHintArrow] = useState<BoardMark|null>(null),
     [wrong, setWrong] = useState(false),
     [played, setPlayed] = useState<string[]>([]);
+  const [mistake,setMistake]=useState<PuzzleMistakePosition|null>(null);
   const layoutRef = useRef<HTMLDivElement>(null),
     puzzleBoardRef = useRef<HTMLDivElement>(null);
   const [ratingOffset, setRatingOffset] = useState(47);
@@ -177,6 +179,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     setMessage("");
     setHint("");setHintArrow(null);
     setWrong(false);
+    setMistake(null);
     setPlayed([]);
     graded.current = daily && !!library.progress.daily[today()];
   }
@@ -189,6 +192,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
       if (uci !== puzzle.moves[cursor] && !ch.isCheckmate()) {
         grade(false);
         setWrong(true);
+        setMistake({before:fen,after:ch.fen(),move:m.san});
         setMessage("Try another move.");
         return;
       }
@@ -196,6 +200,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
       setPlayed((p) => [...p, m.san]);
       setCursor(cursor + 1);
       setWrong(false);
+      setMistake(null);
       setHint("");setHintArrow(null);
       setMessage("");
       if (cursor + 1 >= puzzle.moves.length || ch.isCheckmate()) complete();
@@ -334,6 +339,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
 
         </div>
         <div className="side-panels">
+          {mistake && <PuzzleMistake position={mistake}/>}
           {daily ? <PuzzleChat key={`${today()}/${puzzle.id}`} puzzleKey={`${today()}/${puzzle.id}`}/> : <>
           <Card>
             <div className="large-metric puzzle-rating">

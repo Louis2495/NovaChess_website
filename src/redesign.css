@@ -5374,3 +5374,6 @@ html { scrollbar-gutter:stable; }
 .saved-game-card { padding:16px; }
 .saved-game-card .saved-board-button { max-width:200px; margin-bottom:12px; }
 .saved-game-card .button-row { padding-top:10px; min-height:46px; }
+.puzzle-mistake { border:2px solid #ff5968; background:#381f28; }
+.puzzle-mistake h2 { color:#ff9ca6; font-size:1rem; margin-bottom:10px; }
+.puzzle-mistake p { margin:0; line-height:1.55; overflow-wrap:anywhere; }
