@@ -23,15 +23,3 @@ test('trivia completion summarizes this round accurately and resets on replay', 
   await expect(page.locator('.game-score-row')).toContainText('0 pts');
   await expect(page.locator('.result-review')).toHaveCount(0);
 });
-
-test('original quiz reveals the choice breakdown and can be retaken', async ({page}) => {
-  await page.goto('/#learn/quizzes');
-  await page.getByRole('button',{name:/What's your chess style/}).click();
-  for (let step=0; step<6; step++) await page.locator('.quiz-moves button').first().click();
-  await expect(page.locator('.quiz-result h2')).toHaveText('The attacker');
-  await expect(page.locator('.result-banner')).toContainText('6 choices explored');
-  await expect(page.locator('.result-trait.leading')).toContainText('6 / 6');
-  await expect(page.locator('.result-trait')).toHaveCount(4);
-  await page.getByRole('button',{name:'Retake quiz',exact:true}).click();
-  await expect(page.locator('.game-score-row')).toContainText('1 / 6');
-});

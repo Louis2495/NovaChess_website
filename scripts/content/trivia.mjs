@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { Chess } from "chess.js";
 const entries = JSON.parse(readFileSync("public/data/encyclopedia.json"));
 const questions = entries
   .filter(
@@ -197,50 +196,4 @@ writeFileSync(
   "public/data/trivia.json",
   JSON.stringify(questions, null, 2) + "\n",
 );
-const scenarios = [
-  {
-    setup: "",
-    prompt: "Choose your first move.",
-    moves: ["e4", "d4", "Nf3", "c4"],
-  },
-  {
-    setup: "e4 e5 Nf3 Nc6 Bc4 Bc5",
-    prompt: "How do you build the position?",
-    moves: ["b4", "c3", "d3", "O-O"],
-  },
-  {
-    setup: "d4 Nf6 c4 e6 Nc3 Bb4",
-    prompt: "What matters most here?",
-    moves: ["e4", "Qc2", "e3", "a3"],
-  },
-  {
-    setup: "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3",
-    prompt: "Choose Black’s next move.",
-    moves: ["g6", "a6", "e6", "Nc6"],
-  },
-  {
-    setup: "e4 e6 d4 d5 Nc3 Nf6 e5 Nfd7",
-    prompt: "How do you use your space?",
-    moves: ["f4", "Nf3", "Bd3", "a3"],
-  },
-  {
-    setup: "d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7",
-    prompt: "Pick your next step.",
-    moves: ["cxd5", "Qc2", "Bd3", "Rc1"],
-  },
-].map((s) => {
-  const c = new Chess();
-  for (const m of s.setup.split(" ").filter(Boolean)) c.move(m);
-  for (const m of s.moves) new Chess(c.fen()).move(m);
-  return { ...s, fen: c.fen() };
-});
-writeFileSync(
-  "public/data/personality.json",
-  JSON.stringify(scenarios, null, 2) + "\n",
-);
-console.log(
-  questions.length,
-  "trivia questions,",
-  scenarios.length,
-  "legal quiz positions",
-);
+console.log(questions.length, "trivia questions");

@@ -3,16 +3,6 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {Chess} from 'chess.js';
 const data=name=>JSON.parse(readFileSync(`public/data/${name}.json`,'utf8'));
-test('new personality quizzes have unique chess questions and reachable, distinct outcomes',()=>{
- const quizzes=data('personality-quizzes');assert.equal(quizzes.length,10);
- assert.equal(new Set(quizzes.map(q=>q.id)).size,10);
- const prompts=[];
- for(const q of quizzes){assert.match(q.title,/\?$/);assert.equal(q.questions.length,6);assert.equal(q.results.length,4);assert.equal(new Set(q.results.map(r=>r.title)).size,4);
-  for(const question of q.questions){prompts.push(question.prompt);assert.match(question.prompt,/\?$/);assert.equal(question.answers.length,4);assert.equal(new Set(question.answers.map(a=>a.label)).size,4);assert.deepEqual(question.answers.map(a=>a.score).sort(),[0,1,2,3]);}
-  for(let outcome=0;outcome<4;outcome++){const score=[0,0,0,0];for(const question of q.questions)score[question.answers.find(a=>a.score===outcome).score]++;assert.equal(score.indexOf(Math.max(...score)),outcome);}
- }
- assert.equal(new Set(prompts).size,prompts.length);
-});
 test('encyclopedia covers broad topics with meaningful articles and playable defining opening lines',()=>{
  const entries=data('encyclopedia');assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
  for(const category of ['Tactics','Strategy','Pawn structures','Pieces & board','Chess technology','Ratings & organizations','Players','Events & history','Variants','Calculation & training','Chess culture & literature']){

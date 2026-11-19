@@ -36,18 +36,16 @@ test("Analysis fills available space while staying inside the screen and support
     .poll(async () => (await board.boundingBox())!.width)
     .toBeCloseTo(saved, 0);
 });
-test("boards can be resized in puzzles, play and readonly quizzes, and only Blindfold text offers typed moves", async ({
+test("boards can be resized in puzzles and play, and only Blindfold text offers typed moves", async ({
   page,
 }) => {
-  for (const route of ["puzzles", "play", "learn/quizzes"]) {
+  for (const route of ["puzzles", "play"]) {
     await page.goto("/#" + route);
     if (route === "play") await page.getByRole("button",{name:"Computer",exact:true}).click();
     if (route === "play")
       await page
         .getByRole("button", { name: "Start game", exact: true })
         .click();
-    if (route === "learn/quizzes")
-      await page.getByRole("button", { name: /What's your chess style/ }).click();
     const handle = page
       .getByRole("slider", { name: "Resize board", exact: true })
       .first();

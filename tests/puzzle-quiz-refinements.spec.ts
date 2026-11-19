@@ -56,34 +56,6 @@ test("puzzles hide turn/status text and move history until the first answer, wit
   await expect(page.locator(".puzzle-moves")).toContainText(answer.san);
 });
 
-test("every quiz position faces its side to move and introductions/results have illustrations", async ({
-  page,
-}) => {
-  const scenarios = JSON.parse(
-    fs.readFileSync("public/data/personality.json", "utf8"),
-  );
-  await page.goto("/#learn/quizzes");
-  await expect(page.locator(".quiz-selection .quiz-picture")).toHaveCount(13);
-  await page.getByRole("button", { name: /What's your chess style/ }).click();
-  for (const scenario of scenarios) {
-    await expect(squares(page).last()).toHaveAttribute(
-      "aria-label",
-      new RegExp(
-        "^" + (scenario.fen.split(" ")[1] === "b" ? "a8" : "h1") + ",",
-      ),
-    );
-    await page.locator(".quiz-moves>button").first().click();
-  }
-  await expect(page.locator(".quiz-result .quiz-picture")).toBeVisible();
-  await expect(page.locator(".quiz-result .quiz-picture")).toHaveCSS(
-    "background-image",
-    /quizzes\/princesses-archetypes\.webp/,
-  );
-  expect(
-    (await page.request.get("/quizzes/princesses-archetypes.webp")).ok(),
-  ).toBeTruthy();
-});
-
 test("black-to-move positions open correctly in Analysis, Guess the Eval and saved game previews", async ({
   page,
 }) => {

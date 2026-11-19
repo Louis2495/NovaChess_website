@@ -472,11 +472,6 @@ test("encyclopedia covers advanced motifs and opening lines, and quizzes use leg
     .getByRole("button", { name: "Study opening", exact: true })
     .click();
   await expect(page.locator(".lesson-board-area h2")).toHaveText(openingTitle);
-  await page.goto("/#learn/quizzes");
-  await page.getByRole("button", { name: /Which Disney princess/ }).click();
-  for (let i = 0; i < 6; i++)
-    await page.locator(".quiz-moves>button").first().click();
-  await expect(page.locator(".quiz-result")).toContainText("Mulan");
   await page.goto("/#learn/trivia");
   await expect(page.locator(".trivia-options>button")).toHaveCount(4);
   await page.locator(".trivia-options>button").first().click();

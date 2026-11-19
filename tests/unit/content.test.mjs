@@ -53,9 +53,7 @@ test("owner-supplied memes form a unique 22-day cycle and facts omit movement di
     ),
   );
 });
-test("quiz moves are legal and trivia always offers four distinct answers", () => {
-  for (const q of read("personality"))
-    for (const san of q.moves) new Chess(q.fen).move(san);
+test("trivia always offers four distinct answers", () => {
   for (const q of read("trivia")) {
     assert.ok(q.prompt.endsWith("?"), q.id);
     assert.equal(new Set(q.answers).size, 4, q.id);
