@@ -5358,3 +5358,14 @@ html { scrollbar-gutter:stable; }
 @media(max-width:1000px) {
  .variants-hub .online-variant-gallery { width:94%; margin-inline:auto; }
 }
+
+/* Keep the research resize rail outside the board's requested width. */
+.research-board-with-eval { min-width:0; width:100%; }
+.research-board-with-eval > .board-frame { flex-shrink:0 !important; width:min(calc(100% - 29px),var(--board-max)) !important; }
+@media(min-width:1001px) {
+ .workspace .research-layout.research-loaded,
+ .manual-boards .workspace .research-layout.research-loaded { grid-template-columns:minmax(0,1fr) 320px; }
+ .research-loaded .research-panels { min-width:0; }
+ .research-loaded .research-form { padding:16px; }
+}
+.research-board-with-eval .board { width:100%; }

@@ -234,7 +234,7 @@ export default function Research() {
   }
   return (
     <>
-      <div className="chess-layout research-layout">
+      <div className={`chess-layout research-layout ${games.length ? "research-loaded" : ""}`}>
         <div className="board-column">
           <div className="board-with-eval research-board-with-eval">
             <div className="eval-meter" role="img" aria-label={`Evaluation ${scoreLabel(evaluation)}`}>
