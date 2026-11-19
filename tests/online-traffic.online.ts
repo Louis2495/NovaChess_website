@@ -339,6 +339,15 @@ test('Friends loads beyond fifty people without pagination controls',async({page
  await connected(page);const friends=Array.from({length:51},(_,i)=>({id:`00000000-0000-4000-8000-${String(i+100).padStart(12,'0')}`,screen_name:`Friend ${i+1}`,rating:1200,relationship:'friends',online:false}));
  await page.route('**/rest/v1/rpc/player_directory',async r=>{const body=r.request().postDataJSON();await r.fulfill({json:body.p_section==='requests'?[]:friends.slice(body.p_page*50,body.p_page*50+50)});});
  await page.goto('/#players');await expect(page.getByRole('heading',{name:'Friend 51',exact:true})).toBeVisible();await expect(page.locator('.players-pagination')).toHaveCount(0);
- await page.getByRole('button',{name:'Everyone',exact:true}).click();await expect(page.locator('.players-pagination')).toBeVisible();
+ await page.getByRole('button',{name:'Everyone',exact:true}).click();await page.getByLabel('Search players',{exact:true}).fill('Friend');await expect(page.locator('.players-pagination')).toBeVisible();
  await page.goto('/#play');await page.getByRole('button',{name:'Play a Friend',exact:true}).click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:/^Friend 51 /})).toBeVisible();await expect(dialog.getByRole('button',{name:'Previous',exact:true})).toHaveCount(0);await expect(dialog.getByRole('button',{name:'Next',exact:true})).toHaveCount(0);
+});
+
+test('Everyone waits for three search characters and hides results when cleared',async({page})=>{
+ await connected(page);const queries:any[]=[];
+ await page.route('**/rest/v1/rpc/player_directory',async r=>{const body=r.request().postDataJSON();queries.push(body);await r.fulfill({json:body.p_section==='everyone'?[{id:peer,screen_name:'Friendly Knight',rating:1450,relationship:'none',online:true}]:[]});});
+ await page.goto('/#players');await page.getByRole('button',{name:'Everyone',exact:true}).click();const search=page.getByLabel('Search players',{exact:true});
+ await expect(page.getByText('Type at least 3 characters to search for players.',{exact:true})).toBeVisible();await search.fill('  Kn  ');await page.waitForTimeout(350);expect(queries.filter(q=>q.p_section==='everyone')).toHaveLength(0);await expect(page.locator('.player-card')).toHaveCount(0);await expect(page.locator('.players-pagination')).toHaveCount(0);
+ await search.fill('Kni');await expect(page.getByRole('heading',{name:'Friendly Knight',exact:true})).toBeVisible();expect(queries.some(q=>q.p_section==='everyone'&&q.p_query==='Kni')).toBe(true);
+ await search.fill('Kn');await expect(page.locator('.player-card')).toHaveCount(0);await expect(page.locator('.players-pagination')).toHaveCount(0);await search.clear();await expect(page.getByText('Type at least 3 characters to search for players.',{exact:true})).toBeVisible();
 });
