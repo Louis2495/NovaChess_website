@@ -284,7 +284,7 @@ export default function Research() {
           </div>
         </div>
         <div className="side-panels research-panels">
-      <Card className="research-form">
+      <Card className={`research-form${busy ? " is-loading" : ""}`}>
         <div className="research-fields">
           <div className="research-source field">
             <span>Source</span>
@@ -340,15 +340,6 @@ export default function Research() {
             <Search size={16} />
             Load games
           </Button>
-          {busy && (
-            <Button
-              className="secondary"
-              onClick={() => controller.current?.abort()}
-            >
-              <X size={16} />
-              Cancel
-            </Button>
-          )}
         </div>
 
         {busy && <ResearchLoadingAnimation/>}
@@ -363,6 +354,11 @@ export default function Research() {
               />
             )}
             {status}
+            {busy && (
+              <Button className="secondary" onClick={() => controller.current?.abort()}>
+                <X size={16} />Cancel
+              </Button>
+            )}
           </p>
         )}
         {error && (

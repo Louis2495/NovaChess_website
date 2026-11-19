@@ -371,6 +371,11 @@ export function Board({
       el.closest<HTMLElement>(".board-column,.master-replay")
         ?.style.setProperty("--actual-board-width", `${rect.width}px`);
       el.closest<HTMLElement>(".board-column,.master-replay")?.style.setProperty("--board-surface-inset", `${rect.top - el.parentElement!.getBoundingClientRect().top}px`);
+      const research=el.closest<HTMLElement>(".research-layout");
+      if(research){
+        research.style.setProperty("--research-board-height",`${rect.height}px`);
+        research.style.setProperty("--research-board-inset",`${rect.top-research.getBoundingClientRect().top}px`);
+      }
       const archive=el.closest<HTMLElement>(".master-archive");
       if(archive)archive.style.setProperty("--replay-board-top",`${rect.top-archive.getBoundingClientRect().top}px`);
       // Leave room for material and replay controls; use document position so
