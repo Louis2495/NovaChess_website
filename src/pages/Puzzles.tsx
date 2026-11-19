@@ -271,7 +271,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
                 }
               }}
             >
-              {daily ? <RotateCcw size={16} /> : <ArrowRight size={16} />}{" "}
+              {daily ? <RotateCcw size={16} /> : !done ? <ArrowRight size={16} /> : null}{" "}
               <span className="puzzle-action-label">{daily ? "Replay" : done ? "Next puzzle" : "Skip"}</span>
             </Button>}
           </div>
