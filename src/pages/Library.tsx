@@ -189,7 +189,7 @@ export default function LibraryPage() {
                   : libraryKind(g)}{" "}
                 · {Math.ceil(g.moves.length / 2)} {Math.ceil(g.moves.length / 2) === 1 ? "move" : "moves"}
               </p>
-              <p className="caption library-game-date"><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})} · Started {new Date(g.created).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</time></p>
+              <p className="caption library-game-date"><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})} · {new Date(g.created).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</time></p>
               <div className="button-row">
                 {isStudy(g) ? (
                   <>
