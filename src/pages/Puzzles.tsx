@@ -1,3 +1,4 @@
+import {useControl} from "../lib/controls";
 import PuzzleMistake, {type PuzzleMistakePosition} from "../components/PuzzleMistake";
 import { usePremoves } from "../lib/usePremoves";
 import PuzzleChat from "../components/PuzzleChat";
@@ -5,7 +6,7 @@ import PremoveQueue from "../components/PremoveQueue";
 import { humanTheme } from "../lib/moves";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
-import { Lightbulb, ArrowRight, RotateCcw, Calendar } from "lucide-react";
+import { Lightbulb, ArrowRight, RotateCcw, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useApp } from "../lib/context";
 import { useData, today, hintColor } from "../lib/store";
 import type { PuzzleData } from "../lib/types";
@@ -88,6 +89,9 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     [wrong, setWrong] = useState(false),
     [played, setPlayed] = useState<string[]>([]);
   const [mistake,setMistake]=useState<PuzzleMistakePosition|null>(null);
+  const [reviewIndex,setReviewIndex]=useState<number|null>(null);
+  const reviewing=reviewIndex!==null;
+  const history=useMemo(()=>{const board=new Chess(puzzle.fen);board.move(puzzle.moves[0]);const positions=[board.fen()];for(const move of played){board.move(move);positions.push(board.fen());}return positions;},[puzzle,played]);
   const layoutRef = useRef<HTMLDivElement>(null),
     puzzleBoardRef = useRef<HTMLDivElement>(null);
   const [ratingOffset, setRatingOffset] = useState(47);
@@ -181,10 +185,11 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     setWrong(false);
     setMistake(null);
     setPlayed([]);
+    setReviewIndex(null);
     graded.current = daily && !!library.progress.daily[today()];
   }
   function attempt(from: string, to: string, promotion?: string) {
-    if (done || c.turn() !== learner) return;
+    if (done || reviewing || c.turn() !== learner) return;
     try {
       const ch = new Chess(fen),
         m = ch.move({ from, to, promotion: promotion || "q" }),
@@ -229,10 +234,17 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     legal: c
       .moves({ verbose: true })
       .map((m) => m.from + m.to + (m.promotion || "")),
-    active: !done,
+    active: !done && !reviewing,
     identity: puzzle.id,
     execute: (move) => attempt(move.slice(0, 2), move.slice(2, 4), move[4]),
   });
+  function seekReview(index:number){
+    premove.clear();
+    const next=Math.max(0,Math.min(played.length,index));
+    setReviewIndex(next===played.length?null:next);
+  }
+  useControl('previous',()=>seekReview((reviewIndex ?? played.length)-1));
+  useControl('next',()=>seekReview((reviewIndex ?? played.length)+1));
   const themes = useMemo(
     () => [...new Set(puzzles.flatMap((p) => p.themes))].sort(),
     [puzzles],
@@ -241,7 +253,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
 <div className="puzzle-actions-right">
             {!done && <Button
               className="hint-button" aria-label="Hint" title="Hint"
-              disabled={done || c.turn() !== learner}
+              disabled={done || reviewing || c.turn() !== learner}
               onClick={() => {
                 grade(false);
                 const m = new Chess(fen).move(puzzle.moves[cursor]);
@@ -311,19 +323,19 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             className={`puzzle-board ${wrong ? "wrong" : ""} ${done ? "solved" : ""}`}
           >
             <Board
-              fen={premove.preview}
-              materialFen={fen}
+              fen={reviewing ? history[reviewIndex] : premove.preview}
+              materialFen={reviewing ? history[reviewIndex] : fen}
               onCancelPremoves={premove.cancelOnRightClick}
-              legalMoves={c.turn() === learner ? undefined : premove.options}
+              legalMoves={reviewing ? [] : c.turn() === learner ? undefined : premove.options}
               onMove={(from, to, promotion) =>
                 c.turn() === learner
                   ? attempt(from, to, promotion)
                   : premove.enqueue(from + to + (promotion || ""))
               }
-              disabled={done || (c.turn() !== learner && !appearance.premoves)}
+              disabled={done || reviewing || (c.turn() !== learner && !appearance.premoves)}
               flipped={learner === "b"}
-              hint={hint}
-              guides={hintArrow?[hintArrow]:[]}
+              hint={reviewing ? "" : hint}
+              guides={!reviewing && hintArrow?[hintArrow]:[]}
             />
           </div>
           </div>
@@ -339,6 +351,11 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
 
         </div>
         <div className="side-panels">
+          <div className="puzzle-review-bar" role="group" aria-label="Puzzle move navigation">
+            <Button className="secondary" aria-label="Previous puzzle move" disabled={(reviewIndex ?? played.length)===0} onClick={()=>seekReview((reviewIndex ?? played.length)-1)}><ChevronLeft size={19}/></Button>
+            <input aria-label="Puzzle replay position" type="range" min={0} max={played.length} value={reviewIndex ?? played.length} disabled={!played.length} onChange={e=>seekReview(Number(e.target.value))}/>
+            <Button className="secondary" aria-label="Next puzzle move" disabled={!reviewing} onClick={()=>seekReview((reviewIndex ?? played.length)+1)}><ChevronRight size={19}/></Button>
+          </div>
           {mistake && <PuzzleMistake position={mistake}/>}
           {daily ? <PuzzleChat key={`${today()}/${puzzle.id}`} puzzleKey={`${today()}/${puzzle.id}`}/> : <>
           <Card>
