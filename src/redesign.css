@@ -5433,3 +5433,4 @@ html { scrollbar-gutter:stable; }
 .home-recent .recent-game-scrubber input { background:#fff; }
 .home-recent .recent-game-scrubber input::-webkit-slider-thumb { background:#fff; }
 .home-recent .recent-game-scrubber input::-moz-range-thumb { background:#fff; }
+.analysis-layout .pv-heading > span { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; flex:none; border:2px solid currentColor; border-radius:50%; box-sizing:border-box; color:var(--text); font-weight:700; }
