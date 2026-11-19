@@ -291,7 +291,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {gameClock && <span className="online-player-clock" role="timer" aria-label={`${side === "w" ? "White" : "Black"} clock`}>{duration(remaining(side)).split('.')[0]}</span>}
       <div className="online-player-identity">{members.map(member => {
         const profile = profiles.find(p => p.id === member.id);
-        return <div key={member.id}><b>{username(member.id)} <GameScore result={position?.result} side={side}/></b><span className="caption">{profile?.rating ?? "—"}</span></div>;
+        return <div key={member.id}><b><GameScore result={position?.result} side={side}/> {username(member.id)}</b><span className="caption">{profile?.rating ?? "—"}</span></div>;
       })}{side === "b" && room.settings.bot && <b>Computer</b>}
       {!members.length && !(side === "b" && room.settings.bot) && <b>Waiting for opponent</b>}</div>
     </div>;

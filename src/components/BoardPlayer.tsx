@@ -7,7 +7,7 @@ export function GameScore({result,side}:{result?:string;side:'w'|'b'}) {
  return <span className={`board-player-score score-${score==='1'?'win':score==='0'?'loss':'draw'}`}>{score}</span>;
 }
 export default function BoardPlayer({name,rating,side,result,placement}:{name:string;rating?:number;side:'w'|'b';result?:string;placement:'top'|'bottom'}) {
- return <div className={`board-player-label player-${placement}`} aria-label={`${side==='w'?'White':'Black'} player`}><b>{name}</b><span>({rating ?? '—'})</span><GameScore result={result} side={side}/></div>;
+ return <div className={`board-player-label player-${placement}`} aria-label={`${side==='w'?'White':'Black'} player`}><GameScore result={result} side={side}/><b>{name}</b><span>({rating ?? '—'})</span></div>;
 }
 
 export function SavedBoardPlayer({game,side,placement}:{game:SavedGame;side:'w'|'b';placement:'top'|'bottom'}) {

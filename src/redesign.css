@@ -5459,3 +5459,11 @@ html { scrollbar-gutter:stable; }
 .board-player-label b { min-width:0; overflow-wrap:anywhere; }
 .board-player-label > span { white-space:nowrap; }
 .master-score { max-height:520px; overflow:auto; }
+.board-player-label.player-top { justify-content:flex-start; text-align:left; }
+.board-player-score { margin-left:0; margin-right:3px; }
+.online-player-strip.player-top .online-player-identity { order:0; margin-left:0; text-align:left; }
+.online-player-strip.player-top .online-player-identity > div { justify-content:flex-start; }
+.online-player-strip.player-top .online-player-clock { order:2; margin-right:0; margin-left:auto; }
+@media(min-width:1201px) {
+ .master-archive > .master-notes { padding-top:var(--replay-board-top,0px); }
+}

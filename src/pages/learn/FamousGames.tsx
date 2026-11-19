@@ -54,7 +54,6 @@ export default function FamousGames() {
 function Archive({ games }: { games: FamousGame[] }) {
   const { appearance, library, setLibrary, navigate, notify } = useApp();
   const [search, setSearch] = useState(""),
-    [motif, setMotif] = useState("All"),
     [id, setId] = useState(games[0].id),
     [cursor, setCursor] = useState(0),
     [playing, setPlaying] = useState(false),
@@ -75,7 +74,6 @@ function Archive({ games }: { games: FamousGame[] }) {
     () =>
       games.filter(
         (g) =>
-          (motif === "All" || g.motif === motif) &&
           (
             g.title +
             " " +
@@ -90,7 +88,7 @@ function Archive({ games }: { games: FamousGame[] }) {
             .toLowerCase()
             .includes(search.toLowerCase()),
       ),
-    [games, search, motif],
+    [games, search],
   );
   function seek(n: number) {
     setCursor(n);
@@ -169,16 +167,6 @@ function Archive({ games }: { games: FamousGame[] }) {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <ChoiceSelect
-          aria-label="Game theme"
-          value={motif}
-          onChange={(e) => setMotif(e.target.value)}
-        >
-          <option value="All">All themes</option>
-          {[...new Set(games.map((g) => g.motif))].map((m) => (
-            <option key={m}>{m}</option>
-          ))}
-        </ChoiceSelect>
         <div className="master-game-rows">
           {filtered.map((g) => (
             <button
