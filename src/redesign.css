@@ -5423,3 +5423,6 @@ html { scrollbar-gutter:stable; }
 .recent-player-score.score-loss { color:#ff5364; }
 .recent-player-score.score-draw { color:#c9ced6; }
 .recent-game-details { display:flex; flex-direction:column; gap:5px; font-size:.7rem; line-height:1.35; text-align:right; overflow-wrap:anywhere; color:var(--muted); }
+/* Keep arrows distinct from solid square marks of the same color. */
+.board-marks { z-index:7; }
+.board-marks > g { filter:brightness(.78); }

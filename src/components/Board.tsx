@@ -678,7 +678,7 @@ export function Board({
                 key={i}
                 stroke={m.color}
                 fill={m.color}
-                opacity={m.opacity ?? 0.85}
+                opacity={m.opacity ?? 1}
               >
                 {knight ? (
                   <polyline
