@@ -5377,7 +5377,7 @@ html { scrollbar-gutter:stable; }
 .puzzle-mistake { border:2px solid #ff5968; background:#381f28; }
 .puzzle-mistake h2 { color:#ff9ca6; font-size:1rem; margin-bottom:10px; }
 .puzzle-mistake p { margin:0; line-height:1.55; overflow-wrap:anywhere; }
-.saved-game-card { border-width:2px; border-style:solid; }
+.saved-game-card { border-width:4px; border-style:solid; }
 .saved-game-card.result-study { border-color:#ffffff; }
 .saved-game-card.result-win { border-color:#32ed75; }
 .saved-game-card.result-loss { border-color:#ff384b; }
