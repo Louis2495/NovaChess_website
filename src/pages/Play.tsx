@@ -768,7 +768,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
           className={
             game.variant === "bughouse"
               ? "chess-layout play-match bughouse-match"
-              : "chess-layout play-match"
+              : `chess-layout play-match${game.speedrun ? " speedrun-match" : ""}`
           }
         >
           <div className="board-column">

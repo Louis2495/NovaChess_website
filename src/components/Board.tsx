@@ -365,6 +365,8 @@ export function Board({
         gesture.y = gesture.lastY;
         gesture.target = rect.width;
       }
+      const column=el.closest<HTMLElement>(".board-column");
+      if(column)column.style.setProperty("--board-center-y",`${rect.top-column.getBoundingClientRect().top+rect.height/2}px`);
       el.parentElement?.style.setProperty("--board-top-offset", `${el.offsetTop}px`);
       el.closest<HTMLElement>(".board-column")
         ?.style.setProperty("--actual-board-width", `${rect.width}px`);
@@ -404,6 +406,15 @@ export function Board({
             "--puzzle-panel-gap": gap,
             "--puzzle-end-padding": 0,
           })) layout.style.setProperty(name, `${value}px`);
+        }
+      }
+      if (!compact && window.innerWidth > 1000) {
+        const layout=el.closest<HTMLElement>(".speedrun-match");
+        if(layout){
+          const bounds=layout.getBoundingClientRect(),center=document.documentElement.clientWidth/2;
+          const width=Math.max(160,Math.min(requestedBoardSize.current ?? heightLimit,heightLimit,2*(center-bounds.left-152),2*(bounds.right-center-244)));
+          layout.style.setProperty("--speedrun-board-width",`${width}px`);
+          layout.style.setProperty("--speedrun-board-left",`${center-bounds.left-width/2}px`);
         }
       }
       // Let the layout place its controls immediately beside the largest

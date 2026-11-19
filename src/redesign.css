@@ -5157,9 +5157,9 @@ html { scrollbar-gutter:stable; }
  .online-match > .board-column { min-width:0; grid-column:1; grid-row:1; }
  .online-match > .side-panels { min-width:0; grid-column:2; grid-row:1; padding-top:70px; }
  .online-match .board-frame,.online-match .online-player-strip { margin-inline:auto; }
- .play-match > .match-sidebar { grid-column:1; grid-row:1; }
- .play-match > .board-column { grid-column:2; grid-row:1; }
- .play-match.chess-layout { grid-template-columns:220px minmax(0,min(var(--play-board-size,650px),calc(100% - 240px))); }
+ .play-match > .match-sidebar { grid-column:2; grid-row:1; }
+ .play-match > .board-column { grid-column:1; grid-row:1; }
+ .play-match.chess-layout { grid-template-columns:minmax(0,min(var(--play-board-size,650px),calc(100% - 240px))) 220px; }
 }
 @media(max-width:1000px) {
  .online-match > .board-column { grid-row:1; }
@@ -5400,3 +5400,10 @@ html { scrollbar-gutter:stable; }
 .puzzle-layout .puzzle-actions-right > .btn.puzzle-next-button:hover { background:#ffdf00; }
 
 .puzzle-layout .side-panels > .card:has(.theme-select) .field > span { color:#26143d; }
+
+@media(min-width:1001px) {
+ .workspace .speedrun-match.chess-layout { grid-template-columns:minmax(0,calc(var(--speedrun-board-left,0px))) minmax(0,var(--speedrun-board-width,500px)) minmax(0,1fr); gap:0; }
+ .speedrun-match > .board-column { position:relative; grid-column:2; }
+ .speedrun-match > .match-sidebar { grid-column:3; margin-left:24px; }
+ .speedrun-match .speedrun-clock { position:absolute; left:-152px; top:var(--board-center-y,50%); transform:translateY(-50%); width:128px; min-height:56px; display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; box-sizing:border-box; border:2px solid #ffdf00; border-radius:12px; background:var(--panel); color:#ffdf00; }
+}
