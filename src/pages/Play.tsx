@@ -268,6 +268,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
       kind: "game",
       origin: "novachess",
       opponent: "Computer",
+      humanRating: library.localRating,
       opponentChoice: choice,
       botRating: speedrunMode ? Math.max(100,Math.min(3000,Math.round(speedrunRating/50)*50)) : choice === "Current rating" ? library.localRating : rating,
       speedrun: speedrunMode ? {elapsedMs:0,turnStartedAt:human === "w" ? Date.now() : null} : undefined,

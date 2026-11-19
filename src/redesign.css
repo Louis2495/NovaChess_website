@@ -5426,3 +5426,10 @@ html { scrollbar-gutter:stable; }
 /* Keep arrows distinct from solid square marks of the same color. */
 .board-marks { z-index:7; }
 .board-marks > g { filter:brightness(.78); }
+.home-recent-list { scrollbar-color:#fff transparent; scrollbar-width:thin; }
+.home-recent-list::-webkit-scrollbar { width:8px; }
+.home-recent-list::-webkit-scrollbar-thumb { background:#fff; border-radius:8px; }
+.home-page .home-recent .home-recent-list .recent-game-entry { margin-block:14px; }
+.home-recent .recent-game-scrubber input { background:#fff; }
+.home-recent .recent-game-scrubber input::-webkit-slider-thumb { background:#fff; }
+.home-recent .recent-game-scrubber input::-moz-range-thumb { background:#fff; }

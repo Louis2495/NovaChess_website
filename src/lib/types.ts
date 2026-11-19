@@ -109,6 +109,8 @@ export type SavedGame = {
   opponentChoice?: string;
   requestedOpening?: string;
   botRating?: number;
+  humanRating?: number;
+  opponentRating?: number;
   opponent?: string;
   country?: string;
   branches?: {

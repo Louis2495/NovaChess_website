@@ -272,6 +272,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
       initial:state.initial || state.positions[0] || state.fen,
       variant:room.variant, moves:state.moves, notation:state.notation, positions:state.positions,
       result:previous && last ? last.result : state.result, human, folder:"Games",
+      humanRating:profiles.find(p=>p.id===uid)?.rating,
+      opponentRating:profiles.find(p=>room.members.some(m=>m.id===p.id && m.team && m.team!==human))?.rating,
       opponent:room.members.filter(m => m.team && m.team !== human).map(m => username(m.id)).join(", "),
       ...(specialVariants.includes(room.variant) && "blocked" in state ? {special:state} : {}),
     };
