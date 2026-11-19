@@ -24,7 +24,7 @@ import {
   GitBranch,
 } from "lucide-react";
 import { useApp } from "../lib/context";
-import { uid, download, dateLabel, base, loadData, initialFen } from "../lib/store";
+import { uid, download, base, loadData, initialFen } from "../lib/store";
 import { search, useEngine, useSettledEvaluation, scoreLabel } from "../lib/engine";
 import { fairy, legal, squares, fog } from "../lib/variants";
 import type {
@@ -171,10 +171,10 @@ export default function LibraryPage() {
               className={`saved-game-card result-${g.result === "*" ? "study" : g.result === "1/2-1/2" ? "draw" : g.result === (g.human === "w" ? "1-0" : "0-1") ? "win" : "loss"}`}
             >
               <div className="saved-board-button">
-                <Board fen={g.positions.at(-1) || g.initial} disabled compact />
+                <Board fen={g.positions.at(-1) || g.initial} flipped={g.human === "b"} disabled compact />
               </div>
               <div className="card-heading">
-                <h3>{g.title}</h3>
+                <h3>{g.result === "*" && !isStudy(g) ? g.title.replace(/\s*(?:[·—–-]\s*)?\bunfinished\b/gi, "").trim() || "Game" : g.title}</h3>
                 <span className="pill">
                   {isStudy(g)
                     ? "Study"
@@ -187,8 +187,9 @@ export default function LibraryPage() {
                 {isStudy(g)
                   ? `${1 + (g.branches?.length || 0)} lines`
                   : libraryKind(g)}{" "}
-                · {Math.ceil(g.moves.length / 2)} moves · {dateLabel(g.created)}
+                · {Math.ceil(g.moves.length / 2)} {Math.ceil(g.moves.length / 2) === 1 ? "move" : "moves"}
               </p>
+              <p className="caption library-game-date"><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})} · Started {new Date(g.created).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</time></p>
               <div className="button-row">
                 {isStudy(g) ? (
                   <>
@@ -207,7 +208,7 @@ export default function LibraryPage() {
                     className="secondary"
                     onClick={() => setSelected(g.id)}
                   >
-                    Replay & review <ChevronRight size={15} />
+                    Review
                   </Button>
                 )}
                 <IconButton
