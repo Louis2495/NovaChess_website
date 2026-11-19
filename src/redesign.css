@@ -5522,3 +5522,9 @@ html { scrollbar-gutter:stable; }
  .home-page:has(.home-recent):not(.memes-hidden) { grid-template-columns:minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.4fr); }
  .home-page:has(.home-recent):not(.memes-hidden) .home-puzzle { min-height:336px; }
 }
+.puzzle-settings-row { display:flex; justify-content:flex-end; }
+.puzzle-layout .puzzle-theme-picker { position:relative; width:40px; color:var(--text); }
+.puzzle-theme-picker summary { width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center; box-sizing:border-box; border:1px solid var(--border); border-radius:10px; background:var(--panel); }
+.puzzle-theme-picker summary:hover,.puzzle-theme-picker[open] summary { border-color:#a77be8; color:#c6a2f4; }
+.puzzle-theme-picker .theme-picker-menu { position:absolute; top:calc(100% + 8px); right:0; z-index:30; width:min(290px,calc(100vw - 48px)); max-height:60dvh; overflow:auto; box-sizing:border-box; margin:0; padding:14px; background:#a77be8; color:#26143d; border:2px solid #59318a; border-radius:12px; box-shadow:0 12px 32px #0006; }
+.theme-picker-menu h3 { margin:0 0 12px; font-size:.95rem; }

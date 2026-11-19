@@ -9,7 +9,7 @@ for(const route of ['puzzles','puzzles/daily'])test(`${route} explains wrong mov
  await expect(square('d7')).toHaveAttribute('aria-label','d7, black pawn');
  await square('e7').click();await square('e5').click();await expect(box).toHaveCount(0);await expect(page.locator('.puzzle-board')).toHaveClass(/solved/);
  if(route==='puzzles'){
-  const theme=page.locator('.card:has(.theme-select)');await expect(theme).toHaveCSS('background-color','rgb(167, 123, 232)');await expect(theme).toHaveCSS('border-color','rgb(89, 49, 138)');
+  await expect(page.locator('.card:has(.theme-select)')).toHaveCount(0);await expect(page.locator('.puzzle-theme-picker summary')).toBeVisible();
   const next=page.getByRole('button',{name:'Next puzzle',exact:true});await expect(next).toHaveCSS('background-color','rgb(255, 223, 0)');await expect(next.locator('svg')).toHaveCount(0);await next.hover();await expect(next).toHaveCSS('background-color','rgb(255, 223, 0)');
  }
 

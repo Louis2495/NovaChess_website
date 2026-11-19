@@ -349,6 +349,12 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
 
         </div>
         <div className="side-panels">
+          {!daily && <div className="puzzle-settings-row"><PuzzleThemePicker value={theme} themes={themes} onChange={value=>{
+                setTheme(value);
+                const choices=value==='All themes'?puzzles:puzzles.filter(p=>p.themes.includes(value));
+                if(!done)grade(false);
+                load([...choices].sort((a,b)=>Math.abs(a.sourceRating-library.progress.rating)-Math.abs(b.sourceRating-library.progress.rating))[0]);
+              }}/></div>}
           <div className="puzzle-review-bar" role="group" aria-label="Puzzle move navigation">
             <Button className="secondary" aria-label="Previous puzzle move" disabled={(reviewIndex ?? played.length)===0} onClick={()=>seekReview((reviewIndex ?? played.length)-1)}><ChevronLeft size={19}/></Button>
             <input aria-label="Puzzle replay position" type="range" min={0} max={played.length} value={reviewIndex ?? played.length} disabled={!played.length} onChange={e=>seekReview(Number(e.target.value))}/>
@@ -361,16 +367,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               {Math.round(library.progress.rating)}
             </div>
           </Card>
-          {!daily && (
-            <Card>
-              <PuzzleThemePicker value={theme} themes={themes} onChange={value=>{
-                setTheme(value);
-                const choices=value==='All themes'?puzzles:puzzles.filter(p=>p.themes.includes(value));
-                if(!done)grade(false);
-                load([...choices].sort((a,b)=>Math.abs(a.sourceRating-library.progress.rating)-Math.abs(b.sourceRating-library.progress.rating))[0]);
-              }}/>
-            </Card>
-          )}
           {played.length > 0 && (
             <Card className="puzzle-moves">
               <div className="card-heading">
