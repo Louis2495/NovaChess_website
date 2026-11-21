@@ -5391,7 +5391,7 @@ html { scrollbar-gutter:stable; }
 }
 .workspace-shell:has(.variants-hub.setup-active) > .workspace {
   display:block; min-height:0; max-width:none; box-sizing:border-box;
-  padding:clamp(14px,3.4dvh,32px) clamp(18px,5vw,84px) clamp(8px,1.8dvh,16px);
+  padding:clamp(24px,calc(20dvh - 84px),96px) clamp(18px,5vw,84px) clamp(8px,1.8dvh,16px);
 }
 .workspace:has(.variants-hub.setup-active) > div:first-child,
 .workspace:has(.variants-hub.setup-active) > div:first-child > div {
@@ -5462,6 +5462,7 @@ html { scrollbar-gutter:stable; }
   .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active { --variant-section-gap:clamp(9px,2.4dvh,20px); }
   .variants-hub.setup-active .variant-gallery { --variant-gallery-gap:clamp(7px,1.7dvh,15px); }
   .workspace-shell:has(.variants-hub.setup-active) > .workspace {
+    padding-top:clamp(14px,6dvh,48px);
     padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
   .variants-hub.setup-active :is(.variant-gallery,.computer-variant-gallery) {
