@@ -4224,17 +4224,17 @@ select.theme-select {
 .move-quality {
   display:inline-flex; align-items:center; justify-content:center; flex:none;
   box-sizing:border-box; width:24px; height:24px; border-radius:8px;
-  color:var(--quality-ink); background:var(--quality);
+  color:#fff; background:var(--quality);
   border:1px solid #fff8; box-shadow:0 2px 0 #0003;
   font-family:"Nunito Sans",sans-serif; font-weight:900; font-size:15px; line-height:1;
 }
 .move-quality svg { width:66%; height:66%; stroke-width:2.5; }
-.quality-book { --quality:#8a38eb; --quality-ink:#fff; }
-.quality-best { --quality:#16e36b; --quality-ink:#07391d; }
-.quality-excellent { --quality:#00d4ff; --quality-ink:#07384b; }
-.quality-inaccuracy { --quality:#ffd400; --quality-ink:#3d2900; }
-.quality-mistake { --quality:#ff831f; --quality-ink:#401700; }
-.quality-blunder { --quality:#dc1749; --quality-ink:#fff; }
+.quality-book { --quality:#6d28c9; }
+.quality-best { --quality:#087a3c; }
+.quality-excellent { --quality:#006b91; }
+.quality-inaccuracy { --quality:#875b00; }
+.quality-mistake { --quality:#af4600; }
+.quality-blunder { --quality:#bc1741; }
 .quality-good:empty { display:none; }
 .game-review-layout .board-navigation { width:var(--actual-board-width,calc(100% - 29px)); margin-left:29px; }
 .game-review-layout .side-panels { gap:14px; }
@@ -4249,9 +4249,9 @@ select.theme-select {
 .review-notation th { color:var(--muted); text-align:left; font-size:.72rem; padding-bottom:8px; font-weight:500; }
 .review-notation th:first-child,.review-notation td:first-child { width:29px; color:var(--muted); }
 .review-notation td { padding:2px; }
-.review-notation td button { width:100%; display:flex; justify-content:space-between; gap:6px; align-items:center; padding:7px; border-radius:6px; text-align:left; }
+.review-notation td button { width:100%; display:flex; justify-content:flex-start; gap:6px; align-items:center; padding:7px; border-radius:6px; text-align:left; }
 .review-notation td button.current { background:var(--accent-soft); color:var(--accent); }
-.review-notation-card { max-height:440px; overflow:auto; }
+.review-notation-card { box-sizing:border-box; width:min(100%,360px); max-height:440px; overflow:auto; }
 @media(min-width:1001px){ .game-review-layout.chess-layout { grid-template-columns:minmax(0,1fr) minmax(300px,360px); } }
 .review-board-eval:has(.material-top) > .eval-meter { margin-top:29px; }
 .review-board-eval:has(.board + .material-imbalance) > .eval-meter { margin-bottom:29px; }
@@ -4271,7 +4271,7 @@ select.theme-select {
 .review-player-metric {
   display:grid; grid-template-rows:subgrid; grid-row:span 4;
   margin:0; padding:8px 6px;
-  border-top:5px solid var(--review-outcome,transparent); text-align:center;
+  border:3px solid var(--review-outcome,transparent); text-align:center;
 }
 .review-player-metric.white { background:#fff; color:#111318; }
 .review-player-metric.black { background:#111318; color:#fff; }

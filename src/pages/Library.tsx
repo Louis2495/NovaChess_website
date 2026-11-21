@@ -18,10 +18,8 @@ import {
   ChevronsRight,
   Play,
   Square,
-  ListChecks,
   ChartLine,
   Share2,
-  LoaderCircle,
   Save,
   GitBranch,
 } from "lucide-react";
@@ -94,8 +92,7 @@ export default function LibraryPage() {
     [folder, setFolder] = useState("All"),
     [query, setQuery] = useState(""),
     [newFolder, setNewFolder] = useState(false),
-    [name, setName] = useState(""),
-    [selected, setSelected] = useState(detail || "");
+    [name, setName] = useState("");
   const records =
     library.activeGame?.moves.length &&
     !library.games.some((g) => g.id === library.activeGame?.id)
@@ -107,7 +104,7 @@ export default function LibraryPage() {
       (folder === "All" || g.folder === folder) &&
       g.title.toLowerCase().includes(query.toLowerCase()),
   );
-  const g = records.find((v) => v.id === selected);
+  const g = records.find((v) => v.id === detail);
   if (trainingStudy)
     return (
       <StudyTraining
@@ -115,7 +112,7 @@ export default function LibraryPage() {
         onClose={() => setTrainingStudy(null)}
       />
     );
-  if (g) return <GameViewer game={g} onClose={() => setSelected("")} />;
+  if (g) return <GameViewer game={g} />;
   return (
     <>
       <PageTitle title="Library" />
@@ -212,7 +209,7 @@ export default function LibraryPage() {
                 ) : (
                   <Button
                     className="secondary"
-                    onClick={() => setSelected(g.id)}
+                    onClick={() => navigate("library", g.id)}
                   >
                     Review
                   </Button>
@@ -379,13 +376,7 @@ function material(fen: string) {
     0,
   );
 }
-function GameViewer({
-  game,
-  onClose,
-}: {
-  game: SavedGame;
-  onClose: () => void;
-}) {
+function GameViewer({ game }: { game: SavedGame }) {
   const { library, setLibrary, navigate, notify } = useApp();
   const [cursor, setCursor] = useState(0),
     [playing, setPlaying] = useState(false),
@@ -608,15 +599,8 @@ function GameViewer({
       <PageTitle
         title="Game review"
       >
-        <Button className="secondary" onClick={onClose}>
-          Back to Library
-        </Button>
         {game.variant === "cvfog" && <Toggle label="Fog" checked={fogEnabled} onChange={setFogEnabled} />}
         <Button className="secondary" onClick={() => setSharing(true)}><Share2 size={16}/>Share</Button>
-        {!game.special && <Button disabled={reviewing || rows.length >= game.moves.length && rows.every(r=>r.afterScore!==undefined)} onClick={() => void review()}>
-          {reviewing ? <LoaderCircle className="spin" size={16}/> : <ListChecks size={16} aria-hidden="true" />}
-          {reviewing ? `${rows.length} / ${game.moves.length}` : rows.length && rows.length<game.moves.length ? "Resume review" : "Review game"}
-        </Button>}
         <Button
           onClick={() => navigate("analysis", "game:" + game.id)}
           disabled={!standard}

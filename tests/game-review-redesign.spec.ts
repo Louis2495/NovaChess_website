@@ -10,11 +10,19 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  await page.route('**/engine/stockfish-19-lite-single.js',route=>route.fulfill({contentType:'application/javascript',body:`const fixtures=${JSON.stringify(map)};let fen='';onmessage=({data})=>{if(data==='uci')postMessage('uciok');else if(data==='isready')postMessage('readyok');else if(data.startsWith('position fen '))fen=data.slice(13);else if(data.startsWith('go ')){const p=fixtures[fen];if(!p)return;const sign=fen.split(' ')[1]==='w'?1:-1;postMessage('info depth 20 score cp '+p.score*sign+' pv '+p.best);if(!data.includes('infinite'))postMessage('bestmove '+p.best);}};`}));
  await page.goto('/#library/review-fixture');
  await expect(page.getByRole('heading',{name:'Game review',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Back to Library',exact:true})).toHaveCount(0);
+ await expect(page.getByRole('button',{name:/^(Review game|Resume review)$/})).toHaveCount(0);
  await expect(page.getByLabel('Time per position')).toHaveCount(0);await expect(page.getByLabel('Replay speed')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Engine review',exact:true})).toHaveCount(0);
  await expect(page.getByRole('status').filter({hasText:'Review complete.'})).toBeVisible();
  await expect(page.locator('.review-notation th')).toHaveText(['#','White','Black']);await expect(page.locator('.review-notation .move-quality')).toHaveCount(moves.length);
  await expect(page.locator('.review-notation-card h2')).toHaveCSS('position', 'static');
  await expect(page.locator('.review-notation th').first()).toHaveCSS('position', 'static');
+ const firstMove = page.locator('.review-notation td button').first();
+ const book = firstMove.locator('.quality-book');
+ await expect(book).toHaveCSS('color', 'rgb(255, 255, 255)');
+ const moveText = (await firstMove.locator('span').first().boundingBox())!;
+ const badge = (await book.boundingBox())!;
+ expect(badge.x - (moveText.x + moveText.width)).toBeLessThanOrEqual(8);
  await expect(page.locator('.evaluation-graph polyline')).toHaveAttribute('points',/\S+ \S+/);
  await expect(page.locator('.review-performance .review-player-metric dd:first-of-type')).not.toHaveText(['—','—']);
  for (const panel of await page.locator('.review-performance dl').all()) {
@@ -62,7 +70,10 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
     await expect(panel.locator('dt')).toHaveText(['Estimated rating', 'Centipawn loss']);
     await expect(panel.locator('dd')).toHaveCount(2);
     await expect(panel).toHaveCSS('background-color', fill);
-    await expect(panel).toHaveCSS('border-top-color', stripe);
+    for (const edge of ['top', 'right', 'bottom', 'left']) {
+      await expect(panel).toHaveCSS(`border-${edge}-color`, stripe);
+      await expect(panel).toHaveCSS(`border-${edge}-width`, '3px');
+    }
   }
   const [white, black] = await Promise.all([
     stats.locator('dl[aria-label="White"]').boundingBox(),
@@ -77,4 +88,15 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
     expect(rating.x - (board.x + board.width)).toBeGreaterThanOrEqual(36);
     expect(Math.abs(rating.y - board.y)).toBeLessThan(1);
   }
+
+  await page.setViewportSize(isMobile ? { width: 390, height: 650 } : { width: 1440, height: 720 });
+  const replay = page.locator('.game-review-layout .board-navigation');
+  await expect.poll(async () => {
+    const controls = (await replay.boundingBox())!;
+    const viewportBottom = await page.evaluate(() => {
+      const tabs = document.querySelector('.mobile-tabs');
+      return tabs && tabs.getBoundingClientRect().height ? tabs.getBoundingClientRect().top : innerHeight;
+    });
+    return controls.y + controls.height <= viewportBottom;
+  }).toBe(true);
 });

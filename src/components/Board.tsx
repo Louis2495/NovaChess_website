@@ -381,7 +381,14 @@ export function Board({
       // Leave room for material and replay controls; use document position so
       // scrolling never changes the board size while someone is using it.
       const top = rect.top + window.scrollY;
-      const reserve = tab === "puzzles" ? (el.closest(".daily-puzzle-layout") ? (window.innerWidth <= 1000 ? 185 : 125) : (window.innerWidth <= 1000 ? 158 : 56)) : 90;
+      let reserve = 90;
+      if (el.closest(".game-review-layout")) {
+        reserve = window.innerWidth <= 800 ? 205 : 145;
+      } else if (tab === "puzzles") {
+        reserve = el.closest(".daily-puzzle-layout")
+          ? (window.innerWidth <= 1000 ? 185 : 125)
+          : (window.innerWidth <= 1000 ? 158 : 56);
+      }
       const available = window.innerHeight - top - reserve;
       let heightLimit = top < window.innerHeight - 80
         ? Math.max(80,available)
