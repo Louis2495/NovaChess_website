@@ -77,9 +77,10 @@ export function usePremoves({
       });
   }, [allowed, turn, side, fen, legal, queue]);
   const pending = sent?.fen === fen ? [sent.move, ...queue] : queue,
+    destinations = new Set<string>(),
     preview =
       allowed && (pending.length || turn !== side)
-        ? previewPremoves(fen, pending, side, variant)
+        ? previewPremoves(fen, pending, side, variant, destinations)
         : fen;
   return {
     queue,
@@ -95,6 +96,7 @@ export function usePremoves({
       setQueue((q) => (q.length < 32 ? [...q, m] : q));
     },
     preview,
+    destinations,
     options: premoveOptions(preview, side, chaos, blocked, variant),
     clear: () => {
       setQueue([]);

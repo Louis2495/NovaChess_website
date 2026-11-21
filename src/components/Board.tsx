@@ -57,6 +57,7 @@ export function Board({
   marks: externalMarks,
   onCancel,
   onCancelPremoves,
+  premoveDestinations,
   onFlip,
   materialFen,
   guides = [],
@@ -86,6 +87,7 @@ export function Board({
   onMarksChange?: (marks: BoardMark[]) => void;
   onCancel?: () => void;
   onCancelPremoves?: () => boolean;
+  premoveDestinations?: ReadonlySet<string>;
   onFlip?: () => void;
   materialFen?: string;
   guides?: BoardMark[];
@@ -563,6 +565,7 @@ export function Board({
               piece = cells[square],
               fogged = visible && !visible.has(square),
               concealed = hidden || fogged,
+              queued = !concealed && premoveDestinations?.has(square),
               squareMark = [...guides, ...currentMarks].reverse().find(m => m.from === square && m.to === square),
               isDark = (file.charCodeAt(0) - 97 + 8 - Number(rank)) % 2 === 1;
             return (
@@ -573,6 +576,7 @@ export function Board({
                 data-annotation={squareMark?.color}
                 style={squareMark && !fogged && !blocked.includes(square) ? { background: squareMark.color } : undefined}
                 aria-pressed={active === square}
+                aria-description={queued ? "Queued premove destination" : undefined}
                 aria-disabled={
                   blocked.includes(square) || (disabled && !onSquare)
                 }
@@ -668,6 +672,7 @@ export function Board({
                   }
                 }}
               >
+                {queued && <span className="board-premove-marker" aria-hidden="true" />}
                 {badge?.square === square && <span className="board-move-badge">{badge.content}</span>}
                 {!concealed && piece && <Piece symbol={piece} />}{" "}
                 {!fogged && appearance.coordinates && col === 0 && (

@@ -134,8 +134,11 @@ test("right click cancels premoves before highlighting and the next right click 
   await move(page, "e2e4");
   await move(page, "g1f3");
   await expect(page.locator(".premove-queue")).toContainText("g1f3");
+  await expect(square(page, "f3").locator(".board-premove-marker")).toBeVisible();
+  await expect(square(page, "f3")).toHaveAttribute("aria-description", "Queued premove destination");
   await square(page, "e6").click({ button: "right" });
   await expect(page.locator(".premove-queue")).toHaveCount(0);
+  await expect(page.locator(".board-premove-marker")).toHaveCount(0);
   await expect(square(page, "g1")).toHaveAttribute(
     "aria-label",
     /white knight/,

@@ -648,6 +648,7 @@ export function RepertoireTrainer({
           fen={premove.preview}
           materialFen={fen}
           onCancelPremoves={premove.cancelOnRightClick}
+          premoveDestinations={premove.destinations}
           disabled={done || (!yourTurn && !appearance.premoves)}
           legalMoves={yourTurn ? legalMoves : premove.options}
           flipped={line.side === "b"}

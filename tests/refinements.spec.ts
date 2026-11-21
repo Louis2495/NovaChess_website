@@ -189,4 +189,5 @@ test("consecutive premoves preview a piece through three moves and execute in or
       { timeout: 20000 },
     )
     .toEqual(["e2e4", "g1f3", "f3g5", "g5f3"]);
+  await expect(page.locator(".board-premove-marker")).toHaveCount(0);
 });

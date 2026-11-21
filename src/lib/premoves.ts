@@ -44,6 +44,7 @@ export function previewPremoves(
   moves: string[],
   side: PremoveSide,
   variant = "chess",
+  destinations?: Set<string>,
 ) {
   const p = squares(fen),
     fields = fen.split(" ");
@@ -65,6 +66,7 @@ export function previewPremoves(
       if (index < 0) continue;
       pocket = pocket.slice(0,index) + pocket.slice(index+1);
       p[to] = piece;
+      destinations?.add(to);
     } else {
       const from = main.slice(0, 2),
         to = main.slice(2, 4),
@@ -83,6 +85,8 @@ export function previewPremoves(
         delete p[to];
         p[kingTo] = piece;
         p[rookTo] = rook;
+        destinations?.add(kingTo);
+        destinations?.add(rookTo);
         continue;
       }
       const captured = p[to] || (piece.toLowerCase() === "p" && from[0] !== to[0] ? p[to[0] + from[1]] : undefined);
@@ -98,6 +102,7 @@ export function previewPremoves(
           ? main[4].toUpperCase()
           : main[4].toLowerCase()
         : piece;
+      destinations?.add(to);
       if (
         piece.toLowerCase() === "k" &&
         Math.abs(from.charCodeAt(0) - to.charCodeAt(0)) === 2
@@ -106,11 +111,14 @@ export function previewPremoves(
           target = (to[0] === "g" ? "f" : "d") + from[1];
         p[target] = p[rook];
         delete p[rook];
+        destinations?.add(target);
       }
     }
     if (move.includes(",")) {
       for (const s of Object.keys(p)) if (p[s] === "*") delete p[s];
-      p[move.slice(-2)] = "*";
+      const duckTo = move.slice(-2);
+      p[duckTo] = "*";
+      destinations?.add(duckTo);
     }
   }
   if (hasPockets) fields[0] = fields[0].replace(/\[[^\]]*\]/, "["+pocket+"]");

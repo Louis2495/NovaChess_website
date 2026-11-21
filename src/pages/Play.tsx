@@ -819,6 +819,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 overlay={<GameResult result={game.result} human={game.human} onReview={() => navigate("library", game.id)}/>}
               materialFen={valid.fen}
                 onCancelPremoves={premove.cancelOnRightClick}
+                premoveDestinations={premove.destinations}
                 onMove={play}
                 legalMoves={premoveLegal}
                 onSquare={

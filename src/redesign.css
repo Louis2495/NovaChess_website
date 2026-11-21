@@ -6435,3 +6435,13 @@ html { scrollbar-gutter:stable; }
 
 .admin-reserved-names { display:grid; gap:6px; padding:0; list-style:none; }
 .admin-reserved-names li { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+
+.board-premove-marker {
+  position:absolute;
+  z-index:2;
+  inset:3px;
+  border:2px dashed #d5c5ff;
+  box-shadow:inset 0 0 0 1px #4b2ca3, 0 0 0 1px #4b2ca3;
+  border-radius:5px;
+  pointer-events:none;
+}

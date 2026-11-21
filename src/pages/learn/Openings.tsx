@@ -674,6 +674,7 @@ function LessonWorkspace({
             fen={premove.preview}
             materialFen={fen}
             onCancelPremoves={premove.cancelOnRightClick}
+            premoveDestinations={premove.destinations}
             legalMoves={
               practice && c.turn() !== side ? premove.options : undefined
             }

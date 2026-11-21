@@ -151,6 +151,7 @@ export default function SpecialPlay({
             overlay={<GameResult result={state.result} human={side} onReview={() => navigate("library", saved.id)}/>}
             materialFen={state.fen}
             onCancelPremoves={premove.cancelOnRightClick}
+            premoveDestinations={premove.destinations}
             flipped={boardFlipped} onFlip={()=>setBoardFlipped(v=>!v)}
             legalMoves={turn === side ? legal : premove.options}
             blocked={state.blocked}

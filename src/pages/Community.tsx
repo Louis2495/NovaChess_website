@@ -440,6 +440,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   onDismissOverlay={showLast ? dismissResult : undefined}
                   materialFen={position?.fen}
                   onCancelPremoves={premove.cancelOnRightClick}
+                  premoveDestinations={premove.destinations}
                   flipped={viewFlipped} onFlip={()=>setBoardFlipped(!viewFlipped)}
                   disabled={
                     (busy && !(pendingPrediction.current && !canMove && appearance.premoves)) ||

@@ -340,6 +340,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               fen={reviewFen ?? premove.preview}
               materialFen={reviewFen ?? fen}
               onCancelPremoves={premove.cancelOnRightClick}
+              premoveDestinations={reviewing ? undefined : premove.destinations}
               legalMoves={reviewing || c.turn() === learner ? undefined : premove.options}
               onMove={(from, to, promotion) =>
                 reviewing || c.turn() === learner
