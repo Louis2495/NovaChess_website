@@ -4363,7 +4363,7 @@ select.theme-select {
 .home-page .home-welcome { display:grid; grid-template-columns:minmax(150px,240px) minmax(0,1fr); gap:24px; align-items:center; }
 .home-welcome-art .multiplayer-picture { width:100%; max-width:240px; border-radius:var(--radius); }
 .home-welcome-actions { min-width:0; }
-.learn-groups { display:grid; gap:22px; }
+.learn-groups { display:grid; gap:22px; width:min(92%,1120px); margin-inline:auto; }
 .learn-group-title { font-size:1rem; margin:0 0 12px; color:var(--muted); }
 .learn-group .learn-hub { grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
 .learn-group .learn-tile { padding:16px; min-height:110px; }
