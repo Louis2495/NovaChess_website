@@ -335,8 +335,10 @@ test("Team chess lets teammates move and draw shared arrows, and the server play
   assert.equal(r.status, 200);
   game = r.data;
   assert.equal(game.marks.length, 1);
+  const started = performance.now();
   r = await command(users[1], game, "move", { move: "e2e4" });
   assert.equal(r.status, 200, JSON.stringify(r.data));
+  assert.ok(performance.now() - started >= 1000, "The computer reply should wait at least one second");
   assert.equal(r.data.state.moves.length, 2);
   const c = new Chess();
   for (const move of r.data.state.moves) c.move(move);

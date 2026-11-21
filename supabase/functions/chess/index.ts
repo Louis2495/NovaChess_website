@@ -378,11 +378,17 @@ Deno.serve(async (req) => {
       state.result === "*" &&
       state.fen.split(" ")[1] === "b"
     ) {
+      const replyAt = performance.now() + 1000;
       const rating = clampTeamComputerRating(r.settings.botRating);
       const move = rating > teamComputerCasualMaxRating
         ? await strongTeamComputerMove(state.fen, rating)
         : teamBotMove(state.fen, rating);
-      if (move) state = standardApply(state, move);
+      if (move) {
+        // Search time counts toward the pause. The board already previews the human move.
+        const remaining = Math.ceil(replyAt - performance.now());
+        if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
+        state = standardApply(state, move);
+      }
     }
     if(state.result!=="*" && state.clock)state={...state,clock:{...state.clock,startedAt:null}};
     const finishedState = state,
