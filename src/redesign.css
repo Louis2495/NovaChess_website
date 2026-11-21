@@ -5925,6 +5925,9 @@ html { scrollbar-gutter:stable; }
   margin:0;
   order:0;
 }
+.home-dashboard .home-welcome-actions {
+  max-width:520px;
+}
 .home-dashboard .home-welcome-actions h1 {
   margin:0;
   font-size:clamp(1.55rem,3vw,2.55rem);
@@ -5934,64 +5937,26 @@ html { scrollbar-gutter:stable; }
 }
 .home-dashboard .home-welcome .new-game-primary {
   gap:10px;
-  min-height:clamp(58px,8dvh,80px);
+  min-height:58px;
+  margin-block:0;
   font-size:clamp(1.2rem,2.15vw,1.85rem);
 }
 .home-dashboard .home-welcome .new-game-primary > svg {
   position:static;
   flex:none;
 }
-.home-shortcuts {
-  display:grid;
-  grid-column:1 / -1;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:var(--home-gap);
-}
-.home-shortcut,
 .home-dashboard .home-puzzle,
-.home-dashboard > .home-recent,
-.home-progress {
-  border:1px solid color-mix(in srgb,var(--accent) 32%,var(--border));
+.home-dashboard > .home-recent {
+  border:1px solid var(--border-strong);
   border-radius:var(--radius);
-  background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 12%,var(--panel-solid)),var(--panel-solid));
+  background:var(--panel);
 }
-.home-shortcut {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-height:62px;
-  padding:10px 14px;
-  color:var(--text);
-  font-weight:800;
-  line-height:1.2;
-  text-align:left;
-}
-.home-shortcut:hover { background:color-mix(in srgb,var(--accent) 20%,var(--panel-solid)); }
-.home-shortcut-icon {
-  display:grid;
-  place-items:center;
-  flex:none;
-  width:38px;
-  aspect-ratio:1;
-  border-radius:10px;
-  background:#a9e7d2;
-  color:#193c36;
-}
-.home-shortcut:nth-child(2) .home-shortcut-icon { background:#f8d68c; color:#4b361a; }
-.home-shortcut:nth-child(3) .home-shortcut-icon { background:#d9c5fb; color:#3e295b; }
-.home-shortcut-arrow { flex:none; margin-inline-start:auto; }
-.home-dashboard .home-section-heading h2,
-.home-dashboard .daily-meme-title {
-  display:flex;
-  align-items:center;
-  gap:8px;
+.home-dashboard .home-section-heading h2 {
   margin:0;
   font-size:clamp(1.04rem,1.55vw,1.42rem);
-  font-weight:900;
+  font-weight:800;
   line-height:1.15;
 }
-.home-dashboard .home-section-heading svg,
-.home-dashboard .daily-meme-title svg { flex:none; }
 .home-page.home-dashboard > .home-practice-grid {
   width:100%;
   max-width:none;
@@ -6042,18 +6007,12 @@ html { scrollbar-gutter:stable; }
   max-width:none;
   align-self:stretch;
   border-radius:var(--radius);
-  color:#223644;
-}
-.home-dashboard .daily-meme-title {
-  position:absolute;
-  inset:6px 6px auto;
-  z-index:1;
 }
 .home-page.home-dashboard .home-practice-grid .daily-meme-image {
   position:absolute;
-  inset:34px 0 0;
+  inset:0;
   width:100%;
-  height:calc(100% - 34px);
+  height:100%;
 }
 .home-page.home-dashboard > .home-recent {
   margin:0;
@@ -6063,55 +6022,11 @@ html { scrollbar-gutter:stable; }
 .home-dashboard .home-recent .home-section-heading { margin-bottom:12px; }
 .home-dashboard .home-recent .home-section-heading .text-link { font-size:.9rem; }
 .home-dashboard .home-recent-empty { margin:auto; padding:18px 0; font-size:1rem; }
-.home-progress {
-  grid-column:1 / -1;
-  display:flex;
-  align-items:center;
-  gap:18px;
-  padding:12px 16px;
-}
-.home-progress h2 { margin:0; flex:none; }
-.home-progress h2 button {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:6px 0;
-  background:none;
-  font-size:1rem;
-  font-weight:900;
-}
-.home-progress h2 button:hover { color:var(--accent); }
-.home-progress dl {
-  flex:1;
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  margin:0;
-}
-.home-progress dl > div {
-  --progress-inset:clamp(8px,1.2vw,20px);
-  position:relative;
-  min-width:0;
-  padding-inline:calc(var(--progress-inset) + 30px) var(--progress-inset);
-  border-inline-start:1px solid var(--border);
-}
-.home-progress dl svg {
-  position:absolute;
-  inset-inline-start:var(--progress-inset);
-  inset-block-start:50%;
-  transform:translateY(-50%);
-  color:#a9e7d2;
-}
-.home-progress dl > div:nth-child(1) svg { color:#f8d68c; }
-.home-progress dl > div:nth-child(4) svg { color:#f6be99; }
-.home-progress dt { font-size:.82rem; color:var(--muted); }
-.home-progress dd { margin:0; font-size:1.25rem; font-weight:900; line-height:1.15; }
-
 @media(min-width:1001px) {
   .home-page.home-dashboard:has(.daily-meme) {
     grid-template-columns:minmax(0,1fr) minmax(0,.88fr) minmax(0,1.58fr);
   }
   .home-page.home-dashboard > .home-practice-grid { display:contents; }
-  .home-page.home-dashboard .home-practice-grid .home-puzzle { min-height:clamp(0px,calc(100dvh - 420px),560px); }
   .home-page.home-dashboard:has(.daily-meme) .daily-meme { height:auto; }
   .home-page.home-dashboard:has(.daily-meme) > .home-recent { grid-column:3; }
   .home-page.home-dashboard:not(:has(.daily-meme)) { grid-template-columns:minmax(0,1fr) minmax(0,1.8fr); }
@@ -6119,18 +6034,10 @@ html { scrollbar-gutter:stable; }
 @media(max-width:1000px) {
   .home-page.home-dashboard .home-practice-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .home-page.home-dashboard .home-practice-grid:not(:has(.daily-meme)) { grid-template-columns:minmax(0,1fr); }
-  .home-progress { flex-direction:column; align-items:stretch; gap:6px; }
-  .home-progress dl > div:first-child { --progress-inset:0px; border:0; }
 }
 @media(max-width:600px) {
-  .home-shortcuts { gap:6px; }
-  .home-shortcut { flex-direction:column; justify-content:center; gap:5px; padding:8px 4px; font-size:.8rem; text-align:center; }
-  .home-shortcut-icon { width:30px; border-radius:8px; }
-  .home-shortcut-icon svg { width:17px; }
-  .home-shortcut-arrow { display:none; }
-  .home-page.home-dashboard .home-practice-grid { grid-template-columns:minmax(0,1fr); }
-  .home-progress dl { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 0; }
-  .home-progress dl > div:nth-child(3) { --progress-inset:0px; border:0; }
+  .home-page.home-dashboard > .home-practice-grid { display:contents; }
+  .home-page.home-dashboard .daily-meme { order:1; }
 }
 
 .variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) {

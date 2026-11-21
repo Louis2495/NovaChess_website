@@ -741,7 +741,7 @@ test("bughouse transfers ordinary pieces normally and reverts captured promotion
     .toContain("[p]");
 });
 
-test("Home has one large New Game action and focused shortcuts", async ({
+test("Home has one large New Game action", async ({
   page,
 }) => {
   await page.goto("/");
@@ -755,7 +755,7 @@ test("Home has one large New Game action and focused shortcuts", async ({
   await expect(
     page.getByRole("button", { name: "Customize", exact: true }),
   ).toHaveCount(0);
-  await expect(page.getByRole("navigation", { name: "Quick actions" }).getByRole("button")).toHaveCount(3);
+  await expect(page.getByRole("navigation", { name: "Quick actions" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /tournament/i })).toHaveCount(0);
   await action.click();
   await page.getByRole("button",{name:"Computer",exact:true}).click();
@@ -767,7 +767,7 @@ test("Home has one large New Game action and focused shortcuts", async ({
   await expect(page.getByLabel("Variant", { exact: true })).toHaveCount(0);
 });
 
-test("Home shows the meme and links directly to opening lessons", async ({
+test("Home shows the meme without a visible label", async ({
   page,
 }) => {
   await page.goto("/");
@@ -776,10 +776,8 @@ test("Home shows the meme and links directly to opening lessons", async ({
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Chess meme", exact: true }),
-  ).toBeVisible();
-  await expect(page.locator(".home-lessons,.suggested-lessons")).toHaveCount(0);
-  await page.getByRole("navigation", { name: "Quick actions" }).getByRole("button", { name: "Opening lessons" }).click();
-  await expect(page.locator(".list-summary")).toHaveText("129 lessons");
+  ).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Your progress" })).toHaveCount(0);
 });
 
 test("Stats has dedicated navigation and derives charts from completed local games only", async ({
