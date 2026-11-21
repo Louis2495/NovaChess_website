@@ -19,7 +19,7 @@ import {
   Globe,
   Lock,
 } from "lucide-react";
-import type { SavedGame } from "../lib/types";
+import type { Opening, SavedGame } from "../lib/types";
 import { useApp } from "../lib/context";
 import { useData } from "../lib/store";
 import {
@@ -31,6 +31,7 @@ import {
 type Country = { code: string; polygons: number[][][] };
 export default function Stats() {
   const { library, detail } = useApp();
+  const { data: lessons } = useData<Opening[]>("lessons");
   const [tab, setTab] = useState(
     detail === "rankings" ? "Rankings" : "Overview",
   );
@@ -100,6 +101,8 @@ export default function Stats() {
     bestDaily = Math.max(bestDaily, dailyRun);
     previous = time;
   }
+  const learned = new Set(library.progress.learned);
+  const completedLessons = lessons?.filter(lesson => learned.has(lesson.id)).length ?? 0;
   const badges = [
     ["Marathon", games.length, 1000],
     ["Five thousand", games.length, 5000],
@@ -109,7 +112,7 @@ export default function Stats() {
     ["No room for error", library.progress.streak, 100],
     ["Daily discipline", bestDaily, 90],
     ["Opening specialist", (library.progress.mastered || []).length, 60],
-    ["Complete curriculum", library.progress.learned.length, 129],
+    ["Complete curriculum", completedLessons, lessons?.length || 129],
     ["Endgame mastery", library.progress.endgames.length, 17],
     [
       "Deep repertoire",
@@ -163,7 +166,7 @@ export default function Stats() {
       "Solve the daily puzzle first try for 90 consecutive days",
     "Opening specialist":
       "Recall 60 lesson variations without hints or mistakes",
-    "Complete curriculum": "Complete all 129 curated opening lessons",
+    "Complete curriculum": "Complete every curated opening lesson",
     "Endgame mastery": "Complete all 17 Endgame Lessons",
     "Deep repertoire":
       "Train 25 repertoire lines correctly at least 10 times each",

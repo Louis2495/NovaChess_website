@@ -7,3 +7,5 @@ Run `node scripts/content/encyclopedia.mjs` from the repository root to rebuild 
 - Sources are further-reading references, not quotations. Historical titles are dated; platform-specific variants are identified as NovaChess rules. The catalog is broad, not a claim to contain every fact about chess.
 
 `tests/unit/expanded-content.test.mjs` checks quiz structure, unique questions, reachable outcomes, topic coverage, article integrity, and exact legal replay of every rendered named opening.
+
+Run `node scripts/content/opening-continuations.mjs` from the repository root to regenerate the advanced lessons. The script extends the curated workbooks with the bundled single-threaded Stockfish and compares multiple alternatives at each workbook’s decision position. Move commentary on these continuations describes verifiable board changes and replies. Checkpoints shared with the workbooks retain their authored notes.

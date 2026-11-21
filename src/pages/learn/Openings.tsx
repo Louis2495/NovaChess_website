@@ -110,6 +110,7 @@ function LessonWorkspace({
 }) {
   const { library, setLibrary, notify, appearance } = useApp();
   const [search, setSearch] = useState(query),
+    [familyFilter, setFamilyFilter] = useState(""),
     [selected, setSelected] = useState(
       lessons.find((l) => l.id === selectedId) ||
         all.find((l) => l.id === selectedId) ||
@@ -135,37 +136,42 @@ function LessonWorkspace({
       guides.find((g) => g.family === family) ||
       guides.find((g) => selected.name.startsWith(g.family))!;
   const workbook = workbooks.find((w) => w.family === guide?.family);
-  const lines = useMemo(
+  const lines = useMemo<{ name: string; moves: string[]; continuation?: Opening["continuation"]; id?: string }[]>(
     () => [
       {
         name: selected.name.includes("Core plans")
           ? "Main line"
           : selected.name.split(":").slice(1).join(":") || "Selected line",
         moves: selected.moves,
+        continuation: selected.continuation,
       },
       ...(guide?.lines || []).filter(
         (l) => l.moves.join(" ") !== selected.moves.join(" "),
       ),
+      ...lessons
+        .filter(line => line.continuation && line.id !== selected.id && openingFamily(line.name) === family)
+        .map(line => ({ name: line.name.split(": ").slice(1).join(": "), moves: line.moves, continuation: line.continuation, id: line.id })),
       ...(workbook
         ? [{ name: "Study: " + workbook.title, moves: workbook.moves }]
         : []),
     ],
-    [guide, selected, workbook],
+    [family, guide, lessons, selected, workbook],
   );
+  const lessonId = lines[branch]?.id ?? selected.id;
   const moves = lines[branch]?.moves || selected.moves,
     c = new Chess();
   for (const m of moves.slice(0, step)) c.move(m);
   const fen = c.fen(),
     expected = step < moves.length ? new Chess(fen).move(moves[step]) : null;
-  const candidates = useMemo(
-    () =>
-      search.trim()
-        ? all.filter((o) =>
-            (o.name + " " + o.eco).toLowerCase().includes(search.toLowerCase()),
-          )
-        : lessons,
-    [all, lessons, search],
-  );
+  const families = useMemo(() => [...new Set(lessons.map(line => openingFamily(line.name)))].sort(), [lessons]);
+  const candidates = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    const lessonIds = new Set(lessons.map(line => line.id));
+    const source = term ? [...lessons, ...all.filter(line => !lessonIds.has(line.id))] : lessons;
+    return source.filter(line =>
+      (!familyFilter || openingFamily(line.name) === familyFilter) &&
+      (!term || `${line.name} ${line.eco}`.toLowerCase().includes(term)));
+  }, [all, lessons, search, familyFilter]);
   const openingGroups = useMemo(() => groupByOpening(candidates, opening => openingFamily(opening.name)), [candidates]);
   let remaining = limit;
   const visibleGroups = openingGroups.flatMap(group => {
@@ -201,13 +207,13 @@ function LessonWorkspace({
       ...l,
       progress: {
         ...l.progress,
-        learned: [...new Set([...l.progress.learned, selected.id])],
+        learned: [...new Set([...l.progress.learned, lessonId])],
         mastered:
           practice && perfect
             ? [
                 ...new Set([
                   ...(l.progress.mastered || []),
-                  selected.id + ":" + branch,
+                  lessonId + ":" + branch,
                 ]),
               ]
             : l.progress.mastered || [],
@@ -241,6 +247,7 @@ function LessonWorkspace({
     show(0);
     setPerfect(true);
     setAnswer(null);
+    setInfo("Study");
     setCatalog(false);
     setAutoplay(false);
   }
@@ -280,13 +287,18 @@ function LessonWorkspace({
     identity: selected.id + ":" + branch,
     execute: (move) => play(move.slice(0, 2), move.slice(2, 4), move[4]),
   });
+  const activeContinuation = lines[branch]?.continuation;
+  const study = activeContinuation
+    ? { title: lines[branch].name, ...activeContinuation }
+    : workbook;
+  const jumpToNote = activeContinuation ? show : studyPosition;
   const lessonNote =
     workbook &&
     moves.slice(0, step + 1).every((m, i) => m === workbook.moves[i])
       ? workbook.notes.find((n) => n.ply === step + 1)?.text
       : undefined;
   const explanation =
-    lessonNote || (expected ? moveNote(c, expected, guide) : guide?.structure);
+    activeContinuation?.notes.find(note => note.ply === step + 1)?.text || lessonNote || (expected ? moveNote(c, expected, guide) : guide?.structure);
   const shift = selected.id.length % 3,
     answers =
       guide?.quiz.answers.map((_, i) => guide.quiz.answers[(i + shift) % 3]) ||
@@ -368,10 +380,16 @@ function LessonWorkspace({
                   placeholder="Name or ECO code"
                 />
               </div>
+              <Field label="Opening family">
+                <select value={familyFilter} onChange={event => { setFamilyFilter(event.target.value); setLimit(80); }}>
+                  <option value="">All openings</option>
+                  {families.map(family => <option key={family}>{family}</option>)}
+                </select>
+              </Field>
               <div className="list-summary">
                 {search
                   ? `${candidates.length} lines`
-                  : `${lessons.length} lessons`}
+                  : `${candidates.length} lessons`}
               </div>
               <div className="scroll-list">
                 {visibleGroups.map(({ family, lines }) => (
@@ -445,21 +463,22 @@ function LessonWorkspace({
                 aria-label="Lesson notes"
               >
                 {guide ? (
-                  info === "Study" && workbook ? (
+                  info === "Study" && study ? (
                     <div className="opening-study">
-                      <h3>{workbook.title}</h3>
-                      <p>{workbook.summary}</p>
+                      <h3>{study.title}</h3>
+                      <p>{study.summary}</p>
+                      {activeContinuation && <p className="caption">Worked example with a Stockfish continuation.</p>}
                       <Button
                         className="secondary"
-                        onClick={() => studyPosition(workbook.notes[0].ply)}
+                        onClick={() => jumpToNote(study.notes[0].ply)}
                       >
                         Study the position
                       </Button>
                       <div className="study-checkpoints">
-                        {workbook.notes.map((n) => (
+                        {study.notes.map((n) => (
                           <button
                             key={n.ply}
-                            onClick={() => studyPosition(n.ply)}
+                            onClick={() => jumpToNote(n.ply)}
                           >
                             <b>
                               {Math.ceil(n.ply / 2)}

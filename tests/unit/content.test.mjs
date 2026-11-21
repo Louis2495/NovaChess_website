@@ -114,3 +114,20 @@ test("each opening trap has a playable refutation and a concrete defense exercis
     assert.notDeepEqual(t.trap, t.refutation);
   }
 });
+
+test("advanced opening continuations cover every workbook family with deep lines and accurate checkpoints", () => {
+  const advanced = read("lessons").filter(lesson => lesson.continuation);
+  assert.ok(advanced.length >= 100);
+  for (const { family } of read("opening-workbooks")) {
+    const lines = advanced.filter(lesson => lesson.name.startsWith(family + ":"));
+    assert.ok(lines.length >= 3, family);
+    assert.equal(new Set(lines.map(lesson => lesson.moves.join(" "))).size, lines.length);
+    for (const line of lines) {
+      assert.ok(line.moves.length >= 36, line.name);
+      assert.ok(line.continuation.notes.length >= 4, line.name);
+      const board = new Chess();
+      const notation = line.moves.map(move => board.move(move).san);
+      for (const note of line.continuation.notes) assert.equal(note.san, notation[note.ply - 1], line.name);
+    }
+  }
+});

@@ -6183,3 +6183,33 @@ html { scrollbar-gutter:stable; }
 }
 .repertoire-families { display:grid; gap:24px; }
 .repertoire-families .opening-family > h2 { margin:0 0 10px; font-size:1.15rem; font-weight:800; }
+
+.lesson-workspace .opening-list .field { margin-block:8px; }
+.repertoire-page { width:min(96%,1120px); margin-inline:auto; }
+.repertoire-editor,.workspace .repertoire-training { width:min(96%,1240px); margin-inline:auto; }
+.repertoire-color-toggle { display:flex; justify-content:center; margin-block:0 16px; }
+.repertoire-color-toggle > [role="group"] { width:min(100%,360px); }
+.repertoire-filters {
+  display:grid;
+  grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+.repertoire-filters .field { margin:0; }
+.repertoire-families .opening-family > details > summary {
+  cursor:pointer;
+  color:var(--text);
+  font-weight:800;
+  font-size:1.1rem;
+  padding:9px 10px;
+  margin-bottom:10px;
+  border-bottom:1px solid var(--border-strong);
+}
+.repertoire-families .opening-family > details > summary small { margin-inline-start:12px; color:var(--muted); font-weight:600; }
+.repertoire-coverage { margin:12px 0 0; }
+.repertoire-coverage > summary { cursor:pointer; font-weight:750; }
+.repertoire-coverage li { margin-block:5px; }
+.repertoire-coverage .text-link { text-align:left; }
+@media(max-width:600px) {
+  .repertoire-filters { grid-template-columns:minmax(0,1fr); gap:8px; }
+}

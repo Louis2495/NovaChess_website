@@ -1,4 +1,4 @@
-import { groupByOpening, repertoireFamilyLookup } from "../../lib/openingFamilies";
+import { groupByOpening, openingFamily, repertoireFamilyLookup } from "../../lib/openingFamilies";
 import { exportRepertoire, repertoirePaths } from "../../lib/repertoire";
 import RepertoireEditor, { RepertoireImport } from "./RepertoireEditor";
 import { usePremoves } from "../../lib/usePremoves";
@@ -15,13 +15,15 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useApp } from "../../lib/context";
-import { download, dateLabel, useData } from "../../lib/store";
+import { download, dateLabel, initialFen, useData } from "../../lib/store";
 import type { Opening, Repertoire as Line } from "../../lib/types";
 import { Board } from "../../components/Board";
 import {
   Card,
+  ChoiceSelect,
   Button,
   Empty,
+  Field,
   IconButton,
 } from "../../components/UI";
 function key(c: Chess) {
@@ -53,12 +55,39 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
   const groups = useMemo(() => groupByOpening(library.repertoire, repertoireFamilyLookup(openings ?? []))
     .sort((a, b) => (a.family === "Other lines" ? 1 : 0) - (b.family === "Other lines" ? 1 : 0) || a.family.localeCompare(b.family)),
     [library.repertoire, openings]);
+  const { data: lessons } = useData<Opening[]>("lessons");
+  const [query, setQuery] = useState("");
+  const [color, setColor] = useState("all");
+  const [dueOnly, setDueOnly] = useState(false);
+  const term = query.trim().toLowerCase();
+  const now = Date.now();
+  const reference = useMemo(() => new Map(groupByOpening(
+    (lessons ?? []).filter(line => !line.continuation),
+    line => openingFamily(line.name),
+  ).map(({family, lines}) => [family, lines])), [lessons]);
+  const matchesColor = (line: Line) => color === "all" || line.side === color;
+  const start = initialFen.split(" ").slice(0, 4).join(" ");
+  const coveredPaths = library.repertoire
+    .filter(line => matchesColor(line) && line.initial.split(" ").slice(0, 4).join(" ") === start)
+    .flatMap(repertoirePaths);
+  const visible = groups.map(group => ({
+    ...group,
+    lines: group.lines.filter(line =>
+      matchesColor(line) && (!dueOnly || line.due <= now) &&
+      (!term || `${group.family} ${line.name}`.toLowerCase().includes(term)))
+      .sort((a, b) => a.due - b.due || a.name.localeCompare(b.name)),
+  })).filter(group => group.lines.length);
   return (
-    <>
+    <div className="repertoire-page">
+      <div className="repertoire-color-toggle">
+        <ChoiceSelect aria-label="Repertoire color" value={color} onChange={event => setColor(event.target.value)}>
+          <option value="all">Both</option><option value="w">White</option><option value="b">Black</option>
+        </ChoiceSelect>
+      </div>
       <div className="section-toolbar">
         <p className="muted">
           {library.repertoire.length} lines ·{" "}
-          {library.repertoire.filter((l) => l.due <= Date.now()).length} due
+          {library.repertoire.filter((l) => l.due <= now).length} due
         </p>
         <div className="button-row">
           <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
@@ -67,6 +96,12 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
           <Button onClick={onAdd}><Plus size={16} /> Add line</Button>
         </div>
       </div>
+      {!!library.repertoire.length && <div className="repertoire-filters">
+        <Field label="Search repertoire"><input type="search" placeholder="Opening or line name" value={query} onChange={event => setQuery(event.target.value)} /></Field>
+        <Field label="Review status"><select value={dueOnly ? "due" : "all"} onChange={event => setDueOnly(event.target.value === "due")}>
+          <option value="all">All lines</option><option value="due">Due for review</option>
+        </select></Field>
+      </div>}
       {!library.repertoire.length ? (
         <Card>
           <Empty
@@ -77,64 +112,88 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
             <Button onClick={onAdd}>Build repertoire</Button>
           </Empty>
         </Card>
-      ) : (
+      ) : visible.length ? (
         <div className="repertoire-families">
-          {groups.map(({ family, lines }) => (
+          {visible.map(({ family, lines }) => (
             <section key={family} className="opening-family" aria-label={family}>
-              <h2>{family}</h2>
-              <div className="repertoire-grid">
-                {lines.map((line) => (
-                  <Card key={line.id}>
-                    <div className="card-heading">
-                      <h3>{line.name}</h3>
-                      <span className="pill">
-                        {line.side === "w" ? "White" : "Black"}
-                      </span>
-                    </div>
-                    <p className="caption">
-                      {Math.ceil(line.moves.length / 2)} moves · {line.trained}{" "}
-                      reviews ·{" "}
-                      {line.due <= Date.now()
-                        ? "Due now"
-                        : `Due ${dateLabel(line.due)}`}
-                    </p>
-                    <div className="button-row">
-                      <Button onClick={() => onTrain(line)}>
-                        <GraduationCap size={15} />
-                        Train
-                      </Button>
-                      <Button className="secondary" onClick={() => navigate("learn", "repertoire:edit/" + line.id)}>
-                        Edit
-                      </Button>
-                      <IconButton
-                        label={`Export ${line.name}`}
-                        onClick={() => download("repertoire.pgn", exportRepertoire(line), "application/x-chess-pgn")}
-                      >
-                        <Download size={16} />
-                      </IconButton>
-                      <IconButton
-                        label={`Delete ${line.name}`}
-                        onClick={() => {
-                          setLibrary((l) => ({
-                            ...l,
-                            repertoire: l.repertoire.filter((v) => v.id !== line.id),
-                          }));
-                          notify("Line deleted.");
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </IconButton>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+              <details open>
+                <summary><span>{family}</span><small>{lines.length} {lines.length === 1 ? "line" : "lines"} · {lines.filter(line => line.due <= now).length} due</small></summary>
+                <div className="repertoire-grid">
+                  {lines.map((line) => (
+                    <Card key={line.id}>
+                      <div className="card-heading">
+                        <h3>{line.name}</h3>
+                        <span className="pill">
+                          {line.side === "w" ? "White" : "Black"}
+                        </span>
+                      </div>
+                      <p className="caption">
+                        {Math.ceil(line.moves.length / 2)} moves · {line.trained}{" "}
+                        reviews ·{" "}
+                        {line.due <= now
+                          ? "Due now"
+                          : `Due ${dateLabel(line.due)}`}
+                      </p>
+                      <div className="button-row">
+                        <Button onClick={() => onTrain(line)}>
+                          <GraduationCap size={15} />
+                          Train
+                        </Button>
+                        <Button className="secondary" onClick={() => navigate("learn", "repertoire:edit/" + line.id)}>
+                          Edit
+                        </Button>
+                        <IconButton
+                          label={`Export ${line.name}`}
+                          onClick={() => download("repertoire.pgn", exportRepertoire(line), "application/x-chess-pgn")}
+                        >
+                          <Download size={16} />
+                        </IconButton>
+                        <IconButton
+                          label={`Delete ${line.name}`}
+                          onClick={() => {
+                            setLibrary((l) => ({
+                              ...l,
+                              repertoire: l.repertoire.filter((v) => v.id !== line.id),
+                            }));
+                            notify("Line deleted.");
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </IconButton>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+                <RepertoireSuggestions
+                  suggestions={reference.get(family) ?? []}
+                  paths={coveredPaths}
+                  onSelect={id => navigate("learn", "lessons:" + id)}
+                />
+              </details>
             </section>
           ))}
         </div>
-      )}
-    </>
+      ) : <p className="muted">No repertoire lines match these filters.</p>}
+    </div>
   );
 }
+
+function RepertoireSuggestions({ suggestions, paths, onSelect }: {
+  suggestions: Opening[]; paths: string[][]; onSelect: (id: string) => void;
+}) {
+  if (!suggestions.length) return null;
+  const missing = suggestions.filter(lesson =>
+    !paths.some(path => lesson.moves.every((move, index) => path[index] === move)));
+  if (!missing.length) return <p className="caption repertoire-coverage">You’ve saved all the suggested lines for this opening.</p>;
+  return <details className="repertoire-coverage">
+    <summary>Suggested lines to add ({missing.length})</summary>
+    <p className="caption">These lessons aren’t covered by the complete move sequences in your saved lines or sidelines.</p>
+    <ul>{missing.map(lesson => <li key={lesson.id}>
+      <button className="text-link" onClick={() => onSelect(lesson.id)}>{lesson.name}</button>
+    </li>)}</ul>
+  </details>;
+}
+
 export function RepertoireTrainer({
   line,
   onClose,
@@ -241,7 +300,7 @@ export function RepertoireTrainer({
     setHint("");
   }
   return (
-    <div className="chess-layout">
+    <div className="chess-layout repertoire-training">
       <div className="board-column">
         <div className="card-heading">
           <h2>{line.name}</h2>

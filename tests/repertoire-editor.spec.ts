@@ -66,3 +66,39 @@ test("saved lines are grouped by their opening even when they have custom names"
   await expect(sicilian.getByRole("heading", { level: 3 })).toHaveText(["First draft", "My tournament line"]);
   await expect(page.getByRole("region", { name: "French Defense", exact: true })).toContainText("A different defense");
 });
+
+test("repertoire filters reviews and checks saved sidelines before suggesting missing lines", async ({ page }) => {
+  const { readFileSync } = await import("node:fs");
+  const foundation = JSON.parse(readFileSync("public/data/lessons.json", "utf8"))
+    .find((line: { name: string }) => line.name === "Sicilian Defense: Core plans");
+  await page.addInitScript(moves => {
+    const line = {
+      initial: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      trained: 0, successes: 0, moves: ["e2e4", "c7c5"],
+    };
+    localStorage.setItem("novachess-library-v2", JSON.stringify({
+      repertoire: [
+        { ...line, id: "one", name: "White example", side: "w", due: Date.now() + 60000 },
+        { ...line, id: "two", name: "Black example", side: "b", due: 0, branches: [moves] },
+      ],
+    }));
+  }, foundation.moves);
+  await page.goto("/#learn/repertoire");
+  const sicilian = page.getByRole("region", { name: "Sicilian Defense", exact: true });
+  await expect(sicilian).toBeVisible();
+  const workspace = (await page.locator("#workspace").boundingBox())!;
+  const toggle = page.getByRole("group", { name: "Repertoire color" });
+  const buttons = (await toggle.boundingBox())!;
+  const section = (await sicilian.boundingBox())!;
+  expect(buttons.y).toBeLessThan(section.y);
+  expect(buttons.x + buttons.width / 2).toBeCloseTo(workspace.x + workspace.width / 2, 0);
+  expect(section.x + section.width / 2).toBeCloseTo(workspace.x + workspace.width / 2, 0);
+  await sicilian.getByText(/Suggested lines to add/).click();
+  await expect(sicilian.getByRole("button", { name: "Sicilian Defense: Core plans", exact: true })).toHaveCount(0);
+  await page.getByRole("group", { name: "Repertoire color" }).getByRole("button", { name: "White", exact: true }).click();
+  await expect(sicilian.getByRole("button", { name: "Sicilian Defense: Core plans", exact: true })).toBeVisible();
+  await page.getByLabel("Review status", { exact: true }).selectOption("due");
+  await expect(page.getByText("No repertoire lines match these filters.")).toBeVisible();
+  await page.getByRole("group", { name: "Repertoire color" }).getByRole("button", { name: "Black", exact: true }).click();
+  await expect(sicilian.getByText("Black example")).toBeVisible();
+});

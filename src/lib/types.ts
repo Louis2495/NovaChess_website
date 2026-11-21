@@ -20,6 +20,7 @@ export type Opening = {
   name: string;
   moves: string[];
   key?: string;
+  continuation?: { summary: string; notes: { ply: number; san: string; text: string }[] };
 };
 export type PuzzleData = {
   id: string;

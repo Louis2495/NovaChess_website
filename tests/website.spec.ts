@@ -263,7 +263,7 @@ test("curated opening lesson and searchable full opening library work", async ({
   page,
 }) => {
   await page.goto("/#learn/lessons");
-  await expect(page.locator(".list-summary")).toHaveText("129 lessons");
+  await expect(page.locator(".list-summary")).toHaveText(`${JSON.parse(fs.readFileSync("public/data/lessons.json", "utf8")).length} lessons`);
   const sicilian = page.getByRole("region", { name: "Sicilian Defense", exact: true });
   await expect(sicilian.getByRole("button", { name: /Sicilian Defense: Core plans/ })).toBeVisible();
   expect(await sicilian.getByRole("button").count()).toBeGreaterThan(1);
