@@ -614,10 +614,6 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
           ))}
         </ChoiceSelect>
       </Field>}
-      {variant !== "chess" && <div className="variant-summary">
-        <VariantIcon id={variant} />
-        <span>{variantList.find((v) => v.id === variant)?.name}</span>
-      </div>}
       {variantList.find((v) => v.id === variant)?.description && (
         <p className="caption">
           {variantList.find((v) => v.id === variant)?.description}
@@ -754,19 +750,21 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
             ))}
 
           </div>}
-          {speedrunMode && <Card className="speedrun-setup" aria-hidden={variantsOnly && options ? true : undefined}><p className="caption">Beat the computer as fast as possible</p>{speedrunEloField}</Card>}
-          <Card className="game-settings-card">
-            <button
-              className="options-toggle"
-              aria-expanded={options}
-              aria-haspopup={variantsOnly ? "dialog" : undefined}
-              onClick={() => setOptions(!options)}
-            >
-              Game options
-              <ChevronDown size={17} />
-            </button>
-            {!variantsOnly && gameOptions}
-          </Card>
+          <div className={variantsOnly ? "variant-settings-footer" : "game-settings-footer"}>
+            {speedrunMode && <Card className="speedrun-setup" aria-hidden={variantsOnly && options ? true : undefined}>{!variantsOnly && <p className="caption">Beat the computer as fast as possible</p>}{speedrunEloField}</Card>}
+            <Card className="game-settings-card">
+              <button
+                className="options-toggle"
+                aria-expanded={options}
+                aria-haspopup={variantsOnly ? "dialog" : undefined}
+                onClick={() => setOptions(!options)}
+              >
+                Game options
+                <ChevronDown size={17} />
+              </button>
+              {!variantsOnly && gameOptions}
+            </Card>
+          </div>
           {variantsOnly && options && (
             <Modal title="Game options" onClose={() => setOptions(false)}>
               {gameOptions}

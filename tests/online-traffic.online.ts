@@ -488,3 +488,45 @@ test('Everyone waits for two search characters and hides results when cleared',a
  await search.fill('  Kn  ');await expect(page.getByRole('heading',{name:'Friendly Knight',exact:true})).toBeVisible();expect(queries.some(q=>q.p_section==='everyone'&&q.p_query==='Kn')).toBe(true);
  await search.fill('K');await expect(page.locator('.player-card')).toHaveCount(0);await expect(page.locator('.players-pagination')).toHaveCount(0);await search.clear();await expect(page.locator('.players-results-heading')).toHaveCount(0);await expect(page.locator('.players-page')).not.toContainText('Type at least');
 });
+
+const teamFriend='33333333-3333-4333-8333-333333333333';
+const teamDirectory=[
+ {id:peer,screen_name:'Rival Knight',rating:1400,relationship:'friends',online:true},
+ {id:teamFriend,screen_name:'Allied Rook',rating:1300,relationship:'friends',online:true},
+];
+
+test('Team Chess sends separate opponent and teammate invites from setup',async({page})=>{
+ const env=await connected(page);
+ await page.route('**/rest/v1/rpc/player_directory',r=>r.fulfill({json:teamDirectory}));
+ await page.goto('/#variants');
+ await page.getByRole('group',{name:'Online variants',exact:true}).getByRole('button',{name:'Team Chess',exact:true}).click();
+ await page.getByRole('button',{name:'Invite friends',exact:true}).click();
+ const picker=page.getByRole('dialog',{name:'Invite friends to your team'});
+ await picker.getByRole('button',{name:/Allied Rook/}).click();
+ await picker.getByRole('button',{name:'Save teammates'}).click();
+ await page.getByRole('button',{name:'Play a Friend',exact:true}).click();
+ await page.getByRole('dialog',{name:'Play a Friend'}).getByRole('button',{name:/Rival Knight/}).click();
+ await page.getByRole('button',{name:'Start Team Chess',exact:true}).click();
+ await expect.poll(()=>env.actions[0]).toMatchObject({action:'create',mode:'team',friend:peer,teammates:[teamFriend]});
+});
+
+test('Team Chess opponent acceptance immediately opens the teammate picker and lets it reopen from the game',async({page})=>{
+ const env=await connected(page);
+ Object.assign(env.room,{mode:'team',host:peer,members:[{id:peer,team:'w'},{id:uid,team:'b'}],settings:{bot:false,invitedFriend:uid}});
+ let pending=true;
+ await page.route('**/rest/v1/rpc/friend_game_invitations',r=>r.fulfill({json:pending?[{id:'team-challenge',room_id:roomId,screen_name:'Rival Knight',name:'Team Chess',mode:'team',team:null,variant:'chess',time_control:180}]:[]}));
+ await page.route('**/rest/v1/rpc/respond_friend_game',r=>{pending=false;return r.fulfill({json:null});});
+ await page.route('**/rest/v1/rpc/player_directory',r=>r.fulfill({json:teamDirectory}));
+ await page.goto('/#stats');
+ await page.getByRole('button',{name:'Accept game',exact:true}).click();
+ const picker=page.getByRole('dialog',{name:'Invite friends to your team'});
+ await expect(picker).toBeVisible();
+ expect(env.actions[0]).toMatchObject({action:'join',room:roomId,invite:'team-challenge'});
+ await expect(picker.getByRole('button',{name:/Rival Knight/})).toHaveCount(0);
+ await picker.getByRole('button',{name:/Allied Rook/}).click();
+ await picker.getByRole('button',{name:'Send invitations'}).click();
+ await expect(picker).toHaveCount(0);
+ expect(env.actions[1]).toMatchObject({action:'invite_teammates',room:roomId,friends:[teamFriend]});
+ await page.getByRole('button',{name:'Invite friends',exact:true}).click();
+ await expect(picker).toBeVisible();
+});

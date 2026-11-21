@@ -97,6 +97,11 @@ Deno.serve(async (req) => {
     const body=await req.json();
     let action=body.action;
     const finishing=action==="finish";
+    if (action === "invite_teammates") {
+      const {data,error}=await db.rpc("invite_team_friends",{p_room:body.room,p_actor:uid,p_friends:body.friends});
+      if(error)throw error;
+      return json({sent:data});
+    }
     if (action === "create") {
       const {data:active}=await db.rpc("active_online_account",{p_actor:uid});
       if(active!==true)return json({error:"Account unavailable."},403);
@@ -124,6 +129,15 @@ Deno.serve(async (req) => {
       const timed=body.mode==="standard" && variant==="chess" && [180,300,600].includes(body.timeControlSeconds);
       const initial=await fresh(variant,Math.max(1,Math.min(4,+body.dropCount||2)));
       if(timed)initial.clock={incrementMs:increment*1000,remaining:{w:body.timeControlSeconds*1000,b:body.timeControlSeconds*1000},startedAt:null};
+      if(body.mode==="team" && (body.friend || body.teammates?.length)){
+        const {data,error}=await db.rpc("create_team_friend_game",{
+          p_host:uid,p_opponent:body.friend || null,p_friends:body.teammates || [],
+          p_variant:variant,p_name:String(body.name||"Team Chess").trim().slice(0,80)||"Team Chess",
+          p_state:initial,p_settings:{bot:!body.friend && body.bot===true,dropCount:Math.max(1,Math.min(4,+body.dropCount||2))},
+        });
+        if(error)throw error;
+        return json(data);
+      }
       if(body.friend){
         const {data,error}=await db.rpc("create_friend_game",{p_host:uid,p_friend:body.friend,p_mode:body.mode,p_variant:variant,p_name:String(body.name||"Friendly game").trim().slice(0,80)||"Friendly game",p_state:initial,p_settings:{bot:false,dropCount:Math.max(1,Math.min(4,+body.dropCount||2)),timeControlSeconds:timed?body.timeControlSeconds:0,incrementSeconds:timed?increment:0}});
         if(error)throw error;return json(data);
@@ -191,6 +205,11 @@ Deno.serve(async (req) => {
       return json(await commit());
     }
     if (status === "cancelled") throw Error("This game request was canceled.");
+    if (action === "join" && r.mode === "team") {
+      const {data,error}=await db.rpc("join_team_room",{p_room:r.id,p_actor:uid,p_team:body.team || null,p_invite:body.invite || null});
+      if(error)throw error;
+      return json(data);
+    }
     if (action === "join") {
       if(r.settings.invitedFriend && r.settings.invitedFriend!==uid && !me)throw Error("This game is reserved for an invited friend.");
       if (me && r.mode !== "throne") return json(r);
@@ -205,16 +224,10 @@ Deno.serve(async (req) => {
       }
       if (!me) {
         let team: "w" | "b" | null = null;
-        if (r.mode === "team" || r.mode === "vote") {
+        if (r.mode === "vote") {
           if (members.length >= 32) throw Error("This team room is full.");
-          team = r.settings.bot
-            ? "w"
-            : r.mode === "team" && (body.team === "w" || body.team === "b")
-              ? body.team
-              : members.filter((m) => m.team === "w").length <=
-                members.filter((m) => m.team === "b").length
-              ? "w"
-              : "b";
+          team = r.settings.bot || members.filter((m) => m.team === "w").length <=
+            members.filter((m) => m.team === "b").length ? "w" : "b";
         } else if (!members.some((m) => m.team === "w")) team = "w";
         else if (!members.some((m) => m.team === "b")) team = "b";
         if(r.variant === "bughouse"){

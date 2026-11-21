@@ -94,15 +94,17 @@ const mockDb = {
     try {
       const keys = Object.keys(values),
         args = keys.map((k) =>
-          typeof values[k] === "object" && values[k] !== null
-            ? JSON.stringify(values[k])
-            : values[k],
+          k === "p_friends" && Array.isArray(values[k])
+            ? `{${values[k].join(",")}}`
+            : typeof values[k] === "object" && values[k] !== null
+              ? JSON.stringify(values[k])
+              : values[k],
         );
       const r = await pg.query(
         `select * from public.${name}(${keys.map((k, i) => k + "=> $" + (i + 1)).join(",")})`,
         args,
       );
-      return { data: name==="room_for_action"?r.rows[0].room_for_action:name==="active_online_account"?r.rows[0].active_online_account:r.rows[0], error: null };
+      return { data: name==="room_for_action"?r.rows[0].room_for_action:name==="active_online_account"?r.rows[0].active_online_account:name==="invite_team_friends"?r.rows[0].invite_team_friends:r.rows[0], error: null };
     } catch (e) {
       return { data: null, error: { message: e.message } };
     }
@@ -171,6 +173,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180013_player_challenges.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180014_signup_profile.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180015_throne_stats_period.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180016_team_friend_invites.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -811,4 +814,50 @@ test("the sign-up trigger saves country and photo with the public profile", asyn
     {screen_name:"Test Pawn",country:"CA",avatar},
     {screen_name:"Test Rook",country:"",avatar:""},
   ]);
+});
+
+
+test("Team Chess invites reserve the correct side and also work after play starts", async () => {
+  const [host, opponent, teammate, opposingTeammate]=users;
+  await pg.query("delete from friendships where sender=any($1::uuid[]) or recipient=any($1::uuid[])",[`{${users.join(",")}}`]);
+  await pg.query("insert into friendships(sender,recipient,status) values($1,$2,'accepted'),($3,$4,'accepted')",[host,teammate,opponent,opposingTeammate]);
+  const created=await call(host,{action:"create",mode:"team",variant:"chess",friend:opponent,teammates:[teammate]});
+  assert.equal(created.status,200,JSON.stringify(created.data));
+  let game=created.data;
+  const pending=(await pg.query("select id,team,recipient from friend_game_invites where room_id=$1",[game.id])).rows;
+  const inviteFor=recipient=>pending.find(row=>row.recipient===recipient);
+  assert.equal(inviteFor(teammate).team,"w");
+  assert.equal(inviteFor(opponent).team,null);
+  assert.equal((await command(opposingTeammate,game,"join",{invite:inviteFor(teammate).id})).status,400);
+  const ally=await command(teammate,game,"join",{invite:inviteFor(teammate).id,team:"b"});
+  assert.equal(ally.status,200,JSON.stringify(ally.data));
+  game=ally.data;
+  assert.equal(game.status,"waiting");
+  assert.equal(game.members.find(m=>m.id===teammate).team,"w");
+  const challenger=await command(opponent,game,"join",{invite:inviteFor(opponent).id,team:"w"});
+  assert.equal(challenger.status,200,JSON.stringify(challenger.data));
+  game=challenger.data;
+  assert.equal(game.status,"playing");
+  assert.equal(game.members.find(m=>m.id===opponent).team,"b");
+  assert.equal((await command(host,game,"invite_teammates",{friends:[opposingTeammate]})).status,400);
+  const sent=await command(opponent,game,"invite_teammates",{friends:[opposingTeammate]});
+  assert.equal(sent.status,200,JSON.stringify(sent.data));
+  assert.equal(sent.data.sent,1);
+  await pg.exec(`set request.jwt.claim.sub='${opposingTeammate}'`);
+  const offered=(await pg.query("select friend_game_invitations() as invites")).rows[0].invites.find(inv=>inv.room_id===game.id);
+  assert.equal(offered.team,"b");
+  const joined=await command(opposingTeammate,game,"join",{invite:offered.id});
+  assert.equal(joined.status,200,JSON.stringify(joined.data));
+  assert.equal(joined.data.members.find(m=>m.id===opposingTeammate).team,"b");
+  const friends=Array.from({length:6},(_,i)=>`fa00000${i}-0000-4000-a000-00000000010${i}`);
+  await pg.query("insert into auth.users(id,raw_user_meta_data) select id, jsonb_build_object('screen_name','Knight ' || right(id::text,1)) from unnest($1::uuid[]) as id",[friends]);
+  await pg.query("insert into friendships(sender,recipient,status) select $1,id,'accepted' from unnest($2::uuid[]) as id",[host,friends]);
+  const excessive=await call(host,{action:"create",mode:"team",variant:"chess",teammates:friends});
+  assert.equal(excessive.status,400);
+  assert.match(excessive.data.error,/up to five/i);
+  const filled=await call(host,{action:"create",mode:"team",variant:"chess",teammates:friends.slice(0,5)});
+  assert.equal(filled.status,200,JSON.stringify(filled.data));
+  const full=await command(host,filled.data,"invite_teammates",{friends:friends.slice(5)});
+  assert.equal(full.status,400);
+  assert.match(full.data.error,/six players/i);
 });
