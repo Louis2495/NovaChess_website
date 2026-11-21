@@ -207,7 +207,7 @@ test("a friend can import only the shared repertoire lines with their sidelines"
 
 test("repertoire training fits a short viewport and follows a saved sideline", async ({ page }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
-  await page.setViewportSize({ width: mobile ? 360 : 1366, height: mobile ? 580 : 650 });
+  await page.setViewportSize({ width: mobile ? 320 : 1366, height: mobile ? 480 : 650 });
   await page.addInitScript(() => {
     localStorage.setItem("novachess-library-v2", JSON.stringify({ repertoire: [{
       id: "practice", name: "Sicilian practice", side: "w",

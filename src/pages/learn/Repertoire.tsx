@@ -562,19 +562,21 @@ export function RepertoireTrainer({
     const layout = layoutRef.current;
     const panel = panelRef.current;
     const workspace = layout?.closest(".workspace");
-    if (!layout || !panel || !workspace) return;
-    function measure() {
-      if (!layout || !panel || !workspace) return;
+    const frame = layout?.querySelector(".board-frame");
+    if (!layout || !panel || !workspace || !frame) return;
+    const measure = () => {
       const top = layout.getBoundingClientRect().top + window.scrollY;
       const bottom = parseFloat(getComputedStyle(workspace).paddingBottom);
       const stacked = window.matchMedia("(max-width: 760px)").matches;
       const panelSpace = stacked ? panel.offsetHeight + 10 : 0;
-      const budget = Math.max(100, Math.floor(window.innerHeight - top - bottom - panelSpace - 44));
+      const frameStyle = getComputedStyle(frame);
+      const materialSpace = parseFloat(frameStyle.paddingTop) + parseFloat(frameStyle.paddingBottom);
+      const budget = Math.max(80, Math.floor(window.innerHeight - top - bottom - panelSpace - materialSpace));
       const limit = `${budget}px`;
       if (layout.style.getPropertyValue("--training-board-limit") !== limit) {
         layout.style.setProperty("--training-board-limit", limit);
       }
-    }
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(panel);
@@ -660,17 +662,11 @@ export function RepertoireTrainer({
       <div className="repertoire-training-panel" ref={panelRef}>
         <Card>
           <div className="repertoire-training-heading">
-            <div>
-              <h2>{active.name}</h2>
-              <p className="caption">
-                {line.side === "w" ? "White" : "Black"} · {Math.ceil(cursor / 2)} /{" "}
-                {Math.ceil(active.moves.length / 2)} moves{session && ` · ${session.progress}`}
-              </p>
-            </div>
-            <Button className="secondary" onClick={onClose}>
-              <ArrowLeft size={15} />
-              Lines
-            </Button>
+            <h2>{active.name}</h2>
+            <p className="caption">
+              {line.side === "w" ? "White" : "Black"} · {Math.ceil(cursor / 2)} /{" "}
+              {Math.ceil(active.moves.length / 2)} moves{session && ` · ${session.progress}`}
+            </p>
           </div>
           <p className="feedback" role="status">
             {message || (yourTurn ? "Play your next move." : "Playing reply…")}
@@ -694,6 +690,10 @@ export function RepertoireTrainer({
             <Button className="secondary" onClick={restart}>
               <RotateCcw size={16} />
               Restart
+            </Button>
+            <Button className="secondary" onClick={onClose}>
+              <ArrowLeft size={15} />
+              Lines
             </Button>
           </div>
           {appearance.premoves && <div className="repertoire-training-queue">
