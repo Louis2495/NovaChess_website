@@ -254,10 +254,10 @@ test('a pending Play a Friend request can be canceled from the left of the board
  expect(env.actions).toEqual([expect.objectContaining({action:'cancel_friend_request',room:roomId})]);
 });
 
-test('finished game has a sad king, paired notation, review and outside-board dismissal',async({page})=>{
+test('online win has a happy king, paired notation, review and outside-board dismissal',async({page})=>{
  const env=await connected(page);const initial=env.c.fen();env.c.move('e4');const afterWhite=env.c.fen();env.c.move('e5');
  env.room.status='finished';env.room.state={...env.room.state,initial,fen:env.c.fen(),moves:['e2e4','e7e5'],notation:['e4','e5'],positions:[initial,afterWhite,env.c.fen()],result:'1-0'};
- await page.goto('/#play/online/'+roomId);const message=page.locator('.game-result-banner');await expect(message.getByRole('img',{name:'Sad chess king'})).toBeVisible();await expect(message.getByRole('button',{name:'Game review',exact:true})).toBeVisible();
+ await page.goto('/#play/online/'+roomId);const message=page.locator('.game-result-banner');await expect(message.getByRole('img',{name:'Happy chess king'})).toBeVisible();await expect(message.getByRole('button',{name:'Game review',exact:true})).toBeVisible();
  const notation=page.getByRole('table',{name:'Game notation'});await expect(notation.getByRole('columnheader')).toHaveText(['Move','White','Black']);await expect(notation.locator('tbody tr').first().getByRole('cell')).toHaveText(['e4','e5']);
  await message.getByText('You won!',{exact:true}).click();await expect(message).toBeVisible();
  const board=(await page.locator('.board').boundingBox())!;await page.mouse.click(board.x+8,board.y+8);await expect(message).toHaveCount(0);

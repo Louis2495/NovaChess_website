@@ -8,7 +8,10 @@ test('computer game result can be dismissed outside the message and opened for r
   await page.addInitScript(game => localStorage.setItem('novachess-library-v2', JSON.stringify({activeGame:game,games:[game]})), game);
   await page.goto('/#play/resume');
   const message = page.locator('.game-result-banner');
-  await expect(message.getByRole('img', {name:'Sad chess king'})).toBeVisible();
+  const king = message.getByRole('img', {name:'Happy chess king'});
+  await expect(king).toBeVisible();
+  await expect.poll(() => king.evaluate(img => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  expect((await king.boundingBox())!.height).toBeGreaterThan(125);
   await message.getByText('You won!', {exact:true}).click();
   await expect(message).toBeVisible();
   const bounds = (await page.locator('.play-match .board').boundingBox())!;

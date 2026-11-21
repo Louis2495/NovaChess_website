@@ -1,8 +1,9 @@
+import { BookOpen } from "lucide-react";
 import { reviewQuality } from "../lib/gameReview";
 import type { ReviewRow } from "../lib/types";
 export function MoveBadge({label}: {label:string}) {
-  const quality=reviewQuality(label),symbol={book:"Book",best:"!",excellent:"!",good:"",inaccuracy:"?!",mistake:"?",blunder:"??"}[quality];
-  return <span className={`move-quality quality-${quality}`} role="img" aria-label={label} title={label}>{symbol}</span>;
+  const quality=reviewQuality(label),symbol={book:"",best:"!",excellent:"!",good:"",inaccuracy:"?!",mistake:"?",blunder:"??"}[quality];
+  return <span className={`move-quality quality-${quality}`} role="img" aria-label={label} title={label}>{quality === "book" ? <BookOpen aria-hidden="true" /> : symbol}</span>;
 }
 export function EvaluationGraph({rows,total,cursor,onSelect}:{rows:ReviewRow[];total:number;cursor:number;onSelect:(n:number)=>void}) {
   const samples=rows.length?[{index:0,score:rows[0].score},...rows.filter(r=>r.afterScore!==undefined).map(r=>({index:r.ply+1,score:r.afterScore!}))]:[];

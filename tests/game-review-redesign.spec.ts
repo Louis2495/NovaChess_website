@@ -16,7 +16,7 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  await expect(page.locator('.evaluation-graph polyline')).toHaveAttribute('points',/\S+ \S+/);
  await expect(page.locator('.review-performance .metric-pair b')).not.toHaveText(['—','—']);
  const batch=await page.evaluate(()=>(window as any).__engineWorkers.filter((w:any)=>w.commands.filter((s:string)=>s.startsWith('go ')&&!s.includes('infinite')).length>1));expect(batch).toHaveLength(1);
- await page.locator('.review-notation td button').first().click();await expect(page.locator('.board-move-badge .move-quality')).toHaveAttribute('aria-label','Book');
+ await page.locator('.review-notation td button').first().click();await expect(page.locator('.board-move-badge .move-quality')).toHaveAttribute('aria-label','Book');await expect(page.locator('.board-move-badge .quality-book svg')).toBeVisible();
  const board=(await page.locator('.game-review-layout .board').boundingBox())!,bar=(await page.locator('.review-board-eval .eval-meter').boundingBox())!;expect(bar.x+bar.width).toBeLessThan(board.x);expect(Math.abs(bar.height-board.height)).toBeLessThan(1);
  await page.getByRole('button',{name:'Share',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Share game',exact:true});await expect(dialog.getByRole('button',{name:'Download PGN',exact:true})).toBeVisible();await expect(dialog.getByRole('button',{name:'Game GIF',exact:true})).toBeVisible();
  const download=page.waitForEvent('download');await dialog.getByRole('button',{name:'Download PGN',exact:true}).click();expect((await download).suggestedFilename()).toMatch(/\.pgn$/);
@@ -49,5 +49,6 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
     const board = (await page.locator('.game-review-layout .board').boundingBox())!;
     const summary = (await page.locator('.game-review-layout .review-summary').boundingBox())!;
     expect(summary.x - (board.x + board.width)).toBeGreaterThanOrEqual(36);
+    expect(Math.abs(summary.y - board.y)).toBeLessThan(1);
   }
 });

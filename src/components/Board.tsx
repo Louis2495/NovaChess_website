@@ -416,11 +416,13 @@ export function Board({
         }
       }
       if (!compact && column) {
-        const match = column.parentElement;
-        if (match?.matches(".play-match, .online-match")) {
-          const bounds = match.getBoundingClientRect();
-          match.style.setProperty("--match-center", `${document.documentElement.clientWidth / 2 - bounds.left}px`);
-          match.style.setProperty("--match-board-top", `${rect.top - bounds.top}px`);
+        const layout = column.parentElement;
+        if (layout?.matches(".chess-layout")) {
+          const bounds = layout.getBoundingClientRect();
+          layout.style.setProperty("--board-layout-top", `${rect.top - bounds.top}px`);
+          if (layout.matches(".play-match, .online-match")) {
+            layout.style.setProperty("--match-center", `${document.documentElement.clientWidth / 2 - bounds.left}px`);
+          }
         }
       }
       // Let the layout place its controls immediately beside the largest
@@ -439,8 +441,8 @@ export function Board({
     observer.observe(el);
     if (el.parentElement) observer.observe(el.parentElement);
     if (!compact) {
-      const matchColumn = el.closest(".play-match > .board-column, .online-match > .board-column");
-      if (matchColumn) observer.observe(matchColumn);
+      const layoutColumn = el.closest(".chess-layout > .board-column");
+      if (layoutColumn) observer.observe(layoutColumn);
       const workspace=el.closest(".workspace");
       if(workspace)observer.observe(workspace);
     }
