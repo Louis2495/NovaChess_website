@@ -6079,10 +6079,11 @@ html { scrollbar-gutter:stable; }
 }
 .home-featured > span:last-child > * { display:block; overflow-wrap:anywhere; }
 .home-featured strong { font-size:clamp(1.2rem,1.5vw,1.42rem); line-height:1.18; margin-block:3px 5px; }
-.home-featured small { color:var(--muted); }
 .home-featured-group:has(> :nth-child(2)) .home-featured {
-  flex-direction:column;
-  align-items:start;
+  padding:clamp(8px,1.2vw,18px);
+}
+.home-featured-group:has(> :nth-child(2)) .home-featured > :is(.multiplayer-picture,.variant-picture,.speedrun-picture) {
+  width:clamp(28px,5vw,78px);
 }
 @media(min-width:1001px) {
   .home-page.home-dashboard:has(.daily-meme) {
@@ -6101,6 +6102,13 @@ html { scrollbar-gutter:stable; }
   .home-page.home-dashboard > .home-practice-grid { display:contents; }
   .home-page.home-dashboard .daily-meme { order:1; }
   .home-extras { grid-template-columns:minmax(0,1fr); }
+  .home-featured-group:has(> :nth-child(2)) .home-featured {
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    align-content:start;
+  }
+  .home-featured-group:has(> :nth-child(2)) .home-featured > span:last-child { display:contents; }
+  .home-featured-group:has(> :nth-child(2)) .home-featured > span:last-child > span { grid-column:1 / -1; }
 }
 
 .variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) {

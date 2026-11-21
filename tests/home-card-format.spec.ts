@@ -88,7 +88,7 @@ test('Home shows the app announcement and opens Vote Chess from the entire tile'
  await expect(app.getByText('Coming soon to the App Store')).toBeVisible();
  await expect(page.getByRole('region',{name:'Next up'})).toHaveCount(0);
  await expect(page.getByText('Featured variant',{exact:true})).toHaveCount(0);
- await expect(page.getByRole('button',{name:/Last played variant/})).toHaveCount(0);
+ await expect(page.locator('.home-featured-group > button:nth-child(2)')).toHaveCount(0);
  await page.getByRole('button',{name:/^Vote Chess/}).click({position:{x:5,y:5}});
  await expect(page.getByRole('group',{name:'Online variants'}).getByRole('button',{name:'Vote Chess',exact:true})).toHaveAttribute('aria-pressed','true');
 });
@@ -108,9 +108,15 @@ test('Home splits the featured space with the most recently played variant',asyn
  });
  await page.goto('/');
  const vote=page.getByRole('button',{name:/^Vote Chess/});
- const recent=page.getByRole('button',{name:/Last played variant Atomic/});
+ const recent=page.getByRole('button',{name:/^Atomic/});
  await expect(vote).toBeVisible();
  await expect(recent).toContainText("Captures explode nearby non-pawns.");
+ await expect(page.getByText('Last played variant',{exact:true})).toHaveCount(0);
+ for(const tile of [vote,recent]){
+  const art=(await tile.locator(':scope > span').first().boundingBox())!;
+  const title=(await tile.locator('strong').boundingBox())!;
+  expect(title.x).toBeGreaterThan(art.x+art.width);
+ }
  expect((await vote.boundingBox())!.height).toBeCloseTo((await recent.boundingBox())!.height,0);
  await recent.focus();
  await page.keyboard.press('Enter');

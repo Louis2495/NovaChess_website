@@ -169,7 +169,6 @@ export default function HomePage() {
                 : lastPlayed.id === "speedrun" ? <img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt="" />
                 : <VariantIcon id={lastPlayed.id} size={112} />}
               <span>
-                <small>Last played variant</small>
                 <strong>{recentVariant.name}</strong>
                 <span>{recentVariant.description}</span>
               </span>
