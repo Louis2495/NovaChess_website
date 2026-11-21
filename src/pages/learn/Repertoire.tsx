@@ -1,10 +1,10 @@
 import { groupByOpening, openingFamily, repertoireFamilyLookup } from "../../lib/openingFamilies";
-import { exportRepertoire, repertoirePaths } from "../../lib/repertoire";
+import { exportRepertoire, repertoirePaths, uci } from "../../lib/repertoire";
 import { RepertoireInbox, ShareWithFriend } from "./RepertoireFriends";
 import RepertoireEditor, { RepertoireImport } from "./RepertoireEditor";
 import { usePremoves } from "../../lib/usePremoves";
 import PremoveQueue from "../../components/PremoveQueue";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
   Plus,
@@ -33,12 +33,13 @@ import {
   IconButton,
   Modal,
 } from "../../components/UI";
-function key(c: Chess) {
-  return c.fen().split(" ").slice(0, 4).join(" ");
+function positionKey(fen: string) {
+  return fen.split(" ", 4).join(" ");
 }
 export default function Repertoire() {
   const { library, detail, navigate } = useApp();
   const [training, setTraining] = useState<Line | null>(null);
+  const [trainingPlan, setTrainingPlan] = useState<Line[] | null>(null);
   const route = detail.slice("repertoire".length + 1);
   const back = () => navigate("learn", "repertoire");
   if (route === "new" || route.startsWith("new/")) {
@@ -52,14 +53,19 @@ export default function Repertoire() {
       <Card><p>That repertoire line is unavailable.</p><Button onClick={back}>Back to repertoire</Button></Card>;
   }
   const add = () => navigate("learn", "repertoire:new");
+  if (trainingPlan) return <RepertoireTrainingSession lines={trainingPlan} onClose={() => setTrainingPlan(null)} />;
   if (training)
     return (
       <RepertoireTrainer line={training} onClose={() => setTraining(null)} />
     );
-  return <RepertoireLines onTrain={setTraining} onAdd={add} />;
+  return <RepertoireLines onTrain={setTraining} onTrainAll={setTrainingPlan} onAdd={add} />;
 }
 
-function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; onAdd: () => void }) {
+function RepertoireLines({ onTrain, onTrainAll, onAdd }: {
+  onTrain: (line: Line) => void;
+  onTrainAll: (lines: Line[]) => void;
+  onAdd: () => void;
+}) {
   const { library, setLibrary, navigate, notify } = useApp();
   const { data: openings } = useData<Opening[]>("openings");
   const categories = library.repertoireCategories;
@@ -78,6 +84,8 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
   const unranked = positions.size;
   const groups = [...defaultGroups].sort((a, b) =>
     (positions.get(a.family) ?? unranked) - (positions.get(b.family) ?? unranked));
+  const trainingLines = groups.flatMap(group => group.lines.filter(line => line.moves.length)
+    .sort((a, b) => a.name.localeCompare(b.name)));
   const categoryName = (family: string) => categories?.names?.[family] || family;
   const updateCategories = (update: (current: NonNullable<Library["repertoireCategories"]>) => NonNullable<Library["repertoireCategories"]>) =>
     setLibrary(current => ({ ...current, repertoireCategories: update(current.repertoireCategories ?? {}) }));
@@ -117,7 +125,10 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
             <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
               <Download size={16} /> Import
             </Button>
-            <Button onClick={onAdd}><Plus size={16} /> Add line</Button>
+            {!!trainingLines.length && <Button onClick={() => onTrainAll(trainingLines)}>
+              <GraduationCap size={16} /> Train everything
+            </Button>}
+            <Button className={trainingLines.length ? "secondary" : ""} onClick={onAdd}><Plus size={16} /> Add line</Button>
           </div>
         </div>
         {!managing && !!groups.length && <div className="repertoire-browse">
@@ -479,14 +490,50 @@ function RepertoireSuggestions({ reference, repertoire, savedFamilies, categoryN
   </Modal>;
 }
 
+type ContinuationIndex = Map<string, { line: Line; index: number; move: string }[]>;
+
+function indexContinuations(lines: Line[], side?: Line["side"]): ContinuationIndex {
+  const positions: ContinuationIndex = new Map();
+  for (const saved of lines) {
+    if ((side && saved.side !== side) || !saved.moves.length) continue;
+    for (const moves of repertoirePaths(saved)) {
+      const branch = { ...saved, moves };
+      const board = new Chess(saved.initial);
+      for (const [index, move] of moves.entries()) {
+        const position = saved.side + positionKey(board.fen());
+        const choices = positions.get(position) ?? [];
+        if (!choices.length) positions.set(position, choices);
+        choices.push({ line: branch, index, move });
+        board.move(move);
+      }
+    }
+  }
+  return positions;
+}
+
+function RepertoireTrainingSession({ lines, onClose }: { lines: Line[]; onClose: () => void }) {
+  const [index, setIndex] = useState(0);
+  const continuations = useMemo(() => indexContinuations(lines), [lines]);
+  const final = index === lines.length - 1;
+  return <RepertoireTrainer key={lines[index].id} line={lines[index]} onClose={onClose}
+    session={{
+      continuations,
+      progress: `Line ${index + 1} of ${lines.length}`,
+      nextLabel: final ? "Finish training" : "Next line",
+      advance: final ? onClose : () => setIndex(current => current + 1),
+    }} />;
+}
+
 export function RepertoireTrainer({
   line,
   onClose,
   lines,
+  session,
 }: {
   line: Line;
   onClose: () => void;
   lines?: Line[];
+  session?: { continuations: ContinuationIndex; progress: string; nextLabel: string; advance: () => void };
 }) {
   const { library, appearance } = useApp();
   const [fen, setFen] = useState(line.initial),
@@ -495,50 +542,76 @@ export function RepertoireTrainer({
     [assisted, setAssisted] = useState(false),
     [done, setDone] = useState(false),
     [message, setMessage] = useState(""),
-    [hint, setHint] = useState("");
-  const c = new Chess(fen);
-  const choices = useMemo(() => {
-    const result: { line: Line; index: number; move: string }[] = [];
-    for (const l of (lines || library.repertoire).filter(
-      (v) => v.side === line.side,
-    )) {
-      for (const moves of repertoirePaths(l)) {
-        const b = new Chess(l.initial);
-        for (let i = 0; i < moves.length; i++) {
-          if (key(b) === key(c)) result.push({ line: { ...l, moves }, index: i, move: moves[i] });
-          b.move(moves[i]);
-        }
+    [hint, setHint] = useState(""),
+    [restartCount, setRestartCount] = useState(0);
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const yourTurn = fen.split(" ")[1] === line.side;
+  const legalMoves = useMemo(
+    () => yourTurn && !done ? new Chess(fen).moves({ verbose: true }).map(uci) : [],
+    [fen, yourTurn, done],
+  );
+  const continuations = useMemo(
+    () => session?.continuations ?? indexContinuations(lines ?? library.repertoire, line.side),
+    [session?.continuations, lines, library.repertoire, line.side],
+  );
+  const positionChoices = continuations.get(line.side + positionKey(fen)) ?? [];
+  const choices = session ? positionChoices.filter(choice => choice.line.id === line.id) : positionChoices;
+
+  useLayoutEffect(() => {
+    const layout = layoutRef.current;
+    const panel = panelRef.current;
+    const workspace = layout?.closest(".workspace");
+    if (!layout || !panel || !workspace) return;
+    function measure() {
+      if (!layout || !panel || !workspace) return;
+      const top = layout.getBoundingClientRect().top + window.scrollY;
+      const bottom = parseFloat(getComputedStyle(workspace).paddingBottom);
+      const stacked = window.matchMedia("(max-width: 760px)").matches;
+      const panelSpace = stacked ? panel.offsetHeight + 10 : 0;
+      const budget = Math.max(100, Math.floor(window.innerHeight - top - bottom - panelSpace - 44));
+      const limit = `${budget}px`;
+      if (layout.style.getPropertyValue("--training-board-limit") !== limit) {
+        layout.style.setProperty("--training-board-limit", limit);
       }
     }
-    return result;
-  }, [fen, library.repertoire, lines]);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(panel);
+    observer.observe(workspace);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
   function finish(helped: boolean) {
     if (done) return;
     setDone(true);
     setMessage(helped ? "Line completed with help." : "Line completed.");
   }
-  function apply(uci: string, l = active, index = cursor) {
+  function apply(move: string, l = active, index = cursor) {
     const b = new Chess(fen);
-    b.move(uci);
+    b.move(move);
     setFen(b.fen());
     setCursor(index + 1);
     setHint("");
     if (index + 1 >= l.moves.length) finish(assisted);
   }
   useEffect(() => {
-    if (done || c.turn() === line.side) return;
+    if (done || yourTurn) return;
     const move = active.moves[cursor];
     if (!move) {
       finish(assisted);
       return;
     }
-    const t = setTimeout(() => apply(move), 400);
+    const t = setTimeout(() => apply(move), 120);
     return () => clearTimeout(t);
   }, [fen, done]);
-  function attempt(uci: string) {
+  function attempt(move: string) {
     const match =
-      choices.find((v) => v.move === uci && v.line.moves === active.moves) ||
-      choices.find((v) => v.move === uci);
+      choices.find((choice) => choice.move === move && choice.line.moves === active.moves) ||
+      choices.find((choice) => choice.move === move);
     if (!match) {
       setAssisted(true);
       setMessage("Not a saved continuation. Try again.");
@@ -546,19 +619,18 @@ export function RepertoireTrainer({
     }
     setActive(match.line);
     setMessage("Correct.");
-    apply(uci, match.line, match.index);
+    apply(move, match.line, match.index);
   }
   const premove = usePremoves({
     fen,
     side: line.side,
-    legal: c
-      .moves({ verbose: true })
-      .map((m) => m.from + m.to + (m.promotion || "")),
+    legal: legalMoves,
     active: !done,
-    identity: line.id,
+    identity: `${line.id}-${restartCount}`,
     execute: attempt,
   });
   function restart() {
+    setRestartCount(count => count + 1);
     setFen(line.initial);
     setActive(line);
     setCursor(0);
@@ -568,75 +640,71 @@ export function RepertoireTrainer({
     setHint("");
   }
   return (
-    <div className="chess-layout repertoire-training">
+    <div className="chess-layout repertoire-training" ref={layoutRef}>
       <div className="board-column">
-        <div className="card-heading">
-          <h2>{line.name}</h2>
-          <Button className="secondary" onClick={onClose}>
-            <ArrowLeft size={15} />
-            Lines
-          </Button>
-        </div>
         <Board
           fen={premove.preview}
           materialFen={fen}
           onCancelPremoves={premove.cancelOnRightClick}
-          disabled={done || (c.turn() !== line.side && !appearance.premoves)}
-          legalMoves={c.turn() === line.side ? undefined : premove.options}
+          disabled={done || (!yourTurn && !appearance.premoves)}
+          legalMoves={yourTurn ? legalMoves : premove.options}
           flipped={line.side === "b"}
           hint={hint}
           onMove={(from, to, promotion) =>
-            c.turn() === line.side
+            yourTurn
               ? attempt(from + to + (promotion || ""))
               : premove.enqueue(from + to + (promotion || ""))
           }
         />
-        <PremoveQueue
-          moves={premove.queue}
-          undo={() => premove.setQueue((q) => q.slice(0, -1))}
-          clear={premove.clear}
-        />
-        <p className="feedback" role="status">
-          {message ||
-            (c.turn() === line.side
-              ? "Play your next move."
-              : "Playing reply…")}
-        </p>
-        <div className="button-row">
-          <Button
-            disabled={done || (c.turn() !== line.side && !appearance.premoves)}
-            onClick={() => {
-              const expected =
-                choices.find((v) => v.line.moves === active.moves) || choices[0];
-              if (expected) {
-                const m = new Chess(fen).move(expected.move);
-                setHint(m.from);
-                setMessage(`Try ${m.san}.`);
-                setAssisted(true);
-              }
-            }}
-          >
-            <Lightbulb size={16} />
-            Hint
-          </Button>
-          <Button className="secondary" onClick={restart}>
-            <RotateCcw size={16} />
-            Restart
-          </Button>
-        </div>
       </div>
-      <Card>
-        <h2>Training</h2>
-        <p className="caption">
-          {line.side === "w" ? "White" : "Black"} · {Math.ceil(cursor / 2)} /{" "}
-          {Math.ceil(active.moves.length / 2)} moves
-        </p>
-        <p className="muted">{active.name}</p>
-        <p className="caption">
-          Saved branches and transpositions are accepted. Opponent replies play
-          automatically.
-        </p>
-      </Card>
+      <div className="repertoire-training-panel" ref={panelRef}>
+        <Card>
+          <div className="repertoire-training-heading">
+            <div>
+              <h2>{active.name}</h2>
+              <p className="caption">
+                {line.side === "w" ? "White" : "Black"} · {Math.ceil(cursor / 2)} /{" "}
+                {Math.ceil(active.moves.length / 2)} moves{session && ` · ${session.progress}`}
+              </p>
+            </div>
+            <Button className="secondary" onClick={onClose}>
+              <ArrowLeft size={15} />
+              Lines
+            </Button>
+          </div>
+          <p className="feedback" role="status">
+            {message || (yourTurn ? "Play your next move." : "Playing reply…")}
+          </p>
+          <div className="button-row">
+            {session && done ? <Button onClick={session.advance}>{session.nextLabel}</Button> : <Button
+              disabled={done || !yourTurn}
+              onClick={() => {
+                const expected =
+                  choices.find((choice) => choice.line.moves === active.moves) || choices[0];
+                if (!expected) return;
+                const move = new Chess(fen).move(expected.move);
+                setHint(move.from);
+                setMessage(`Try ${move.san}.`);
+                setAssisted(true);
+              }}
+            >
+              <Lightbulb size={16} />
+              Hint
+            </Button>}
+            <Button className="secondary" onClick={restart}>
+              <RotateCcw size={16} />
+              Restart
+            </Button>
+          </div>
+          {appearance.premoves && <div className="repertoire-training-queue">
+            <PremoveQueue
+              moves={premove.queue}
+              undo={() => premove.setQueue((queue) => queue.slice(0, -1))}
+              clear={premove.clear}
+            />
+          </div>}
+        </Card>
+      </div>
     </div>
   );
 }

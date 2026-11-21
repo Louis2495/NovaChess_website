@@ -204,3 +204,59 @@ test("a friend can import only the shared repertoire lines with their sidelines"
     await friend.close();
   }
 });
+
+test("repertoire training fits a short viewport and follows a saved sideline", async ({ page }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  await page.setViewportSize({ width: mobile ? 360 : 1366, height: mobile ? 580 : 650 });
+  await page.addInitScript(() => {
+    localStorage.setItem("novachess-library-v2", JSON.stringify({ repertoire: [{
+      id: "practice", name: "Sicilian practice", side: "w",
+      initial: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      moves: ["e2e4", "c7c5", "g1f3"],
+      branches: [["d2d4", "d7d5", "c2c4"]],
+    }] }));
+  });
+  await page.goto("/#learn/repertoire");
+  await page.getByRole("button", { name: "Train", exact: true }).click();
+  const board = page.getByRole("group", { name: "Chessboard", exact: true });
+  const panel = page.locator(".repertoire-training-panel");
+  await expect(board).toBeVisible();
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight))
+    .toBeLessThanOrEqual(1);
+  if (!mobile) {
+    await expect.poll(async () => Math.abs((await board.boundingBox())!.y - (await panel.boundingBox())!.y))
+      .toBeLessThanOrEqual(1);
+  }
+  await move(page, "d2", "d4");
+  await expect(board.getByRole("button", { name: "d5, black pawn", exact: true })).toBeVisible();
+  await move(page, "c2", "c4");
+  await expect(page.locator(".feedback")).toHaveText("Line completed.");
+  await page.getByRole("button", { name: "Restart", exact: true }).click();
+  await expect(board.getByRole("button", { name: "d2, white pawn", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Hint", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Lines", exact: true })).toBeInViewport();
+});
+
+test("Train everything covers both colors and skips empty placeholders", async ({ page }) => {
+  await page.addInitScript(() => {
+    const initial = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    localStorage.setItem("novachess-library-v2", JSON.stringify({ repertoire: [
+      { id: "black", initial, side: "b", name: "Black line", category: "Second opening", moves: ["e2e4", "e7e5"] },
+      { id: "white", initial, side: "w", name: "White line", category: "First opening", moves: ["d2d4"] },
+      { id: "empty", initial, side: "w", name: "Empty line", category: "First opening", moves: [] },
+    ] }));
+  });
+  await page.goto("/#learn/repertoire");
+  await page.getByRole("group", { name: "Repertoire color" }).getByRole("button", { name: "White", exact: true }).click();
+  await page.getByRole("button", { name: "Train everything", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "White line" })).toBeVisible();
+  await expect(page.getByText(/Line 1 of 2/)).toBeVisible();
+  await move(page, "d2", "d4");
+  await page.getByRole("button", { name: "Next line", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Black line" })).toBeVisible();
+  await expect(page.getByText(/Line 2 of 2/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "e4, white pawn", exact: true })).toBeVisible();
+  await move(page, "e7", "e5");
+  await page.getByRole("button", { name: "Finish training", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Train everything", exact: true })).toBeVisible();
+});
