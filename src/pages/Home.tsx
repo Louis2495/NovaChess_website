@@ -7,7 +7,7 @@ import { variantList } from "../lib/variants";
 import { duration } from "../lib/speedrun";
 import DailyMeme from "../components/DailyMeme";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, BookOpen, Plus, RotateCcw, Target } from "lucide-react";
+import { ArrowRight, Plus, RotateCcw, Smartphone } from "lucide-react";
 import { useApp } from "../lib/context";
 import { useData, today, base, emptyLibrary } from "../lib/store";
 import type { PuzzleData, SavedGame } from "../lib/types";
@@ -16,16 +16,16 @@ import { Board } from "../components/Board";
 import { Button } from "../components/UI";
 import { isStudy } from "../lib/library";
 const multiplayerVariants = {
-  vote: "Vote Chess",
-  team: "Team Chess",
-  throne: "Throne",
+  vote: { name: "Vote Chess", description: "Vote with your team on the next move." },
+  team: { name: "Team Chess", description: "Share moves and arrows with your teammates." },
+  throne: { name: "Throne", description: "Join the queue to challenge the reigning winner." },
 };
 
 function variantShortcut(id: string) {
-  if (Object.hasOwn(multiplayerVariants, id)) return { name: multiplayerVariants[id as keyof typeof multiplayerVariants], multiplayer: true };
-  if (id === "speedrun") return { name: "Speedrun", multiplayer: false };
+  if (Object.hasOwn(multiplayerVariants, id)) return { ...multiplayerVariants[id as keyof typeof multiplayerVariants], multiplayer: true };
+  if (id === "speedrun") return { name: "Speedrun", description: "Beat the computer as fast as possible.", multiplayer: false };
   const variant = variantList.find(variant => variant.id === id && id !== "chess");
-  return variant ? { name: variant.name, multiplayer: false } : undefined;
+  return variant ? { name: variant.name, description: variant.description, multiplayer: false } : undefined;
 }
 
 export function dailyPuzzle(puzzles: PuzzleData[]) {
@@ -59,14 +59,13 @@ export default function HomePage() {
   const welcome = name && name !== emptyLibrary.profile.name ? `Welcome back, ${name}!` : "Welcome to NovaChess";
   const games = library.games.filter(game => !isStudy(game) && game.folder !== "Studies");
   const recent = [...games].sort((a, b) => b.created - a.created).slice(0, 3);
-  const dueOpenings = library.repertoire.filter(line => line.due <= Date.now()).length;
   const lastSavedVariant = [...games, ...(library.activeGame ? [library.activeGame] : [])]
     .filter(game => game.origin !== "archive" && !isStudy(game) && (game.moves.length || game.partner?.moves.length))
     .sort((a, b) => b.created - a.created)
     .map(game => {
       const online = game.id.startsWith("online-");
       const mode = online && game.variant === "chess"
-        ? Object.entries(multiplayerVariants).find(([, name]) => name === game.title)?.[0]
+        ? Object.entries(multiplayerVariants).find(([, variant]) => variant.name === game.title)?.[0]
         : undefined;
       return { id: game.speedrun ? "speedrun" : mode ?? game.variant, online };
     })
@@ -147,28 +146,21 @@ export default function HomePage() {
         )}
       </section>
       <div className="home-extras">
-        <section className="home-next" aria-labelledby="home-next-title">
-          <h2 id="home-next-title">Next up</h2>
-          <button className="home-next-action" onClick={() => navigate("learn", dueOpenings ? "repertoire" : "train")}>
-            <BookOpen size={20} aria-hidden="true" />
-            <span><strong>{dueOpenings ? "Review your repertoire" : "Practice an opening"}</strong>
-              {dueOpenings > 0 && <small>{dueOpenings} {dueOpenings === 1 ? "line" : "lines"} due</small>}
-            </span>
-            <ArrowRight size={16} aria-hidden="true" />
-          </button>
-          <button className="home-next-action" onClick={() => navigate("puzzles")}>
-            <Target size={20} aria-hidden="true" />
-            <span><strong>Train tactics</strong><small>Puzzles matched to your rating</small></span>
-            <ArrowRight size={16} aria-hidden="true" />
-          </button>
+        <section className="home-app" aria-labelledby="home-app-title">
+          <span className="home-app-icon"><Smartphone size={28} aria-hidden="true" /></span>
+          <div>
+            <h2 id="home-app-title">Try the app</h2>
+            {appStoreUrl
+              ? <a className="text-link" href={appStoreUrl}>Get NovaChess on the App Store <ArrowRight size={14} aria-hidden="true" /></a>
+              : <p>Coming soon to the App Store</p>}
+          </div>
         </section>
         <div className="home-featured-group">
           <button type="button" className="home-featured" onClick={() => navigate("variants", "choose/vote")}>
             <MultiplayerPicture mode="vote" />
             <span>
-              <small>Featured variant</small>
               <strong>Vote Chess</strong>
-              <span>Vote with your team on the next move.</span>
+              <span>{multiplayerVariants.vote.description}</span>
             </span>
           </button>
           {lastPlayed && recentVariant && (
@@ -176,12 +168,15 @@ export default function HomePage() {
               {recentVariant.multiplayer ? <MultiplayerPicture mode={lastPlayed.id} />
                 : lastPlayed.id === "speedrun" ? <img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt="" />
                 : <VariantIcon id={lastPlayed.id} size={112} />}
-              <span><small>Last played variant</small><strong>{recentVariant.name}</strong></span>
+              <span>
+                <small>Last played variant</small>
+                <strong>{recentVariant.name}</strong>
+                <span>{recentVariant.description}</span>
+              </span>
             </button>
           )}
         </div>
       </div>
-      {appStoreUrl && <a className="home-app-link text-link" href={appStoreUrl}>Get NovaChess on the App Store <ArrowRight size={14} aria-hidden="true" /></a>}
     </div>
   );
 }

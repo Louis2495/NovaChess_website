@@ -79,25 +79,18 @@ test('Home completion uses a yellow outline and recent games show stacked player
  const faint=await entries.first().evaluate(e=>{const s=getComputedStyle(e);return s.backgroundColor!==s.borderTopColor});expect(faint).toBe(true);
 });
 
-test('Home surfaces opening reviews and opens Vote Chess from the entire featured tile',async({page})=>{
- await page.addInitScript(()=>{
-  localStorage.setItem('novachess-library-v2',JSON.stringify({
-   repertoire:[{id:'due-opening',name:'Italian Game',due:0,side:'w',moves:[]}],
-  }));
- });
+test('Home shows the app announcement and opens Vote Chess from the entire tile',async({page})=>{
  await page.goto('/');
- const next=page.getByRole('region',{name:'Next up'});
  const launch=(await page.getByRole('button',{name:'New game',exact:true}).boundingBox())!;
  const recent=(await page.getByRole('region',{name:'Recent games'}).boundingBox())!;
  expect(launch.x+launch.width).toBeCloseTo(recent.x+recent.width,0);
- await expect(next.getByRole('button',{name:/Review your repertoire/})).toContainText('1 line due');
+ const app=page.getByRole('region',{name:'Try the app'});
+ await expect(app.getByText('Coming soon to the App Store')).toBeVisible();
+ await expect(page.getByRole('region',{name:'Next up'})).toHaveCount(0);
+ await expect(page.getByText('Featured variant',{exact:true})).toHaveCount(0);
  await expect(page.getByRole('button',{name:/Last played variant/})).toHaveCount(0);
- const featured=page.getByRole('button',{name:/Featured variant Vote Chess/});
- await featured.click({position:{x:5,y:5}});
+ await page.getByRole('button',{name:/^Vote Chess/}).click({position:{x:5,y:5}});
  await expect(page.getByRole('group',{name:'Online variants'}).getByRole('button',{name:'Vote Chess',exact:true})).toHaveAttribute('aria-pressed','true');
- await page.goto('/');
- await next.getByRole('button',{name:/Review your repertoire/}).click();
- await expect(page).toHaveURL(/#learn\/repertoire$/);
 });
 
 test('Home splits the featured space with the most recently played variant',async({page})=>{
@@ -114,10 +107,10 @@ test('Home splits the featured space with the most recently played variant',asyn
   }));
  });
  await page.goto('/');
- const vote=page.getByRole('button',{name:/Featured variant Vote Chess/});
+ const vote=page.getByRole('button',{name:/^Vote Chess/});
  const recent=page.getByRole('button',{name:/Last played variant Atomic/});
  await expect(vote).toBeVisible();
- await expect(recent).toBeVisible();
+ await expect(recent).toContainText("Captures explode nearby non-pawns.");
  expect((await vote.boundingBox())!.height).toBeCloseTo((await recent.boundingBox())!.height,0);
  await recent.focus();
  await page.keyboard.press('Enter');
