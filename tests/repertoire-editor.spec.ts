@@ -105,3 +105,45 @@ test("repertoire filters reviews and checks saved sidelines before suggesting mi
   await page.getByRole("group", { name: "Repertoire color" }).getByRole("button", { name: "Black", exact: true }).click();
   await expect(sicilian.getByText("Black example")).toBeVisible();
 });
+
+test("opening categories can be dragged, moved with buttons, and renamed across reloads", async ({ page }) => {
+  await page.addInitScript(() => {
+    const storageKey = "novachess-library-v2";
+    if (localStorage.getItem(storageKey)) return;
+    const line = {
+      initial: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      side: "w", due: 0, trained: 0, successes: 0,
+    };
+    localStorage.setItem(storageKey, JSON.stringify({
+      repertoire: [
+        { ...line, id: "one", name: "My Sicilian line", moves: ["e2e4", "c7c5"] },
+        { ...line, id: "two", name: "My French line", moves: ["e2e4", "e7e6"] },
+      ],
+    }));
+  });
+  await page.goto("/#learn/repertoire");
+  const headings = page.locator(".repertoire-family-name");
+  await expect(headings).toHaveText(["French Defense", "Sicilian Defense"]);
+  await page.getByRole("button", { name: "Manage categories" }).click();
+  const manager = page.getByRole("region", { name: "Manage opening categories" });
+  const labels = manager.locator(".repertoire-category-name");
+  await manager.getByRole("button", { name: "Move Sicilian Defense up" }).click();
+  await expect(labels).toHaveText(["Sicilian Defense", "French Defense"]);
+  if (!(await page.evaluate(() => navigator.maxTouchPoints))) {
+    const rows = manager.getByRole("listitem");
+    await rows.first().locator(".repertoire-category-grip").dragTo(rows.last());
+    await expect(labels).toHaveText(["French Defense", "Sicilian Defense"]);
+    await manager.getByRole("button", { name: "Move French Defense down" }).click();
+  }
+  await manager.getByRole("button", { name: "Rename Sicilian Defense" }).click();
+  await manager.getByRole("textbox", { name: "Category name" }).fill("Tournament prep");
+  await manager.getByRole("button", { name: "Save", exact: true }).click();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(headings).toHaveText(["Tournament prep", "French Defense"]);
+  await page.reload();
+  await expect(headings).toHaveText(["Tournament prep", "French Defense"]);
+  await page.getByRole("searchbox", { name: "Search repertoire" }).fill("tournament");
+  const renamed = page.getByRole("region", { name: "Tournament prep" });
+  await expect(renamed.getByRole("heading", { name: "My Sicilian line" })).toBeVisible();
+  await expect(renamed.getByText(/Suggested lines to add/)).toBeVisible();
+});

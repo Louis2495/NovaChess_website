@@ -181,6 +181,7 @@ export type Library = {
   games: SavedGame[];
   folders: string[];
   repertoire: Repertoire[];
+  repertoireCategories?: { order?: string[]; names?: Record<string, string> };
   progress: Progress;
   profile: Profile;
   activeGame: SavedGame | null;

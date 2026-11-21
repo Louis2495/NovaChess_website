@@ -13,10 +13,14 @@ import {
   Lightbulb,
   Download,
   ArrowLeft,
+  ArrowUp,
+  ArrowDown,
+  GripVertical,
+  Pencil,
 } from "lucide-react";
 import { useApp } from "../../lib/context";
 import { download, dateLabel, initialFen, useData } from "../../lib/store";
-import type { Opening, Repertoire as Line } from "../../lib/types";
+import type { Library, Opening, Repertoire as Line } from "../../lib/types";
 import { Board } from "../../components/Board";
 import {
   Card,
@@ -52,9 +56,18 @@ export default function Repertoire() {
 function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; onAdd: () => void }) {
   const { library, setLibrary, navigate, notify } = useApp();
   const { data: openings } = useData<Opening[]>("openings");
-  const groups = useMemo(() => groupByOpening(library.repertoire, repertoireFamilyLookup(openings ?? []))
+  const categories = library.repertoireCategories;
+  const [managing, setManaging] = useState(false);
+  const defaultGroups = useMemo(() => groupByOpening(library.repertoire, repertoireFamilyLookup(openings ?? []))
     .sort((a, b) => (a.family === "Other lines" ? 1 : 0) - (b.family === "Other lines" ? 1 : 0) || a.family.localeCompare(b.family)),
     [library.repertoire, openings]);
+  const positions = new Map(categories?.order?.map((family, index) => [family, index]));
+  const unranked = positions.size;
+  const groups = [...defaultGroups].sort((a, b) =>
+    (positions.get(a.family) ?? unranked) - (positions.get(b.family) ?? unranked));
+  const categoryName = (family: string) => categories?.names?.[family] || family;
+  const updateCategories = (update: (current: NonNullable<Library["repertoireCategories"]>) => NonNullable<Library["repertoireCategories"]>) =>
+    setLibrary(current => ({ ...current, repertoireCategories: update(current.repertoireCategories ?? {}) }));
   const { data: lessons } = useData<Opening[]>("lessons");
   const [query, setQuery] = useState("");
   const [color, setColor] = useState("all");
@@ -74,7 +87,7 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
     ...group,
     lines: group.lines.filter(line =>
       matchesColor(line) && (!dueOnly || line.due <= now) &&
-      (!term || `${group.family} ${line.name}`.toLowerCase().includes(term)))
+      (!term || `${categoryName(group.family)} ${group.family} ${line.name}`.toLowerCase().includes(term)))
       .sort((a, b) => a.due - b.due || a.name.localeCompare(b.name)),
   })).filter(group => group.lines.length);
   return (
@@ -90,12 +103,28 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
           {library.repertoire.filter((l) => l.due <= now).length} due
         </p>
         <div className="button-row">
+          {groups.length > 0 && <Button className="secondary" onClick={() => setManaging(!managing)}>
+            {managing ? "Done" : "Manage categories"}
+          </Button>}
           <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
             <Download size={16} /> Import
           </Button>
           <Button onClick={onAdd}><Plus size={16} /> Add line</Button>
         </div>
       </div>
+      {managing ? (
+        <CategoryManager
+          families={groups.map(group => group.family)}
+          categoryName={categoryName}
+          onReorder={order => updateCategories(current => ({
+            ...current,
+            order: [...order, ...(current.order ?? []).filter(family => !order.includes(family))],
+          }))}
+          onRename={(family, name) => updateCategories(current => ({
+            ...current, names: { ...current.names, [family]: name },
+          }))}
+        />
+      ) : <>
       {!!library.repertoire.length && <div className="repertoire-filters">
         <Field label="Search repertoire"><input type="search" placeholder="Opening or line name" value={query} onChange={event => setQuery(event.target.value)} /></Field>
         <Field label="Review status"><ChoiceSelect value={dueOnly ? "due" : "all"} onChange={event => setDueOnly(event.target.value === "due")}>
@@ -115,10 +144,10 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
       ) : visible.length ? (
         <div className="repertoire-families">
           {visible.map(({ family, lines }) => (
-            <section key={family} className="opening-family" aria-label={family}>
+            <section key={family} className="opening-family" aria-label={categoryName(family)}>
               <details open>
                 <summary className="repertoire-family-heading">
-                  <span className="repertoire-family-name">{family}</span>
+                  <span className="repertoire-family-name">{categoryName(family)}</span>
                   <small>{lines.length} {lines.length === 1 ? "line" : "lines"} · {lines.filter(line => line.due <= now).length} due</small>
                   <span className="repertoire-section-action" aria-hidden="true"><span>Show lines</span><span>Hide lines</span></span>
                 </summary>
@@ -177,8 +206,96 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
           ))}
         </div>
       ) : <p className="muted">No repertoire lines match these filters.</p>}
+      </>}
     </div>
   );
+}
+
+function CategoryManager({ families, categoryName, onReorder, onRename }: {
+  families: string[];
+  categoryName: (family: string) => string;
+  onReorder: (order: string[]) => void;
+  onRename: (family: string, name: string) => void;
+}) {
+  const [dragged, setDragged] = useState<string | null>(null);
+  const [target, setTarget] = useState<string | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const [announcement, setAnnouncement] = useState("");
+
+  function move(family: string, index: number) {
+    const next = families.filter(item => item !== family);
+    next.splice(index, 0, family);
+    onReorder(next);
+    setAnnouncement(`${categoryName(family)} moved to position ${index + 1} of ${families.length}.`);
+  }
+
+  function clearDrag() {
+    setDragged(null);
+    setTarget(null);
+  }
+
+  return <section className="repertoire-category-manager" aria-label="Manage opening categories">
+    <p className="caption">Drag the grip or use the arrow buttons to reorder categories.</p>
+    <ul>
+      {families.map((family, index) => {
+        const name = categoryName(family);
+        return <li key={family} data-drop-target={target === family}
+          onDragOver={event => {
+            if (dragged === null) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "move";
+            setTarget(family === dragged ? null : family);
+          }}
+          onDrop={event => {
+            if (dragged === null) return;
+            event.preventDefault();
+            if (dragged !== family) move(dragged, index);
+            clearDrag();
+          }}>
+          <span className="repertoire-category-grip" draggable aria-hidden="true"
+            onDragStart={event => {
+              event.dataTransfer.setData("text/plain", family);
+              event.dataTransfer.effectAllowed = "move";
+              setDragged(family);
+            }}
+            onDragEnd={clearDrag}><GripVertical size={20} /></span>
+          {editing === family ? (
+            <form onSubmit={event => {
+              event.preventDefault();
+              const name = draft.trim();
+              if (!name) return;
+              onRename(family, name);
+              setEditing(null);
+              setAnnouncement(`Category renamed to ${name}.`);
+            }}>
+              <input aria-label="Category name" value={draft} onChange={event => setDraft(event.target.value)}
+                autoFocus required maxLength={80} onKeyDown={event => {
+                  if (event.key === "Escape") setEditing(null);
+                }} />
+              <Button type="submit" disabled={!draft.trim()}>Save</Button>
+              <Button type="button" className="secondary" onClick={() => setEditing(null)}>Cancel</Button>
+            </form>
+          ) : (
+            <>
+              <span className="repertoire-category-name">{name}</span>
+              <div className="button-row">
+                <IconButton label={`Rename ${name}`} onClick={() => {
+                  setDraft(name);
+                  setEditing(family);
+                }}><Pencil size={16} /></IconButton>
+                <IconButton label={`Move ${name} up`} disabled={index === 0}
+                  onClick={() => move(family, index - 1)}><ArrowUp size={16} /></IconButton>
+                <IconButton label={`Move ${name} down`} disabled={index === families.length - 1}
+                  onClick={() => move(family, index + 1)}><ArrowDown size={16} /></IconButton>
+              </div>
+            </>
+          )}
+        </li>;
+      })}
+    </ul>
+    <span className="sr-only" role="status">{announcement}</span>
+  </section>;
 }
 
 function RepertoireSuggestions({ suggestions, paths, onSelect }: {
