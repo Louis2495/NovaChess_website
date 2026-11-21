@@ -5913,7 +5913,7 @@ html { scrollbar-gutter:stable; }
   gap:var(--home-gap);
   align-items:stretch;
   max-width:1560px;
-  padding-top:clamp(4px,1.5dvh,16px);
+  padding-top:calc(clamp(4px,1.5dvh,16px) + 1cm);
   margin-inline:auto;
 }
 .home-page.home-dashboard > .home-welcome {
@@ -5921,7 +5921,7 @@ html { scrollbar-gutter:stable; }
   grid-template-columns:clamp(72px,11vw,148px) minmax(0,1fr);
   gap:clamp(12px,2vw,26px);
   min-height:0;
-  margin:0 0 clamp(10px,2dvh,22px);
+  margin:0 0 calc(clamp(10px,2dvh,22px) + 2cm);
   order:0;
 }
 .home-dashboard .home-welcome-actions h1 {
