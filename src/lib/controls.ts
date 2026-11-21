@@ -50,7 +50,7 @@ export function useControl(action: ControlAction, fn: () => void) {
       if (
         e.target instanceof HTMLElement &&
         e.target.closest(
-          "input,textarea,select,[contenteditable=true],[role=dialog]",
+          "input,textarea,select,[contenteditable=true],dialog,[role=dialog]",
         )
       )
         return;

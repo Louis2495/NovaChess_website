@@ -599,6 +599,102 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
         }}
       />
     );
+  const speedrunEloField = <Field label="Computer Elo"><input type="number" min={speedrunMinRating} max={speedrunMaxRating} step={speedrunRatingStep} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(clampSpeedrunRating(speedrunRating || speedrunMinRating))}/></Field>;
+  const gameOptions = options && (
+    <div className={`game-options${variantsOnly ? " variant-dialog-options" : ""}`}>
+      {variantsOnly && <Field label="Variant">
+        <ChoiceSelect
+          value={speedrunMode?"speedrun":variant}
+          onChange={(e) => {setVariant(e.target.value==="speedrun"?"chess":e.target.value);setSpeedrunMode(e.target.value==="speedrun");}}
+        >
+          {[...variantList.filter(v=>v.id!=="chess"),{id:"speedrun",name:"Speedrun",description:""}].sort((a,b)=>variantRank(a.id)-variantRank(b.id)).map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.name}
+            </option>
+          ))}
+        </ChoiceSelect>
+      </Field>}
+      {variant !== "chess" && <div className="variant-summary">
+        <VariantIcon id={variant} />
+        <span>{variantList.find((v) => v.id === variant)?.name}</span>
+      </div>}
+      {variantList.find((v) => v.id === variant)?.description && (
+        <p className="caption">
+          {variantList.find((v) => v.id === variant)?.description}
+        </p>
+      )}
+      {variant === "dropping" && (
+        <Field label="Squares to drop">
+          <ChoiceSelect
+            value={dropCount}
+            onChange={(e) => setDropCount(+e.target.value)}
+          >
+            {[1, 2, 3, 4].map((n) => (
+              <option key={n}>{n}</option>
+            ))}
+          </ChoiceSelect>
+        </Field>
+      )}
+      <Field label="Your color">
+        <ChoiceSelect
+          value={human}
+          onChange={(e) => setHuman(e.target.value as "w" | "b")}
+        >
+          <option value="w">White</option>
+          <option value="b">Black</option>
+        </ChoiceSelect>
+      </Field>
+      {!speedrunMode && !["dropping", "chaos", "random"].includes(variant) && (
+        <>
+          <div className="opponent-choices">
+            {["Current rating", "Custom"].map((v) => (
+              <label key={v}>
+                <input
+                  type="radio"
+                  name="opponent"
+                  checked={choice === v}
+                  onChange={() => setChoice(v)}
+                />
+                <span>
+                  {v}
+                  {v === "Current rating" && (
+                    <small>{Math.round(library.localRating)}</small>
+                  )}
+                </span>
+              </label>
+            ))}
+          </div>
+          {choice === "Custom" && (
+            <Field label="Rating">
+              <input
+                type="number"
+                min={1}
+                max={10000}
+                value={rating}
+                onChange={(e) =>
+                  setRating(
+                    Math.max(
+                      1,
+                      Math.min(10000, Number(e.target.value) || 1),
+                    ),
+                  )
+                }
+              />
+            </Field>
+          )}
+          <Toggle
+            label="Rated"
+            checked={rated && variant === "chess"}
+            onChange={(v) => setRated(v && variant === "chess")}
+          />
+          {variant === "chess" && (
+            <OpeningPicker openings={openings||[]} value={openingId} onChange={setOpeningId}/>
+          )}
+        </>
+      )}
+      {variantsOnly && speedrunMode && speedrunEloField}
+    </div>
+  );
   return (
     <>
       <h1 className="sr-only">{playing ? "Chess game" : "New game"}</h1>
@@ -613,6 +709,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
           <section
             className="new-game-section setup-launch"
             aria-label="New game"
+            aria-hidden={variantsOnly && options ? true : undefined}
           >
             <div className="play-feature-copy">
               <Button
@@ -657,111 +754,30 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
             ))}
 
           </div>}
-          {speedrunMode && <Card className="speedrun-setup"><p className="caption">Beat the computer as fast as possible</p><Field label="Computer Elo"><input type="number" min={speedrunMinRating} max={speedrunMaxRating} step={speedrunRatingStep} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(clampSpeedrunRating(speedrunRating || speedrunMinRating))}/></Field></Card>}
+          {speedrunMode && <Card className="speedrun-setup" aria-hidden={variantsOnly && options ? true : undefined}><p className="caption">Beat the computer as fast as possible</p>{speedrunEloField}</Card>}
           <Card className="game-settings-card">
             <button
               className="options-toggle"
               aria-expanded={options}
+              aria-haspopup={variantsOnly ? "dialog" : undefined}
               onClick={() => setOptions(!options)}
             >
               Game options
               <ChevronDown size={17} />
             </button>
-            {options && (
-              <div className="game-options">
-                {variantsOnly && <Field label="Variant">
-                  <ChoiceSelect
-                    value={speedrunMode?"speedrun":variant}
-                    onChange={(e) => {setVariant(e.target.value==="speedrun"?"chess":e.target.value);setSpeedrunMode(e.target.value==="speedrun");}}
-                  >
-                    {[...variantList.filter(v=>v.id!=="chess"),{id:"speedrun",name:"Speedrun",description:""}].sort((a,b)=>variantRank(a.id)-variantRank(b.id)).map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.name}
-                      </option>
-                    ))}
-                  </ChoiceSelect>
-                </Field>}
-                {variant !== "chess" && <div className="variant-summary">
-                  <VariantIcon id={variant} />
-                  <span>{variantList.find((v) => v.id === variant)?.name}</span>
-                </div>}
-                {variantList.find((v) => v.id === variant)?.description && (
-                  <p className="caption">
-                    {variantList.find((v) => v.id === variant)?.description}
-                  </p>
-                )}
-                {variant === "dropping" && (
-                  <Field label="Squares to drop">
-                    <ChoiceSelect
-                      value={dropCount}
-                      onChange={(e) => setDropCount(+e.target.value)}
-                    >
-                      {[1, 2, 3, 4].map((n) => (
-                        <option key={n}>{n}</option>
-                      ))}
-                    </ChoiceSelect>
-                  </Field>
-                )}
-                <Field label="Your color">
-                  <ChoiceSelect
-                    value={human}
-                    onChange={(e) => setHuman(e.target.value as "w" | "b")}
-                  >
-                    <option value="w">White</option>
-                    <option value="b">Black</option>
-                  </ChoiceSelect>
-                </Field>
-                {!speedrunMode && !["dropping", "chaos", "random"].includes(variant) && (
-                  <>
-                    <div className="opponent-choices">
-                      {["Current rating", "Custom"].map((v) => (
-                        <label key={v}>
-                          <input
-                            type="radio"
-                            name="opponent"
-                            checked={choice === v}
-                            onChange={() => setChoice(v)}
-                          />
-                          <span>
-                            {v}
-                            {v === "Current rating" && (
-                              <small>{Math.round(library.localRating)}</small>
-                            )}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                    {choice === "Custom" && (
-                      <Field label="Rating">
-                        <input
-                          type="number"
-                          min={1}
-                          max={10000}
-                          value={rating}
-                          onChange={(e) =>
-                            setRating(
-                              Math.max(
-                                1,
-                                Math.min(10000, Number(e.target.value) || 1),
-                              ),
-                            )
-                          }
-                        />
-                      </Field>
-                    )}
-                    <Toggle
-                      label="Rated"
-                      checked={rated && variant === "chess"}
-                      onChange={(v) => setRated(v && variant === "chess")}
-                    />
-                    {variant === "chess" && (
-                      <OpeningPicker openings={openings||[]} value={openingId} onChange={setOpeningId}/>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
+            {!variantsOnly && gameOptions}
           </Card>
+          {variantsOnly && options && (
+            <Modal title="Game options" onClose={() => setOptions(false)}>
+              {gameOptions}
+              <div className="button-row">
+                <Button onClick={() => {
+                  setOptions(false);
+                  start();
+                }}>Start game</Button>
+              </div>
+            </Modal>
+          )}
         </div>
       ) : (
         <div

@@ -5801,3 +5801,17 @@ html { scrollbar-gutter:stable; }
 @media(min-width:1001px) {
   .workspace:has(.analysis-layout) { justify-content:flex-start; }
 }
+
+.variant-dialog-options {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start;
+  gap:12px;
+}
+.variant-dialog-options > .field { min-width:0; margin:0; }
+.variant-dialog-options > :not(.field) { grid-column:1 / -1; }
+.variant-dialog-options > .opponent-choices {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.variant-dialog-options > .caption { margin:0; }

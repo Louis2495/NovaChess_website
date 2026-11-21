@@ -58,11 +58,26 @@ test('Variants centers its setup and fits all cards without page scrolling',asyn
  await page.getByRole('button',{name:'Speedrun',exact:true}).click();
  await expect(page.getByRole('spinbutton',{name:'Computer Elo'})).toBeInViewport({ratio:1});
  await check('Choose variant','Start game');
- await page.getByRole('button',{name:'Game options',exact:true}).click();
- await check('Choose variant','Start game');
+ const options = page.getByRole('button',{name:'Game options',exact:true});
+ const gallery = page.locator('.computer-variant-gallery');
+ async function checkOptions(){
+  const cardsBefore = await gallery.boundingBox();
+  await expect(options).toBeInViewport({ratio:1});
+  await options.click();
+  const dialog = page.getByRole('dialog',{name:'Game options',exact:true});
+  await expect(dialog.getByRole('spinbutton',{name:'Computer Elo'})).toBeInViewport({ratio:1});
+  await expect(dialog.getByRole('button',{name:'Start game',exact:true})).toBeInViewport({ratio:1});
+  expect(await gallery.boundingBox()).toEqual(cardsBefore);
+  expect(await page.evaluate(()=>window.scrollY)).toBe(0);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(options).toBeFocused();
+ }
+ await checkOptions();
  if(!isMobile){
   await page.setViewportSize({width:900,height:620});
   await check('Choose variant','Start game');
+  await checkOptions();
  }
 });
 test('research fields stay aligned in their column even with an injected autofill badge',async({page})=>{
