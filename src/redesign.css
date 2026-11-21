@@ -4144,7 +4144,6 @@ select.theme-select {
 .analysis-layout > .side-panels > .card:not(.engine-top-lines) { max-width:none; width:100%; }
 @media(min-width:1001px){
   .analysis-layout.chess-layout { grid-template-columns:minmax(0,calc(var(--analysis-board-size) + 29px)) minmax(280px,1fr); max-width:1200px; }
-  .play-match.chess-layout { grid-template-columns:minmax(0,min(var(--play-board-size),calc(100% - 240px))) 220px; }
 }
 @media(max-width:1200px){ .engine-lines { grid-template-columns:1fr; } }
 @media(max-width:1000px){
@@ -5157,9 +5156,6 @@ html { scrollbar-gutter:stable; }
  .online-match > .board-column { min-width:0; grid-column:1; grid-row:1; }
  .online-match > .side-panels { min-width:0; grid-column:2; grid-row:1; padding-top:70px; }
  .online-match .board-frame,.online-match .online-player-strip { margin-inline:auto; }
- .play-match > .match-sidebar { grid-column:2; grid-row:1; }
- .play-match > .board-column { grid-column:1; grid-row:1; }
- .play-match.chess-layout { grid-template-columns:minmax(0,min(var(--play-board-size,650px),calc(100% - 240px))) 220px; }
 }
 @media(max-width:1000px) {
  .online-match > .board-column { grid-row:1; }
@@ -5404,10 +5400,37 @@ html { scrollbar-gutter:stable; }
 .puzzle-layout .side-panels > .card:has(.theme-select) .field > span { color:#26143d; }
 
 @media(min-width:1001px) {
- .workspace .speedrun-match.chess-layout { grid-template-columns:minmax(0,calc(var(--speedrun-board-left,0px))) minmax(0,var(--speedrun-board-width,500px)) minmax(0,1fr); gap:0; }
- .speedrun-match > .board-column { position:relative; grid-column:2; }
- .speedrun-match > .match-sidebar { grid-column:3; margin-left:24px; }
+ .speedrun-match > .board-column { position:relative; }
  .speedrun-match .speedrun-clock { position:absolute; left:-152px; top:var(--board-center-y,50%); transform:translateY(-50%); width:128px; min-height:56px; display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; box-sizing:border-box; border:2px solid #ffdf00; border-radius:12px; background:var(--panel); color:#ffdf00; }
+}
+.online-match > .cancel-friend-request { min-height:56px; width:min(100%,var(--cancel-request-width,192px)); justify-content:center; }
+/* Center the board in the viewport while keeping the action rail beside it. */
+@media(min-width:1001px) {
+ .workspace .chess-layout:is(.play-match,.online-match:has(.board-frame:not(.compact-frame))) {
+  --match-rail:220px;
+  --match-gap:20px;
+  --match-board-width:min(var(--play-board-size),var(--auto-board-limit,calc(100dvh - 150px)),
+   calc(2 * (var(--match-center,50%) - var(--match-left-room,var(--match-gap)))),
+   calc(2 * (100% - var(--match-center,50%) - var(--match-rail) - var(--match-gap))));
+  grid-template-columns:minmax(0,calc(var(--match-center,50%) - var(--match-board-width) / 2 - var(--match-gap)))
+   minmax(0,var(--match-board-width)) var(--match-rail);
+  gap:var(--match-gap);
+ }
+ .workspace .online-match.chess-layout:has(.board-frame:not(.compact-frame)) { --match-rail:240px; }
+ .workspace .speedrun-match.chess-layout { --match-left-room:152px; }
+ :is(.play-match,.online-match:has(.board-frame:not(.compact-frame))) > .board-column { grid-column:2; grid-row:1; }
+ :is(.play-match,.online-match:has(.board-frame:not(.compact-frame))) > .side-panels {
+  grid-column:3; grid-row:1; min-width:0; padding-top:var(--match-board-top,58px);
+ }
+ .online-match > .cancel-friend-request { grid-column:1; grid-row:1; justify-self:end; margin-top:var(--match-board-top,58px); }
+ .workspace .online-match:has(> .cancel-friend-request) {
+  --cancel-request-width:clamp(140px,14vw,192px);
+  --match-left-room:calc(var(--cancel-request-width) + var(--match-gap));
+ }
+}
+@media(max-width:1000px) {
+ .online-match:has(> .cancel-friend-request) > .board-column { grid-row:2; }
+ :is(.play-match,.online-match) > .board-column > :is(.board-frame,.board-player-label,.online-player-strip) { margin-inline:auto; }
 }
 .home-page .home-puzzle.is-completed { outline:4px solid #ffdf00; outline-offset:0; }
 .home-page .home-practice-grid .daily-meme { height:var(--home-preview-height,360px); width:100%; box-sizing:border-box; border:8px solid #fff; border-radius:12px; overflow:hidden; }

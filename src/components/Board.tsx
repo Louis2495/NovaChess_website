@@ -415,13 +415,12 @@ export function Board({
           })) layout.style.setProperty(name, `${value}px`);
         }
       }
-      if (!compact && window.innerWidth > 1000) {
-        const layout=el.closest<HTMLElement>(".speedrun-match");
-        if(layout){
-          const bounds=layout.getBoundingClientRect(),center=document.documentElement.clientWidth/2;
-          const width=Math.max(160,Math.min(requestedBoardSize.current ?? heightLimit,heightLimit,2*(center-bounds.left-152),2*(bounds.right-center-244)));
-          layout.style.setProperty("--speedrun-board-width",`${width}px`);
-          layout.style.setProperty("--speedrun-board-left",`${center-bounds.left-width/2}px`);
+      if (!compact && column) {
+        const match = column.parentElement;
+        if (match?.matches(".play-match, .online-match")) {
+          const bounds = match.getBoundingClientRect();
+          match.style.setProperty("--match-center", `${document.documentElement.clientWidth / 2 - bounds.left}px`);
+          match.style.setProperty("--match-board-top", `${rect.top - bounds.top}px`);
         }
       }
       // Let the layout place its controls immediately beside the largest
@@ -440,6 +439,8 @@ export function Board({
     observer.observe(el);
     if (el.parentElement) observer.observe(el.parentElement);
     if (!compact) {
+      const matchColumn = el.closest(".play-match > .board-column, .online-match > .board-column");
+      if (matchColumn) observer.observe(matchColumn);
       const workspace=el.closest(".workspace");
       if(workspace)observer.observe(workspace);
     }

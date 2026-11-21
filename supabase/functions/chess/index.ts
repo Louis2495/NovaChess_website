@@ -181,6 +181,16 @@ Deno.serve(async (req) => {
       if (error) throw error;
       return data;
     }
+    if (action === "cancel_friend_request") {
+      if (r.host !== uid || !r.settings.invitedFriend)
+        throw Error("Only the sender can cancel this game request.");
+      if (status === "cancelled") return json(r);
+      if (status !== "waiting" || members.some(member => member.id === r.settings.invitedFriend))
+        throw Error("This game request is no longer pending.");
+      status = "cancelled";
+      return json(await commit());
+    }
+    if (status === "cancelled") throw Error("This game request was canceled.");
     if (action === "join") {
       if(r.settings.invitedFriend && r.settings.invitedFriend!==uid && !me)throw Error("This game is reserved for an invited friend.");
       if (me && r.mode !== "throne") return json(r);

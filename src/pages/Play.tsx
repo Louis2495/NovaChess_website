@@ -952,23 +952,6 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
             )}
           </div>
           <div className="side-panels match-sidebar">
-            {game.variant === "bughouse" && game.partner && (
-              <Card className="partner-board">
-                <h2>Partner board</h2>
-                <p className="caption">
-                  Three local opponents · captures transfer between boards
-                </p>
-                <Board
-                  fen={game.partner.positions.at(-1)!}
-                  disabled
-                  flipped={game.human === "w"}
-                  compact
-                />
-                <p className="caption">
-                  {game.partner.notation.slice(-6).join(" ") || "Ready"}
-                </p>
-              </Card>
-            )}
             {game.result === "*" ? (
               <div className="game-actions">
                 <Button
@@ -1068,6 +1051,23 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                   New game
                 </Button>
               </div>
+            )}
+            {game.variant === "bughouse" && game.partner && (
+              <Card className="partner-board">
+                <h2>Partner board</h2>
+                <p className="caption">
+                  Three local opponents · captures transfer between boards
+                </p>
+                <Board
+                  fen={game.partner.positions.at(-1)!}
+                  disabled
+                  flipped={game.human === "w"}
+                  compact
+                />
+                <p className="caption">
+                  {game.partner.notation.slice(-6).join(" ") || "Ready"}
+                </p>
+              </Card>
             )}
             {game.variant !== "cvfog" && (
               <Card>

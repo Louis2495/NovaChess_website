@@ -42,6 +42,7 @@ type Member = { id: string; team: "w" | "b" | null; board?:number };
 type LastGame={id:string;result:string;white:string;black:string;reason:string;resignedBy?:string;position?:Room["state"]};
 type Room = {
   id: string;
+  host: string;
   name: string;
   mode: string;
   variant: string;
@@ -52,7 +53,7 @@ type Room = {
   deadline: string | null;
   revision: number;
   marks: BoardMark[];
-  settings: { bot: boolean };
+  settings: { bot: boolean; invitedFriend?: string };
 };
 type Profile = { id: string; username: string;screen_name?:string; rating?:number };
 export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0, children, friendSettingsHost}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number; children?:ReactNode; friendSettingsHost?:HTMLElement|null}) {
@@ -180,6 +181,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
         revision: base?.revision,
         ...extra,
       });
+      if (action === "cancel_friend_request") {
+        if (routeRef.current === base?.id) navigate("play");
+        return;
+      }
       if (result.id) {
         acceptRoom(result);
         if (!roomId) navigate(result.mode === "standard" && result.variant === "chess" ? "play" : "variants", "online/"+result.id);
@@ -308,6 +313,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
     } catch (e) { setError((e as Error).message);notify((e as Error).message); }
     finally { setBusy(false); }
   }
+  const canCancelFriendRequest = room?.status === "waiting" && room.host === uid &&
+    !!room.settings.invitedFriend && !room.members.some(member => member.id === room.settings.invitedFriend);
   const selectedDescription = mode === "throne" ? "Winner stays. Queue to challenge."
     : mode === "vote" ? "One day per move. Earliest vote breaks a tie."
     : mode === "team" ? "Invite friends to your side. Share moves and arrows."
@@ -333,8 +340,18 @@ export default function Community({presetMode = "standard", presetVariant = "che
               {error}
             </div>
           )}
-          {room ? (
+          {room?.status === "cancelled" ? (
+            <Card>
+              <p>This game request was canceled.</p>
+              <Button onClick={() => navigate("play")}>Back to Play</Button>
+            </Card>
+          ) : room ? (
             <div className="chess-layout online-match">
+              {canCancelFriendRequest && (
+                <Button className="cancel-friend-request secondary" disabled={busy} onClick={() => void act("cancel_friend_request")}>
+                  <X size={20} /> Cancel request
+                </Button>
+              )}
 
               <div className="board-column">
                 {playerStrip(viewFlipped ? "w" : "b", "top")}

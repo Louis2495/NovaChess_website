@@ -214,8 +214,8 @@ test('online clocks align right, identities align left and actions sit in the ri
  await expect(page.locator('.player-top')).toContainText('Opponent');await expect(page.locator('.player-bottom')).toContainText('Player');
  await expect(page.locator('.player-top').getByRole('timer',{name:'White clock',exact:true})).toBeVisible();await expect(page.locator('.player-bottom').getByRole('timer',{name:'Black clock',exact:true})).toBeVisible();
  const board=(await page.locator('.board').boundingBox())!,top=(await page.locator('.player-top').boundingBox())!,bottom=(await page.locator('.player-bottom').boundingBox())!,actions=(await page.getByRole('complementary',{name:'Game actions'}).boundingBox())!;
- const layout=(await page.locator('.online-match').boundingBox())!;
- expect(Math.abs(board.x-layout.x)).toBeLessThan(2);
+ const center=await page.evaluate(()=>document.documentElement.clientWidth/2);
+ expect(Math.abs(board.x+board.width/2-center)).toBeLessThan(2);
  expect(Math.abs(actions.y-board.y)).toBeLessThan(2);
  expect(Math.abs(top.x-board.x)).toBeLessThan(2);expect(Math.abs(bottom.x-board.x)).toBeLessThan(2);expect(top.y+top.height).toBeLessThanOrEqual(board.y);expect(bottom.y).toBeGreaterThanOrEqual(board.y+board.height);expect(actions.x).toBeGreaterThanOrEqual(board.x+board.width);
  for (const strip of [page.locator('.player-top'), page.locator('.player-bottom')]) {
@@ -229,6 +229,29 @@ test('online clocks align right, identities align left and actions sit in the ri
 test('Play a Friend chooses an accepted friend and creates a reserved game without matchmaking',async({page})=>{
  const env=await connected(page);await page.route('**/rest/v1/rpc/player_directory',r=>r.fulfill({json:[{id:peer,screen_name:'Chess buddy',rating:1400,relationship:'friends',online:true}]}));await page.goto('/#play');const friendButton=page.getByRole('button',{name:'Play a Friend',exact:true}),start=page.getByRole('button',{name:'Start',exact:true});await expect(friendButton).toBeEnabled();await expect(start).toBeVisible();const f=(await friendButton.boundingBox())!,s=(await start.boundingBox())!;expect(f.y+f.height).toBeLessThan(s.y);await friendButton.click();await page.getByRole('dialog').getByRole('button',{name:/Chess buddy/}).click();await expect(page.getByRole('textbox',{name:'Selected friend',exact:true})).toHaveValue('Chess buddy');expect(env.actions).toHaveLength(0);await expect(page.locator('.play-hub-heading').getByRole('textbox',{name:'Selected friend',exact:true})).toBeVisible();await page.getByRole('button',{name:'Remove selected friend',exact:true}).click();await expect(friendButton).toBeVisible();await friendButton.click();await page.getByRole('dialog').getByRole('button',{name:/Chess buddy/}).click();await expect(page).toHaveURL(/#play$/);await page.getByRole('group',{name:'Time control',exact:true}).getByRole('button',{name:'5',exact:true}).click();await expect(page.getByRole('textbox',{name:'Selected friend',exact:true})).toHaveValue('Chess buddy');await start.click();
  await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);expect(env.actions[0]).toMatchObject({action:'create',mode:'standard',variant:'chess',bot:false,friend:peer,timeControlSeconds:300});expect(env.requests.some(u=>u.pathname.endsWith('/room_lobby'))).toBe(false);
+});
+
+test('a pending Play a Friend request can be canceled from the left of the board',async({page})=>{
+ const env=await connected(page);
+ Object.assign(env.room,{host:uid,members:[{id:uid,team:'w'}],status:'waiting',settings:{bot:false,invitedFriend:peer}});
+ await page.route('**/functions/v1/chess',async route=>{
+  const body=route.request().postDataJSON();
+  env.actions.push(body);
+  await route.fulfill({json:{...env.room,status:'cancelled',revision:1}});
+ });
+ await page.goto('/#play/online/'+roomId);
+ const cancel=page.getByRole('button',{name:'Cancel request',exact:true}),board=page.locator('.online-match .board');
+ await expect(cancel).toBeVisible();
+ for(const width of [1440,1100,390]){
+  await page.setViewportSize({width,height:900});
+  await expect.poll(async()=>{
+   const [c,b]=await Promise.all([cancel.boundingBox(),board.boundingBox()]);
+   return !!c&&!!b&&c.height>=56&&(width>1000?c.x+c.width<=b.x&&Math.abs(c.y-b.y)<2:c.y+c.height<=b.y);
+  }).toBe(true);
+ }
+ await cancel.click();
+ await expect(page).toHaveURL(/#play$/);
+ expect(env.actions).toEqual([expect.objectContaining({action:'cancel_friend_request',room:roomId})]);
 });
 
 test('finished game has a sad king, paired notation, review and outside-board dismissal',async({page})=>{
@@ -345,6 +368,22 @@ test('Friends loads beyond fifty people without pagination controls',async({page
  await expect(offline.locator('.player-card').getByRole('heading').last()).toHaveText('Friend 51');
  await page.getByRole('button',{name:'Everyone',exact:true}).click();await page.getByLabel('Search players',{exact:true}).fill('Friend');await expect(page.locator('.players-pagination')).toBeVisible();
  await page.goto('/#play');await page.getByRole('button',{name:'Play a Friend',exact:true}).click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:/^Friend 51 /})).toBeVisible();await expect(dialog.getByRole('button',{name:'Previous',exact:true})).toHaveCount(0);await expect(dialog.getByRole('button',{name:'Next',exact:true})).toHaveCount(0);
+});
+
+test('Players can challenge someone without adding them as a friend',async({page})=>{
+ const env=await connected(page);
+ await page.route('**/rest/v1/rpc/player_directory',async route=>{
+  const {p_section}=route.request().postDataJSON();
+  await route.fulfill({json:p_section==='everyone'?[{id:peer,screen_name:'Friendly Knight',rating:1450,relationship:'none',online:true}]:[]});
+ });
+ await page.goto('/#players');
+ await page.getByRole('button',{name:'Everyone',exact:true}).click();
+ await page.getByRole('searchbox',{name:'Search players'}).fill('Kn');
+ const row=page.locator('.player-card').filter({hasText:'Friendly Knight'});
+ await expect(row.getByRole('button',{name:'Add friend',exact:true})).toBeVisible();
+ await row.getByRole('button',{name:'Play',exact:true}).click();
+ await expect(page).toHaveURL(/#play\/online(?:\/|%2F)/);
+ expect(env.actions).toEqual([expect.objectContaining({action:'create',mode:'standard',variant:'chess',friend:peer,timeControlSeconds:180})]);
 });
 
 test('Everyone waits for two search characters and hides results when cleared',async({page})=>{
