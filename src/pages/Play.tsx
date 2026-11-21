@@ -1,7 +1,7 @@
 import {SavedBoardPlayer} from "../components/BoardPlayer";
 import OpeningPicker from "../components/OpeningPicker";
 import { useReviewWarmup } from "../lib/useReviewWarmup";
-import { duration } from "../lib/speedrun";
+import { clampSpeedrunRating, duration, speedrunMaxRating, speedrunMinRating, speedrunRatingStep } from "../lib/speedrun";
 import { weakComputerMove } from "../lib/computerStrength";
 import { matchTypedMove } from "../lib/moves";
 import { previewPremoves } from "../lib/premoves";
@@ -269,7 +269,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
       opponent: "Computer",
       humanRating: library.localRating,
       opponentChoice: choice,
-      botRating: speedrunMode ? Math.max(100,Math.min(3000,Math.round(speedrunRating/50)*50)) : choice === "Current rating" ? library.localRating : rating,
+      botRating: speedrunMode ? clampSpeedrunRating(speedrunRating) : choice === "Current rating" ? library.localRating : rating,
       speedrun: speedrunMode ? {elapsedMs:0,turnStartedAt:human === "w" ? Date.now() : null} : undefined,
       rated: !speedrunMode && rated && variant === "chess",
       requestedOpening: speedrunMode ? "" : openingId,
@@ -657,7 +657,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
             ))}
 
           </div>}
-          {speedrunMode && <Card className="speedrun-setup"><p className="caption">Beat the computer as fast as possible</p><Field label="Computer Elo"><input type="number" min={100} max={3000} step={50} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(Math.max(100,Math.min(3000,Math.round((speedrunRating||100)/50)*50)))}/></Field></Card>}
+          {speedrunMode && <Card className="speedrun-setup"><p className="caption">Beat the computer as fast as possible</p><Field label="Computer Elo"><input type="number" min={speedrunMinRating} max={speedrunMaxRating} step={speedrunRatingStep} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(clampSpeedrunRating(speedrunRating || speedrunMinRating))}/></Field></Card>}
           <Card className="game-settings-card">
             <button
               className="options-toggle"

@@ -4,6 +4,7 @@ import Play from "./Play";
 import Community from "./Community";
 import {variantList,variantRank} from "../lib/variantCatalog";
 import {base} from "../lib/store";
+import {clampSpeedrunRating} from "../lib/speedrun";
 import VariantIcon from "../components/VariantIcon";
 import MultiplayerPicture from "../components/MultiplayerPicture";
 
@@ -22,7 +23,7 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
   const online = opponent === "online";
   if (detail.startsWith("online/")) return <Community />;
   const speedrunMatch = /^speedrun\/(\d+)$/.exec(detail);
-  if(speedrunMatch)return <Play speedrunElo={Math.max(100,Math.min(3000,Math.round(Number(speedrunMatch[1])/50)*50))}/>;
+  if(speedrunMatch)return <Play speedrunElo={clampSpeedrunRating(Number(speedrunMatch[1]))}/>;
   if (detail === "resume") return <Play variantsOnly={variants} />;
   return <div className={`play-hub ${variants ? "variants-hub" : "standard-play-hub"} ${playing ? "match-active" : "setup-active"} ${online ? "online-opponent" : "computer-opponent"}`}>
     {!playing && <div className="play-hub-heading">

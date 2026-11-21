@@ -1,6 +1,6 @@
 import "./stats-dashboard.css";
 import { variantList } from "../lib/variantCatalog";
-import { duration, speedrunBests, throneDuration } from "../lib/speedrun";
+import { duration, speedrunBests, speedrunMaxRating, speedrunMinRating, speedrunRatingStep, throneDuration } from "../lib/speedrun";
 import { online, useOnlineSession } from "../lib/online";
 import { isStudy } from "../lib/library";
 import Rankings from "./Rankings";
@@ -261,7 +261,7 @@ function VariantStats({games, speedrunGames, since}: {games:SavedGame[]; speedru
  const [total,setTotal]=useState(0),[throneGames,setThroneGames]=useState(0),[metric,setMetric]=useState("Time"),[error,setError]=useState("");
  useEffect(()=>{setTotal(0);setThroneGames(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_stats", since === null ? {} : {p_since:new Date(since).toISOString()});if(active){setTotal(Number(r.data?.timeMs)||0);setThroneGames(Number(r.data?.games)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id,since]);
  const bests=new Map(speedrunBests(speedrunGames));
- const ratings = Array.from({length:59}, (_, i) => 100+i*50);
+ const ratings = Array.from({length:(speedrunMaxRating - speedrunMinRating) / speedrunRatingStep + 1}, (_, i) => speedrunMinRating + i * speedrunRatingStep);
  return <div className="stats-competition">
       <Card className="variant-breakdown-card">
         <div className="variant-breakdown">

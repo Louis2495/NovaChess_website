@@ -9,13 +9,13 @@ test('Stats uses a quiet overview, outcome splits and a separate competition tab
  const overviewWidth = (await page.locator('.stats-metrics').boundingBox())!.width;
  await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();
  await expect(page.locator('.variant-breakdown .stat-bar')).toBeVisible();await expect(page.locator('.variant-breakdown summary')).toHaveCount(0);
- const throne=page.getByRole('group',{name:'Throne metric',exact:true});await throne.getByRole('button',{name:'Games',exact:true}).click();await expect(page.locator('.competition-total')).toHaveText('0');await throne.getByRole('button',{name:'Time',exact:true}).click();await expect(page.locator('.competition-total')).toHaveText('0:00:00');await expect(page.locator('.speedrun-rating')).toHaveCount(59);await expect(page.locator('.speedrun-rating').first()).toContainText('100');await expect(page.locator('.speedrun-rating').last()).toContainText('3000');const s=(await page.locator('.speedrun-stats').boundingBox())!;expect(Math.abs(s.width-overviewWidth)).toBeLessThan(2);await expect(page.locator('.speedrun-stats h2')).toHaveCSS('font-weight','650');
+ const throne=page.getByRole('group',{name:'Throne metric',exact:true});await throne.getByRole('button',{name:'Games',exact:true}).click();await expect(page.locator('.competition-total')).toHaveText('0');await throne.getByRole('button',{name:'Time',exact:true}).click();await expect(page.locator('.competition-total')).toHaveText('0:00:00');await expect(page.locator('.speedrun-rating')).toHaveCount(60);await expect(page.locator('.speedrun-rating').first()).toContainText('100');await expect(page.locator('.speedrun-rating').last()).toContainText('3050');const s=(await page.locator('.speedrun-stats').boundingBox())!;expect(Math.abs(s.width-overviewWidth)).toBeLessThan(2);await expect(page.locator('.speedrun-stats h2')).toHaveCSS('font-weight','650');
 });
 
 test('Speedrun rating squares start a local game at the selected Elo',async({page})=>{
- await page.goto('/#stats');await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();await page.getByRole('button',{name:'Play Speedrun at 1500 Elo',exact:true}).click();
+ await page.goto('/#stats');await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();await page.getByRole('button',{name:'Play Speedrun at 3050 Elo',exact:true}).click();
  await expect(page.locator('.play-match')).toBeVisible();
- const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).activeGame);expect(game.botRating).toBe(1500);expect(game.title).toBe('Speedrun');expect(game.speedrun.invalid).not.toBe(true);
+ const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).activeGame);expect(game.botRating).toBe(3050);expect(game.title).toBe('Speedrun');expect(game.speedrun.invalid).not.toBe(true);
 });
 test('variant breakdown uses display names',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('novachess-library-v2',JSON.stringify({games:[{id:'fog-game',title:'Fog',variant:'cvfog',folder:'Games',moves:['e2e4'],result:'1-0',human:'w',created:Date.now()}]})));
@@ -56,7 +56,7 @@ test('Stats period follows the user across the overview, competition, achievemen
   await expect(page.getByRole('img',{name:'White: 1 wins, 0 losses, 0 draws'})).toBeVisible();
   await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();
   const ratings = page.getByRole('list',{name:'Fastest wins by computer rating'});
-  await expect(ratings.getByRole('listitem')).toHaveCount(59);
+  await expect(ratings.getByRole('listitem')).toHaveCount(60);
   const positions = await ratings.getByRole('button').evaluateAll(buttons => {
     const cards = buttons.map(button => button.getBoundingClientRect());
     const firstRow = cards.filter(card => card.top === cards[0].top);

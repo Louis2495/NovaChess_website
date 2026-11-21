@@ -13,17 +13,17 @@ test('winning a Speedrun archives a stopped record while losses are excluded',as
  await page.goto('/#play/resume');const board=page.locator('.play-match .board');await board.getByRole('button',{name:'g6, white queen',exact:true}).click();await board.getByRole('button',{name:'g7, empty',exact:true}).click();await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).games.length)).toBe(1);const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).games[0]);expect(game.result).toBe('1-0');expect(game.speedrun.elapsedMs).toBeGreaterThan(2000);expect(game.speedrun.turnStartedAt).toBeNull();await page.goto('/#stats');await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();await expect(page.locator('.speedrun-rating.has-record')).toHaveCount(1);
 });
 
-test('Speedrun ratings run from 100 to 3000 without a ratings filter',async({page})=>{
+test('Speedrun ratings run from 100 to 3050 without a ratings filter',async({page})=>{
  await page.goto('/#stats');await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();
  const grid=page.getByRole('list',{name:'Fastest wins by computer rating'}),cards=grid.getByRole('listitem');
- await expect(cards).toHaveCount(59);
+ await expect(cards).toHaveCount(60);
  await expect(cards.first().getByRole('button')).toHaveAttribute('aria-label','Play Speedrun at 100 Elo');
- await expect(cards.last().getByRole('button')).toHaveAttribute('aria-label','Play Speedrun at 3000 Elo');
+ await expect(cards.last().getByRole('button')).toHaveAttribute('aria-label','Play Speedrun at 3050 Elo');
  await expect(page.getByLabel('Speedrun rating range')).toHaveCount(0);
  await page.goto('/#variants');await page.getByRole("button",{name:"Computer",exact:true}).click();await page.getByRole('button',{name:'Speedrun',exact:true}).click();
  const elo=page.getByRole('spinbutton',{name:'Computer Elo',exact:true});
- await expect(elo).toHaveAttribute('min','100');await expect(elo).toHaveAttribute('max','3000');await expect(elo).toHaveAttribute('step','50');
+ await expect(elo).toHaveAttribute('min','100');await expect(elo).toHaveAttribute('max','3050');await expect(elo).toHaveAttribute('step','50');
  await elo.fill('50');await elo.blur();await expect(elo).toHaveValue('100');
- await elo.fill('3050');await elo.blur();await expect(elo).toHaveValue('3000');
+ await elo.fill('3100');await elo.blur();await expect(elo).toHaveValue('3050');
  await elo.fill('1226');await elo.blur();await expect(elo).toHaveValue('1250');
 });

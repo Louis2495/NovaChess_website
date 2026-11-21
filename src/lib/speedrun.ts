@@ -1,4 +1,13 @@
 import type { SavedGame } from './types';
+
+export const speedrunMinRating = 100;
+export const speedrunMaxRating = 3050;
+export const speedrunRatingStep = 50;
+
+export function clampSpeedrunRating(rating: number) {
+  const rounded = Math.round(rating / speedrunRatingStep) * speedrunRatingStep;
+  return Math.max(speedrunMinRating, Math.min(speedrunMaxRating, rounded));
+}
 export function duration(ms: number, omitZeroMinutes = false) {
  const seconds=Math.floor(Math.max(0,ms)/1000);
  if(omitZeroMinutes && seconds<60)return `${seconds}.${Math.floor(Math.max(0,ms)%1000/100)}`;
