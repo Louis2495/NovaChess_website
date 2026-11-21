@@ -924,3 +924,28 @@ test("Bughouse preserves an invited rival's seat and places invited partners on 
   assert.equal(matched.status,200,JSON.stringify(matched.data));
   assert.deepEqual(matched.data.members.find(member=>member.id===rivalPartner),{id:rivalPartner,board:1,team:"w"});
 });
+
+test("standard chess can be left before the player's first move without a result", async () => {
+  let game=await room("standard",{variant:"chess",timeControlSeconds:180});
+  const waiting=await command(users[0],game,"leave");
+  assert.equal(waiting.status,200,JSON.stringify(waiting.data));
+  assert.equal(waiting.data.status,"cancelled");
+  assert.equal(waiting.data.state.result,"*");
+
+  game=await room("standard",{variant:"chess",timeControlSeconds:180});
+  game=(await command(users[1],game,"join")).data;
+  game=(await command(users[0],game,"move",{move:"e2e4"})).data;
+  assert.equal((await command(users[0],game,"leave")).status,400);
+  const left=await command(users[1],game,"leave");
+  assert.equal(left.status,200,JSON.stringify(left.data));
+  assert.equal(left.data.status,"cancelled");
+  assert.equal(left.data.state.result,"*");
+  assert.equal(left.data.state.clock.startedAt,null);
+
+  game=await room("standard",{variant:"chess",timeControlSeconds:180});
+  game=(await command(users[1],game,"join")).data;
+  game=(await command(users[0],game,"move",{move:"e2e4"})).data;
+  const resigned=await command(users[0],game,"resign");
+  assert.equal(resigned.status,200,JSON.stringify(resigned.data));
+  assert.equal(resigned.data.state.result,"0-1");
+});

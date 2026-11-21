@@ -137,17 +137,23 @@ export default function Community({presetMode = "standard", presetVariant = "che
     for(const p of data||[])profileCache.current.set(p.id,p);
     setProfiles([...profileCache.current.values()]);
   },[]);
+  const navigateRef=useRef(navigate);
+  navigateRef.current=navigate;
   const load=useCallback(async()=>{
     if(!online || !uid)return;
     if(roomId){
       const {data,error}=await online.from("rooms").select("*").eq("id",roomId).single();
       if(routeRef.current!==roomId)return;
       if(error){setError(error.message);return;}
+      if(data && tab==="play" && (data.mode!=="standard" || data.variant!=="chess")){
+        navigateRef.current("variants","online/"+roomId);
+        return;
+      }
       if(data){acceptRoom(data);void loadProfiles([...data.members.map((m:Member)=>m.id),...data.state.lastGame?[data.state.lastGame.white,data.state.lastGame.black]:[]]);}
     }else{
       setConfirmed(null);setPrediction(null);
     }
-  },[uid,roomId,loadProfiles,acceptRoom]);
+  },[uid,roomId,loadProfiles,acceptRoom,tab]);
   useEffect(()=>{
     void load();if(!online || !uid)return;
     const refresh=()=>{if(document.visibilityState!=="hidden"){void load();if(confirmedRef.current?.state.clock || confirmedRef.current?.state.speedrun)void syncOnlineClock();}};
@@ -207,8 +213,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
         revision: base?.revision,
         ...extra,
       });
-      if (action === "cancel_friend_request") {
-        if (routeRef.current === base?.id) navigate("play");
+      if (action === "cancel_friend_request" || action === "leave") {
+        if (routeRef.current === base?.id) navigate(base?.mode === "standard" && base.variant === "chess" ? "play" : "variants");
         return;
       }
       if (result.id) {
@@ -289,6 +295,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
   let seen:string|undefined=dismissed[resultKey];try{seen ||= sessionStorage.getItem('novachess-result-'+resultKey)||undefined;}catch{}
   const showLast=!!last && [last.white,last.black].includes(uid||'') && last.id!==seen;
   const dismissResult=()=>{if(!last)return;setDismissed(d=>({...d,[resultKey]:last.id}));try{sessionStorage.setItem('novachess-result-'+resultKey,last.id);}catch{}premove.clear();};
+  const canLeave = room?.mode === "standard" && room.variant !== "bughouse" && !!me?.team &&
+    room.state.moves.length <= (me.team === "b" ? 1 : 0);
   const clockSide=room?.state.fen.split(' ')[1] as 'w'|'b',gameClock=room?.state.clock;
   const remaining=(side:'w'|'b')=>gameClock?Math.max(0,gameClock.remaining[side]-(room?.status==='playing' && clockSide===side && gameClock.startedAt!==null?Math.max(0,onlineNow()-gameClock.startedAt):0)):0;
   const timeoutRequested=useRef({key:'',at:0});
@@ -323,7 +331,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
     const members = room.members.filter(m => m.team === side &&
       (room.variant !== "bughouse" || (m.board || 0) === (me?.board || 0)));
     return <div className={`online-player-strip player-${placement}`} aria-label={`${side === "w" ? "White" : "Black"} player`}>
-      {gameClock && <span className="online-player-clock" role="timer" aria-label={`${side === "w" ? "White" : "Black"} clock`}>{duration(remaining(side)).split('.')[0]}</span>}
+      {gameClock && <span className={`online-player-clock turn-clock${room.status === "playing" && room.state.result === "*" && clockSide === side ? " is-active" : ""}`} role="timer" aria-label={`${side === "w" ? "White" : "Black"} clock`}>{duration(remaining(side)).split('.')[0]}</span>}
+      {room.state.speedrun && me?.team === side && <span className={`online-player-clock turn-clock speedrun-clock${canMove ? " is-active" : ""}`} role="timer" aria-label="Your move time">
+        {duration(room.state.speedrun.elapsed[side]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}
+      </span>}
       <div className="online-player-identity">{members.map(member => {
         const profile = profiles.find(p => p.id === member.id);
         return <div key={member.id}><b><GameScore result={position?.result} side={side}/> {username(member.id)}</b><span className="caption">{profile?.rating ?? "—"}</span></div>;
@@ -405,7 +416,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
           )}
           {room?.status === "cancelled" ? (
             <Card>
-              <p>This game request was canceled.</p>
+              <p>This game was canceled.</p>
               <Button onClick={() => navigate("play")}>Back to Play</Button>
             </Card>
           ) : room ? (
@@ -417,7 +428,6 @@ export default function Community({presetMode = "standard", presetVariant = "che
               )}
 
               <div className="board-column">
-                {room.state.speedrun && me?.team && <div className="speedrun-clock" role="timer" aria-label="Your move time">{duration(room.state.speedrun.elapsed[me.team]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}</div>}
                 {playerStrip(viewFlipped ? "w" : "b", "top")}
                 {room.variant === "blindtext" ? <form onSubmit={e=>{e.preventDefault();if(!ff || !position || (!canMove && !appearance.premoves))return;const b=new ff.Board("chess",canMove?position.fen:premove.preview);try{const move=matchTypedMove(typed,(canMove?legal:premove.options).map(m=>{let san=m;try{san=b.sanMove(m);}catch{}return {uci:m,san};}));if(move){if(canMove)void submitMove(move).then(()=>setTyped("")).catch(()=>{});else{premove.enqueue(move);setTyped("");}}}finally{b.delete();}}}><Field label="Blindfold move"><input value={typed} onChange={e=>setTyped(e.target.value)} autoComplete="off" disabled={room.status!=="playing" || room.state.result!=="*" || !me?.team || (!canMove && !appearance.premoves)}/></Field><Button disabled={room.status!=="playing" || room.state.result!=="*" || !me?.team || (!canMove && !appearance.premoves)}>{canMove?"Move":"Queue premove"}</Button></form> : <Board
                   fen={duck?.fen || premove.preview}
@@ -529,10 +539,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
                     <Button
                       className="resign-button"
                       disabled={busy || room.state.result !== "*"}
-                      onClick={() => void act("resign")}
+                      onClick={() => void act(canLeave ? "leave" : "resign")}
                     >
                       <Flag size={16} />
-                      Resign
+                      {canLeave ? "Leave" : "Resign"}
                     </Button>
                   )}
 

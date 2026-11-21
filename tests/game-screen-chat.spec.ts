@@ -34,9 +34,9 @@ test("games maximize the board, omit typing/pause/game settings, show player nam
       .boundingBox())!,
     notation = (await page.locator(".match-notation").boundingBox())!;
   expect(actions.y + actions.height).toBeLessThan(notation.y);
-  await page.getByRole("button", { name: "Resign", exact: true }).click();
+  await page.getByRole("button", { name: "Leave", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "New game", exact: true }),
+    page.getByRole("button", { name: "Start game", exact: true }),
   ).toBeVisible();
 });
 test("illegal drops return silently and global chat supports a draft without pretending to be connected", async ({

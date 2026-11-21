@@ -48,6 +48,7 @@ export default function SpecialPlay({
   });
   const state = saved.state,
     side = saved.human;
+  const hasMoved = state.moves.length > (side === "b" ? 1 : 0);
   const [boardFlipped,setBoardFlipped]=useState(side==='b');
   const [armed, setArmed] = useState<"" | "freeze" | "swap">(""),
     [first, setFirst] = useState(""),
@@ -214,15 +215,17 @@ export default function SpecialPlay({
             <Button
               className="resign-button"
               disabled={state.result !== "*"}
-              onClick={() =>
-                setSaved((s) => ({
-                  ...s,
-                  state: { ...s.state, result: side === "w" ? "0-1" : "1-0" },
-                }))
-              }
+              onClick={() => {
+                if (!hasMoved) {
+                  setLibrary(l => l.activeGame?.id === saved.id ? { ...l, activeGame: null } : l);
+                  onBack();
+                  return;
+                }
+                setSaved(s => ({ ...s, state: { ...s.state, result: side === "w" ? "0-1" : "1-0" } }));
+              }}
             >
               <Flag size={16} />
-              Resign
+              {hasMoved ? "Resign" : "Leave"}
             </Button>
             <Button
               className="draw-button"

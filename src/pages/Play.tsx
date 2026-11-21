@@ -147,6 +147,8 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
     [busy, setBusy] = useState(false);
   const { data: openings } = useData<Opening[]>("openings");
   const game = library.activeGame;
+  const canResume = game?.result === "*" && (variantsOnly ? game.variant !== "chess" || !!game.speedrun : game.variant === "chess" && !game.speedrun);
+  const hasMoved = !!game && (game.moves.length > (game.human === "b" ? 1 : 0) || !!game.partner?.moves.length);
   useEffect(()=>onPlayingChange?.(playing || !!special),[playing,special,onPlayingChange]);
   useEffect(() => { if (!game?.speedrun || game.result !== "*") return; const tick=setInterval(()=>setClockNow(Date.now()),100); return ()=>clearInterval(tick); },[game?.id,game?.result]);
   const live = useRef(game);
@@ -583,6 +585,11 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
     setConfirm(false);
     setPremoves([]);
   }
+  function leave() {
+    setLibrary(l => l.activeGame?.id === game?.id ? {...l, activeGame:null} : l);
+    if (detail === "resume" || speedrunElo !== undefined) navigate(variantsOnly || speedrunElo !== undefined ? "variants" : "play");
+    else setPlaying(false);
+  }
   const launchedSpeedrun = useRef(false);
   useEffect(()=>{
     if(speedrunElo !== undefined && ff && !launchedSpeedrun.current){launchedSpeedrun.current=true;start();}
@@ -603,6 +610,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
         }}
       />
     );
+  const moveTime = game?.speedrun && <span className={`turn-clock speedrun-clock${game.result === "*" && valid?.turn === game.human ? " is-active" : ""}`} role="timer" aria-label="Your move time"><Timer size={18}/>{duration(game.speedrun.elapsedMs + (game.result === "*" && game.speedrun.turnStartedAt !== null ? Math.max(0,clockNow-game.speedrun.turnStartedAt) : 0))}</span>;
   const speedrunEloField = <Field label="Computer Rating"><input type="number" min={speedrunMinRating} max={speedrunMaxRating} step={speedrunRatingStep} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(clampSpeedrunRating(speedrunRating || speedrunMinRating))}/></Field>;
   const gameOptions = options && (
     <div className={`game-options${variantsOnly ? " variant-dialog-options" : ""}`}>
@@ -719,7 +727,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
               >
                 Start game
               </Button>
-              {game?.result === "*" && (
+              {canResume && game && (
                 <button
                   className="resume-link resume-game-button"
                   onClick={() => {
@@ -790,7 +798,6 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
           }
         >
           <div className="board-column">
-            {game.speedrun && <div className="speedrun-clock" role="timer" aria-label="Your move time"><Timer size={18}/>{duration(game.speedrun.elapsedMs + (game.result === "*" && game.speedrun.turnStartedAt !== null ? Math.max(0,clockNow-game.speedrun.turnStartedAt) : 0))}</div>}
             <>
               <Pocket
                 value={
@@ -805,7 +812,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 enabled={false}
                 onSelect={() => {}}
               />
-              <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/>
+              <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top" clock={(flipped ? "w" : "b") === game.human ? moveTime : undefined}/>
               <Board
                 fen={duck?.fen || premove.preview}
                 overlayId={game.id + game.result}
@@ -865,7 +872,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                     : []
                 }
               />
-              <SavedBoardPlayer game={game} side={flipped?'b':'w'} placement="bottom"/>
+              <SavedBoardPlayer game={game} side={flipped?'b':'w'} placement="bottom" clock={(flipped ? "b" : "w") === game.human ? moveTime : undefined}/>
               <Pocket
                 value={
                   valid.turn === game.human ? (game.human === "w" ? valid.whitePocket : valid.blackPocket) : (premove.preview.match(/\[([^\]]*)\]/)?.[1] || "").split("").filter(p => (p === p.toUpperCase() ? "w" : "b") === game.human).join("")
@@ -1046,11 +1053,11 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 <Button
                   className="resign-button"
                   onClick={() =>
-                    appearance.confirmResign ? setConfirm(true) : resign()
+                    !hasMoved ? leave() : appearance.confirmResign ? setConfirm(true) : resign()
                   }
                 >
                   <Flag size={15} />
-                  Resign
+                  {hasMoved ? "Resign" : "Leave"}
                 </Button>
               </div>
             ) : (

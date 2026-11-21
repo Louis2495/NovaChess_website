@@ -224,6 +224,17 @@ Deno.serve(async (req) => {
       status = "cancelled";
       return json(await commit());
     }
+    if (action === "leave") {
+      if (status === "cancelled" && me?.team) return json(r);
+      if (r.mode !== "standard" || r.variant === "bughouse" || !me?.team ||
+          !["waiting", "playing"].includes(status) || state.result !== "*")
+        throw Error("This game cannot be left.");
+      if (state.moves.length > (me.team === "b" ? 1 : 0))
+        throw Error("You already moved. Resign to end the game.");
+      status = "cancelled";
+      if (state.clock) state = { ...state, clock: { ...state.clock, startedAt: null } };
+      return json(await commit());
+    }
     if (status === "cancelled") throw Error("This game request was canceled.");
     if (action === "join" && r.mode === "vote") {
       const {data,error}=await db.rpc("enter_vote_chess",{p_actor:uid,p_room:r.id,p_initial:null});
@@ -310,13 +321,10 @@ Deno.serve(async (req) => {
     if(action==="claim_timeout"){
       if(!me.team || status!=="playing" || state.result!=="*" || !expired)throw Error("The clock has not expired.");
     }
-    if (
-      !me.team ||
-      (!["resign", "draw", "decline_draw", "claim_timeout"].includes(action) && me.team !== turn) ||
-      status !== "playing" ||
-      state.result !== "*"
-    )
-      throw Error("It is not your team’s turn.");
+    if (!me.team || status !== "playing" || state.result !== "*")
+      throw Error("This game is not active.");
+    if (!["resign", "draw", "decline_draw", "claim_timeout"].includes(action) && me.team !== turn)
+      throw Error(r.mode === "standard" ? "It is not your turn." : "It is not your team’s turn.");
     if (
       !finishing && ["move", "vote", "resign", "draw", "decline_draw"].includes(action) &&
       body.revision !== r.revision

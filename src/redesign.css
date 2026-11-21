@@ -4453,7 +4453,7 @@ select.theme-select {
 @media(min-width:1001px){ .home-practice-grid .home-puzzle-content > .daily-board-preview { width:min(100%,360px,calc(var(--home-card-height) - 100px)); } }
 .speedrun-picture { display:grid; place-items:center; width:118px; height:118px; border-radius:24px; color:#ffe181; background:linear-gradient(145deg,#6542af,#284f86); }
 .speedrun-setup { max-width:320px; margin:20px auto; }
-.speedrun-clock { display:flex; align-items:center; justify-content:center; gap:8px; color:var(--accent); font-size:1.3rem; font-variant-numeric:tabular-nums; }
+.speedrun-clock { display:inline-flex; align-items:center; gap:6px; font-size:1.1rem; }
 .stats-competition-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-bottom:22px; }
 .stats-competition-grid h2 { display:flex; align-items:center; gap:9px; }
 .competition-total { display:block; font-size:2.3rem; margin-top:18px; font-variant-numeric:tabular-nums; }
@@ -5152,7 +5152,7 @@ html { scrollbar-gutter:stable; }
 
 /* Keep player identities and clocks beside their own edge of the board. */
 .online-match .online-player-strip { width:var(--actual-board-width,100%); max-width:100%; display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:48px; padding:0; box-sizing:border-box; }
-.online-player-clock { order:2; margin-left:auto; font-size:1.65rem; font-weight:700; font-variant-numeric:tabular-nums; flex:none; }
+.online-player-clock { order:2; min-inline-size:3.3em; font-size:1.45rem; text-align:center; }
 .online-player-identity { min-width:0; }
 .online-player-identity > div { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
 .online-match-actions { display:flex; flex-direction:row; flex-wrap:wrap; gap:12px; align-self:start; padding-top:0; }
@@ -5569,7 +5569,6 @@ html { scrollbar-gutter:stable; }
 
 @media(min-width:1001px) {
  .speedrun-match > .board-column { position:relative; }
- .speedrun-match .speedrun-clock { position:absolute; left:-152px; top:var(--board-center-y,50%); transform:translateY(-50%); width:128px; min-height:56px; display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; box-sizing:border-box; border:2px solid #ffdf00; border-radius:12px; background:var(--panel); color:#ffdf00; }
 }
 .online-match > .cancel-friend-request { min-height:56px; width:min(100%,var(--cancel-request-width,192px)); justify-content:center; }
 /* Center the board in the viewport while keeping the action rail beside it. */
@@ -5641,7 +5640,6 @@ html { scrollbar-gutter:stable; }
 .play-match .player-strip.player-bottom { justify-content:flex-start; text-align:left; }
 .online-player-strip.player-top .online-player-identity { order:2; margin-left:auto; text-align:right; }
 .online-player-strip.player-top .online-player-identity > div { justify-content:flex-end; }
-.online-player-strip.player-top .online-player-clock { order:0; margin-left:0; margin-right:auto; }
 .paired-game-moves { width:100%; border-collapse:collapse; table-layout:fixed; }
 .paired-game-moves th,.paired-game-moves td { padding:7px 5px; text-align:left; border-bottom:1px solid var(--border); }
 .paired-game-moves th:first-child { width:32px; color:var(--muted); }
@@ -5664,12 +5662,11 @@ html { scrollbar-gutter:stable; }
 .recent-game-preview > .board-frame { padding-block:22px; }
 .recent-game-preview > .board-frame > .material-top { top:0; }
 .recent-game-preview > .board-frame > .material-imbalance { bottom:0; }
-.online-player-strip.player-top:has(+ .board-frame) .online-player-identity { align-self:flex-end; transform:translateY(17px); }
-.board-frame + .online-player-strip.player-bottom .online-player-identity { align-self:flex-start; transform:translateY(-17px); }
+.online-player-strip.player-top:has(+ .board-frame) :is(.online-player-identity,.turn-clock) { align-self:flex-end; transform:translateY(17px); }
+.board-frame + .online-player-strip.player-bottom :is(.online-player-identity,.turn-clock) { align-self:flex-start; transform:translateY(-17px); }
 .board-player-score { margin-left:0; margin-right:3px; }
 .online-player-strip.player-top .online-player-identity { order:0; margin-left:0; text-align:left; }
 .online-player-strip.player-top .online-player-identity > div { justify-content:flex-start; }
-.online-player-strip.player-top .online-player-clock { order:2; margin-right:0; margin-left:auto; }
 @media(min-width:1201px) {
  .master-archive > .master-notes { padding-top:var(--replay-board-top,0px); }
 }
@@ -6134,3 +6131,26 @@ html { scrollbar-gutter:stable; }
   font-size:clamp(.6rem,2.4vw,.78rem);
   white-space:nowrap;
 }
+
+
+/* Use a steady outline to mark the active clock without moving either player row. */
+.turn-clock {
+  position:relative;
+  z-index:1;
+  flex:none;
+  margin-inline-start:auto;
+  padding:1px 8px;
+  border:1px solid transparent;
+  border-radius:7px;
+  color:var(--muted);
+  font-weight:500;
+  font-variant-numeric:tabular-nums;
+  line-height:1.12;
+}
+.turn-clock.is-active {
+  border-color:var(--accent);
+  background:var(--accent-soft);
+  color:var(--text);
+  font-weight:900;
+}
+.board-player-label:has(> .turn-clock) { padding-inline-end:0; }

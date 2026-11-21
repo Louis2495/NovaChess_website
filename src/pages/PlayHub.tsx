@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "../lib/context";
 import Play from "./Play";
 import Community from "./Community";
@@ -15,7 +15,12 @@ const onlineVariants = [
 ].sort((a,b)=>variantRank(a[0])-variantRank(b[0]));
 const teamModes = ["throne", "vote", "team"];
 export default function PlayHub({ variants = false }: { variants?: boolean }) {
-  const { detail } = useApp();
+  const { detail, library, navigate } = useApp();
+  const variantResume = !variants && detail === "resume" && library.activeGame &&
+    (library.activeGame.variant !== "chess" || !!library.activeGame.speedrun);
+  useEffect(() => {
+    if (variantResume) navigate("variants", "resume");
+  }, [variantResume, navigate]);
   const choice = variants ? /^choose\/(online\/)?([^/]+)$/.exec(detail) : null;
   const selectedVariant = onlineVariants.find(([id]) => id === choice?.[2])?.[0];
   const onlineOnly = selectedVariant && teamModes.includes(selectedVariant);
@@ -26,7 +31,8 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
   const online = opponent === "online";
   if (detail.startsWith("online/")) return <Community />;
   const speedrunMatch = /^speedrun\/(\d+)$/.exec(detail);
-  if(speedrunMatch)return <Play speedrunElo={clampSpeedrunRating(Number(speedrunMatch[1]))}/>;
+  if(variants && speedrunMatch)return <Play speedrunElo={clampSpeedrunRating(Number(speedrunMatch[1]))}/>;
+  if (variantResume) return null;
   if (detail === "resume") return <Play variantsOnly={variants} />;
   return <div data-online-variant={variants && online ? mode : undefined} className={`play-hub ${variants ? "variants-hub" : "standard-play-hub"} ${playing ? "match-active" : "setup-active"} ${online ? "online-opponent" : "computer-opponent"}`}>
     {!playing && <div className="play-hub-heading">

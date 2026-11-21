@@ -262,7 +262,10 @@ test('online clocks align right, identities align left and actions sit in the ri
  const env=await connected(page);env.room.members=[{id:uid,team:'b'},{id:peer,team:'w'}];env.room.state.clock={remaining:{w:180000,b:180000},startedAt:Date.now()};
  await page.goto('/#play/online/'+roomId);
  await expect(page.locator('.player-top')).toContainText('Opponent');await expect(page.locator('.player-bottom')).toContainText('Player');
- await expect(page.locator('.player-top').getByRole('timer',{name:'White clock',exact:true})).toBeVisible();await expect(page.locator('.player-bottom').getByRole('timer',{name:'Black clock',exact:true})).toBeVisible();
+ const white=page.locator('.player-top').getByRole('timer',{name:'White clock',exact:true});
+ const black=page.locator('.player-bottom').getByRole('timer',{name:'Black clock',exact:true});
+ await expect(white).toHaveCSS('font-weight','900');
+ await expect(black).toHaveCSS('font-weight','500');
  const board=(await page.locator('.board').boundingBox())!,top=(await page.locator('.player-top').boundingBox())!,bottom=(await page.locator('.player-bottom').boundingBox())!,actions=(await page.getByRole('complementary',{name:'Game actions'}).boundingBox())!;
  const center=await page.evaluate(()=>document.documentElement.clientWidth/2);
  expect(Math.abs(board.x+board.width/2-center)).toBeLessThan(2);
@@ -272,7 +275,15 @@ test('online clocks align right, identities align left and actions sit in the ri
    const clock=(await strip.getByRole('timer').boundingBox())!,identity=(await strip.locator('.online-player-identity').boundingBox())!;
    expect(Math.abs(clock.x+clock.width-board.x-board.width)).toBeLessThan(2);
    expect(Math.abs(identity.x-board.x)).toBeLessThan(2);
+   expect(Math.abs(clock.y + clock.height / 2 - identity.y - identity.height / 2)).toBeLessThan(6);
  }
+ await expect.poll(()=>env.joins.length).toBeGreaterThan(0);
+ env.c.move('e4');
+ Object.assign(env.room.state,{fen:env.c.fen(),moves:['e2e4'],notation:['e4']});
+ env.room.revision++;
+ env.emit('rooms',structuredClone(env.room));
+ await expect(black).toHaveCSS('font-weight','900');
+ await expect(white).toHaveCSS('font-weight','500');
  await expect(page.getByRole('button',{name:'Invite friends',exact:true})).toHaveCount(0);
 });
 
@@ -367,7 +378,7 @@ test('Throne review opens the completed round after a reset',async({page})=>{
  const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).games[0]);expect(game.moves).toEqual(['e2e4']);expect(game.initial).toBe(initial);
 });
 
-test('human games show Offer draw beside Resign and allow accepting an opponent offer',async({page})=>{
+test('human games show Offer draw beside Leave and allow accepting an opponent offer',async({page})=>{
  const env=await connected(page);
  await page.route('**/functions/v1/chess',async route=>{
    const action=route.request().postDataJSON();env.actions.push(action);
@@ -378,8 +389,8 @@ test('human games show Offer draw beside Resign and allow accepting an opponent 
    env.room.revision++;await route.fulfill({json:env.room});
  });
  await page.goto('/#play/online/'+roomId);
- const offer=page.getByRole('button',{name:'Offer draw',exact:true}),resign=page.getByRole('button',{name:'Resign',exact:true});
- const a=(await offer.boundingBox())!,b=(await resign.boundingBox())!;expect(Math.abs(a.y-b.y)).toBeLessThan(2);expect(a.x+a.width).toBeLessThanOrEqual(b.x);
+ const offer=page.getByRole('button',{name:'Offer draw',exact:true}),leave=page.getByRole('button',{name:'Leave',exact:true});
+ const a=(await offer.boundingBox())!,b=(await leave.boundingBox())!;expect(Math.abs(a.y-b.y)).toBeLessThan(2);expect(a.x+a.width).toBeLessThanOrEqual(b.x);
  await offer.click();await expect(page.getByRole('button',{name:'Draw offered',exact:true})).toBeDisabled();expect(env.actions[0].action).toBe('draw');
  await expect.poll(()=>env.joins.length).toBeGreaterThan(0);
  env.room.state.drawOffer='b';env.room.revision++;env.emit('rooms',structuredClone(env.room));
@@ -574,4 +585,16 @@ test('Vote Chess opens the shared game through the server entry point',async({pa
  await expect(page.getByRole('heading',{name:'Vote Chess',exact:true})).toBeVisible();
  expect(env.actions).toEqual([expect.objectContaining({action:'create',mode:'vote'})]);
  expect(env.requests.some(url=>url.pathname.endsWith('/room_lobby'))).toBe(false);
+});
+
+test('Play lets a waiting player leave and routes variant rooms to Variants',async({page})=>{
+ const env=await connected(page);
+ Object.assign(env.room,{status:'waiting',members:[{id:uid,team:'w'}]});
+ await page.goto('/#play/online/'+roomId);
+ await page.getByRole('button',{name:'Leave',exact:true}).click();
+ await expect(page).toHaveURL(/#play$/);
+ expect(env.actions.at(-1)).toMatchObject({action:'leave',room:roomId});
+ env.room.mode='team';
+ await page.goto('/#play/online/'+roomId);
+ await expect(page).toHaveURL(/#variants\/online/);
 });
