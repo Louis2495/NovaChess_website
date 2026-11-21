@@ -5404,7 +5404,7 @@ html { scrollbar-gutter:stable; }
   height:100%;
 }
 .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active {
-  display:flex; flex-direction:column; align-items:center; gap:clamp(7px,1.8dvh,19px);
+  display:flex; flex-direction:column; align-items:center; gap:clamp(12px,3.6dvh,36px);
   width:100%; height:100%; min-height:0;
 }
 .variants-hub.setup-active > .play-hub-heading {
@@ -5422,14 +5422,14 @@ html { scrollbar-gutter:stable; }
   padding:6px; font-size:clamp(.9rem,2.5dvh,1.45rem); letter-spacing:normal;
 }
 .variants-hub.setup-active > .quick-online-play:has(+ .online-variant-gallery) {
-  display:flex; flex-direction:column; justify-content:flex-start; gap:clamp(5px,1dvh,10px);
+  display:flex; flex-direction:column; justify-content:flex-start; gap:clamp(8px,1.6dvh,16px);
 }
 .variants-hub.setup-active > .quick-online-play > :is(.field,.caption) { margin:0; }
 .variants-hub.setup-active > .quick-online-play > .caption { font-size:clamp(.68rem,1.6dvh,.87rem); }
 .variants-hub.setup-active > .friend-settings-slot { flex:none; order:-1; width:min(100%,220px); }
 .variants-hub.setup-active > .variant-sign-in { flex:none; order:-1; margin:0; }
 .variants-hub.setup-active .variant-gallery {
-  --variant-gallery-gap:clamp(6px,1.4dvh,15px);
+  --variant-gallery-gap:clamp(9px,2.3dvh,24px);
   --variant-gallery-rows:3;
   --variant-card-height:170px;
   flex:1 1 0; min-height:0; width:min(100%,960px); margin:0;
@@ -5459,6 +5459,8 @@ html { scrollbar-gutter:stable; }
 .variants-hub.setup-active .game-settings-card > .options-toggle { padding:6px 0; }
 .variants-hub.setup-active .resume-game-button { margin-top:4px; padding:4px 8px; }
 @media(max-width:760px) {
+  .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active { gap:clamp(9px,2.4dvh,20px); }
+  .variants-hub.setup-active .variant-gallery { --variant-gallery-gap:clamp(7px,1.7dvh,15px); }
   .workspace-shell:has(.variants-hub.setup-active) > .workspace {
     padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
