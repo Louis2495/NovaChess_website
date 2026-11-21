@@ -1,10 +1,10 @@
 declare const EdgeRuntime: {waitUntil(task:Promise<unknown>):void};
-import { strongTeamComputerMove } from "./team-engine.ts";
+import { teamComputerMove } from "./team-engine.ts";
 import {onlineEngine} from "./engine.ts";
 import {freshOnline,applyOnline,onlineVariantIds,specialVariants} from "../../../src/lib/onlineVariants.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.119.0";
-import { Chess, type Move } from "npm:chess.js@1.4.0";
-import { clampTeamComputerRating, teamComputerCasualMaxRating } from "../../../src/lib/teamComputer.ts";
+import { Chess } from "npm:chess.js@1.4.0";
+import { clampTeamComputerRating } from "../../../src/lib/teamComputer.ts";
 import {
   newSpecial,
   specialApply,
@@ -66,33 +66,6 @@ function standardApply(state: any, move: string) {
         ? "1/2-1/2"
         : "*",
   };
-}
-const pieceValues = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
-function tacticalValue(move: Move) {
-  if (move.san.endsWith("#")) return 100000;
-  return (move.captured ? pieceValues[move.captured] : 0) +
-    (move.promotion ? pieceValues[move.promotion] - pieceValues.p : 0);
-}
-
-function teamBotMove(fen: string, rating: number) {
-  const moves = new Chess(fen).moves({ verbose: true });
-  const variation = (teamComputerCasualMaxRating - rating) * 0.45;
-  let best: Move | undefined;
-  let bestScore = -Infinity;
-  for (const move of moves) {
-    const immediate = tacticalValue(move);
-    const center = 7 - Math.abs(move.to.charCodeAt(0) - 100.5) - Math.abs(Number(move.to[1]) - 4.5);
-    let score = immediate + center * 4 + Math.random() * variation;
-    if (rating >= 1200 && immediate < 100000) {
-      const replies = new Chess(move.after).moves({ verbose: true });
-      score -= replies.reduce((worst, reply) => Math.max(worst, tacticalValue(reply)), 0);
-    }
-    if (score > bestScore) {
-      bestScore = score;
-      best = move;
-    }
-  }
-  return best ? best.from + best.to + (best.promotion || "") : "";
 }
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -380,9 +353,7 @@ Deno.serve(async (req) => {
     ) {
       const replyAt = performance.now() + 1000;
       const rating = clampTeamComputerRating(r.settings.botRating);
-      const move = rating > teamComputerCasualMaxRating
-        ? await strongTeamComputerMove(state.fen, rating)
-        : teamBotMove(state.fen, rating);
+      const move = await teamComputerMove(state.fen, state.moves, rating);
       if (move) {
         // Search time counts toward the pause. The board already previews the human move.
         const remaining = Math.ceil(replyAt - performance.now());

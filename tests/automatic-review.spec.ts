@@ -13,3 +13,24 @@ test('background evaluation warms review without sharing weakened computer score
  const board=page.locator('.play-match .board');await board.getByRole('button',{name:'e2, white pawn',exact:true}).click();await board.getByRole('button',{name:'e4, empty',exact:true}).click();await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).activeGame.moves.length)).toBe(2);await page.waitForTimeout(1800);
  const id=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).activeGame.id);await page.goto('/#library/'+id);await expect(page.getByRole('status').filter({hasText:'Review complete.'})).toBeVisible({timeout:30000});await expect(page.locator('.review-notation .move-quality')).toHaveCount(2);
 });
+
+test("Game Review restores every move from a compact online game history", async ({ page }) => {
+  const board = new Chess();
+  const initial = board.fen();
+  const moves = ["e2e4", "e7e5", "g1f3"];
+  const notation = moves.map(move => board.move(move).san);
+  const game = {
+    id: "online-team-compact", title: "Team Chess", created: Date.now(), initial,
+    positions: [initial, board.fen()], moves, notation, result: "1-0",
+    human: "w", variant: "chess", folder: "Games", origin: "novachess",
+  };
+  await page.addInitScript(saved => {
+    localStorage.setItem("novachess-library-v2", JSON.stringify({ games: [saved] }));
+  }, game);
+  await page.goto("/#library/online-team-compact");
+  await expect(page.getByRole("status").filter({ hasText: "Review complete." })).toBeVisible({ timeout: 30000 });
+  await expect(page.locator(".review-notation .move-quality")).toHaveCount(3);
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("novachess-library-v2")!).games[0]);
+  expect(stored.positions).toHaveLength(4);
+  expect(stored.review).toHaveLength(3);
+});

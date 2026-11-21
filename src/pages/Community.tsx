@@ -1,4 +1,5 @@
 import { clampTeamComputerRating, teamComputerDefaultRating, teamComputerMaxRating, teamComputerMinRating, teamComputerRatingStep } from "../lib/teamComputer";
+import { restoreReviewHistory } from "../lib/gameReview";
 import {GameScore} from "../components/BoardPlayer";
 import {createPortal} from "react-dom";
 import type { SavedGame } from "../lib/types";
@@ -323,7 +324,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       opponent:room.settings.bot ? "Computer" : room.members.filter(m => m.team && m.team !== human).map(m => username(m.id)).join(", "),
       ...(specialVariants.includes(room.variant) && "blocked" in state ? {special:state} : {}),
     };
-    setLibrary(l => ({...l, games:[game,...l.games.filter(g => g.id !== id)]}));
+    setLibrary(l => ({...l, games:[restoreReviewHistory(game),...l.games.filter(g => g.id !== id)]}));
     navigate("library", id);
   }
   function playerStrip(side: "w" | "b", placement: "top" | "bottom") {
@@ -664,6 +665,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                 <Button className="secondary" aria-pressed={Number(botRating) === teamComputerMaxRating}
                   onClick={() => setBotRating(String(teamComputerMaxRating))}>Max strength</Button>
               </div>}
+              {mode === "team" && bot && <p className="caption">Computer ratings are approximate.</p>}
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 if(selectedFriend){await challengeFriend(selectedFriend.id);return;}
                 setBusy(true);setError("");

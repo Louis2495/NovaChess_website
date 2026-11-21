@@ -1,7 +1,7 @@
 import {SavedBoardPlayer} from "../components/BoardPlayer";
 import {screenName} from "../lib/screenName";
 import { cachedReview, cacheReview } from "../lib/reviewCache";
-import { classifyMove, performanceRating } from "../lib/gameReview";
+import { classifyMove, performanceRating, restoreReviewHistory } from "../lib/gameReview";
 import { MoveBadge, EvaluationGraph } from "../components/ReviewVisuals";
 import { isStudy, libraryKind } from "../lib/library";
 import { RepertoireTrainer } from "./learn/Repertoire";
@@ -112,7 +112,7 @@ export default function LibraryPage() {
         onClose={() => setTrainingStudy(null)}
       />
     );
-  if (g) return <GameViewer game={g} />;
+  if (g) return <GameViewer key={g.id} game={restoreReviewHistory(g)} />;
   return (
     <div className="library-page">
       <PageTitle title="Library" />
@@ -463,6 +463,7 @@ function GameViewer({ game }: { game: SavedGame }) {
         setStatus(`Reviewing move ${Math.floor(i / 2) + 1}`);
         const before = game.positions[i],
           after = game.positions[i + 1];
+        if (!before || !after) throw Error("The position history for this game is incomplete.");
         let best = "",
           score = 0,
           loss = 0,
@@ -551,7 +552,7 @@ function GameViewer({ game }: { game: SavedGame }) {
         setLibrary((l) => ({
           ...l,
           games: l.games.map((g) =>
-            g.id === game.id ? { ...g, review: [...collected] } : g,
+            g.id === game.id ? { ...g, positions: game.positions, notation: game.notation, review: [...collected] } : g,
           ),
           activeGame: l.activeGame?.id === game.id ? {...l.activeGame,review:[...collected]} : l.activeGame,
         }));
@@ -572,7 +573,7 @@ function GameViewer({ game }: { game: SavedGame }) {
   }
   const average = (side: string) => {
     const chosen = rows.filter(
-      (r) => game.positions[r.ply].split(" ")[1] === side,
+      (r) => game.positions[r.ply]?.split(" ")[1] === side,
     );
     return chosen.length
       ? Math.round(

@@ -178,6 +178,8 @@ before(async () => {
 
   await pg.exec(readFileSync("supabase/migrations/202611180018_single_vote_chess.sql","utf8"));
 
+  await pg.exec(readFileSync("supabase/migrations/202611180020_reserved_usernames.sql", "utf8"));
+
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
     .replace('"./team-engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/team-engine.ts")).href))
@@ -189,7 +191,7 @@ before(async () => {
       "",
     )
     .replace(
-      /import \{ Chess, type Move \} from ["']npm:chess.js@1.4.0["'];/,
+      /import \{ Chess \} from ["']npm:chess.js@1.4.0["'];/,
       `import {Chess} from ${JSON.stringify(pathToFileURL(resolve("node_modules/chess.js/dist/esm/chess.js")).href)};`,
     )
     .replace(
@@ -309,6 +311,43 @@ test("Vote Chess shares one room across simultaneous entries and creates a new g
   const next=await call(users[0],{action:"create",mode:"vote"});
   assert.equal(next.status,200,JSON.stringify(next.data));
   assert.notEqual(next.data.id,active.id);
+});
+
+test("username reservations are admin-only and enforced for signups and profile edits", async () => {
+  const setActor = id => pg.query("select set_config('request.jwt.claim.sub', $1, false)", [id]);
+  const reserve = (name, release = false) => pg.query("select public.admin_reserved_usernames($1, $2) as names", [name, release]);
+  const check = name => pg.query("select public.username_is_reserved($1) as reserved", [name]);
+  const edit = (id, name) => pg.query("update public.profiles set screen_name=$1 where id=$2", [name, id]);
+  const newcomer = "55555555-5555-4555-8555-555555555555";
+  try {
+    await setActor(users[1]);
+    await assert.rejects(reserve("Nova Support"), /Administrator access required/);
+    await setActor(users[0]);
+    assert.deepEqual((await reserve("Nova Support")).rows[0].names, ["Nova Support"]);
+    assert.equal((await check("nova support")).rows[0].reserved, false);
+    await edit(users[0], "Nova Support");
+    await setActor("");
+    assert.equal((await check("  NOVA SUPPORT  ")).rows[0].reserved, true);
+    await assert.rejects(pg.query("insert into auth.users (id, raw_user_meta_data) values ($1, $2)",
+      [newcomer, { screen_name: "nova support" }]), /username is reserved/);
+    await setActor(users[1]);
+    await assert.rejects(edit(users[1], "NOVA SUPPORT"), /username is reserved/);
+    await setActor(users[0]);
+    assert.deepEqual((await reserve("nova support", true)).rows[0].names, []);
+  } finally {
+    await edit(users[0], "");
+    await setActor("");
+  }
+});
+
+test("Team Chess preserves exact rated settings and can play below the native minimum", async () => {
+  const game = await room("team", { bot: true, botRating: 450 });
+  assert.equal(game.settings.botRating, 450);
+  const result = await command(users[0], game, "move", { move: "e2e4" });
+  assert.equal(result.status, 200, JSON.stringify(result.data));
+  assert.equal(result.data.state.moves.length, 2);
+  const upper = await room("team", { bot: true, botRating: 3190 });
+  assert.equal(upper.settings.botRating, 3190);
 });
 
 test("Team Chess max strength uses the server Stockfish build and returns a legal move", async () => {

@@ -19,6 +19,49 @@ function GrantAdmin(){
  {message && <p role="status">{message}</p>}{error && <p role="alert" className="auth-error">{error}</p>}
  </form>;
 }
+function ReservedUsernames() {
+  const [names, setNames] = useState<string[]>([]);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(true);
+  const [error, setError] = useState("");
+
+  async function update(value?: string, release = false) {
+    setBusy(true);
+    setError("");
+    try {
+      const { data, error } = await online!.rpc("admin_reserved_usernames",
+        value === undefined ? {} : { p_name: value, p_release: release });
+      if (error) throw error;
+      setNames(Array.isArray(data) ? data : []);
+      if (value !== undefined && !release) setName("");
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  useEffect(() => { void update(); }, []);
+
+  return <section className="admin-grant" aria-label="Reserved usernames">
+    <h3>Reserved usernames</h3>
+    <p className="caption">Only the administrator who reserves a name can use it until it is released.</p>
+    <form className="admin-account-search" onSubmit={event => {
+      event.preventDefault();
+      if (name.trim().length >= 2) void update(name.trim());
+    }}>
+      <Field label="Username to reserve"><input value={name} maxLength={32} required
+        onChange={event => setName(event.target.value)} /></Field>
+      <Button disabled={busy || name.trim().length < 2}>Reserve username</Button>
+    </form>
+    {error && <p role="alert" className="auth-error">{error}</p>}
+    {!!names.length && <ul className="admin-reserved-names">{names.map(name => <li key={name}>
+      <span>{name}</span>
+      <Button className="secondary" aria-label={`Release ${name}`} disabled={busy}
+        onClick={() => void update(name, true)}>Release</Button>
+    </li>)}</ul>}
+  </section>;
+}
 function AccountList(){
  const [users,setUsers]=useState<Account[]>([]),[total,setTotal]=useState(0),[query,setQuery]=useState(''),[search,setSearch]=useState(''),[page,setPage]=useState(0),[loading,setLoading]=useState(true),[error,setError]=useState(''),[message,setMessage]=useState(''),[resetting,setResetting]=useState(''),[hashes,setHashes]=useState<Record<string,string>>({}),[loadingHash,setLoadingHash]=useState('');
  useEffect(()=>{let active=true;setLoading(true);setError('');setHashes({});
@@ -52,7 +95,7 @@ function AccountList(){
  },[accountIds]);
  return <Card className="admin-accounts"><div className="card-heading"><h2>Accounts</h2><span className="pill">{total}</span></div>
   <p className="admin-presence-counts" aria-label="Account activity totals"><span>{counts?.online ?? "—"} online</span><span>{counts?.offline ?? "—"} offline</span></p>
-  <GrantAdmin/><form className="admin-account-search" onSubmit={e=>{e.preventDefault();setPage(0);setQuery(search.trim());}}><Field label="Search accounts"><input type="search" value={search} maxLength={100} onChange={e=>setSearch(e.target.value)} placeholder="Screen name, username or email"/></Field><Button>Search</Button></form>
+  <GrantAdmin/><ReservedUsernames/><form className="admin-account-search" onSubmit={e=>{e.preventDefault();setPage(0);setQuery(search.trim());}}><Field label="Search accounts"><input type="search" value={search} maxLength={100} onChange={e=>setSearch(e.target.value)} placeholder="Screen name, username or email"/></Field><Button>Search</Button></form>
   {error && <p role="alert" className="auth-error">{error}</p>}{message && <p role="status">{message}</p>}
   {loading?<p role="status">Loading accounts…</p>:<div className="admin-account-table"><table><thead><tr><th>Screen name</th><th>Username</th><th>Email</th><th>Joined</th><th>Last sign-in</th><th>Provider</th><th>Password</th></tr></thead><tbody>{users.map(user=><tr key={user.id}><td><span className="admin-account-name"><span className={`account-status-dot ${onlineIds===null?'unknown':onlineIds.has(user.id)?'online':'offline'}`} role="img" aria-label={onlineIds===null?'Status unavailable':onlineIds.has(user.id)?'Online':'Offline'} title={onlineIds===null?'Status unavailable':onlineIds.has(user.id)?'Online':'Offline'}/><span>{screenName(user)}</span></span></td><td>{isGeneratedUsername(user.username)?'—':user.username||'—'}</td><td>{user.email||'—'}{user.email && !user.email_confirmed_at && <small>Not confirmed</small>}</td><td>{date(user.created_at)}</td><td>{date(user.last_sign_in_at)}</td><td>{user.provider}</td><td><div className="admin-password-actions"><Button className="secondary" disabled={!user.email || !!resetting} aria-label={`Send password reset to ${screenName(user,user.email||"Player")}`} onClick={async()=>{
    setResetting(user.id);setError('');setMessage('');try{await requestPasswordReset(user.email!);setMessage('Reset link requested. The user sets their own password.');}catch(e){setError((e as Error).message);}finally{setResetting('');}

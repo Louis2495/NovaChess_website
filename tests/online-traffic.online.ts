@@ -574,7 +574,7 @@ test('Team Chess sends the chosen rating when starting a computer game',async({p
  await expect(rating).toHaveValue('1000');
  await rating.fill('1650');
  await page.getByRole('button',{name:'Start Team Chess',exact:true}).click();
- await expect.poll(()=>env.actions[0]).toMatchObject({action:'create',mode:'team',bot:true,botRating:1700});
+ await expect.poll(()=>env.actions[0]).toMatchObject({action:'create',mode:'team',bot:true,botRating:1650});
 });
 
 test("Team Chess can start a game at max computer strength", async ({ page }) => {
@@ -657,4 +657,23 @@ test("share selected repertoire lines with a friend, accept a share, and reject 
   await incoming.getByRole("button", { name: "Reject", exact: true }).click();
   await expect(incoming).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Shared French" })).toHaveCount(0);
+});
+
+test("Admin Controls can reserve and release a username", async ({ page }) => {
+  await connected(page);
+  await page.route("**/rpc/is_site_admin", route => route.fulfill({ json: true }));
+  await page.route("**/rpc/admin_accounts", route => route.fulfill({ json: { users: [], total: 0 } }));
+  let names: string[] = [];
+  await page.route("**/rpc/admin_reserved_usernames", route => {
+    const { p_name, p_release } = route.request().postDataJSON();
+    if (p_name) names = p_release ? names.filter(name => name !== p_name) : [...names, p_name];
+    return route.fulfill({ json: names });
+  });
+  await page.goto("/#profile/admin");
+  const reservations = page.getByRole("region", { name: "Reserved usernames" });
+  await reservations.getByLabel("Username to reserve").fill("Nova Support");
+  await reservations.getByRole("button", { name: "Reserve username", exact: true }).click();
+  await expect(reservations.getByText("Nova Support", { exact: true })).toBeVisible();
+  await reservations.getByRole("button", { name: "Release Nova Support" }).click();
+  await expect(reservations.getByText("Nova Support", { exact: true })).toHaveCount(0);
 });

@@ -48,6 +48,10 @@ export default function OnlineAccount() {
     try {
      if(!reset && mode==='signup' && (name.trim().length<2 || isGeneratedUsername(name)))throw Error('Choose a screen name with 2–32 characters.');
      if(!reset && mode==='signup' && (!country || !avatar))throw Error('Choose a country and profile picture.');
+     if(!reset && mode==='signup'){
+      const {data}=await online!.rpc('username_is_reserved',{p_name:name.trim()});
+      if(data===true)throw Error('That username is reserved. Choose a different name.');
+     }
      if(reset){
       if(password!==confirm)throw Error('Passwords do not match.');
       const {error}=await online!.auth.updateUser({password});if(error)throw error;
