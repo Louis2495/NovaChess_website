@@ -114,7 +114,7 @@ export default function LibraryPage() {
     );
   if (g) return <GameViewer game={g} />;
   return (
-    <>
+    <div className="library-page">
       <PageTitle title="Library" />
       <div className="library-header-row">
       <div
@@ -264,7 +264,7 @@ export default function LibraryPage() {
           </Button>
         </Modal>
       )}
-    </>
+    </div>
   );
 }
 function StudyTraining({

@@ -5098,6 +5098,7 @@ html { scrollbar-gutter:stable; }
  .learn-study-art img { height:170px; }
 }
 
+.library-page { padding-inline:clamp(4px,calc(9vw - 40px),148px); }
 .library-header-row { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px; }
 .library-header-row .library-categories { margin:0; }
 .library-add-folder { flex:none; }
@@ -5398,7 +5399,7 @@ html { scrollbar-gutter:stable; }
 }
 .research-board-with-eval .board { width:100%; }
 /* Compact Library cards leave room for more games in each row. */
-.saved-games-grid { grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr)); gap:16px; }
+.saved-games-grid { grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr)); gap:24px; }
 .saved-game-card { padding:16px; }
 .saved-game-card .saved-board-button { max-width:200px; margin-bottom:12px; }
 .saved-game-card .button-row { padding-top:10px; min-height:46px; }
