@@ -84,7 +84,7 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
           <option value="all">Both</option><option value="w">White</option><option value="b">Black</option>
         </ChoiceSelect>
       </div>
-      <div className="section-toolbar">
+      <div className="section-toolbar repertoire-toolbar">
         <p className="muted">
           {library.repertoire.length} lines ·{" "}
           {library.repertoire.filter((l) => l.due <= now).length} due
@@ -117,23 +117,26 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
           {visible.map(({ family, lines }) => (
             <section key={family} className="opening-family" aria-label={family}>
               <details open>
-                <summary><span>{family}</span><small>{lines.length} {lines.length === 1 ? "line" : "lines"} · {lines.filter(line => line.due <= now).length} due</small><span className="repertoire-section-action" aria-hidden="true"><span>Show lines</span><span>Hide lines</span></span></summary>
+                <summary className="repertoire-family-heading">
+                  <span className="repertoire-family-name">{family}</span>
+                  <small>{lines.length} {lines.length === 1 ? "line" : "lines"} · {lines.filter(line => line.due <= now).length} due</small>
+                  <span className="repertoire-section-action" aria-hidden="true"><span>Show lines</span><span>Hide lines</span></span>
+                </summary>
                 <div className="repertoire-grid">
                   {lines.map((line) => (
-                    <Card key={line.id}>
-                      <div className="card-heading">
+                    <Card key={line.id} className="repertoire-line">
+                      <div className="repertoire-line-info">
                         <h3>{line.name}</h3>
-                        <span className="pill">
-                          {line.side === "w" ? "White" : "Black"}
-                        </span>
+                        <div className="repertoire-line-meta">
+                          <span className="repertoire-line-color" data-color={line.side}>
+                            {line.side === "w" ? "White" : "Black"}
+                          </span>
+                          <span>{Math.ceil(line.moves.length / 2)} moves · {line.trained} reviews</span>
+                          <span className={line.due <= now ? "repertoire-line-due" : undefined}>
+                            {line.due <= now ? "Due now" : `Due ${dateLabel(line.due)}`}
+                          </span>
+                        </div>
                       </div>
-                      <p className="caption">
-                        {Math.ceil(line.moves.length / 2)} moves · {line.trained}{" "}
-                        reviews ·{" "}
-                        {line.due <= now
-                          ? "Due now"
-                          : `Due ${dateLabel(line.due)}`}
-                      </p>
                       <div className="button-row">
                         <Button onClick={() => onTrain(line)}>
                           <GraduationCap size={15} />
@@ -187,7 +190,7 @@ function RepertoireSuggestions({ suggestions, paths, onSelect }: {
   if (!missing.length) return <p className="caption repertoire-coverage">You’ve saved all the suggested lines for this opening.</p>;
   return <details className="repertoire-coverage">
     <summary><span>Suggested lines to add ({missing.length})</span><span className="repertoire-section-action" aria-hidden="true"><span>Show</span><span>Hide</span></span></summary>
-    <p className="caption">These lessons aren’t covered by the complete move sequences in your saved lines or sidelines.</p>
+    <p className="caption">Lessons missing from your saved lines and sidelines.</p>
     <ul>{missing.map(lesson => <li key={lesson.id}>
       <button className="text-link" onClick={() => onSelect(lesson.id)}>{lesson.name}</button>
     </li>)}</ul>
