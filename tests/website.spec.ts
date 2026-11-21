@@ -283,8 +283,8 @@ test("repertoire building, saving, training and spaced review work", async ({
 }) => {
   await page.goto("/#learn/repertoire");
   await page.getByRole("button", { name: "Add line", exact: true }).click();
-  const d = page.getByRole("dialog");
-  await d.getByLabel("Line name").fill("King pawn");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByLabel("Line name").fill("King pawn");
   await uiMove(page, "e2e4");
   await page.getByRole("button", { name: "Save line", exact: true }).click();
   await page.getByRole("button", { name: "Train", exact: true }).click();

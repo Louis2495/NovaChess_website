@@ -137,6 +137,7 @@ export type ReviewRow = {
   expected?: string;
 };
 export type Repertoire = {
+  branches?: string[][];
   id: string;
   name: string;
   side: "w" | "b";

@@ -6150,3 +6150,24 @@ html { scrollbar-gutter:stable; }
   font-weight:900;
 }
 .board-player-label:has(> .turn-clock) { padding-inline-end:0; }
+
+.repertoire-editor h1 { margin:0 0 14px; }
+.workspace .repertoire-workspace.chess-layout {
+  grid-template-columns:minmax(0,min(65%,max(460px,calc(100dvh - 175px)))) minmax(0,1fr);
+}
+.repertoire-navigation { justify-content:center; margin-top:10px; }
+.repertoire-edit-panel { min-width:0; }
+.repertoire-moves { max-height:52dvh; overflow:auto; margin-block:12px; }
+.repertoire-notation { width:100%; table-layout:fixed; border-collapse:collapse; }
+.repertoire-notation caption { text-align:left; color:var(--muted); padding:4px 3px; font-weight:700; }
+.repertoire-notation th:first-child { width:3em; }
+.repertoire-notation th,.repertoire-notation td { text-align:left; border-bottom:1px solid var(--border); padding:3px; }
+.repertoire-notation button { width:100%; padding:6px; text-align:left; border-radius:5px; }
+.repertoire-notation button:is(:hover,[aria-current="step"]) { background:var(--accent-soft); }
+.repertoire-sideline > td { padding-inline-start:12px; border-inline-start:2px solid var(--accent); }
+.repertoire-sideline .repertoire-notation { background:var(--input); }
+.repertoire-import { max-width:720px; margin-inline:auto; }
+.repertoire-import .caption { display:flex; align-items:center; gap:6px; }
+@media(max-width:760px) {
+  .workspace .repertoire-workspace.chess-layout { grid-template-columns:minmax(0,1fr); }
+}

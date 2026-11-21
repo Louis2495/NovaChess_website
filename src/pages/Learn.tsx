@@ -22,8 +22,8 @@ export default function Learn() {
         <div className="learn-page-heading">
           <Button
             className="learn-back"
-            aria-label="Back to Learn"
-            onClick={() => navigate("learn")}
+            aria-label={section === "repertoire" && detail !== "repertoire" ? "Back to repertoire" : "Back to Learn"}
+            onClick={() => navigate("learn", section === "repertoire" && detail !== "repertoire" ? "repertoire" : undefined)}
           >
             <ArrowLeft size={21} />
           </Button>

@@ -1,3 +1,5 @@
+import { exportRepertoire, repertoirePaths } from "../../lib/repertoire";
+import RepertoireEditor, { RepertoireImport } from "./RepertoireEditor";
 import { usePremoves } from "../../lib/usePremoves";
 import PremoveQueue from "../../components/PremoveQueue";
 import { useEffect, useMemo, useState } from "react";
@@ -7,21 +9,17 @@ import {
   Trash2,
   GraduationCap,
   RotateCcw,
-  Save,
   Lightbulb,
   Download,
   ArrowLeft,
 } from "lucide-react";
 import { useApp } from "../../lib/context";
-import { initialFen, uid, download, dateLabel } from "../../lib/store";
+import { download, dateLabel } from "../../lib/store";
 import type { Repertoire as Line } from "../../lib/types";
 import { Board } from "../../components/Board";
 import {
-  ChoiceSelect,
   Card,
   Button,
-  Field,
-  Modal,
   Empty,
   IconButton,
 } from "../../components/UI";
@@ -29,48 +27,18 @@ function key(c: Chess) {
   return c.fen().split(" ").slice(0, 4).join(" ");
 }
 export default function Repertoire() {
-  const { library, setLibrary, notify } = useApp();
-  const [editing, setEditing] = useState<Line | null | false>(false),
-    [training, setTraining] = useState<Line | null>(null),
-    [name, setName] = useState(""),
-    [side, setSide] = useState<"w" | "b">("w"),
-    [moves, setMoves] = useState<string[]>([]),
-    [initial, setInitial] = useState(initialFen),
-    [error, setError] = useState("");
-  const c = new Chess(initial);
-  for (const m of moves) c.move(m);
-  function edit(line: Line | null) {
-    setEditing(line);
-    setName(line?.name || "");
-    setSide(line?.side || "w");
-    setMoves(line?.moves || []);
-    setInitial(line?.initial || initialFen);
-    setError("");
+  const { library, setLibrary, detail, navigate, notify } = useApp();
+  const [training, setTraining] = useState<Line | null>(null);
+  const route = detail.slice("repertoire".length + 1);
+  const back = () => navigate("learn", "repertoire");
+  if (route === "new") return <RepertoireEditor onBack={back} />;
+  if (route === "import") return <RepertoireImport onBack={back} />;
+  if (route.startsWith("edit/")) {
+    const line = library.repertoire.find(line => line.id === route.slice(5));
+    return line ? <RepertoireEditor line={line} onBack={back} /> :
+      <Card><p>That repertoire line is unavailable.</p><Button onClick={back}>Back to repertoire</Button></Card>;
   }
-  function save() {
-    if (!name.trim() || !moves.length) {
-      setError("Add a name and at least one move.");
-      return;
-    }
-    const line: Line = {
-      id: editing ? editing.id : uid(),
-      name: name.trim(),
-      side,
-      initial,
-      moves,
-      due: Date.now(),
-      trained: editing ? editing.trained : 0,
-      successes: editing ? editing.successes : 0,
-    };
-    setLibrary((l) => ({
-      ...l,
-      repertoire: editing
-        ? l.repertoire.map((v) => (v.id === editing.id ? line : v))
-        : [...l.repertoire, line],
-    }));
-    setEditing(false);
-    notify("Repertoire saved.");
-  }
+  const add = () => navigate("learn", "repertoire:new");
   if (training)
     return (
       <RepertoireTrainer line={training} onClose={() => setTraining(null)} />
@@ -82,10 +50,12 @@ export default function Repertoire() {
           {library.repertoire.length} lines ·{" "}
           {library.repertoire.filter((l) => l.due <= Date.now()).length} due
         </p>
-        <Button onClick={() => edit(null)}>
-          <Plus size={16} />
-          Add line
-        </Button>
+        <div className="button-row">
+          <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
+            <Download size={16} /> Import Lichess study
+          </Button>
+          <Button onClick={add}><Plus size={16} /> Add line</Button>
+        </div>
       </div>
       {!library.repertoire.length ? (
         <Card>
@@ -94,7 +64,7 @@ export default function Repertoire() {
             title="No saved lines"
             description="Build a line and train either color with spaced review."
           >
-            <Button onClick={() => edit(null)}>Build repertoire</Button>
+            <Button onClick={add}>Build repertoire</Button>
           </Empty>
         </Card>
       ) : (
@@ -119,20 +89,12 @@ export default function Repertoire() {
                   <GraduationCap size={15} />
                   Train
                 </Button>
-                <Button className="secondary" onClick={() => edit(line)}>
+                <Button className="secondary" onClick={() => navigate("learn", "repertoire:edit/" + line.id)}>
                   Edit
                 </Button>
                 <IconButton
                   label={`Export ${line.name}`}
-                  onClick={() => {
-                    const ch = new Chess(line.initial);
-                    line.moves.forEach((m) => ch.move(m));
-                    download(
-                      "repertoire.pgn",
-                      ch.pgn(),
-                      "application/x-chess-pgn",
-                    );
-                  }}
+                  onClick={() => download("repertoire.pgn", exportRepertoire(line), "application/x-chess-pgn")}
                 >
                   <Download size={16} />
                 </IconButton>
@@ -152,81 +114,6 @@ export default function Repertoire() {
             </Card>
           ))}
         </div>
-      )}
-      {editing !== false && (
-        <Modal
-          title={editing ? "Edit line" : "Add repertoire line"}
-          onClose={() => setEditing(false)}
-          wide
-        >
-          <div className="editor-layout">
-            <div>
-              <Board
-                fen={c.fen()}
-                onMove={(from, to, promotion) => {
-                  try {
-                    const move = new Chess(c.fen()).move({
-                      from,
-                      to,
-                      promotion: promotion || "q",
-                    });
-                    setMoves((v) => [
-                      ...v,
-                      move.from + move.to + (move.promotion || ""),
-                    ]);
-                  } catch {}
-                }}
-              />
-              <div className="move-chips">
-                {c.history().map((m, i) => (
-                  <span key={i}>{m}</span>
-                ))}
-              </div>
-              <div className="button-row">
-                <Button
-                  className="secondary"
-                  disabled={!moves.length}
-                  onClick={() => setMoves((v) => v.slice(0, -1))}
-                >
-                  <RotateCcw size={15} />
-                  Undo
-                </Button>
-              </div>
-            </div>
-            <div>
-              <Field label="Line name">
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={100}
-                />
-              </Field>
-              <Field label="Train as">
-                <ChoiceSelect
-                  value={side}
-                  onChange={(e) => setSide(e.target.value as "w" | "b")}
-                >
-                  <option value="w">White</option>
-                  <option value="b">Black</option>
-                </ChoiceSelect>
-              </Field>
-              <p className="caption">
-                Play both sides to build the line. Add separate lines for
-                branches. Training accepts saved continuations at matching
-                positions.
-              </p>
-              {error && (
-                <p role="alert" className="error">
-                  {error}
-                </p>
-              )}
-              <Button disabled={!moves.length || !name.trim()} onClick={save}>
-                <Save size={16} />
-                Save line
-              </Button>
-            </div>
-          </div>
-        </Modal>
       )}
     </>
   );
@@ -254,11 +141,12 @@ export function RepertoireTrainer({
     for (const l of (lines || library.repertoire).filter(
       (v) => v.side === line.side,
     )) {
-      const b = new Chess(l.initial);
-      for (let i = 0; i < l.moves.length; i++) {
-        if (key(b) === key(c))
-          result.push({ line: l, index: i, move: l.moves[i] });
-        b.move(l.moves[i]);
+      for (const moves of repertoirePaths(l)) {
+        const b = new Chess(l.initial);
+        for (let i = 0; i < moves.length; i++) {
+          if (key(b) === key(c)) result.push({ line: { ...l, moves }, index: i, move: moves[i] });
+          b.move(moves[i]);
+        }
       }
     }
     return result;
@@ -305,7 +193,7 @@ export function RepertoireTrainer({
   }, [fen, done]);
   function attempt(uci: string) {
     const match =
-      choices.find((v) => v.move === uci && v.line.id === active.id) ||
+      choices.find((v) => v.move === uci && v.line.moves === active.moves) ||
       choices.find((v) => v.move === uci);
     if (!match) {
       setAssisted(true);
@@ -375,7 +263,7 @@ export function RepertoireTrainer({
             disabled={done || (c.turn() !== line.side && !appearance.premoves)}
             onClick={() => {
               const expected =
-                choices.find((v) => v.line.id === active.id) || choices[0];
+                choices.find((v) => v.line.moves === active.moves) || choices[0];
               if (expected) {
                 const m = new Chess(fen).move(expected.move);
                 setHint(m.from);
