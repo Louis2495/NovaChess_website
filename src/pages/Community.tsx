@@ -320,7 +320,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
     : mode === "team" ? "Invite friends to your side. Share moves and arrows."
     : variant === "speedrun" ? "Beat the computer as fast as possible"
     : variantList.find(v => v.id === variant)?.description;
-  const friendSettings = !room && mode !== "throne" && mode !== "vote" ? <div className="friend-game-settings">{selectedFriend ? <div className="friend-selection-field"><input aria-label="Selected friend" readOnly value={screenName(selectedFriend)}/><button type="button" aria-label="Remove selected friend" disabled={busy} onClick={()=>setSelectedFriend(null)}><X size={14}/></button></div> : <Button className="secondary invite-friends-option" disabled={busy || !online || !uid} onClick={()=>setChoosingFriend(true)}><Users size={16}/>Play a Friend</Button>}</div> : null;
+  const supportsFriendGame = mode !== "throne" && mode !== "vote" && variant !== "speedrun" && variant !== "bughouse";
+  const friendSettings = !room && supportsFriendGame ? <div className="friend-game-settings">{selectedFriend ? <div className="friend-selection-field"><input aria-label="Selected friend" readOnly value={screenName(selectedFriend)}/><button type="button" aria-label="Remove selected friend" disabled={busy} onClick={()=>setSelectedFriend(null)}><X size={14}/></button></div> : <Button className="secondary invite-friends-option" disabled={busy || !online || !uid} onClick={()=>setChoosingFriend(true)}><Users size={16}/>Play a Friend</Button>}</div> : null;
   return (
     <>
       {friendSettingsHost ? createPortal(friendSettings,friendSettingsHost) : friendSettings}
