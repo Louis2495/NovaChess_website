@@ -269,7 +269,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               <span className="puzzle-action-label">Hint</span>
             </Button>}
             {(!daily || done) && <Button
-              className={done && !daily ? "puzzle-next-button" : undefined}
+              className={daily ? undefined : done ? "puzzle-next-button" : "puzzle-skip-button"}
               aria-label={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
               title={daily ? "Replay" : done ? "Next puzzle" : "Skip"}
               onClick={() => {
