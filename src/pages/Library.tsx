@@ -593,10 +593,12 @@ function GameViewer({
   };
   const selected = rows.find((r) => r.ply === Math.max(0, cursor - 1));
   const sideRows = (side: string) => rows.filter(r => game.positions[r.ply]?.split(" ")[1] === side);
+  const winner = game.result === "1-0" ? "w" : game.result === "0-1" ? "b" : null;
   const playerMetrics = (["w", "b"] as const).map(side => ({
     side: side === "w" ? "white" : "black",
     rating: performanceRating(sideRows(side)),
     loss: average(side),
+    outcome: winner ? (side === winner ? "Win" : "Loss") : game.result === "1/2-1/2" ? "Draw" : undefined,
   }));
   const settledEvaluation = useSettledEvaluation(game.positions[cursor] || game.initial, liveEngine.lines[0]);
   const evaluation = settledEvaluation?.score ?? (cursor ? rows.find(r=>r.ply===cursor-1)?.afterScore : rows[0]?.score) ?? 0;
@@ -746,26 +748,21 @@ function GameViewer({
           </details>
         </div>
         <div className="side-panels">
-          <div className="review-overview">
-            {standard && <Card className="review-performance" aria-label="Player performance">
-              <div className="review-player-metrics">
-                {playerMetrics.map(({ side, rating, loss }) => (
-                  <dl key={side} className={`review-player-metric ${side}`} aria-label={side === "white" ? "White" : "Black"}>
-                    <dt>Estimated rating</dt>
-                    <dd>{rating ?? "—"}</dd>
-                    <dt>Centipawn loss</dt>
-                    <dd>{loss ?? "—"}</dd>
-                  </dl>
-                ))}
-              </div>
-              {playerMetrics.some(({ rating }) => rating === null) && <p className="caption">Needs 8 non-book moves per side.</p>}
-            </Card>}
-            <Card className="review-game-info">
-              <h2>Game information</h2>
-              <p>{game.title}</p>
-              <p className="caption">{game.result}</p>
-            </Card>
-          </div>
+          {standard && <Card className="review-performance" aria-label="Player performance">
+            <div className="review-player-metrics">
+              {playerMetrics.map(({ side, rating, loss, outcome }) => (
+                <dl key={side} className={`review-player-metric ${side}`}
+                  aria-label={side === "white" ? "White" : "Black"} aria-description={outcome}
+                  data-outcome={outcome?.toLowerCase()}>
+                  <dt>Estimated rating</dt>
+                  <dd>{rating ?? "—"}</dd>
+                  <dt>Centipawn loss</dt>
+                  <dd>{loss ?? "—"}</dd>
+                </dl>
+              ))}
+            </div>
+            {playerMetrics.some(({ rating }) => rating === null) && <p className="caption">Needs 8 non-book moves per side.</p>}
+          </Card>}
           {standard && <Card className="review-graph-card"><h2>Evaluation</h2><EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor}/></Card>}
           {status && <p role="status" className="review-status">{status}</p>}
           <Card className="review-notation-card">

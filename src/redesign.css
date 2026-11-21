@@ -4238,7 +4238,7 @@ select.theme-select {
 .quality-good:empty { display:none; }
 .game-review-layout .board-navigation { width:var(--actual-board-width,calc(100% - 29px)); margin-left:29px; }
 .game-review-layout .side-panels { gap:14px; }
-.review-overview h2,.review-graph-card h2,.review-notation-card h2 { font-size:.9rem; margin-bottom:12px; }
+.review-graph-card h2,.review-notation-card h2 { font-size:.9rem; margin-bottom:12px; }
 .review-status { margin:0; color:var(--muted); font-size:.75rem; }
 .evaluation-graph { position:relative; }
 .evaluation-graph svg { display:block; width:100%; }
@@ -4262,28 +4262,26 @@ select.theme-select {
 .puzzle-board.solved,.puzzle-board.wrong { border-color:transparent; }
 .puzzle-board.solved .board { outline:3px solid #f8d953; outline-offset:0; }
 .puzzle-board.wrong .board { outline:3px solid #f15b68; outline-offset:0; }
-.game-review-layout > .side-panels { container-type:inline-size; }
-.review-overview { display:grid; gap:14px; }
-.review-overview:has(.review-performance) { grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); }
-.review-overview > .card { min-width:0; padding:12px; }
-.review-overview p { margin:0; overflow-wrap:anywhere; }
-.review-overview p + p,.review-performance > .caption { margin-top:8px; }
-.review-player-metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.side-panels > .review-performance { padding:12px; }
+.review-performance > .caption { margin:8px 0 0; }
+.review-player-metrics {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:3px;
+  border-radius:9px; overflow:hidden;
+}
 .review-player-metric {
-  display:grid; grid-template-rows:subgrid; grid-row:span 4; gap:3px;
-  margin:0; padding:8px 6px; border:1px solid #818692; border-radius:9px; text-align:center;
+  display:grid; grid-template-rows:subgrid; grid-row:span 4;
+  margin:0; padding:8px 6px;
+  border-top:5px solid var(--review-outcome,transparent); text-align:center;
 }
 .review-player-metric.white { background:#fff; color:#111318; }
 .review-player-metric.black { background:#111318; color:#fff; }
+.review-player-metric[data-outcome="win"] { --review-outcome:#18d966; }
+.review-player-metric[data-outcome="loss"] { --review-outcome:#ff385b; }
+.review-player-metric[data-outcome="draw"] { --review-outcome:#898d97; }
 .review-player-metric dt { font-size:.72rem; line-height:1.25; }
 .review-player-metric dd { margin:0; font-size:1.2rem; font-weight:800; font-variant-numeric:tabular-nums; }
 .review-player-metric dd:first-of-type { margin-bottom:4px; }
-@container (max-width: 270px) {
-  .review-overview:has(.review-performance) { grid-template-columns:minmax(0,1fr); }
-}
-.review-notation-card { scroll-padding-top:70px; }
-.review-notation-card h2 { position:sticky; top:0; z-index:3; background:var(--panel-solid); line-height:20px; padding:8px 0; }
-.review-notation th { position:sticky; top:36px; z-index:2; background:var(--panel-solid); }
+.review-notation-card h2 { line-height:20px; padding:8px 0; }
 .review-game-details { width:var(--actual-board-width,calc(100% - 29px)); margin-left:29px; }
 .review-game-details > summary { padding:10px; color:var(--muted); cursor:pointer; font-size:.8rem; }
 .review-game-details > .card { margin-top:8px; }
