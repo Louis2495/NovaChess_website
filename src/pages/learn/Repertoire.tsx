@@ -1,5 +1,6 @@
 import { groupByOpening, openingFamily, repertoireFamilyLookup } from "../../lib/openingFamilies";
 import { exportRepertoire, repertoirePaths } from "../../lib/repertoire";
+import { RepertoireInbox, ShareWithFriend } from "./RepertoireFriends";
 import RepertoireEditor, { RepertoireImport } from "./RepertoireEditor";
 import { usePremoves } from "../../lib/usePremoves";
 import PremoveQueue from "../../components/PremoveQueue";
@@ -102,29 +103,34 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
   ));
   return (
     <div className="repertoire-page">
-      <div className="repertoire-color-toggle">
-        <ChoiceSelect aria-label="Repertoire color" value={color} onChange={event => setColor(event.target.value)}>
-          <option value="all">Both</option><option value="w">White</option><option value="b">Black</option>
-        </ChoiceSelect>
-      </div>
-      <div className="section-toolbar repertoire-toolbar">
-        <p className="muted">
-          {library.repertoire.length} {library.repertoire.length === 1 ? "line" : "lines"}
-        </p>
-        <div className="button-row">
-          <Button className="secondary" aria-haspopup="dialog" onClick={() => setShowSuggestions(true)}>Show suggestions</Button>
-          {library.repertoire.some(line => line.moves.length > 0) && <Button className="secondary" onClick={() => setSharing(true)}>
-            <Share2 size={16} /> Share
-          </Button>}
-          {(groups.length > 0 || managing) && <Button className="secondary" onClick={() => setManaging(!managing)}>
-            {managing ? "Done" : "Manage categories"}
-          </Button>}
-          <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
-            <Download size={16} /> Import
-          </Button>
-          <Button onClick={onAdd}><Plus size={16} /> Add line</Button>
+      <div className="repertoire-controls">
+        <div className="section-toolbar repertoire-toolbar">
+          <h2 className="repertoire-heading">Your repertoire <span>{library.repertoire.length} {library.repertoire.length === 1 ? "line" : "lines"}</span></h2>
+          <div className="button-row">
+            <Button className="secondary" aria-haspopup="dialog" onClick={() => setShowSuggestions(true)}>Show suggestions</Button>
+            {library.repertoire.some(line => line.moves.length > 0) && <Button className="secondary" onClick={() => setSharing(true)}>
+              <Share2 size={16} /> Share
+            </Button>}
+            {(groups.length > 0 || managing) && <Button className="secondary" onClick={() => setManaging(!managing)}>
+              {managing ? "Done" : "Manage categories"}
+            </Button>}
+            <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
+              <Download size={16} /> Import
+            </Button>
+            <Button onClick={onAdd}><Plus size={16} /> Add line</Button>
+          </div>
         </div>
+        {!managing && !!groups.length && <div className="repertoire-browse">
+          <div className="repertoire-color-toggle">
+            <ChoiceSelect aria-label="Repertoire color" value={color} onChange={event => setColor(event.target.value)}>
+              <option value="all">Both</option><option value="w">White</option><option value="b">Black</option>
+            </ChoiceSelect>
+          </div>
+          <input aria-label="Search repertoire" type="search" placeholder="Search openings or lines" value={query}
+            onChange={event => setQuery(event.target.value)} />
+        </div>}
       </div>
+      <RepertoireInbox />
       {sharing && <RepertoireShare groups={groups.map(({ family, lines }) => ({
         name: categoryName(family), family, lines: lines.filter(line => line.moves.length > 0),
       })).filter(group => group.lines.length)} onClose={() => setSharing(false)} />}
@@ -172,9 +178,6 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
           }))}
         />
       ) : <>
-      {!!groups.length && <div className="repertoire-filters">
-        <Field label="Search repertoire"><input type="search" placeholder="Opening or line name" value={query} onChange={event => setQuery(event.target.value)} /></Field>
-      </div>}
       {!groups.length ? (
         <Card>
           <Empty
@@ -191,8 +194,10 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
             <section key={family} className="opening-family" aria-label={categoryName(family)}>
               <details open>
                 <summary className="repertoire-family-heading">
-                  <span className="repertoire-family-name">{categoryName(family)}</span>
-                  <small>{lines.length ? `${lines.length} ${lines.length === 1 ? "line" : "lines"}` : "Empty"}</small>
+                  <span className="repertoire-family-title">
+                    <span className="repertoire-family-name">{categoryName(family)}</span>
+                    <small>{lines.length ? `${lines.length} ${lines.length === 1 ? "line" : "lines"}` : "Empty"}</small>
+                  </span>
                   <span className="repertoire-section-action" aria-hidden="true"><span>Show lines</span><span>Hide lines</span></span>
                 </summary>
                 <div className="repertoire-grid">
@@ -352,6 +357,8 @@ function RepertoireShare({ groups, onClose }: {
   const [message, setMessage] = useState("");
   const lines = groups.flatMap(group => group.lines).filter(line => selected.includes(line.id));
 
+  const pgn = lines.map(exportRepertoire).join("\n");
+
   function toggle(ids: string[], checked: boolean) {
     setSelected(current => checked ? [...new Set([...current, ...ids])] : current.filter(id => !ids.includes(id)));
     setLink("");
@@ -359,7 +366,6 @@ function RepertoireShare({ groups, onClose }: {
   }
 
   async function share() {
-    const pgn = lines.map(exportRepertoire).join("\n");
     const url = new URL(window.location.href);
     url.hash = "learn/repertoire:shared/" + encodeURIComponent(pgn);
     if (url.href.length > 8000) {
@@ -376,7 +382,7 @@ function RepertoireShare({ groups, onClose }: {
   }
 
   return <Modal title="Share repertoire" onClose={onClose}>
-    <p className="caption">Choose the lines or opening categories to share. Anyone with the link can import the selected lines and their sidelines.</p>
+    <p className="caption">Choose the lines or opening categories you want to share.</p>
     <div className="repertoire-share-selection">
       {groups.map(group => <fieldset key={group.family}>
         <legend>{group.name}</legend>
@@ -393,10 +399,11 @@ function RepertoireShare({ groups, onClose }: {
         </label>)}
       </fieldset>)}
     </div>
-    <div className="button-row">
-      <Button disabled={!lines.length} onClick={() => void share()}>Copy link</Button>
+    <ShareWithFriend pgn={pgn} onSent={onClose} />
+    <div className="button-row repertoire-share-export">
+      <Button className="secondary" disabled={!lines.length} onClick={() => void share()}>Copy link</Button>
       <Button className="secondary" disabled={!lines.length}
-        onClick={() => download("repertoire.pgn", lines.map(exportRepertoire).join("\n"), "application/x-chess-pgn")}>Download PGN</Button>
+        onClick={() => download("repertoire.pgn", pgn, "application/x-chess-pgn")}>Download PGN</Button>
     </div>
     {message && <p role="status" className="caption">{message}</p>}
     {link && <Field label="Share link"><input readOnly value={link} onFocus={event => event.target.select()} /></Field>}

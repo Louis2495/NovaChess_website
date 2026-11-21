@@ -598,3 +598,52 @@ test('Play lets a waiting player leave and routes variant rooms to Variants',asy
  await page.goto('/#play/online/'+roomId);
  await expect(page).toHaveURL(/#variants\/online/);
 });
+
+test("share selected repertoire lines with a friend, accept a share, and reject another", async ({ page }) => {
+  await connected(page);
+  await page.addInitScript(() => {
+    localStorage.setItem("novachess-library-v2", JSON.stringify({ repertoire: [{
+      id: "my-line", name: "My Sicilian", side: "b",
+      initial: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      moves: ["e2e4", "c7c5"],
+    }] }));
+  });
+  const inbox = [
+    { id: "accepted", username: "Opponent", screen_name: "Chess friend", pgn: '[Event "Shared Sicilian"]\n\n1. e4 c5 *' },
+    { id: "rejected", username: "Opponent", screen_name: "Chess friend", pgn: '[Event "Shared French"]\n\n1. e4 e6 *' },
+  ];
+  await page.route("**/rpc/player_directory", route => route.fulfill({
+    json: [{ id: peer, screen_name: "Chess friend", relationship: "friends" }],
+  }));
+  await page.route("**/rpc/repertoire_share_inbox", route => route.fulfill({ json: inbox }));
+  await page.route("**/rpc/respond_repertoire_share", route => {
+    const { p_share, p_accept } = route.request().postDataJSON();
+    expect(p_accept).toBe(p_share === "accepted");
+    inbox.splice(inbox.findIndex(share => share.id === p_share), 1);
+    return route.fulfill({ json: null });
+  });
+  await page.route("**/rpc/send_repertoire_share", route => route.fulfill({ json: null }));
+
+  await page.goto("/#learn/repertoire");
+  await page.getByRole("button", { name: "Share", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Share repertoire" });
+  await dialog.getByRole("checkbox", { name: "My Sicilian" }).check();
+  await dialog.getByLabel("Friend", { exact: true }).selectOption({ label: "Chess friend" });
+  const request = page.waitForRequest("**/rpc/send_repertoire_share");
+  await dialog.getByRole("button", { name: "Send to friend" }).click();
+  const sent = (await request).postDataJSON();
+  expect(sent.p_recipient).toBe(peer);
+  expect(sent.p_pgn).toContain('[Event "My Sicilian"]');
+  await expect(dialog).toHaveCount(0);
+
+  const incoming = page.getByRole("region", { name: "Shared with you" });
+  await expect(incoming.getByRole("article")).toHaveCount(2);
+  const accepted = incoming.getByRole("article").first();
+  await accepted.getByText("View lines").click();
+  await expect(accepted.getByText("Shared Sicilian")).toBeVisible();
+  await accepted.getByRole("button", { name: "Accept", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Shared Sicilian" })).toBeVisible();
+  await incoming.getByRole("button", { name: "Reject", exact: true }).click();
+  await expect(incoming).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Shared French" })).toHaveCount(0);
+});
