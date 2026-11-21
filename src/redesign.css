@@ -5541,22 +5541,23 @@ html { scrollbar-gutter:stable; }
 .puzzle-review-bar .btn { flex:none; padding:8px; }
 .puzzle-review-bar input { width:100%; min-width:0; height:8px; padding:0; accent-color:var(--accent); }
 /* An inset, continuous timeline keeps the preview control inside the card. */
-.home-recent .recent-game-scrubber { flex:none; height:18px; }
+.home-recent .recent-game-scrubber { flex:none; height:14px; }
 .home-recent .recent-game-scrubber input {
   appearance:none; display:block; width:100%; height:100%; min-height:0; margin:0; padding:0;
-  border:0; border-radius:0 0 12px 12px; cursor:ew-resize; outline-offset:-2px;
+  border:0; border-radius:0 0 12px 12px; cursor:ew-resize; outline-offset:-2px; --scrubber-marker-opacity:0;
   background:color-mix(in srgb,var(--recent-color) 35%,var(--panel-solid));
 }
-.home-recent .recent-game-scrubber input:is(:hover,:focus-visible) {
+.home-recent .recent-game-scrubber input:is(:hover,:focus-visible,:active) {
+  --scrubber-marker-opacity:1;
   background:color-mix(in srgb,var(--recent-color) 52%,var(--panel-solid));
 }
 .home-recent .recent-game-scrubber input::-webkit-slider-runnable-track { height:100%; background:transparent; }
 .home-recent .recent-game-scrubber input::-moz-range-track { height:100%; background:transparent; }
 .home-recent .recent-game-scrubber input::-webkit-slider-thumb {
-  appearance:none; width:6px; height:14px; margin-top:2px; border:0; border-radius:3px; background:#fff;
+  appearance:none; width:6px; height:10px; margin-top:2px; border:0; border-radius:3px; background:#fff; opacity:var(--scrubber-marker-opacity);
 }
 .home-recent .recent-game-scrubber input::-moz-range-thumb {
-  width:6px; height:14px; border:0; border-radius:3px; background:#fff;
+  width:6px; height:10px; border:0; border-radius:3px; background:#fff; opacity:var(--scrubber-marker-opacity);
 }
 .home-recent .recent-game-row { --recent-art-size:89.6px; grid-template-columns:minmax(0,1fr) var(--recent-art-size) minmax(0,1fr); }
 .recent-variant-picture { width:var(--recent-art-size); height:var(--recent-art-size); display:grid; place-items:center; position:relative; left:6px; }
