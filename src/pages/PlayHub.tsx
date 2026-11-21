@@ -25,7 +25,7 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
   const speedrunMatch = /^speedrun\/(\d+)$/.exec(detail);
   if(speedrunMatch)return <Play speedrunElo={clampSpeedrunRating(Number(speedrunMatch[1]))}/>;
   if (detail === "resume") return <Play variantsOnly={variants} />;
-  return <div className={`play-hub ${variants ? "variants-hub" : "standard-play-hub"} ${playing ? "match-active" : "setup-active"} ${online ? "online-opponent" : "computer-opponent"}`}>
+  return <div data-online-variant={variants && online ? mode : undefined} className={`play-hub ${variants ? "variants-hub" : "standard-play-hub"} ${playing ? "match-active" : "setup-active"} ${online ? "online-opponent" : "computer-opponent"}`}>
     {!playing && <div className="play-hub-heading">
       {online ? <h1 className="sr-only">{variants ? "Variants" : "Play"}</h1> : <h2 className="sr-only">{variants ? "Variants" : "Play"}</h2>}
       {!variants && online && <div className="time-control-toggle" role="group" aria-label="Time control">{[["180:0","3"],["180:2","3|2"],["300:0","5"],["600:0","10"]].map(([id,label])=><button key={id} aria-pressed={timeControl===id} onClick={()=>setTimeControl(id)}>{label}</button>)}</div>}

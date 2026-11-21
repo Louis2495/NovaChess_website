@@ -5391,7 +5391,12 @@ html { scrollbar-gutter:stable; }
 }
 .workspace-shell:has(.variants-hub.setup-active) > .workspace {
   display:block; min-height:0; max-width:none; box-sizing:border-box;
-  padding:clamp(24px,calc(20dvh - 84px),96px) clamp(18px,5vw,84px) clamp(8px,1.8dvh,16px);
+  --variants-top-inset:clamp(24px,calc(20dvh - 84px),96px);
+  --team-top-offset:0px;
+  padding:calc(var(--variants-top-inset) - var(--team-top-offset)) clamp(18px,5vw,84px) clamp(8px,1.8dvh,16px);
+}
+.workspace-shell:has(.variants-hub.setup-active[data-online-variant="team"]) > .workspace {
+  --team-top-offset:calc(var(--variants-top-inset) / 2);
 }
 .workspace:has(.variants-hub.setup-active) > div:first-child,
 .workspace:has(.variants-hub.setup-active) > div:first-child > div {
@@ -5400,7 +5405,7 @@ html { scrollbar-gutter:stable; }
 .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active {
   --variant-section-gap:clamp(12px,3.6dvh,36px);
   --variant-message-gap:8px;
-  --variant-setup-space:calc(134px + 2 * var(--variant-section-gap) + var(--variant-message-gap));
+  --variant-setup-space:calc(148px + 2 * var(--variant-section-gap) + var(--variant-message-gap) + var(--team-top-offset));
   display:flex; flex-direction:column; align-items:center; gap:var(--variant-section-gap);
   width:100%; height:100%; min-height:0;
   container-type:size;
@@ -5433,7 +5438,8 @@ html { scrollbar-gutter:stable; }
   --variant-fit-rows:3;
   --variant-card-height:min(170px,max(0px,calc((100cqh - var(--variant-setup-space) + var(--variant-gallery-gap)) / var(--variant-fit-rows) - var(--variant-gallery-gap))));
   flex:1 1 0; min-height:0; width:min(100%,calc((960px + var(--variant-gallery-gap)) * 7 / 6 - var(--variant-gallery-gap))); margin:0;
-  max-height:calc(var(--variant-gallery-rows) * var(--variant-card-height) + (var(--variant-gallery-rows) - 1) * var(--variant-gallery-gap));
+  --variant-gallery-height:calc(var(--variant-gallery-rows) * var(--variant-card-height) + (var(--variant-gallery-rows) - 1) * var(--variant-gallery-gap));
+  max-height:var(--variant-gallery-height);
   grid-template-columns:repeat(7,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr);
   gap:var(--variant-gallery-gap);
 }
@@ -5441,7 +5447,22 @@ html { scrollbar-gutter:stable; }
   width:min(960px,calc((100% + var(--variant-gallery-gap)) * 6 / 7 - var(--variant-gallery-gap)));
   grid-template-columns:repeat(6,minmax(0,1fr));
 }
-.variants-hub.setup-active .online-variant-gallery { margin-block-start:var(--variant-message-gap); }
+/* Reserve the same gallery position as the launch, message, and friend controls change. */
+.variants-hub.setup-active .online-variant-gallery {
+  margin-block-start:auto;
+  margin-block-end:max(0px,calc(100cqh - var(--variant-setup-space) - var(--variant-gallery-height)));
+}
+.workspace:has(.variants-hub.setup-active) .variants-hub.setup-active[data-online-variant="team"] {
+  row-gap:calc(var(--variant-section-gap) / 2);
+}
+.variants-hub[data-online-variant="team"] > .quick-online-play:has(+ .online-variant-gallery) { gap:6px; }
+.variants-hub[data-online-variant="team"] .quick-online-play > .field {
+  gap:4px;
+}
+.variants-hub[data-online-variant="team"] .quick-online-play > .field .segmented-control button {
+  min-height:32px;
+  padding-block:5px;
+}
 .variants-hub.setup-active .variant-gallery button {
   container-type:size; justify-content:center; min-height:0; min-width:0;
   padding:1px clamp(5px,1vw,10px); gap:3px; line-height:1.1; text-align:center;
@@ -5461,10 +5482,13 @@ html { scrollbar-gutter:stable; }
 .variants-hub.setup-active .game-settings-card > .options-toggle { padding:6px 0; }
 .variants-hub.setup-active .resume-game-button { margin-top:4px; padding:4px 8px; }
 @media(max-width:760px) {
-  .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active { --variant-section-gap:clamp(9px,2.4dvh,20px); }
+  .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active {
+    --variant-section-gap:clamp(9px,2.4dvh,20px);
+    --variant-mobile-controls:20px;
+  }
   .variants-hub.setup-active .variant-gallery { --variant-gallery-gap:clamp(7px,1.7dvh,15px); }
   .workspace-shell:has(.variants-hub.setup-active) > .workspace {
-    padding-top:clamp(14px,6dvh,48px);
+    --variants-top-inset:clamp(14px,6dvh,48px);
     padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
   .variants-hub.setup-active :is(.variant-gallery,.computer-variant-gallery) {
@@ -5476,7 +5500,7 @@ html { scrollbar-gutter:stable; }
   .variants-hub.setup-active .computer-variant-gallery { --variant-gallery-rows:5; }
 }
 @media(max-width:1000px) {
-  .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active { --variant-setup-space:calc(152px + 3 * var(--variant-section-gap) + var(--variant-message-gap)); }
+  .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active { --variant-setup-space:calc(174px + 3 * var(--variant-section-gap) + var(--variant-message-gap) + var(--team-top-offset) + var(--variant-mobile-controls,0px)); }
   .variants-hub.setup-active > .play-hub-heading {
     position:static; order:-3; align-self:flex-end;
   }

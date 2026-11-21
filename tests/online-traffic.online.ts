@@ -280,27 +280,35 @@ test('Variants centers friend and launch controls with the opponent toggle on th
   const friend = page.getByRole('button', { name: 'Play a Friend', exact: true });
   await page.getByRole('button', { name: 'Atomic', exact: true }).click();
   await expect(friend).toBeEnabled();
-  for (const width of [1440, 390]) {
-    await page.setViewportSize({ width, height: 900 });
+  for (const [width, height] of [[1440, 900], [1280, 720], [390, 664]]) {
+    await page.setViewportSize({ width, height });
     const [area, toggle, action] = (await Promise.all([
       hub.boundingBox(), opponent.boundingBox(), friend.boundingBox(),
     ])).map(box => box!);
     expect(Math.abs(area.x + area.width - toggle.x - toggle.width)).toBeLessThan(2);
     expect(Math.abs(action.x + action.width / 2 - area.x - area.width / 2)).toBeLessThan(2);
     const gallery = page.getByRole('group', { name: 'Online variants', exact: true });
+    const cards = (await gallery.boundingBox())!;
     await gallery.getByRole('button', { name: 'Team Chess', exact: true }).click();
     const team = page.getByRole('button', { name: 'Start Team Chess', exact: true });
     await expect(team).toBeVisible();
     const after = (await gallery.boundingBox())!;
     const launch = (await team.boundingBox())!;
+    expect(Math.abs(after.y-cards.y)).toBeLessThan(1);
+    expect(Math.abs(after.height-cards.height)).toBeLessThan(1);
     const teamSettings = (await hub.locator('.quick-online-play > .field').boundingBox())!;
     const teamToggle = (await opponent.boundingBox())!;
-    if(width>760)expect(Math.abs(teamSettings.y-teamToggle.y)).toBeLessThan(1);
+    if(width>1000)expect(Math.abs(teamSettings.y-teamToggle.y)).toBeLessThan(1);
+    expect(teamToggle.y).toBeLessThan(toggle.y);
+    await hub.locator('.quick-online-play > .field').getByRole('button',{name:'Computer',exact:true}).click();
+    expect(await gallery.boundingBox()).toEqual(after);
+    expect(await page.evaluate(()=>document.documentElement.scrollHeight-window.innerHeight)).toBeLessThanOrEqual(1);
     expect(Math.abs(launch.x + launch.width / 2 - area.x - area.width / 2)).toBeLessThan(2);
     await expect(gallery.getByRole("button").last()).toBeInViewport({ratio:1});
     expect(launch.y + launch.height).toBeLessThan(after.y);
     await gallery.getByRole('button', { name: 'Throne', exact: true }).click();
     await expect(friend).toHaveCount(0);
+    expect(Math.abs((await gallery.boundingBox())!.y-cards.y)).toBeLessThan(1);
 
     await gallery.getByRole('button', { name: 'Atomic', exact: true }).click();
   }
