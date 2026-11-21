@@ -315,7 +315,7 @@ export default function Analysis() {
               {Array.from({ length: lineCount }, (_, i) => {
                 const line = engine.lines[i];
                 return (
-                  <div className="engine-line" key={i}>
+                  <div className="engine-line" key={i} tabIndex={0} role="region" aria-label={`Engine line ${i + 1}`}>
                     <div className="pv-heading">
                       <span>{i + 1}</span>
                       <strong>{scoreLabel(line)}</strong>

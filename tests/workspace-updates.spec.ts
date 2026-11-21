@@ -91,7 +91,7 @@ test("analysis explains positions, has a separate large evaluation and a compact
   ).toBeVisible();
   await expect(page.getByText("Black to move", { exact: true })).toHaveCount(0);
 });
-test("puzzle board entry and reply notation work while rating aligns with the board", async ({
+test("puzzle board entry and reply notation work while the puzzle controls align with the board", async ({
   page,
 }) => {
   const puzzle = JSON.parse(
@@ -114,8 +114,7 @@ test("puzzle board entry and reply notation work while rating aligns with the bo
     await expect
       .poll(async () => {
         const a = (await page
-            .locator(".side-panels>.card")
-            .first()
+            .locator(".puzzle-layout > .side-panels")
             .boundingBox())!,
           b = (await page
             .getByRole("group", { name: "Chessboard", exact: true })

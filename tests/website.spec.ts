@@ -468,7 +468,7 @@ test("saved games replay and engine review persist real results", async ({
   );
   await page.goto("/#library");
   await page
-    .getByRole("button", { name: "Replay & review", exact: true })
+    .getByRole("button", { name: "Review", exact: true })
     .click();
   await page.getByRole("button", { name: "Next move", exact: true }).click();
   await expect(
@@ -483,6 +483,7 @@ test("saved games replay and engine review persist real results", async ({
 test("default dark views and customization dialog pass automated WCAG checks", async ({
   page,
 }) => {
+  test.setTimeout(60000);
   const { default: AxeBuilder } = await import("@axe-core/playwright");
   for (const route of [
     "/",

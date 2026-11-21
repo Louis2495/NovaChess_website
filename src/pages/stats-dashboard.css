@@ -42,6 +42,8 @@
 .stats-dashboard .stats-overview .stats-metrics svg { color:var(--accent); }
 .stats-dashboard .stats-overview .stats-metrics b { color:var(--text); font-size:clamp(1.35rem,3vw,2.2rem); }
 .stats-dashboard .stats-visual-grid { margin:0; }
+.stats-dashboard .stats-overview .results-ring > div { background:var(--panel-solid); }
+.stats-dashboard .stats-overview .results-ring > div > span { color:var(--text); }
 .stats-dashboard .activity-track > span { background:var(--accent); }
 .stats-dashboard .stats-competition .speedrun-stats { grid-column:1 / -1; }
 .stats-dashboard .stats-section-heading {
