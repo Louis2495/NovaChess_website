@@ -5,10 +5,10 @@ import { base, imageFile } from "../lib/store";
 import { Field } from "./UI";
 
 const choices = [
-  ["pawn", "Sunglasses pawn"],
-  ["rook", "Keykeeper rook"],
-  ["knight", "Goofy knight"],
-  ["bishop", "Bow-tie bishop"],
+  ["pawn", "Clay mustache pawn"],
+  ["rook", "Pixel lightning rook"],
+  ["knight", "Watercolor teacup knight"],
+  ["bishop", "Paper collage bishop"],
 ] as const;
 
 export default function SignupProfileFields({ country, avatar, onCountry, onAvatar, onBusy, onError }: {
