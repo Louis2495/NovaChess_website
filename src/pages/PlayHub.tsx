@@ -16,11 +16,11 @@ const onlineVariants = [
 const teamModes = ["throne", "vote", "team"];
 export default function PlayHub({ variants = false }: { variants?: boolean }) {
   const { detail } = useApp();
-  const selectedVariant = variants && detail.startsWith("choose/")
-    ? variantList.find(variant => variant.id !== "chess" && variant.id === detail.slice("choose/".length))
-    : undefined;
-  const [opponent, setOpponent] = useState(selectedVariant ? "computer" : "online"),
-    [mode, setMode] = useState(selectedVariant?.id ?? "throne"),
+  const choice = variants ? /^choose\/(online\/)?([^/]+)$/.exec(detail) : null;
+  const selectedVariant = onlineVariants.find(([id]) => id === choice?.[2])?.[0];
+  const onlineOnly = selectedVariant && teamModes.includes(selectedVariant);
+  const [opponent, setOpponent] = useState(selectedVariant && !onlineOnly && !choice?.[1] ? "computer" : "online"),
+    [mode, setMode] = useState(selectedVariant ?? "throne"),
     [playing, setPlaying] = useState(false),[timeControl,setTimeControl]=useState("180:0");
   const [friendSettingsHost,setFriendSettingsHost]=useState<HTMLDivElement|null>(null);
   const online = opponent === "online";
@@ -53,6 +53,6 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
       </button>)}
     </div>}
     </Community>
-      : <Play variantsOnly={variants} initialVariant={selectedVariant?.id} onPlayingChange={setPlaying} />}
+      : <Play variantsOnly={variants} initialVariant={onlineOnly ? undefined : selectedVariant} onPlayingChange={setPlaying} />}
   </div>;
 }

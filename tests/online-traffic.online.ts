@@ -84,6 +84,10 @@ test('online Duck requires both a piece move and duck placement',async({page})=>
  const env=await connected(page),ff=await native();env.room.variant='duck';env.room.state=freshOnline(ff,'duck');
  await page.goto('/#variants/online/'+roomId);const board=page.locator('.chess-layout .board').first();await board.getByRole('button',{name:'e2, white pawn',exact:true}).click();await board.getByRole('button',{name:'e4, empty',exact:true}).click();expect(env.actions).toHaveLength(0);
  await board.getByRole('button',{name:'d5, empty',exact:true}).click();await expect.poll(()=>env.room.state.moves.length).toBe(1);expect(env.actions[0].move).toMatch(/^e2e4,.*d5$/);
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')||'{}').lastPlayedVariant)).toMatchObject({id:'duck',online:true});
+ await page.goto('/#home');
+ await page.getByRole('button',{name:/Last played variant Duck/}).click();
+ await expect(page.getByRole('group',{name:'Online variants'}).getByRole('button',{name:'Duck',exact:true})).toHaveAttribute('aria-pressed','true');
 });
 test('online Crazyhouse exposes captured pocket pieces and validates drops',async({page})=>{
  const env=await connected(page),ff=await native();env.room.variant='crazyhouse';let state=freshOnline(ff,'crazyhouse');for(const move of ['e2e4','d7d5','e4d5','e7e6'])state=applyOnline(ff,'crazyhouse',state,move);env.room.state=state;

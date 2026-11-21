@@ -118,8 +118,8 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
   const [ff, setFF] = useState<FairyStockfish | null>(null),
     [error, setError] = useState(""),
     [playing, setPlaying] = useState(detail === "resume"),
-    [variant, setVariant] = useState(variantsOnly ? initialVariant ?? variantList.find(v=>v.id!=="chess")!.id : "chess"),
-    [speedrunMode, setSpeedrunMode] = useState(speedrunElo !== undefined),
+    [variant, setVariant] = useState(variantsOnly && initialVariant !== "speedrun" ? initialVariant ?? variantList.find(v=>v.id!=="chess")!.id : "chess"),
+    [speedrunMode, setSpeedrunMode] = useState(speedrunElo !== undefined || initialVariant === "speedrun"),
     [speedrunRating, setSpeedrunRating] = useState(speedrunElo ?? 1000),
     [clockNow, setClockNow] = useState(Date.now()),
     [special, setSpecial] = useState<SpecialVariant | null>(
@@ -373,14 +373,17 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
             next.partner = { ...g.partner, positions: pos };
           }
         }
+        const played = humanMoved && (g.speedrun || g.variant !== "chess")
+          ? { lastPlayedVariant: { id: g.speedrun ? "speedrun" : g.variant, online: false } }
+          : {};
         if (b.isGameOver()) {
           let result = b.result();
           if (boardB && result !== "1/2-1/2")
             result = result === "1-0" ? "0-1" : "1-0";
           next.result = result;
-          return { ...archive(l, next), activeGame: next };
+          return { ...archive(l, next), ...played, activeGame: next };
         }
-        return { ...l, activeGame: next };
+        return { ...l, ...played, activeGame: next };
       } catch (e) {
         notify((e as Error).message);
         return l;

@@ -65,6 +65,9 @@ export default function SpecialPlay({
         history: [...(s.history || []), s.state],
         state: next,
       }));
+      if (next.moves.length > state.moves.length) {
+        setLibrary(l => ({ ...l, lastPlayedVariant: { id: variant, online: false } }));
+      }
       setArmed("");
       setFirst("");
     } catch (e) {

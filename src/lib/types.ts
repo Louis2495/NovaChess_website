@@ -182,6 +182,7 @@ export type Library = {
   progress: Progress;
   profile: Profile;
   activeGame: SavedGame | null;
+  lastPlayedVariant?: { id: string; online: boolean };
   localRating: number;
   analysis: SavedGame | null;
 };

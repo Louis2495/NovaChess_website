@@ -212,6 +212,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
         return;
       }
       if (result.id) {
+        if (action === "move" && result.mode !== "vote") {
+          const id = result.mode === "standard" ? result.variant : result.mode;
+          if (id !== "chess") setLibrary(l => ({ ...l, lastPlayedVariant: { id, online: true } }));
+        }
         acceptRoom(result);
         if (!roomId) navigate(result.mode === "standard" && result.variant === "chess" ? "play" : "variants", "online/"+result.id);
       }

@@ -1,3 +1,4 @@
+import MultiplayerPicture from "../components/MultiplayerPicture";
 import VariantIcon from "../components/VariantIcon";
 import {SavedBoardPlayer} from "../components/BoardPlayer";
 import {createPortal} from "react-dom";
@@ -14,9 +15,18 @@ import { Chess } from "chess.js";
 import { Board } from "../components/Board";
 import { Button } from "../components/UI";
 import { isStudy } from "../lib/library";
-const featuredVariants = variantList.filter(variant =>
-  ["crazyhouse", "duck", "atomic", "kingofthehill", "horde", "chess960"].includes(variant.id),
-);
+const multiplayerVariants = {
+  vote: "Vote Chess",
+  team: "Team Chess",
+  throne: "Throne",
+};
+
+function variantShortcut(id: string) {
+  if (Object.hasOwn(multiplayerVariants, id)) return { name: multiplayerVariants[id as keyof typeof multiplayerVariants], multiplayer: true };
+  if (id === "speedrun") return { name: "Speedrun", multiplayer: false };
+  const variant = variantList.find(variant => variant.id === id && id !== "chess");
+  return variant ? { name: variant.name, multiplayer: false } : undefined;
+}
 
 export function dailyPuzzle(puzzles: PuzzleData[]) {
   const choices = puzzles
@@ -50,8 +60,19 @@ export default function HomePage() {
   const games = library.games.filter(game => !isStudy(game) && game.folder !== "Studies");
   const recent = [...games].sort((a, b) => b.created - a.created).slice(0, 3);
   const dueOpenings = library.repertoire.filter(line => line.due <= Date.now()).length;
-  const week = Math.floor(Date.parse(today()) / (7 * 86400000));
-  const featured = featuredVariants[week % featuredVariants.length];
+  const lastSavedVariant = [...games, ...(library.activeGame ? [library.activeGame] : [])]
+    .filter(game => game.origin !== "archive" && !isStudy(game) && (game.moves.length || game.partner?.moves.length))
+    .sort((a, b) => b.created - a.created)
+    .map(game => {
+      const online = game.id.startsWith("online-");
+      const mode = online && game.variant === "chess"
+        ? Object.entries(multiplayerVariants).find(([, name]) => name === game.title)?.[0]
+        : undefined;
+      return { id: game.speedrun ? "speedrun" : mode ?? game.variant, online };
+    })
+    .find(game => game.id !== "vote" && variantShortcut(game.id));
+  const lastPlayed = library.lastPlayedVariant ?? lastSavedVariant;
+  const recentVariant = lastPlayed && lastPlayed.id !== "vote" ? variantShortcut(lastPlayed.id) : undefined;
   const appStoreUrl = import.meta.env.VITE_APP_STORE_URL?.trim();
   return (
     <div ref={homeRef} className={`home-page home-dashboard${appearance.showMemes ? "" : " memes-hidden"}`}>
@@ -141,17 +162,24 @@ export default function HomePage() {
             <ArrowRight size={16} aria-hidden="true" />
           </button>
         </section>
-        <section className="home-featured" aria-labelledby="home-featured-title">
-          <div className="home-featured-art" aria-hidden="true"><VariantIcon id={featured.id} size={112} /></div>
-          <div>
-            <h2 id="home-featured-title">Featured variant</h2>
-            <strong className="home-featured-name">{featured.name}</strong>
-            <p>{featured.description}</p>
-            <button className="text-link" onClick={() => navigate("variants", `choose/${featured.id}`)}>
-              Try {featured.name} <ArrowRight size={16} aria-hidden="true" />
+        <div className="home-featured-group">
+          <button type="button" className="home-featured" onClick={() => navigate("variants", "choose/vote")}>
+            <MultiplayerPicture mode="vote" />
+            <span>
+              <small>Featured variant</small>
+              <strong>Vote Chess</strong>
+              <span>Vote with your team on the next move.</span>
+            </span>
+          </button>
+          {lastPlayed && recentVariant && (
+            <button type="button" className="home-featured" onClick={() => navigate("variants", `choose/${lastPlayed.online ? "online/" : ""}${lastPlayed.id}`)}>
+              {recentVariant.multiplayer ? <MultiplayerPicture mode={lastPlayed.id} />
+                : lastPlayed.id === "speedrun" ? <img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt="" />
+                : <VariantIcon id={lastPlayed.id} size={112} />}
+              <span><small>Last played variant</small><strong>{recentVariant.name}</strong></span>
             </button>
-          </div>
-        </section>
+          )}
+        </div>
       </div>
       {appStoreUrl && <a className="home-app-link text-link" href={appStoreUrl}>Get NovaChess on the App Store <ArrowRight size={14} aria-hidden="true" /></a>}
     </div>
