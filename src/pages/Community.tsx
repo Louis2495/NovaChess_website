@@ -99,7 +99,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
   useEffect(()=>{if(room?.state.clock || room?.state.speedrun)void syncOnlineClock();},[room?.id,!!room?.state.clock,!!room?.state.speedrun]);
   useEffect(()=>{setPocket("");setDuck(null);},[room?.id,room?.revision]);
   const uid = session?.user.id;
-  const [roomId, inviteQuery = ""] = detail.replace(/^online\//, "").split("?");
+  const [roomId, inviteQuery = ""] = detail.startsWith("choose/") ? [""] : detail.replace(/^online\//, "").split("?");
   const inviteParams = new URLSearchParams(inviteQuery);
   const inviteTeam = inviteParams.get("team");
   const promptForTeammates = inviteParams.has("inviteTeammates");
