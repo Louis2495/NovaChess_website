@@ -7,22 +7,23 @@ test('Stats uses a quiet overview, outcome splits and a separate competition tab
  await expect(page.locator('.outcome-win').first()).toHaveCSS('background-color','rgb(89, 195, 151)');await expect(page.locator('.outcome-loss').first()).toHaveCSS('background-color','rgb(219, 119, 135)');await expect(page.locator('.outcome-draw').first()).toHaveCSS('background-color','rgb(181, 191, 204)');
  const color=(await page.locator('.playing-color-stat').boundingBox())!,activity=(await page.locator('.activity-card').boundingBox())!;expect(activity.y).toBeGreaterThan(color.y);await expect(page.locator('.color-results-key')).toHaveCount(0);
  const overviewWidth = (await page.locator('.stats-metrics').boundingBox())!.width;
- await page.getByRole('button',{name:'Competition',exact:true}).click();
+ await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();
  await expect(page.locator('.variant-breakdown .stat-bar')).toBeVisible();await expect(page.locator('.variant-breakdown summary')).toHaveCount(0);
  const throne=page.getByRole('group',{name:'Throne metric',exact:true});await throne.getByRole('button',{name:'Games',exact:true}).click();await expect(page.locator('.competition-total')).toHaveText('0');await throne.getByRole('button',{name:'Time',exact:true}).click();await expect(page.locator('.competition-total')).toHaveText('0:00:00');await expect(page.locator('.speedrun-rating')).toHaveCount(59);await expect(page.locator('.speedrun-rating').first()).toContainText('100');await expect(page.locator('.speedrun-rating').last()).toContainText('3000');const s=(await page.locator('.speedrun-stats').boundingBox())!;expect(Math.abs(s.width-overviewWidth)).toBeLessThan(2);await expect(page.locator('.speedrun-stats h2')).toHaveCSS('font-weight','650');
 });
 
 test('Speedrun rating squares start a local game at the selected Elo',async({page})=>{
- await page.goto('/#stats');await page.getByRole('button',{name:'Competition',exact:true}).click();await page.getByRole('button',{name:'Play Speedrun at 1500 Elo',exact:true}).click();
+ await page.goto('/#stats');await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();await page.getByRole('button',{name:'Play Speedrun at 1500 Elo',exact:true}).click();
  await expect(page.locator('.play-match')).toBeVisible();
  const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).activeGame);expect(game.botRating).toBe(1500);expect(game.title).toBe('Speedrun');expect(game.speedrun.invalid).not.toBe(true);
 });
 test('variant breakdown uses display names',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('novachess-library-v2',JSON.stringify({games:[{id:'fog-game',title:'Fog',variant:'cvfog',folder:'Games',moves:['e2e4'],result:'1-0',human:'w',created:Date.now()}]})));
- await page.goto('/#stats');await page.getByRole('button',{name:'Competition',exact:true}).click();await expect(page.locator('.variant-breakdown')).toContainText('Fog of War');await expect(page.locator('.variant-breakdown')).not.toContainText('cvfog');
+ await page.goto('/#stats');await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();await expect(page.locator('.variant-breakdown')).toContainText('Fog of War');await expect(page.locator('.variant-breakdown')).not.toContainText('cvfog');
 });
 
-test('Achievements can be filtered and the World map remains interactive', async ({page}) => {
+test('Achievements can be filtered and the interactive World map fits the viewport', async ({page,isMobile}) => {
+  await page.setViewportSize(isMobile ? {width:390,height:580} : {width:1280,height:620});
   await page.goto('/#stats');
   await page.getByRole('button',{name:'Achievements',exact:true}).click();
   await expect(page.getByRole('progressbar')).toHaveCount(18);
@@ -33,6 +34,13 @@ test('Achievements can be filtered and the World map remains interactive', async
   await expect(page.locator('.world-map path').first()).toBeVisible();
   await page.getByRole('button',{name:'Zoom in',exact:true}).click();
   await expect(page.locator('.map-controls')).toContainText('1.5×');
+  await expect(page.getByRole('button',{name:'Reset',exact:true})).toBeInViewport({ratio:1});
+  expect(await page.evaluate(()=>document.documentElement.scrollHeight-window.innerHeight)).toBeLessThanOrEqual(1);
+  if(isMobile){
+    const map=(await page.locator('.world-map-card').boundingBox())!;
+    const tabs=(await page.locator('.mobile-tabs').boundingBox())!;
+    expect(map.y+map.height).toBeLessThan(tabs.y);
+  }
 });
 
 test('Stats period follows the user across the overview, competition, achievements and map', async ({page}) => {
@@ -46,7 +54,7 @@ test('Stats period follows the user across the overview, competition, achievemen
   await page.getByRole('combobox',{name:'Stats period'}).selectOption('7');
   await expect(page.getByRole('img',{name:/1 completed game$/})).toBeVisible();
   await expect(page.getByRole('img',{name:'White: 1 wins, 0 losses, 0 draws'})).toBeVisible();
-  await page.getByRole('button',{name:'Competition',exact:true}).click();
+  await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();
   const ratings = page.getByRole('list',{name:'Fastest wins by computer rating'});
   await expect(ratings.getByRole('listitem')).toHaveCount(59);
   expect(await ratings.evaluate(grid => grid.scrollHeight - grid.clientHeight)).toBeLessThanOrEqual(1);

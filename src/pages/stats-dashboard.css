@@ -99,3 +99,52 @@
 .stats-dashboard :is(.throne-stat,.speedrun-stats) h2 svg {
   flex-shrink:0; transform:translateY(1px);
 }
+
+.workspace-shell:has(.stats-map-active) {
+  height:100dvh;
+}
+.workspace-shell:has(.stats-map-active) > .workspace {
+  min-height:0;
+  box-sizing:border-box;
+  padding-block:clamp(8px,2dvh,18px);
+}
+.workspace:has(.stats-map-active) > div:first-child,
+.workspace:has(.stats-map-active) > div:first-child > div,
+.stats-map-active {
+  height:100%;
+}
+.stats-dashboard.stats-map-active {
+  display:flex;
+  flex-direction:column;
+  padding-bottom:0;
+}
+.stats-map-active .stats-tabs {
+  flex:none;
+  margin-block:8px 12px;
+}
+.stats-map-active .stats-map-layout {
+  flex:1 1 0;
+  min-height:0;
+  display:flex;
+}
+.stats-map-active .world-map-card {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  width:100%;
+  padding:clamp(8px,1.8dvh,16px);
+}
+.stats-map-active .world-map-card .caption,
+.stats-map-active .map-controls,
+.stats-map-active .world-map {
+  margin:0;
+}
+.stats-map-active .world-map {
+  flex:1 1 0;
+  min-height:0;
+}
+@media(max-width:760px) {
+  .workspace-shell:has(.stats-map-active) > .workspace {
+    padding-bottom:calc(72px + env(safe-area-inset-bottom));
+  }
+}

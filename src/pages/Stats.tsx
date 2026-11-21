@@ -185,7 +185,7 @@ export default function Stats() {
     ),
   ];
   return (
-    <div className="stats-page stats-dashboard">
+    <div className={`stats-page stats-dashboard${tab === "World map" ? " stats-map-active" : ""}`}>
       <header className="stats-header">
         <h1>Stats</h1>
         <div className="activity-range">
@@ -199,7 +199,7 @@ export default function Stats() {
         </div>
       </header>
       <div className="stats-tabs" role="group" aria-label="Stats sections">
-        {["Overview", "Competition", "Rankings", "Achievements", "World map"].map((t) => (
+        {["Overview", "Variants", "Rankings", "Achievements", "World map"].map((t) => (
           <button
             key={t}
             aria-pressed={tab === t}
@@ -235,8 +235,8 @@ export default function Stats() {
           </ul>
           {onlyUnlocked && !badges.some(([, value, goal]) => value >= goal) && <p>No achievements unlocked yet.</p>}
         </section>
-      ) : tab === "Competition" ? (
-        <CompetitionStats games={games} speedrunGames={periodGames} since={since} />
+      ) : tab === "Variants" ? (
+        <VariantStats games={games} speedrunGames={periodGames} since={since} />
       ) : tab === "Rankings" ? (
         <>
           {since !== null && <p className="caption">Rankings show current standings.</p>}
@@ -256,14 +256,12 @@ export default function Stats() {
     </div>
   );
 }
-function CompetitionStats({games, speedrunGames, since}: {games:SavedGame[]; speedrunGames:SavedGame[]; since:number|null}) {
+function VariantStats({games, speedrunGames, since}: {games:SavedGame[]; speedrunGames:SavedGame[]; since:number|null}) {
  const {navigate}=useApp(), {session}=useOnlineSession();
  const [total,setTotal]=useState(0),[throneGames,setThroneGames]=useState(0),[metric,setMetric]=useState("Time"),[error,setError]=useState("");
  useEffect(()=>{setTotal(0);setThroneGames(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_stats", since === null ? {} : {p_since:new Date(since).toISOString()});if(active){setTotal(Number(r.data?.timeMs)||0);setThroneGames(Number(r.data?.games)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id,since]);
  const bests=new Map(speedrunBests(speedrunGames));
- const [ratingBand, setRatingBand] = useState("all");
  const ratings = Array.from({length:59}, (_, i) => 100+i*50);
- const visibleRatings = ratingBand === "all" ? ratings : ratings.filter(elo => Math.floor(elo / 1000) === Number(ratingBand));
  return <div className="stats-competition">
       <Card className="variant-breakdown-card">
         <div className="variant-breakdown">
@@ -280,12 +278,7 @@ function CompetitionStats({games, speedrunGames, since}: {games:SavedGame[]; spe
         </div>
       </Card>
   <Card className="throne-stat"><div className="card-heading"><h2><Crown size={21}/>On the Throne</h2><div className="segmented" role="group" aria-label="Throne metric">{["Time","Games"].map(m=><button key={m} aria-pressed={metric===m} className={metric===m?"active":""} onClick={()=>setMetric(m)}>{m}</button>)}</div></div><strong className="competition-total">{metric==="Time" ? throneDuration(total) : throneGames}</strong>{error && <p className="caption">{error}</p>}</Card>
-  <Card className="speedrun-stats"><div className="stats-section-heading"><h2><Timer size={21}/>Speedrun</h2>
-  <ChoiceSelect aria-label="Speedrun rating range" value={ratingBand} onChange={event => setRatingBand(event.target.value)}>
-    <option value="all">All ratings</option><option value="0">100–950 Elo</option>
-    <option value="1">1,000–1,950 Elo</option><option value="2">2,000–2,950 Elo</option>
-    <option value="3">3,000 Elo</option>
-  </ChoiceSelect></div><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating">{visibleRatings.map(elo=>{const game=bests.get(elo);return <div role="listitem" key={elo}><button type="button" className={`speedrun-rating ${game?"has-record":""}`} aria-label={`Play Speedrun at ${elo} Elo${game?`, best ${duration(game.speedrun!.elapsedMs,true)}`:""}`} onClick={()=>navigate("play",`speedrun/${elo}`)}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs,true):"—"}</strong></button></div>;})}</div></Card>
+  <Card className="speedrun-stats"><div className="stats-section-heading"><h2><Timer size={21}/>Speedrun</h2></div><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating">{ratings.map(elo=>{const game=bests.get(elo);return <div role="listitem" key={elo}><button type="button" className={`speedrun-rating ${game?"has-record":""}`} aria-label={`Play Speedrun at ${elo} Elo${game?`, best ${duration(game.speedrun!.elapsedMs,true)}`:""}`} onClick={()=>navigate("play",`speedrun/${elo}`)}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs,true):"—"}</strong></button></div>;})}</div></Card>
  </div>;
 }
 
@@ -545,9 +538,10 @@ function WorldMap({ visited }: { visited: string[] }) {
               distance.current = d;
               setZoom((z) => Math.max(1, Math.min(6, z * ratio)));
             } else if (zoom > 1) {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const dx = ((e.clientX - prev.x) * 720) / rect.width;
-              const dy = ((e.clientY - prev.y) * 360) / rect.height;
+              const transform = e.currentTarget.getScreenCTM();
+              if (!transform) return;
+              const dx = (e.clientX - prev.x) / transform.a;
+              const dy = (e.clientY - prev.y) / transform.d;
               setPan((p) => clampPan(p.x + dx, p.y + dy));
             }
           }}
