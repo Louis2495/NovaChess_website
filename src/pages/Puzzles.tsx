@@ -364,7 +364,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           </div>
 
         </div>
-        <aside className="side-panels puzzle-sidebar" aria-label="Puzzle tools">
+        <aside className="side-panels puzzle-sidebar" aria-label="Puzzle tools" tabIndex={0}>
           {!daily && (
             <Card className="puzzle-rating-card">
               <span className="sr-only">Puzzle rating</span>

@@ -113,3 +113,32 @@
   max-height:300px;
   background:var(--input);
 }
+
+
+/* Keep puzzle details reachable when they exceed the space beside or below the board. */
+.puzzle-layout:has(.puzzle-sidebar) {
+  height:var(--puzzle-available-height,auto);
+  grid-template-rows:minmax(0,1fr);
+}
+.puzzle-layout > .puzzle-sidebar {
+  max-height:100%;
+  box-sizing:border-box;
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.puzzle-layout > .puzzle-sidebar > * { flex-shrink:0; }
+/* The picker opens inside the scrollable sidebar when there is limited room. */
+.puzzle-sidebar .puzzle-theme-picker[open] .theme-picker-menu {
+  position:static;
+  margin-block-start:8px;
+  box-shadow:none;
+}
+@media (max-width:1000px) {
+  .workspace:has(.puzzle-layout) { padding-bottom:0; }
+  .puzzle-layout:has(.puzzle-sidebar) {
+    grid-template-rows:auto minmax(0,1fr);
+    row-gap:12px;
+  }
+  .puzzle-layout .puzzle-feedback { min-height:26px; }
+  .puzzle-layout .puzzle-feedback:empty { min-height:0; }
+}

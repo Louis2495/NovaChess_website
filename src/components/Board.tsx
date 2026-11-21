@@ -386,9 +386,13 @@ export function Board({
       if (el.closest(".game-review-layout")) {
         reserve = window.innerWidth <= 800 ? 205 : 145;
       } else if (tab === "puzzles") {
-        reserve = el.closest(".daily-puzzle-layout")
-          ? (window.innerWidth <= 1000 ? 185 : 125)
-          : (window.innerWidth <= 1000 ? 158 : 56);
+        const narrow = window.innerWidth <= 1000;
+        const daily = !!el.closest(".daily-puzzle-layout");
+        if (el.closest(".puzzle-layout")) {
+          reserve = narrow ? (window.innerWidth <= 760 ? 245 : 185) : (daily ? 125 : 96);
+        } else {
+          reserve = narrow ? 158 : 56;
+        }
       }
       const available = window.innerHeight - top - reserve;
       let heightLimit = top < window.innerHeight - 80
@@ -428,6 +432,11 @@ export function Board({
         if (layout?.matches(".chess-layout")) {
           const bounds = layout.getBoundingClientRect();
           layout.style.setProperty("--board-layout-top", `${rect.top - bounds.top}px`);
+          if (layout.matches(".puzzle-layout")) {
+            const bottomSpace = window.innerWidth <= 760 ? 72 : 20;
+            const height = Math.max(0, window.innerHeight - bounds.top - window.scrollY - bottomSpace);
+            layout.style.setProperty("--puzzle-available-height", `${Math.floor(height)}px`);
+          }
           if (reviewNavigation) {
             const bottom = reviewNavigation.getBoundingClientRect().bottom;
             layout.style.setProperty("--review-moves-height", `${bottom - rect.top}px`);
