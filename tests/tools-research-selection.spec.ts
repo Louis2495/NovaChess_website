@@ -92,7 +92,7 @@ test("Research source/color toggles align with username and NovaChess explores r
     color.getByRole("button", { name: "Black", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
 });
-test("puzzle rating is labeled in the practice header and completion uses only the board outline", async ({
+test("puzzle rating sits above practice in a dark card and completion uses only the board outline", async ({
   page,
 }) => {
   const puzzle = JSON.parse(
@@ -104,7 +104,9 @@ test("puzzle rating is labeled in the practice header and completion uses only t
   await page.goto("/#puzzles");
   const rating = page.locator(".puzzle-rating");
   await expect(rating).toBeVisible();
-  await expect(page.locator(".puzzle-practice-heading")).toContainText("Puzzle rating");
+  await expect(page.locator(".puzzle-sidebar > .card").first()).toHaveClass(/puzzle-rating-card/);
+  await expect(page.locator(".puzzle-rating-card")).toHaveCSS("background-color", "rgb(8, 9, 11)");
+  await expect(rating).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(rating).toHaveText(/^\d+$/);
   const c = new Chess(puzzle.fen);
   c.move(puzzle.moves[0]);

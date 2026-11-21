@@ -366,13 +366,15 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
         </div>
         <aside className="side-panels puzzle-sidebar" aria-label="Puzzle tools">
           {!daily && (
+            <Card className="puzzle-rating-card">
+              <span className="sr-only">Puzzle rating</span>
+              <strong className="puzzle-rating">{Math.round(library.progress.rating)}</strong>
+            </Card>
+          )}
+          {!daily && (
             <Card className="puzzle-practice-card">
               <div className="puzzle-practice-heading">
                 <h2>Practice</h2>
-                <div className="puzzle-rating-display">
-                  <span>Puzzle rating</span>
-                  <strong className="puzzle-rating">{Math.round(library.progress.rating)}</strong>
-                </div>
               </div>
               <PuzzleThemePicker value={theme} themes={themes} onChange={value => {
                 setTheme(value);
@@ -386,7 +388,6 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           <Card className="puzzle-replay-card">
             <div className="puzzle-replay-heading">
               <h2>Replay</h2>
-              <span>{played.length ? `${reviewIndex ?? played.length} of ${played.length}` : "Start position"}</span>
             </div>
             <div className="puzzle-review-bar" role="group" aria-label="Puzzle move navigation">
               <Button className="secondary" aria-label="Previous puzzle move" disabled={(reviewIndex ?? played.length) === 0} onClick={() => seekReview((reviewIndex ?? played.length) - 1)}><ChevronLeft size={19} /></Button>

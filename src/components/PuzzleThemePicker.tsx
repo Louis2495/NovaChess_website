@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState} from 'react';
-import {Check,ChevronDown,Search,SlidersHorizontal} from 'lucide-react';
+import {Check,ChevronDown,Search} from 'lucide-react';
 import {humanTheme} from '../lib/moves';
 export default function PuzzleThemePicker({value,themes,onChange}:{value:string;themes:string[];onChange:(value:string)=>void}) {
  const ref=useRef<HTMLDetailsElement>(null),searchRef=useRef<HTMLInputElement>(null);
@@ -15,7 +15,7 @@ export default function PuzzleThemePicker({value,themes,onChange}:{value:string;
    e.preventDefault();const current=buttons.indexOf(document.activeElement as HTMLButtonElement);buttons[Math.max(0,Math.min(buttons.length-1,current+(e.key==='ArrowDown'?1:-1)))]?.focus();
   }
  }}>
-  <summary aria-label="Puzzle theme settings" title={`Theme: ${label(value)}`}><SlidersHorizontal size={17} aria-hidden="true"/><span>{value === "All themes" ? "Find a theme" : label(value)}</span><ChevronDown size={15} className="theme-picker-chevron" aria-hidden="true"/></summary>
+  <summary aria-label="Puzzle theme settings" title={`Theme: ${label(value)}`}><span>{value === "All themes" ? "Find a theme" : label(value)}</span><ChevronDown size={15} className="theme-picker-chevron" aria-hidden="true"/></summary>
   <div className="theme-picker-menu">
    <div className="theme-picker-search"><Search size={16}/><input ref={searchRef} type="search" aria-label="Search puzzle themes" placeholder="Find a theme" value={query} onChange={e=>setQuery(e.target.value)}/></div>
    <div className="theme-picker-options" role="listbox" aria-label="Puzzle themes">{options.map(theme=><button type="button" role="option" aria-selected={theme===value} key={theme} onClick={()=>{onChange(theme);close(true);}}><span>{label(theme)}</span>{theme===value&&<Check size={16}/>}</button>)}{!options.length&&<p className="theme-picker-empty">No themes match.</p>}</div>
