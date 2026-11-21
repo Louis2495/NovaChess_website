@@ -3745,9 +3745,8 @@ select.theme-select {
   font-weight: 600;
   text-align: center;
 }
-.resume-link.resume-game-button:hover {
-  background: #cfbef5;
-  color: #271d3d;
+@media (hover: hover) {
+  .resume-link.resume-game-button:hover { background: #cfbef5; }
 }
 .home-practice-grid {
   align-items: stretch;
