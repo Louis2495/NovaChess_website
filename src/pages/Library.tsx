@@ -593,7 +593,11 @@ function GameViewer({
   };
   const selected = rows.find((r) => r.ply === Math.max(0, cursor - 1));
   const sideRows = (side: string) => rows.filter(r => game.positions[r.ply]?.split(" ")[1] === side);
-  const rating = (side: string) => performanceRating(sideRows(side));
+  const playerMetrics = (["w", "b"] as const).map(side => ({
+    side: side === "w" ? "white" : "black",
+    rating: performanceRating(sideRows(side)),
+    loss: average(side),
+  }));
   const settledEvaluation = useSettledEvaluation(game.positions[cursor] || game.initial, liveEngine.lines[0]);
   const evaluation = settledEvaluation?.score ?? (cursor ? rows.find(r=>r.ply===cursor-1)?.afterScore : rows[0]?.score) ?? 0;
   const selectedMove = cursor ? game.moves[cursor-1]?.split(",")[0].slice(2,4) : "";
@@ -743,24 +747,24 @@ function GameViewer({
         </div>
         <div className="side-panels">
           <div className="review-overview">
-            {standard && <Card className="review-performance">
-              <h2>Estimated rating</h2>
-              <div className="metric-pair">{["w","b"].map(side=><div key={side} title="Game performance estimate; available after eight analyzed non-book moves per side."><b>{rating(side) ?? "—"}</b><span>{side==="w"?"White":"Black"}</span></div>)}</div>
-              {(rating("w")===null || rating("b")===null) && <p className="caption">Needs 8 non-book moves per side.</p>}
+            {standard && <Card className="review-performance" aria-label="Player performance">
+              <div className="review-player-metrics">
+                {playerMetrics.map(({ side, rating, loss }) => (
+                  <dl key={side} className={`review-player-metric ${side}`} aria-label={side === "white" ? "White" : "Black"}>
+                    <dt>Estimated rating</dt>
+                    <dd>{rating ?? "—"}</dd>
+                    <dt>Centipawn loss</dt>
+                    <dd>{loss ?? "—"}</dd>
+                  </dl>
+                ))}
+              </div>
+              {playerMetrics.some(({ rating }) => rating === null) && <p className="caption">Needs 8 non-book moves per side.</p>}
             </Card>}
             <Card className="review-game-info">
               <h2>Game information</h2>
               <p>{game.title}</p>
               <p className="caption">{game.result}</p>
             </Card>
-            {standard && <Card className="review-engine-info">
-              <h2>Stockfish 19 Lite</h2>
-              <p className="caption">Depth {liveEngine.lines[0]?.depth ?? selected?.depth ?? 0}</p>
-            </Card>}
-            {standard && <Card className="review-summary">
-              <div className="card-heading"><h2>Centipawn loss</h2></div>
-              <div className="metric-pair"><div><b>{average("w") ?? "—"}</b><span>White</span></div><div><b>{average("b") ?? "—"}</b><span>Black</span></div></div>
-            </Card>}
           </div>
           {standard && <Card className="review-graph-card"><h2>Evaluation</h2><EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor}/></Card>}
           {status && <p role="status" className="review-status">{status}</p>}

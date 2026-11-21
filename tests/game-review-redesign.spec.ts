@@ -14,7 +14,7 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  await expect(page.getByRole('status').filter({hasText:'Review complete.'})).toBeVisible();
  await expect(page.locator('.review-notation th')).toHaveText(['#','White','Black']);await expect(page.locator('.review-notation .move-quality')).toHaveCount(moves.length);
  await expect(page.locator('.evaluation-graph polyline')).toHaveAttribute('points',/\S+ \S+/);
- await expect(page.locator('.review-performance .metric-pair b')).not.toHaveText(['—','—']);
+ await expect(page.locator('.review-performance .review-player-metric dd:first-of-type')).not.toHaveText(['—','—']);
  const batch=await page.evaluate(()=>(window as any).__engineWorkers.filter((w:any)=>w.commands.filter((s:string)=>s.startsWith('go ')&&!s.includes('infinite')).length>1));expect(batch).toHaveLength(1);
  await page.locator('.review-notation td button').first().click();await expect(page.locator('.board-move-badge .move-quality')).toHaveAttribute('aria-label','Book');await expect(page.locator('.board-move-badge .quality-book svg')).toBeVisible();
  const board=(await page.locator('.game-review-layout .board').boundingBox())!,bar=(await page.locator('.review-board-eval .eval-meter').boundingBox())!;expect(bar.x+bar.width).toBeLessThan(board.x);expect(Math.abs(bar.height-board.height)).toBeLessThan(1);
@@ -49,8 +49,14 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
   await expect(info).toContainText('Engine fixture');
   await expect(info).toContainText('1-0');
   await expect(page.locator('.page-subtitle')).toHaveCount(0);
-  await expect(page.locator('.review-engine-info')).toContainText('Stockfish 19 Lite');
-  await expect(page.locator('.review-engine-info')).toContainText('Depth');
+  await expect(page.getByText('Stockfish 19 Lite', { exact: false })).toHaveCount(0);
+  const stats = page.getByRole('region', { name: 'Player performance' });
+  for (const side of ['White', 'Black']) {
+    const panel = stats.locator(`dl[aria-label="${side}"]`);
+    await expect(panel.locator('dt')).toHaveText(['Estimated rating', 'Centipawn loss']);
+    await expect(panel.locator('dd')).toHaveCount(2);
+    await expect(panel).toHaveCSS('background-color', side === 'White' ? 'rgb(255, 255, 255)' : 'rgb(17, 19, 24)');
+  }
   await expect(page.locator('.live-game-evaluation')).toHaveText(/^[+-][0-9.]+$/);
 
   if (!isMobile) {
@@ -61,11 +67,6 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
     expect(summary.x - (board.x + board.width)).toBeGreaterThanOrEqual(36);
     expect(Math.abs(summary.y - board.y)).toBeLessThan(1);
 
-    await page.setViewportSize({ width: 1920, height: 1000 });
-    await expect.poll(async () => {
-      const game = (await info.boundingBox())!;
-      const engine = (await page.locator('.review-engine-info').boundingBox())!;
-      return engine.x >= game.x + game.width && Math.abs(engine.y - game.y) < 1;
-    }).toBe(true);
+
   }
 });

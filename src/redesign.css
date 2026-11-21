@@ -4224,23 +4224,21 @@ select.theme-select {
 .move-quality {
   display:inline-flex; align-items:center; justify-content:center; flex:none;
   box-sizing:border-box; width:24px; height:24px; border-radius:8px;
-  color:var(--quality-ink); background:linear-gradient(155deg,var(--quality-light),var(--quality));
+  color:var(--quality-ink); background:var(--quality);
   border:1px solid #fff8; box-shadow:0 2px 0 #0003;
   font-family:"Nunito Sans",sans-serif; font-weight:900; font-size:15px; line-height:1;
 }
 .move-quality svg { width:66%; height:66%; stroke-width:2.5; }
-.quality-book { --quality:#c6a0ff; --quality-light:#ecdbff; --quality-ink:#422470; }
-.quality-best { --quality:#6cf0a0; --quality-light:#c7ffd8; --quality-ink:#13452a; }
-.quality-excellent { --quality:#72e1f8; --quality-light:#c5f7ff; --quality-ink:#16475b; }
-.quality-inaccuracy { --quality:#ffdb5e; --quality-light:#fff3b5; --quality-ink:#573b0e; }
-.quality-mistake { --quality:#ffae65; --quality-light:#ffe0ac; --quality-ink:#592a13; }
-.quality-blunder { --quality:#ff8aab; --quality-light:#ffd0dc; --quality-ink:#641d3a; }
+.quality-book { --quality:#8a38eb; --quality-ink:#fff; }
+.quality-best { --quality:#16e36b; --quality-ink:#07391d; }
+.quality-excellent { --quality:#00d4ff; --quality-ink:#07384b; }
+.quality-inaccuracy { --quality:#ffd400; --quality-ink:#3d2900; }
+.quality-mistake { --quality:#ff831f; --quality-ink:#401700; }
+.quality-blunder { --quality:#dc1749; --quality-ink:#fff; }
 .quality-good:empty { display:none; }
 .game-review-layout .board-navigation { width:var(--actual-board-width,calc(100% - 29px)); margin-left:29px; }
 .game-review-layout .side-panels { gap:14px; }
 .review-overview h2,.review-graph-card h2,.review-notation-card h2 { font-size:.9rem; margin-bottom:12px; }
-.review-summary .metric-pair,.review-performance .metric-pair { margin:0; }
-.review-performance .metric-pair b { font-size:1.6rem; }
 .review-status { margin:0; color:var(--muted); font-size:.75rem; }
 .evaluation-graph { position:relative; }
 .evaluation-graph svg { display:block; width:100%; }
@@ -4266,32 +4264,23 @@ select.theme-select {
 .puzzle-board.wrong .board { outline:3px solid #f15b68; outline-offset:0; }
 .game-review-layout > .side-panels { container-type:inline-size; }
 .review-overview { display:grid; gap:14px; }
-.review-overview:has(.review-performance) {
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-areas:"rating game" "loss engine";
-}
+.review-overview:has(.review-performance) { grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); }
 .review-overview > .card { min-width:0; padding:12px; }
 .review-overview p { margin:0; overflow-wrap:anywhere; }
-.review-overview p + p { margin-top:4px; }
-.review-performance { grid-area:rating; }
-.review-summary { grid-area:loss; }
-.review-overview:has(.review-performance) > .review-game-info { grid-area:game; }
-.review-engine-info { grid-area:engine; }
-@container (min-width: 430px) {
-  .review-overview:has(.review-performance) {
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-template-areas:"rating game engine" "loss loss loss";
-  }
+.review-overview p + p,.review-performance > .caption { margin-top:8px; }
+.review-player-metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.review-player-metric {
+  display:grid; grid-template-rows:subgrid; grid-row:span 4; gap:3px;
+  margin:0; padding:8px 6px; border:1px solid #818692; border-radius:9px; text-align:center;
 }
-@container (max-width: 260px) {
-  .review-overview:has(.review-performance) {
-    grid-template-columns:minmax(0,1fr);
-    grid-template-areas:"rating" "game" "engine" "loss";
-  }
+.review-player-metric.white { background:#fff; color:#111318; }
+.review-player-metric.black { background:#111318; color:#fff; }
+.review-player-metric dt { font-size:.72rem; line-height:1.25; }
+.review-player-metric dd { margin:0; font-size:1.2rem; font-weight:800; font-variant-numeric:tabular-nums; }
+.review-player-metric dd:first-of-type { margin-bottom:4px; }
+@container (max-width: 270px) {
+  .review-overview:has(.review-performance) { grid-template-columns:minmax(0,1fr); }
 }
-.review-summary .card-heading { margin-bottom:12px; }
-.review-summary .metric-pair,.review-performance .metric-pair { padding-top:0; border-top:0; gap:10px; }
-.review-summary .metric-pair b,.review-performance .metric-pair b { font-size:1.4rem; }
 .review-notation-card { scroll-padding-top:70px; }
 .review-notation-card h2 { position:sticky; top:0; z-index:3; background:var(--panel-solid); line-height:20px; padding:8px 0; }
 .review-notation th { position:sticky; top:36px; z-index:2; background:var(--panel-solid); }
