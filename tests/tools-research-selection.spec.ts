@@ -92,7 +92,7 @@ test("Research source/color toggles align with username and NovaChess explores r
     color.getByRole("button", { name: "Black", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
 });
-test("puzzle rating is centered in its card and completion uses only the board outline", async ({
+test("puzzle rating is labeled in the practice header and completion uses only the board outline", async ({
   page,
 }) => {
   const puzzle = JSON.parse(
@@ -104,14 +104,8 @@ test("puzzle rating is centered in its card and completion uses only the board o
   await page.goto("/#puzzles");
   const rating = page.locator(".puzzle-rating");
   await expect(rating).toBeVisible();
-  const number = (await rating.boundingBox())!,
-    card = (await rating.locator("..").boundingBox())!;
-  expect(
-    Math.abs(number.x + number.width / 2 - card.x - card.width / 2),
-  ).toBeLessThan(1);
-  expect(
-    Math.abs(number.y + number.height / 2 - card.y - card.height / 2),
-  ).toBeLessThan(1);
+  await expect(page.locator(".puzzle-practice-heading")).toContainText("Puzzle rating");
+  await expect(rating).toHaveText(/^\d+$/);
   const c = new Chess(puzzle.fen);
   c.move(puzzle.moves[0]);
   const m = c.move(puzzle.moves[1]);

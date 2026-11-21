@@ -23,7 +23,7 @@ for(const route of ['puzzles','puzzles/daily'])test(`${route} explains wrong mov
  expect(await progress()).toEqual(completed);
  if(route==='puzzles'){
   await expect(page.locator('.card:has(.theme-select)')).toHaveCount(0);await expect(page.locator('.puzzle-theme-picker summary')).toBeVisible();
-  const next=page.getByRole('button',{name:'Next puzzle',exact:true});await expect(next).toHaveCSS('background-color','rgb(255, 223, 0)');await expect(next.locator('svg')).toHaveCount(0);await next.hover();await expect(next).toHaveCSS('background-color','rgb(255, 223, 0)');
+  const next=page.getByRole('button',{name:'Next puzzle',exact:true});await expect(next).toHaveCSS('background-color','rgb(173, 217, 237)');await expect(next.locator('svg')).toHaveCount(0);await next.hover();await expect(next).toHaveCSS('background-color','rgb(173, 217, 237)');
  }
 
 });

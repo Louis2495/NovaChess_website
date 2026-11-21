@@ -4663,14 +4663,12 @@ html { scrollbar-gutter:stable; }
  .research-form { padding:14px 18px; margin-bottom:14px; }
 }
 .puzzle-layout .side-panels > .card { background:#d7f3ff; color:#173b59; border:1px solid #81d4f6; box-shadow:0 5px 18px #15314d18; }
-.puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#eee0ff; border-color:#ba93f1; color:#6533ab; }
 .puzzle-layout .side-panels > .card:has(.theme-select) { background:#c8f4dd; border-color:#64cc9a; color:#145438; }
 .puzzle-layout .side-panels h2 { color:inherit; }
 .puzzle-layout .side-panels .field > span { color:#235540; }
 .puzzle-layout .theme-select { background:#f6fffa; color:#16452e; border-color:#69bd94; }
 .puzzle-layout .puzzle-actions-right .hint-button { background:#ffe066; color:#563e08; border-color:#e1b332; }
 .puzzle-layout .puzzle-actions-right > .btn:not(.hint-button) { background:#aa87f5; color:#21103e; border-color:#c6b0fa; }
-.puzzle-layout .move-chips > * { background:#f3fbff; color:#173b59; }
 .admin-grant { margin-block:18px 24px; padding:18px; border:1px solid var(--accent); border-radius:14px; background:var(--accent-soft); }
 .admin-grant .field { max-width:420px; }
 .admin-grant > p { font-size:.85rem; }
@@ -4926,11 +4924,9 @@ html { scrollbar-gutter:stable; }
 .analysis-evaluation-bar .eval-meter > div { position:absolute; bottom:0; left:0; height:100%; }
 .analysis-layout:has(.material-top) > .side-panels { padding-top:0; }
 .puzzle-layout .side-panels > .card { background:#0878d1; color:#fff; border-color:#40b6ff; }
-.puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#7926d4; color:#fff; border-color:#b46cff; }
 .puzzle-layout .side-panels > .card:has(.theme-select) { background:#078147; color:#fff; border-color:#21d583; }
 .puzzle-layout .side-panels .field > span { color:#fff; }
 .puzzle-layout .theme-select { background:#fff; color:#104c30; }
-.puzzle-layout .move-chips > * { background:#0056a3; color:#fff; }
 .play-hub { position:relative; }
 @media(min-width:1001px) {
  .workspace .puzzle-layout > .side-panels { width:75%; justify-self:start; }
@@ -5045,7 +5041,6 @@ html { scrollbar-gutter:stable; }
 
 /* Keep the description centered under the online launch button. */
 .variants-hub > .quick-online-play { text-align:center; }
-.puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#c64b13; color:#fff; border-color:#ff975c; }
 .puzzle-layout .side-panels > .card:has(.theme-select) .field { margin-top:0; }
 .puzzle-layout .side-panels > .card:has(.theme-select) .field > span { font-size:1rem; font-weight:700; }
 @media(min-width:1001px) {
@@ -5069,7 +5064,6 @@ html { scrollbar-gutter:stable; }
 /* Balanced desktop workspaces with room around the complete composition. */
 .learn-study-art { display:flex; justify-content:center; margin:0 0 24px; }
 .learn-study-art img { display:block; width:auto; height:clamp(160px,22dvh,230px); max-width:100%; object-fit:contain; }
-.puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#08090b; color:#fff; border-color:#444950; }
 @media(min-width:1001px) {
  .workspace:has(.analysis-layout),.workspace:has(.variants-hub),.workspace:has(.learn-landing),.workspace:has(> [data-research-view]:not([hidden])) { min-height:100dvh; display:flex; flex-direction:column; justify-content:center; padding-block:24px; }
  .workspace:has(.analysis-layout) > div,.workspace:has(.variants-hub) > div,.workspace:has(.learn-landing) > div { flex:none; width:100%; }
@@ -5715,7 +5709,6 @@ html { scrollbar-gutter:stable; }
  .home-page:has(.home-recent):not(.memes-hidden) { grid-template-columns:minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.4fr); }
  .home-page:has(.home-recent):not(.memes-hidden) .home-puzzle { min-height:336px; }
 }
-.puzzle-settings-row { display:flex; justify-content:flex-end; }
 .puzzle-theme-picker { position:relative; max-width:100%; }
 .puzzle-theme-picker summary {
   display:flex; align-items:center; gap:9px; min-height:42px; padding:8px 12px;

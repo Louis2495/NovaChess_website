@@ -1,0 +1,123 @@
+.puzzle-layout > .puzzle-sidebar {
+  gap:12px;
+  min-width:0;
+}
+.puzzle-layout > .puzzle-sidebar > .card {
+  min-width:0;
+  margin:0;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--panel-solid);
+  color:var(--text);
+  box-shadow:none;
+}
+.puzzle-sidebar :is(.puzzle-practice-heading,.puzzle-replay-heading) {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px 12px;
+  margin-bottom:12px;
+}
+.puzzle-sidebar :is(.puzzle-practice-heading,.puzzle-replay-heading,.puzzle-chat) h2 {
+  margin:0;
+  font-size:1rem;
+  font-weight:700;
+}
+.puzzle-sidebar .puzzle-rating-display {
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  white-space:nowrap;
+  color:var(--muted);
+  font-size:.75rem;
+}
+.puzzle-sidebar .puzzle-rating-display .puzzle-rating {
+  width:auto;
+  padding:0;
+  background:none;
+  color:var(--text);
+  font-size:1rem;
+  font-variant-numeric:tabular-nums;
+}
+.puzzle-sidebar :is(.puzzle-theme-picker,.theme-picker-menu) { width:100%; }
+.puzzle-sidebar .puzzle-theme-picker summary { background:var(--input); }
+.puzzle-sidebar .theme-picker-chevron { margin-inline-start:auto; }
+.puzzle-sidebar .puzzle-replay-heading > span {
+  color:var(--muted);
+  font-size:.75rem;
+  font-variant-numeric:tabular-nums;
+}
+.puzzle-sidebar .puzzle-review-bar {
+  padding:0;
+  border:0;
+  background:none;
+}
+.puzzle-sidebar .puzzle-review-bar .btn {
+  padding:6px;
+  border-radius:8px;
+  background:var(--input);
+  color:var(--text);
+}
+.puzzle-sidebar .puzzle-moves {
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid var(--border);
+}
+.puzzle-sidebar .puzzle-moves h3 {
+  margin:0 0 6px;
+  color:var(--muted);
+  font-size:.75rem;
+}
+.puzzle-sidebar .move-chips > button {
+  padding:5px 8px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  background:var(--input);
+  color:var(--text);
+  font-size:.85rem;
+}
+.puzzle-sidebar .move-chips > button[aria-current="step"] {
+  border-color:var(--accent);
+  background:var(--accent-soft);
+}
+.puzzle-layout > .puzzle-sidebar > .puzzle-mistake {
+  border-inline-start:3px solid var(--accent);
+}
+.puzzle-sidebar .puzzle-mistake h2 {
+  color:var(--text);
+}
+@media (min-width:761px) {
+  .puzzle-layout .puzzle-sidebar > .puzzle-actions-desktop {
+    flex-direction:row;
+    gap:8px;
+  }
+}
+.puzzle-layout :is(.puzzle-sidebar,.board-column) > :is(.puzzle-actions-desktop,.puzzle-actions-mobile) > .btn {
+  flex:1;
+  min-width:0;
+  min-height:42px;
+  padding:8px;
+  border:1px solid var(--border);
+  background:var(--panel-solid);
+  color:var(--text);
+  font-size:.85rem;
+  font-weight:600;
+}
+.puzzle-layout :is(.puzzle-sidebar,.board-column) > :is(.puzzle-actions-desktop,.puzzle-actions-mobile) > .btn:hover:not(:disabled) {
+  border-color:var(--accent);
+  background:var(--accent-soft);
+}
+.puzzle-layout :is(.puzzle-sidebar,.board-column) > :is(.puzzle-actions-desktop,.puzzle-actions-mobile) > .puzzle-next-button {
+  background:var(--button);
+  color:var(--button-text);
+}
+.puzzle-layout :is(.puzzle-sidebar,.board-column) > :is(.puzzle-actions-desktop,.puzzle-actions-mobile) > .puzzle-next-button:hover:not(:disabled) {
+  background:var(--button);
+}
+.puzzle-sidebar .puzzle-chat .room-chat-messages {
+  min-height:120px;
+  max-height:300px;
+  background:var(--input);
+}
