@@ -20,9 +20,9 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  const firstMove = page.locator('.review-notation td button').first();
  const book = firstMove.locator('.quality-book');
  await expect(book).toHaveCSS('color', 'rgb(255, 255, 255)');
- const moveText = (await firstMove.locator('span').first().boundingBox())!;
+ const moveText = (await firstMove.locator('span').last().boundingBox())!;
  const badge = (await book.boundingBox())!;
- expect(badge.x - (moveText.x + moveText.width)).toBeLessThanOrEqual(8);
+ expect(moveText.x - (badge.x + badge.width)).toBeCloseTo(8, 0);
  await expect(page.locator('.evaluation-graph polyline')).toHaveAttribute('points',/\S+ \S+/);
  await expect(page.locator('.review-performance .review-player-metric dd:first-of-type')).not.toHaveText(['—','—']);
  for (const panel of await page.locator('.review-performance dl').all()) {
@@ -85,7 +85,11 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
   if (!isMobile) {
     const board = (await page.locator('.game-review-layout .board').boundingBox())!;
     const rating = (await stats.boundingBox())!;
-    expect(rating.x - (board.x + board.width)).toBeGreaterThanOrEqual(36);
+    const moves = (await page.locator('.review-notation-card').boundingBox())!;
+    expect(moves.x).toBeGreaterThan(board.x + board.width);
+    expect(rating.x).toBeGreaterThan(moves.x + moves.width);
+    expect(Math.abs(moves.height - board.height)).toBeLessThan(1);
+    expect(Math.abs(moves.y - board.y)).toBeLessThan(1);
     expect(Math.abs(rating.y - board.y)).toBeLessThan(1);
   }
 

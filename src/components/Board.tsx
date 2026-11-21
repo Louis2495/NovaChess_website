@@ -427,6 +427,8 @@ export function Board({
         if (layout?.matches(".chess-layout")) {
           const bounds = layout.getBoundingClientRect();
           layout.style.setProperty("--board-layout-top", `${rect.top - bounds.top}px`);
+          if (layout.classList.contains("game-review-layout"))
+            layout.style.setProperty("--review-board-height", `${rect.height}px`);
           if (layout.matches(".play-match, .online-match")) {
             layout.style.setProperty("--match-center", `${document.documentElement.clientWidth / 2 - bounds.left}px`);
           }

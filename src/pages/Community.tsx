@@ -354,8 +354,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
               )}
 
               <div className="board-column">
-                {playerStrip(viewFlipped ? "w" : "b", "top")}
                 {room.state.speedrun && me?.team && <div className="speedrun-clock" role="timer" aria-label="Your move time">{duration(room.state.speedrun.elapsed[me.team]+(canMove && room.state.speedrun.startedAt!==null?Math.max(0,clock-room.state.speedrun.startedAt):0))}</div>}
+                {playerStrip(viewFlipped ? "w" : "b", "top")}
                 {room.variant === "blindtext" ? <form onSubmit={e=>{e.preventDefault();if(!ff || !position || (!canMove && !appearance.premoves))return;const b=new ff.Board("chess",canMove?position.fen:premove.preview);try{const move=matchTypedMove(typed,(canMove?legal:premove.options).map(m=>{let san=m;try{san=b.sanMove(m);}catch{}return {uci:m,san};}));if(move){if(canMove)void submitMove(move).then(()=>setTyped("")).catch(()=>{});else{premove.enqueue(move);setTyped("");}}}finally{b.delete();}}}><Field label="Blindfold move"><input value={typed} onChange={e=>setTyped(e.target.value)} autoComplete="off" disabled={room.status!=="playing" || room.state.result!=="*" || !me?.team || (!canMove && !appearance.premoves)}/></Field><Button disabled={room.status!=="playing" || room.state.result!=="*" || !me?.team || (!canMove && !appearance.premoves)}>{canMove?"Move":"Queue premove"}</Button></form> : <Board
                   fen={duck?.fen || premove.preview}
                   hidden={room.variant === "blind"}

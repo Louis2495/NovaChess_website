@@ -615,7 +615,6 @@ function GameViewer({ game }: { game: SavedGame }) {
       </Modal>}
       <div className="chess-layout game-review-layout">
         <div className="board-column">
-          <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/>
           {standard && (
             <div className="live-game-evaluation">
               <strong>{settledEvaluation ? scoreLabel(settledEvaluation) : `${evaluation>=0?"+":""}${(evaluation/100).toFixed(2)}`}</strong>
@@ -626,6 +625,7 @@ function GameViewer({ game }: { game: SavedGame }) {
               {liveEngine.error}
             </p>
           )}
+          <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/>
           <div className={`review-board-eval ${standard ? "has-eval" : ""}`}>
             {standard && <div className="eval-meter" style={{justifyContent:flipped?"flex-start":"flex-end"}} role="img" aria-label={`Evaluation ${(evaluation/100).toFixed(2)}`}>
               <div style={{height:`${50+Math.tanh(evaluation/450)*46}%`}}/>
@@ -731,6 +731,18 @@ function GameViewer({ game }: { game: SavedGame }) {
           </Card>
           </details>
         </div>
+        <Card className="review-notation-card">
+          <h2>Moves</h2>
+          <table className="review-notation"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead>
+            <tbody>{Array.from({length:Math.ceil((game.moves.length+(game.initial.split(" ")[1]==="b"?1:0))/2)},(_,i)=>{
+              const blackStart=game.initial.split(" ")[1]==="b"?1:0;
+              return <tr key={i}><td>{Number(game.initial.split(" ")[5]||1)+i}</td>{[0,1].map(side=>{
+                const index=i*2+side-blackStart, row=rows.find(r=>r.ply===index);
+                return <td key={side}>{index>=0 && index<game.moves.length && <button className={cursor===index+1?"current":""} onClick={()=>setCursor(index+1)}>{row && <MoveBadge label={row.label}/>}<span>{game.notation[index]}</span></button>}</td>;
+              })}</tr>;
+            })}</tbody>
+          </table>
+        </Card>
         <div className="side-panels">
           {standard && <Card className="review-performance" aria-label="Player performance">
             <div className="review-player-metrics">
@@ -749,18 +761,6 @@ function GameViewer({ game }: { game: SavedGame }) {
           </Card>}
           {standard && <Card className="review-graph-card"><h2>Evaluation</h2><EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor}/></Card>}
           {status && <p role="status" className="review-status">{status}</p>}
-          <Card className="review-notation-card">
-            <h2>Moves</h2>
-            <table className="review-notation"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead>
-              <tbody>{Array.from({length:Math.ceil((game.moves.length+(game.initial.split(" ")[1]==="b"?1:0))/2)},(_,i)=>{
-                const blackStart=game.initial.split(" ")[1]==="b"?1:0;
-                return <tr key={i}><td>{Number(game.initial.split(" ")[5]||1)+i}</td>{[0,1].map(side=>{
-                  const index=i*2+side-blackStart, row=rows.find(r=>r.ply===index);
-                  return <td key={side}>{index>=0 && index<game.moves.length && <button className={cursor===index+1?"current":""} onClick={()=>setCursor(index+1)}><span>{game.notation[index]}</span>{row && <MoveBadge label={row.label}/>}</button>}</td>;
-                })}</tr>;
-              })}</tbody>
-            </table>
-          </Card>
           {isStudy(game) && !!game.branches?.length && (
             <Card>
               <h2>Saved branches</h2>

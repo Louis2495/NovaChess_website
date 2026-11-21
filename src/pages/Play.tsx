@@ -773,7 +773,6 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
         >
           <div className="board-column">
             {game.speedrun && <div className="speedrun-clock" role="timer" aria-label="Your move time"><Timer size={18}/>{duration(game.speedrun.elapsedMs + (game.result === "*" && game.speedrun.turnStartedAt !== null ? Math.max(0,clockNow-game.speedrun.turnStartedAt) : 0))}</div>}
-            <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/>
             <>
               <Pocket
                 value={
@@ -788,6 +787,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 enabled={false}
                 onSelect={() => {}}
               />
+              <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/>
               <Board
                 fen={duck?.fen || premove.preview}
                 overlayId={game.id + game.result}
@@ -847,6 +847,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                     : []
                 }
               />
+              <SavedBoardPlayer game={game} side={flipped?'b':'w'} placement="bottom"/>
               <Pocket
                 value={
                   valid.turn === game.human ? (game.human === "w" ? valid.whitePocket : valid.blackPocket) : (premove.preview.match(/\[([^\]]*)\]/)?.[1] || "").split("").filter(p => (p === p.toUpperCase() ? "w" : "b") === game.human).join("")
@@ -859,7 +860,6 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 onSelect={setPocket}
               />
             </>
-            <SavedBoardPlayer game={game} side={flipped?'b':'w'} placement="bottom"/>
             <div className="game-message" role="status">
               {duck ? (
                 "Place the duck."

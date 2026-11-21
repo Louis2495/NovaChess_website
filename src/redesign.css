@@ -4249,10 +4249,9 @@ select.theme-select {
 .review-notation th { color:var(--muted); text-align:left; font-size:.72rem; padding-bottom:8px; font-weight:500; }
 .review-notation th:first-child,.review-notation td:first-child { width:29px; color:var(--muted); }
 .review-notation td { padding:2px; }
-.review-notation td button { width:100%; display:flex; justify-content:flex-start; gap:6px; align-items:center; padding:7px; border-radius:6px; text-align:left; }
+.review-notation td button { width:100%; display:flex; justify-content:flex-start; gap:8px; align-items:center; padding:7px 4px; border-radius:6px; text-align:left; }
 .review-notation td button.current { background:var(--accent-soft); color:var(--accent); }
-.review-notation-card { box-sizing:border-box; width:min(100%,360px); max-height:440px; overflow:auto; }
-@media(min-width:1001px){ .game-review-layout.chess-layout { grid-template-columns:minmax(0,1fr) minmax(300px,360px); } }
+.review-notation-card { box-sizing:border-box; width:100%; max-height:440px; overflow:auto; }
 .review-board-eval:has(.material-top) > .eval-meter { margin-top:29px; }
 .review-board-eval:has(.board + .material-imbalance) > .eval-meter { margin-bottom:29px; }
 .move-quality svg { flex:none; }
@@ -4285,7 +4284,6 @@ select.theme-select {
 .review-game-details { width:var(--actual-board-width,calc(100% - 29px)); margin-left:29px; }
 .review-game-details > summary { padding:10px; color:var(--muted); cursor:pointer; font-size:.8rem; }
 .review-game-details > .card { margin-top:8px; }
-@media(min-width:1001px){ .game-review-layout.chess-layout { grid-template-columns:minmax(0,calc(var(--board-max) + 29px)) minmax(300px,360px); justify-content:start; } .game-review-layout > .board-column { max-width:calc(var(--board-max) + 29px); } }
 
 /* Research controls share the same label, gap, control height, and baseline. */
 .research-fields > .field { display:grid; grid-template-rows:20px 44px; gap:8px; margin:0; align-content:start; }
@@ -4869,7 +4867,6 @@ html { scrollbar-gutter:stable; }
  .workspace { width:100%; max-width:none; padding:16px 24px 24px; box-sizing:border-box; }
  .workspace .chess-layout { --board-rail:0px; grid-template-columns:minmax(0,calc(var(--auto-board-limit,var(--board-max)) + var(--board-rail))) minmax(250px,1fr); gap:20px; max-width:none; justify-content:start; }
  .workspace .analysis-layout,.workspace .game-review-layout { --board-rail:29px; }
- .workspace .game-review-layout.chess-layout { column-gap:clamp(36px,4vw,48px); }
  .workspace .chess-layout > .board-column { width:100%; max-width:none; }
  .manual-boards .workspace .chess-layout { grid-template-columns:minmax(0,calc(var(--board-max) + var(--board-rail))) minmax(250px,1fr); }
  .workspace .lesson-workspace { grid-template-columns:minmax(260px,310px) minmax(0,1fr); max-height:none; gap:20px; }
@@ -4904,6 +4901,13 @@ html { scrollbar-gutter:stable; }
  .workspace .chess-layout > .side-panels { width:100%; min-width:0; }
  .workspace :is(.analysis-layout,.game-review-layout,.puzzle-layout) > .side-panels {
   margin-block-start:var(--board-layout-top,22px); padding-top:0;
+ }
+ .workspace .game-review-layout.chess-layout {
+  grid-template-columns:minmax(0,min(calc(var(--auto-board-limit,var(--board-max)) + 29px),calc(var(--board-max) + 29px))) clamp(230px,19vw,270px) clamp(190px,17vw,240px);
+  column-gap:clamp(16px,2vw,28px);
+ }
+ .game-review-layout > .review-notation-card {
+  margin-block-start:var(--board-layout-top,22px); height:var(--review-board-height,440px); max-height:none; padding:12px;
  }
  .analysis-layout .engine-lines { grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); }
  .workspace .learning-layout { grid-template-columns:minmax(250px,1fr) minmax(0,var(--board-max)); }
@@ -5483,7 +5487,7 @@ html { scrollbar-gutter:stable; }
 .home-recent .recent-game-scrubber input::-webkit-slider-thumb { background:#fff; }
 .home-recent .recent-game-scrubber input::-moz-range-thumb { background:#fff; }
 .analysis-layout .pv-heading > span { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; flex:none; border:2px solid currentColor; border-radius:50%; box-sizing:border-box; color:var(--text); font-weight:700; }
-.board-player-label { width:var(--actual-board-width,100%); max-width:100%; min-height:36px; display:flex; align-items:center; gap:8px; box-sizing:border-box; font-size:.9rem; }
+.board-player-label { width:var(--actual-board-width,100%); max-width:100%; min-height:26px; display:flex; align-items:center; gap:8px; box-sizing:border-box; font-size:.9rem; }
 .board-player-label.player-top { justify-content:flex-end; text-align:right; }
 .board-player-label.player-bottom { justify-content:flex-start; text-align:left; }
 .board-player-score { font-weight:800; margin-left:5px; }
@@ -5504,11 +5508,21 @@ html { scrollbar-gutter:stable; }
 .master-replay .board-player-label { width:var(--actual-board-width,100%); }
 .analysis-layout > .board-column > .board-player-label,
 .game-review-layout > .board-column:has(.has-eval) > .board-player-label { margin-left:29px; }
-.saved-game-card .board-player-label { font-size:.72rem; min-height:28px; gap:4px; }
+.saved-game-card .board-player-label { font-size:.72rem; min-height:22px; gap:4px; }
 .board-player-label b { min-width:0; overflow-wrap:anywhere; }
 .board-player-label > span { white-space:nowrap; }
 .master-score { max-height:520px; overflow:auto; }
-.board-player-label.player-top { justify-content:flex-start; text-align:left; }
+.board-player-label.player-top { justify-content:flex-start; text-align:left; align-items:flex-end; }
+.board-player-label.player-bottom { align-items:flex-start; }
+/* Share the material gutter with the names so the board stays still as material changes. */
+.board-player-label { position:relative; z-index:1; padding-inline-end:40px; }
+.board-player-label.player-top { top:17px; }
+.board-player-label.player-bottom { top:-17px; }
+.recent-game-preview > .board-frame { padding-block:22px; }
+.recent-game-preview > .board-frame > .material-top { top:0; }
+.recent-game-preview > .board-frame > .material-imbalance { bottom:0; }
+.online-player-strip.player-top:has(+ .board-frame) .online-player-identity { align-self:flex-end; transform:translateY(17px); }
+.board-frame + .online-player-strip.player-bottom .online-player-identity { align-self:flex-start; transform:translateY(-17px); }
 .board-player-score { margin-left:0; margin-right:3px; }
 .online-player-strip.player-top .online-player-identity { order:0; margin-left:0; text-align:left; }
 .online-player-strip.player-top .online-player-identity > div { justify-content:flex-start; }
