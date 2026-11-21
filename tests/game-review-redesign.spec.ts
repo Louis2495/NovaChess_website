@@ -45,10 +45,27 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
   expect(wasmRequests).toBeGreaterThan(0);
   await expect(page.locator('.review-notation .move-quality')).toHaveCount(1);
 
+  const info = page.locator('.review-game-info');
+  await expect(info).toContainText('Engine fixture');
+  await expect(info).toContainText('1-0');
+  await expect(page.locator('.page-subtitle')).toHaveCount(0);
+  await expect(page.locator('.review-engine-info')).toContainText('Stockfish 19 Lite');
+  await expect(page.locator('.review-engine-info')).toContainText('Depth');
+  await expect(page.locator('.live-game-evaluation')).toHaveText(/^[+-][0-9.]+$/);
+
   if (!isMobile) {
     const board = (await page.locator('.game-review-layout .board').boundingBox())!;
-    const summary = (await page.locator('.game-review-layout .review-summary').boundingBox())!;
+    const summary = (await info.boundingBox())!;
+    const rating = (await page.locator('.review-performance').boundingBox())!;
+    expect(Math.abs(summary.y - rating.y)).toBeLessThan(1);
     expect(summary.x - (board.x + board.width)).toBeGreaterThanOrEqual(36);
     expect(Math.abs(summary.y - board.y)).toBeLessThan(1);
+
+    await page.setViewportSize({ width: 1920, height: 1000 });
+    await expect.poll(async () => {
+      const game = (await info.boundingBox())!;
+      const engine = (await page.locator('.review-engine-info').boundingBox())!;
+      return engine.x >= game.x + game.width && Math.abs(engine.y - game.y) < 1;
+    }).toBe(true);
   }
 });

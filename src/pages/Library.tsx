@@ -601,7 +601,6 @@ function GameViewer({
     <>
       <PageTitle
         title="Game review"
-        subtitle={`${game.title} · ${game.result}`}
       >
         <Button className="secondary" onClick={onClose}>
           Back to Library
@@ -629,9 +628,6 @@ function GameViewer({
           <SavedBoardPlayer game={game} side={flipped?'w':'b'} placement="top"/>
           {standard && (
             <div className="live-game-evaluation">
-              <span>
-                Stockfish 19 Lite · Depth {liveEngine.lines[0]?.depth ?? selected?.depth ?? 0}
-              </span>
               <strong>{settledEvaluation ? scoreLabel(settledEvaluation) : `${evaluation>=0?"+":""}${(evaluation/100).toFixed(2)}`}</strong>
             </div>
           )}
@@ -746,15 +742,26 @@ function GameViewer({
           </details>
         </div>
         <div className="side-panels">
-          {standard && <Card className="review-summary">
-            <div className="card-heading"><h2>Centipawn loss</h2></div>
-            <div className="metric-pair"><div><b>{average("w") ?? "—"}</b><span>White</span></div><div><b>{average("b") ?? "—"}</b><span>Black</span></div></div>
-          </Card>}
-          {standard && <Card className="review-performance">
-            <h2>Estimated rating</h2>
-            <div className="metric-pair">{["w","b"].map(side=><div key={side} title="Game performance estimate; available after eight analyzed non-book moves per side."><b>{rating(side) ?? "—"}</b><span>{side==="w"?"White":"Black"}</span></div>)}</div>
-            {(rating("w")===null || rating("b")===null) && <p className="caption">Needs 8 non-book moves per side.</p>}
-          </Card>}
+          <div className="review-overview">
+            {standard && <Card className="review-performance">
+              <h2>Estimated rating</h2>
+              <div className="metric-pair">{["w","b"].map(side=><div key={side} title="Game performance estimate; available after eight analyzed non-book moves per side."><b>{rating(side) ?? "—"}</b><span>{side==="w"?"White":"Black"}</span></div>)}</div>
+              {(rating("w")===null || rating("b")===null) && <p className="caption">Needs 8 non-book moves per side.</p>}
+            </Card>}
+            <Card className="review-game-info">
+              <h2>Game information</h2>
+              <p>{game.title}</p>
+              <p className="caption">{game.result}</p>
+            </Card>
+            {standard && <Card className="review-engine-info">
+              <h2>Stockfish 19 Lite</h2>
+              <p className="caption">Depth {liveEngine.lines[0]?.depth ?? selected?.depth ?? 0}</p>
+            </Card>}
+            {standard && <Card className="review-summary">
+              <div className="card-heading"><h2>Centipawn loss</h2></div>
+              <div className="metric-pair"><div><b>{average("w") ?? "—"}</b><span>White</span></div><div><b>{average("b") ?? "—"}</b><span>Black</span></div></div>
+            </Card>}
+          </div>
           {standard && <Card className="review-graph-card"><h2>Evaluation</h2><EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor}/></Card>}
           {status && <p role="status" className="review-status">{status}</p>}
           <Card className="review-notation-card">

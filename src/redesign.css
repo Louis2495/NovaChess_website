@@ -3953,9 +3953,8 @@ select.theme-select {
 }
 .live-game-evaluation {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  gap: 12px;
   margin-bottom: 12px;
   font-size: 0.8rem;
   color: var(--muted);
@@ -4239,7 +4238,7 @@ select.theme-select {
 .quality-good:empty { display:none; }
 .game-review-layout .board-navigation { width:var(--actual-board-width,calc(100% - 29px)); margin-left:29px; }
 .game-review-layout .side-panels { gap:14px; }
-.review-summary h2,.review-performance h2,.review-graph-card h2,.review-notation-card h2 { font-size:.9rem; margin-bottom:12px; }
+.review-overview h2,.review-graph-card h2,.review-notation-card h2 { font-size:.9rem; margin-bottom:12px; }
 .review-summary .metric-pair,.review-performance .metric-pair { margin:0; }
 .review-performance .metric-pair b { font-size:1.6rem; }
 .review-status { margin:0; color:var(--muted); font-size:.75rem; }
@@ -4265,9 +4264,31 @@ select.theme-select {
 .puzzle-board.solved,.puzzle-board.wrong { border-color:transparent; }
 .puzzle-board.solved .board { outline:3px solid #f8d953; outline-offset:0; }
 .puzzle-board.wrong .board { outline:3px solid #f15b68; outline-offset:0; }
-.game-review-layout .side-panels { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-content:start; }
-.game-review-layout .side-panels > * { grid-column:1 / -1; }
-.game-review-layout .side-panels > .review-summary,.game-review-layout .side-panels > .review-performance { grid-column:auto; padding:16px; }
+.game-review-layout > .side-panels { container-type:inline-size; }
+.review-overview { display:grid; gap:14px; }
+.review-overview:has(.review-performance) {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-areas:"rating game" "loss engine";
+}
+.review-overview > .card { min-width:0; padding:12px; }
+.review-overview p { margin:0; overflow-wrap:anywhere; }
+.review-overview p + p { margin-top:4px; }
+.review-performance { grid-area:rating; }
+.review-summary { grid-area:loss; }
+.review-overview:has(.review-performance) > .review-game-info { grid-area:game; }
+.review-engine-info { grid-area:engine; }
+@container (min-width: 430px) {
+  .review-overview:has(.review-performance) {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-areas:"rating game engine" "loss loss loss";
+  }
+}
+@container (max-width: 260px) {
+  .review-overview:has(.review-performance) {
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"rating" "game" "engine" "loss";
+  }
+}
 .review-summary .card-heading { margin-bottom:12px; }
 .review-summary .metric-pair,.review-performance .metric-pair { padding-top:0; border-top:0; gap:10px; }
 .review-summary .metric-pair b,.review-performance .metric-pair b { font-size:1.4rem; }
@@ -4278,7 +4299,6 @@ select.theme-select {
 .review-game-details > summary { padding:10px; color:var(--muted); cursor:pointer; font-size:.8rem; }
 .review-game-details > .card { margin-top:8px; }
 @media(min-width:1001px){ .game-review-layout.chess-layout { grid-template-columns:minmax(0,calc(var(--board-max) + 29px)) minmax(300px,360px); justify-content:start; } .game-review-layout > .board-column { max-width:calc(var(--board-max) + 29px); } }
-@media(max-width:380px){ .game-review-layout .side-panels > .review-summary,.game-review-layout .side-panels > .review-performance { grid-column:1 / -1; } }
 
 /* Research controls share the same label, gap, control height, and baseline. */
 .research-fields > .field { display:grid; grid-template-rows:20px 44px; gap:8px; margin:0; align-content:start; }
