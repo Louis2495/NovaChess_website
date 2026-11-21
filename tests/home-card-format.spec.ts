@@ -8,6 +8,13 @@ test('meme frames match puzzle height without cropping and puzzle hover highligh
  const card=page.locator('.home-puzzle'),content=page.locator('.home-puzzle-content');const before=await card.evaluate(e=>getComputedStyle(e).backgroundColor);await card.hover();await expect.poll(()=>card.evaluate(e=>getComputedStyle(e).backgroundColor)).not.toBe(before);await expect(content).toHaveCSS('background-color','rgba(0, 0, 0, 0)');const c=(await card.boundingBox())!,b=(await card.locator('.board').boundingBox())!;expect(b.y+b.height).toBeLessThanOrEqual(c.y+c.height);await card.click();await expect(page).toHaveURL(/puzzles/);
 });
 
+test('Recent games stays visible when the library is empty', async ({ page }) => {
+  await page.goto('/');
+  const recent = page.getByRole('region', { name: 'Recent games' });
+  await expect(recent.getByText('No games yet.')).toBeVisible();
+  await expect(recent.locator('.recent-game-entry')).toHaveCount(0);
+});
+
 test('desktop Home places equally tall Recent games beside the meme',async({page})=>{
  await page.addInitScript(()=>{const initial='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';localStorage.setItem('novachess-library-v2',JSON.stringify({games:['1-0','0-1','1/2-1/2'].map((result,i)=>({id:String(i),title:'Standard',initial,positions:[initial],moves:[],notation:[],result,human:'w',variant:'chess',folder:'Games',kind:'game',created:Date.now(),opponent:'Computer',botRating:1200}))}));});
  for(const meme of [memes.reduce((a:any,b:any)=>a.width/a.height<b.width/b.height?a:b),memes.reduce((a:any,b:any)=>a.width/a.height>b.width/b.height?a:b)]){
@@ -25,7 +32,7 @@ test('desktop Home places equally tall Recent games beside the meme',async({page
 test('Home completion uses a yellow outline and recent games show stacked players and individual scores',async({page})=>{
  await page.addInitScript(()=>{const initial='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',d=new Date(),date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;localStorage.setItem('novachess-library-v2',JSON.stringify({profile:{name:'My name'},progress:{daily:{[date]:{id:'test',completed:true,correct:true}}},games:['1-0','0-1','1/2-1/2'].map((result,i)=>({id:String(i),title:'Standard',initial,positions:[initial],moves:['e2e4','e7e5'],notation:['e4','e5'],result,human:'b',variant:'chess',folder:'Games',kind:'game',created:Date.UTC(2026,10,18,18,25),opponent:'Opponent name',humanRating:1234,opponentRating:1567}))}));});
  await page.goto('/');await expect(page.locator('.completion-label')).toHaveCount(0);await expect(page.locator('.home-puzzle')).toHaveCSS('outline-color','rgb(255, 223, 0)');
- const entries=page.locator('.recent-game-entry');await expect(entries).toHaveCount(3);await expect(entries.locator('.recent-variant-picture')).toHaveCount(3);await expect(entries.locator('.recent-variant-picture').first()).toHaveCSS('width','64px');
+ const entries=page.locator('.recent-game-entry');await expect(entries).toHaveCount(3);await expect(entries.locator('.recent-variant-picture')).toHaveCount(3);await expect(entries.locator('.recent-variant-picture').first()).toHaveCSS('width','89.5938px');
  for(const entry of await entries.all()){const players=entry.locator('.recent-player');await expect(players.first()).toContainText('Opponent name (1567)');await expect(players.last()).toContainText('My name (1234)');expect((await players.first().boundingBox())!.y).toBeLessThan((await players.last().boundingBox())!.y);await expect(entry.locator('time')).toContainText('2026');await expect(entry.locator('time')).toContainText(/· .*\d.*:\d\d/);await expect(entry.locator('.game-result-label')).toHaveCount(0);}
  await expect(entries.first().locator('.recent-player-score').first()).toHaveText('1');await expect(entries.first().locator('.recent-player-score').first()).toHaveCSS('color','rgb(57, 237, 131)');await expect(entries.first().locator('.recent-player-score').last()).toHaveCSS('color','rgb(255, 83, 100)');await expect(entries.last().locator('.recent-player-score').first()).toHaveText('½');
  await expect(page.locator('.home-recent-list')).toHaveCSS('scrollbar-color','rgb(255, 255, 255) rgba(0, 0, 0, 0)');

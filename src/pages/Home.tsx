@@ -96,20 +96,22 @@ export default function HomePage() {
         </section>
         {appearance.showMemes && <DailyMeme/>}
       </div>
-      {library.games.length > 0 && (
-        <section className="home-recent">
-          <div className="home-section-heading">
-            <h2>Recent games</h2>
-            <button className="text-link" onClick={() => navigate("library")}>
-              View all
-              <ArrowRight size={14} />
-            </button>
-          </div>
+      <section className="home-recent" aria-labelledby="recent-games-title">
+        <div className="home-section-heading">
+          <h2 id="recent-games-title">Recent games</h2>
+          <button className="text-link" onClick={() => navigate("library")}>
+            View all
+            <ArrowRight size={14} />
+          </button>
+        </div>
+        {library.games.length ? (
           <div className="home-recent-list">{library.games.slice(0, 3).map((g) => (
             <RecentGame key={g.id} game={g} open={() => navigate("library", g.id)} />
           ))}</div>
-        </section>
-      )}
+        ) : (
+          <p className="muted home-recent-empty">No games yet.</p>
+        )}
+      </section>
     </div>
   );
 }
@@ -128,7 +130,7 @@ function RecentGame({ game: g, open }: { game: SavedGame; open: () => void }) {
   return <div className={`recent-game-entry result-${result}`}>
     <button className="recent-game-row" onClick={open}>
       <span className="recent-players">{(['w','b'] as const).map((side,i)=><span className="recent-player" key={side}><span className={`recent-color-chip ${side==='w'?'white':'black'}`} aria-label={side==='w'?'White':'Black'}/><span className={`recent-player-score score-${scores[i]==='1'?'win':scores[i]==='0'?'loss':'draw'}`}>{scores[i]}</span><b>{side===g.human?yours:opponent} ({(side===g.human?yourRating:opponentRating) ?? "—"})</b></span>)}</span>
-      <span className="recent-variant-picture" role="img" aria-label={`${g.speedrun?'Speedrun':variantList.find(v=>v.id===g.variant)?.name || g.title} illustration`}>{g.speedrun ? <img src={`${base}variants/speedrun.webp`} alt=""/> : <VariantIcon id={g.variant} size={64}/>}</span>
+      <span className="recent-variant-picture" role="img" aria-label={`${g.speedrun?'Speedrun':variantList.find(v=>v.id===g.variant)?.name || g.title} illustration`}>{g.speedrun ? <img src={`${base}variants/speedrun.webp`} alt=""/> : <VariantIcon id={g.variant} size={90}/>}</span>
       <span className="recent-game-details"><span>{g.speedrun ? "Speedrun" : variantList.find(v=>v.id===g.variant)?.name || g.title}</span><span>{moves} {moves===1?'move':'moves'}{g.timeControl ? ` · ${g.timeControl}` : ""}{g.speedrun ? ` · ${duration(g.speedrun.elapsedMs)}` : ""}</span><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})} · {new Date(g.created).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</time></span>
     </button>
     <div ref={scrubberRef} className="recent-game-scrubber" onPointerLeave={() => setPreview(null)}>
