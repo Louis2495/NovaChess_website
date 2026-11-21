@@ -45,6 +45,12 @@
 .stats-dashboard .stats-overview .results-ring > div { background:var(--panel-solid); }
 .stats-dashboard .stats-overview .results-ring > div > span { color:var(--text); }
 .stats-dashboard .stats-overview .activity-track > span { background:#5b93ca; }
+.stats-dashboard .stats-competition .variant-breakdown {
+  margin:0;
+  padding:0;
+  border:0;
+}
+.stats-dashboard .stats-competition .variant-breakdown h2 { margin-top:0; }
 .stats-dashboard .stats-competition .speedrun-stats { grid-column:1 / -1; }
 .stats-dashboard .stats-section-heading {
   display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px;
@@ -52,7 +58,7 @@
 .stats-dashboard .stats-section-heading .caption { margin:4px 0 0; }
 .stats-dashboard .speedrun-rating-grid {
   display:flex; flex-wrap:wrap; justify-content:center;
-  gap:8px 4px; overflow:visible; padding:2px;
+  gap:8px 12px; overflow:visible; padding:2px;
 }
 .stats-dashboard .speedrun-rating-grid > [role="listitem"] {
   flex:0 0 min(100%,96px);

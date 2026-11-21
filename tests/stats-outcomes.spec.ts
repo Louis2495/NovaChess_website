@@ -68,7 +68,7 @@ test('Stats period follows the user across the overview, competition, achievemen
       lastRowOffset: (lastRow[0].left + lastRow.at(-1)!.right - grid.left - grid.right) / 2,
     };
   });
-  expect(positions.gap).toBeCloseTo(4, 0);
+  expect(positions.gap).toBeCloseTo(12, 0);
   expect(Math.abs(positions.firstRowOffset)).toBeLessThan(1);
   expect(Math.abs(positions.lastRowOffset)).toBeLessThan(1);
   expect(await ratings.evaluate(grid => grid.scrollHeight - grid.clientHeight)).toBeLessThanOrEqual(1);

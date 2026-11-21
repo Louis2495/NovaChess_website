@@ -139,7 +139,7 @@ test("opening workbooks and trap defenses are interactive", async ({
     page.getByRole("status").filter({ hasText: /Correct/ }),
   ).toBeVisible();
 });
-test("puzzles show a clean rating, readable themes and yellow hints", async ({
+test("puzzles show a clean rating, readable themes and a Hint button that matches the sidebar", async ({
   page,
 }) => {
   await page.goto("/#puzzles");
@@ -158,7 +158,7 @@ test("puzzles show a clean rating, readable themes and yellow hints", async ({
   expect(options.every((t) => !/[a-z][A-Z]/.test(t))).toBeTruthy();
   await expect(
     page.getByRole("button", { name: "Hint", exact: true }),
-  ).toHaveCSS("background-color", "rgb(243, 207, 114)");
+  ).toHaveCSS("background-color", "rgb(54, 83, 106)");
 });
 test("consecutive premoves preview a piece through three moves and execute in order", async ({
   page,
