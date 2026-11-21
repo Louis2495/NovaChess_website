@@ -355,6 +355,7 @@ export function Board({
   useLayoutEffect(() => {
     const el = boardRef.current;
     if (!el) return;
+    const reviewNavigation = el.closest(".game-review-layout")?.querySelector(".board-navigation");
     const measure = () => {
       const rect = el.getBoundingClientRect();
       setMeasuredSize(Math.round(rect.width));
@@ -427,8 +428,10 @@ export function Board({
         if (layout?.matches(".chess-layout")) {
           const bounds = layout.getBoundingClientRect();
           layout.style.setProperty("--board-layout-top", `${rect.top - bounds.top}px`);
-          if (layout.classList.contains("game-review-layout"))
-            layout.style.setProperty("--review-board-height", `${rect.height}px`);
+          if (reviewNavigation) {
+            const bottom = reviewNavigation.getBoundingClientRect().bottom;
+            layout.style.setProperty("--review-moves-height", `${bottom - rect.top}px`);
+          }
           if (layout.matches(".play-match, .online-match")) {
             layout.style.setProperty("--match-center", `${document.documentElement.clientWidth / 2 - bounds.left}px`);
           }
@@ -448,6 +451,7 @@ export function Board({
     };
     const observer = new ResizeObserver(measure);
     observer.observe(el);
+    if (reviewNavigation) observer.observe(reviewNavigation);
     if (el.parentElement) observer.observe(el.parentElement);
     if (!compact) {
       const layoutColumn = el.closest(".chess-layout > .board-column");

@@ -15,8 +15,11 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  await expect(page.getByLabel('Time per position')).toHaveCount(0);await expect(page.getByLabel('Replay speed')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Engine review',exact:true})).toHaveCount(0);
  await expect(page.getByRole('status').filter({hasText:'Review complete.'})).toBeVisible();
  await expect(page.locator('.review-notation th')).toHaveText(['#','White','Black']);await expect(page.locator('.review-notation .move-quality')).toHaveCount(moves.length);
- await expect(page.locator('.review-notation-card h2')).toHaveCSS('position', 'static');
+ await expect(page.getByRole('region', { name: 'Moves' }).getByRole('heading')).toHaveCount(0);
  await expect(page.locator('.review-notation th').first()).toHaveCSS('position', 'static');
+ const row = page.locator('.review-notation tbody tr').first();
+ await expect(row.locator('td').nth(1)).toHaveCSS('padding-inline-start', '2px');
+ await expect(row.locator('td').nth(2)).toHaveCSS('padding-inline-start', '8px');
  const firstMove = page.locator('.review-notation td button').first();
  const book = firstMove.locator('.quality-book');
  await expect(book).toHaveCSS('color', 'rgb(255, 255, 255)');
@@ -82,13 +85,20 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
   expect(Math.abs(white!.x + white!.width - black!.x)).toBeLessThan(1);
   await expect(page.locator('.live-game-evaluation')).toHaveText(/^[+-][0-9.]+$/);
 
+  const sizes = await stats.locator('dl').first().evaluate(panel => {
+    const [rating, loss] = panel.querySelectorAll('dd');
+    return { rating: parseFloat(getComputedStyle(rating).fontSize), loss: parseFloat(getComputedStyle(loss).fontSize) };
+  });
+  expect(sizes.rating).toBeGreaterThan(sizes.loss);
+  const replay = page.locator('.game-review-layout .board-navigation');
   if (!isMobile) {
     const board = (await page.locator('.game-review-layout .board').boundingBox())!;
     const rating = (await stats.boundingBox())!;
     const moves = (await page.locator('.review-notation-card').boundingBox())!;
     expect(moves.x).toBeGreaterThan(board.x + board.width);
     expect(rating.x).toBeGreaterThan(moves.x + moves.width);
-    expect(Math.abs(moves.height - board.height)).toBeLessThan(1);
+    const controls = (await replay.boundingBox())!;
+    expect(Math.abs(moves.y + moves.height - controls.y - controls.height)).toBeLessThan(1);
     expect(Math.abs(moves.y - board.y)).toBeLessThan(1);
     expect(Math.abs(rating.y - board.y)).toBeLessThan(1);
     const layout = page.locator('.game-review-layout');
@@ -101,7 +111,6 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
   }
 
   await page.setViewportSize(isMobile ? { width: 390, height: 650 } : { width: 1440, height: 720 });
-  const replay = page.locator('.game-review-layout .board-navigation');
   await expect.poll(async () => {
     const controls = (await replay.boundingBox())!;
     const viewportBottom = await page.evaluate(() => {

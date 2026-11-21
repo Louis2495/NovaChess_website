@@ -731,8 +731,7 @@ function GameViewer({ game }: { game: SavedGame }) {
           </Card>
           </details>
         </div>
-        <Card className="review-notation-card">
-          <h2>Moves</h2>
+        <Card className="review-notation-card" aria-label="Moves">
           <table className="review-notation"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead>
             <tbody>{Array.from({length:Math.ceil((game.moves.length+(game.initial.split(" ")[1]==="b"?1:0))/2)},(_,i)=>{
               const blackStart=game.initial.split(" ")[1]==="b"?1:0;
