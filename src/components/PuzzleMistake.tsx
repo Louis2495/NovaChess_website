@@ -31,7 +31,7 @@ export default function PuzzleMistake({position}:{position:PuzzleMistakePosition
       if(line?.mate!==null && line?.mate!==undefined && line.mate*sign<0)
         reason=`This allows a forced checkmate against your king in ${Math.abs(line.mate)} moves.`;
       else if(line && baseline && baseline.mate===null && line.mate===null && (baseline.score-line.score)*sign>=75)
-        reason=`The engine estimates that this gives up ${(((baseline.score-line.score)*sign)/100).toFixed(1)} pawns of advantage compared with the strongest continuation.`;
+        reason=`This gives up ${(((baseline.score-line.score)*sign)/100).toFixed(1)} pawns of advantage compared with the strongest continuation.`;
       else if(line && line.mate===null && line.score*sign < -150)
         reason=`The resulting position favors ${opponent} by about ${(Math.abs(line.score)/100).toFixed(1)} pawns.`;
       setExplanation(reply+reason);setLoading(false);

@@ -5,7 +5,7 @@ for(const route of ['puzzles','puzzles/daily'])test(`${route} explains wrong mov
  await page.goto('/#'+route);const board=page.getByRole('group',{name:'Chessboard',exact:true});
  const square=(s:string)=>board.getByRole('button',{name:new RegExp('^'+s+',')});
  await square('d7').click();await square('d5').click();
- const box=page.locator('.puzzle-mistake');await expect(box).toBeVisible();await expect(box).toContainText('Why d5 didn’t work');await expect(box).toContainText('White can respond with exd5');await expect(box).toContainText('2.0 pawns');
+ const box=page.locator('.puzzle-mistake');await expect(box).toBeVisible();await expect(box).toContainText('Why d5 didn’t work');await expect(box).toContainText('White can respond with exd5');await expect(box).toContainText('This gives up 2.0 pawns');
  await expect(square('d7')).toHaveAttribute('aria-label','d7, black pawn');
  await square('e7').click();await square('e5').click();await expect(box).toHaveCount(0);await expect(page.locator('.puzzle-board')).toHaveClass(/solved/);
  const progress = () => page.evaluate(() => JSON.parse(localStorage.getItem('novachess-library-v2')!).progress);
