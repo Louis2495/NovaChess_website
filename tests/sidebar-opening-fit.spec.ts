@@ -49,8 +49,12 @@ test('Variants centers its setup and fits all cards without page scrolling',asyn
  }
  await expect(page.getByRole('group',{name:'Online variants',exact:true}).getByRole('button')).toHaveCount(21);
  await check('Online variants','Join queue');
+ const onlineCard=(await page.locator('.online-variant-gallery > button').first().boundingBox())!;
  await toggle.getByRole('button',{name:'Computer',exact:true}).click();
  await check('Choose variant','Start game');
+ const computerCard=(await page.locator('.computer-variant-gallery > button').first().boundingBox())!;
+ expect(Math.abs(onlineCard.width-computerCard.width)).toBeLessThan(1);
+ expect(Math.abs(onlineCard.height-computerCard.height)).toBeLessThan(1);
  await page.getByRole('button',{name:'Speedrun',exact:true}).click();
  await expect(page.getByRole('spinbutton',{name:'Computer Elo'})).toBeInViewport({ratio:1});
  await check('Choose variant','Start game');

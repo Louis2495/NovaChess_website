@@ -5404,8 +5404,11 @@ html { scrollbar-gutter:stable; }
   height:100%;
 }
 .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active {
-  display:flex; flex-direction:column; align-items:center; gap:clamp(12px,3.6dvh,36px);
+  --variant-section-gap:clamp(12px,3.6dvh,36px);
+  --variant-setup-space:calc(134px + 2 * var(--variant-section-gap));
+  display:flex; flex-direction:column; align-items:center; gap:var(--variant-section-gap);
   width:100%; height:100%; min-height:0;
+  container-type:size;
 }
 .variants-hub.setup-active > .play-hub-heading {
   position:absolute; inset-block-start:0; inset-inline-end:0; z-index:3; margin:0;
@@ -5428,16 +5431,19 @@ html { scrollbar-gutter:stable; }
 .variants-hub.setup-active > .quick-online-play > .caption { font-size:clamp(.68rem,1.6dvh,.87rem); }
 .variants-hub.setup-active > .friend-settings-slot { flex:none; order:-1; width:min(100%,220px); }
 .variants-hub.setup-active > .variant-sign-in { flex:none; order:-1; margin:0; }
+/* Base both galleries on the wider grid and the taller setup controls. */
 .variants-hub.setup-active .variant-gallery {
   --variant-gallery-gap:clamp(9px,2.3dvh,24px);
   --variant-gallery-rows:3;
-  --variant-card-height:170px;
-  flex:1 1 0; min-height:0; width:min(100%,960px); margin:0;
+  --variant-fit-rows:3;
+  --variant-card-height:min(170px,max(0px,calc((100cqh - var(--variant-setup-space) + var(--variant-gallery-gap)) / var(--variant-fit-rows) - var(--variant-gallery-gap))));
+  flex:1 1 0; min-height:0; width:min(100%,calc((960px + var(--variant-gallery-gap)) * 7 / 6 - var(--variant-gallery-gap))); margin:0;
   max-height:calc(var(--variant-gallery-rows) * var(--variant-card-height) + (var(--variant-gallery-rows) - 1) * var(--variant-gallery-gap));
   grid-template-columns:repeat(7,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr);
   gap:var(--variant-gallery-gap);
 }
 .variants-hub.setup-active .computer-variant-gallery {
+  width:min(960px,calc((100% + var(--variant-gallery-gap)) * 6 / 7 - var(--variant-gallery-gap)));
   grid-template-columns:repeat(6,minmax(0,1fr));
 }
 .variants-hub.setup-active .variant-gallery button {
@@ -5459,19 +5465,21 @@ html { scrollbar-gutter:stable; }
 .variants-hub.setup-active .game-settings-card > .options-toggle { padding:6px 0; }
 .variants-hub.setup-active .resume-game-button { margin-top:4px; padding:4px 8px; }
 @media(max-width:760px) {
-  .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active { gap:clamp(9px,2.4dvh,20px); }
+  .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active { --variant-section-gap:clamp(9px,2.4dvh,20px); }
   .variants-hub.setup-active .variant-gallery { --variant-gallery-gap:clamp(7px,1.7dvh,15px); }
   .workspace-shell:has(.variants-hub.setup-active) > .workspace {
     padding-bottom:calc(72px + env(safe-area-inset-bottom));
   }
   .variants-hub.setup-active :is(.variant-gallery,.computer-variant-gallery) {
     --variant-gallery-rows:6;
-    --variant-card-height:94px;
+    --variant-fit-rows:6;
+    width:min(100%,960px);
     grid-template-columns:repeat(4,minmax(0,1fr));
   }
   .variants-hub.setup-active .computer-variant-gallery { --variant-gallery-rows:5; }
 }
 @media(max-width:1000px) {
+  .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active { --variant-setup-space:calc(152px + 3 * var(--variant-section-gap)); }
   .variants-hub.setup-active > .play-hub-heading {
     position:static; order:-3; align-self:flex-end;
   }
@@ -5482,6 +5490,8 @@ html { scrollbar-gutter:stable; }
 @media(max-height:480px) {
   .variants-hub.setup-active :is(.variant-gallery,.computer-variant-gallery) {
     --variant-gallery-rows:3;
+    --variant-fit-rows:3;
+    width:min(100%,960px);
     grid-template-columns:repeat(7,minmax(0,1fr));
   }
 }
