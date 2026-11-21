@@ -2,7 +2,8 @@ declare const EdgeRuntime: {waitUntil(task:Promise<unknown>):void};
 import {onlineEngine} from "./engine.ts";
 import {freshOnline,applyOnline,onlineVariantIds,specialVariants} from "../../../src/lib/onlineVariants.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.119.0";
-import { Chess } from "npm:chess.js@1.4.0";
+import { Chess, type Move } from "npm:chess.js@1.4.0";
+import { clampTeamComputerRating, teamComputerMaxRating } from "../../../src/lib/teamComputer.ts";
 import {
   newSpecial,
   specialApply,
@@ -65,22 +66,32 @@ function standardApply(state: any, move: string) {
         : "*",
   };
 }
-function simpleBot(state: any) {
-  const c = new Chess(state.fen),
-    weights: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };
-  const moves = c.moves({ verbose: true });
-  moves.sort(
-    (a, b) =>
-      (b.captured ? weights[b.captured] : 0) -
-      (a.captured ? weights[a.captured] : 0),
-  );
-  const best = moves.filter(
-    (m) =>
-      (m.captured ? weights[m.captured] : 0) ===
-      (moves[0]?.captured ? weights[moves[0].captured] : 0),
-  );
-  const m = best[Math.floor(Math.random() * best.length)];
-  return m ? m.from + m.to + (m.promotion || "") : "";
+const pieceValues = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
+function tacticalValue(move: Move) {
+  if (move.san.endsWith("#")) return 100000;
+  return (move.captured ? pieceValues[move.captured] : 0) +
+    (move.promotion ? pieceValues[move.promotion] - pieceValues.p : 0);
+}
+
+function teamBotMove(fen: string, rating: number) {
+  const moves = new Chess(fen).moves({ verbose: true });
+  const variation = (teamComputerMaxRating - rating) * 0.45;
+  let best: Move | undefined;
+  let bestScore = -Infinity;
+  for (const move of moves) {
+    const immediate = tacticalValue(move);
+    const center = 7 - Math.abs(move.to.charCodeAt(0) - 100.5) - Math.abs(Number(move.to[1]) - 4.5);
+    let score = immediate + center * 4 + Math.random() * variation;
+    if (rating >= 1200 && immediate < 100000) {
+      const replies = new Chess(move.after).moves({ verbose: true });
+      score -= replies.reduce((worst, reply) => Math.max(worst, tacticalValue(reply)), 0);
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      best = move;
+    }
+  }
+  return best ? best.from + best.to + (best.promotion || "") : "";
 }
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -129,6 +140,8 @@ Deno.serve(async (req) => {
       const timed=body.mode==="standard" && variant==="chess" && [180,300,600].includes(body.timeControlSeconds);
       const initial=await fresh(variant,Math.max(1,Math.min(4,+body.dropCount||2)));
       if(timed)initial.clock={incrementMs:increment*1000,remaining:{w:body.timeControlSeconds*1000,b:body.timeControlSeconds*1000},startedAt:null};
+      const teamBot = body.mode === "team" && body.bot === true && !body.friend;
+      const botRating = teamBot ? { botRating: clampTeamComputerRating(body.botRating) } : {};
       if(variant==="bughouse" && (body.friend || body.teammates?.length)){
         const {data,error}=await db.rpc("create_bughouse_friend_game",{
           p_host:uid,p_opponent:body.friend || null,p_friends:body.teammates || [],
@@ -142,7 +155,7 @@ Deno.serve(async (req) => {
         const {data,error}=await db.rpc("create_team_friend_game",{
           p_host:uid,p_opponent:body.friend || null,p_friends:body.teammates || [],
           p_variant:variant,p_name:String(body.name||"Team Chess").trim().slice(0,80)||"Team Chess",
-          p_state:initial,p_settings:{bot:!body.friend && body.bot===true,dropCount:Math.max(1,Math.min(4,+body.dropCount||2))},
+          p_state:initial,p_settings:{bot:teamBot,...botRating,dropCount:Math.max(1,Math.min(4,+body.dropCount||2))},
         });
         if(error)throw error;
         return json(data);
@@ -164,12 +177,13 @@ Deno.serve(async (req) => {
           state: initial,
           members: [{ id: uid, team: "w", ...(variant === "bughouse" ? {board:0} : {}) }],
           settings: {
-            bot: body.mode === "team" && body.bot === true,
+            bot: teamBot,
+            ...botRating,
             dropCount: Math.max(1, Math.min(4, +body.dropCount || 2)),
             timeControlSeconds:timed?body.timeControlSeconds:0,
             incrementSeconds:timed?increment:0,
           },
-          status: body.mode === "team" && body.bot ? "playing" : "waiting",
+          status: teamBot ? "playing" : "waiting",
           deadline:
             body.mode === "vote"
               ? new Date(Date.now() + 86400000).toISOString()
@@ -358,7 +372,7 @@ Deno.serve(async (req) => {
       state.result === "*" &&
       state.fen.split(" ")[1] === "b"
     ) {
-      const move = simpleBot(state);
+      const move = teamBotMove(state.fen, clampTeamComputerRating(r.settings.botRating));
       if (move) state = standardApply(state, move);
     }
     if(state.result!=="*" && state.clock)state={...state,clock:{...state.clock,startedAt:null}};

@@ -1,3 +1,4 @@
+import { clampTeamComputerRating, teamComputerDefaultRating, teamComputerMaxRating, teamComputerMinRating, teamComputerRatingStep } from "../lib/teamComputer";
 import {GameScore} from "../components/BoardPlayer";
 import {createPortal} from "react-dom";
 import type { SavedGame } from "../lib/types";
@@ -53,7 +54,7 @@ type Room = {
   deadline: string | null;
   revision: number;
   marks: BoardMark[];
-  settings: { bot: boolean; invitedFriend?: string };
+  settings: { bot: boolean; botRating?: number; invitedFriend?: string };
 };
 type Profile = { id: string; username: string;screen_name?:string; rating?:number };
 export default function Community({presetMode = "standard", presetVariant = "chess", timeControlSeconds = 180, incrementSeconds = 0, children, friendSettingsHost}: {presetMode?: string; presetVariant?: string; timeControlSeconds?:number; incrementSeconds?:number; children?:ReactNode; friendSettingsHost?:HTMLElement|null}) {
@@ -65,6 +66,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
     [name] = useState(presetMode === "standard" ? (variantList.find(v=>v.id===presetVariant)?.name || "Speedrun") : presetMode === "vote" ? "Vote Chess" : presetMode === "team" ? "Team Chess" : "Throne"),
     [variant] = useState(presetVariant),
     [bot, setBot] = useState(false),
+    [botRating, setBotRating] = useState(String(teamComputerDefaultRating)),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [votes, setVotes] = useState<
@@ -303,10 +305,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
       variant:room.variant, moves:state.moves, notation:state.notation, positions:state.positions,
       result:previous && last ? last.result : state.result, human, folder:"Games",
       whiteName:room.members.filter(m=>m.team==='w').map(m=>username(m.id)).join(", "),
-      blackName:room.members.filter(m=>m.team==='b').map(m=>username(m.id)).join(", "),
+      blackName:room.settings.bot ? "Computer" : room.members.filter(m=>m.team==='b').map(m=>username(m.id)).join(", "),
       humanRating:profiles.find(p=>p.id===uid)?.rating,
-      opponentRating:profiles.find(p=>room.members.some(m=>m.id===p.id && m.team && m.team!==human))?.rating,
-      opponent:room.members.filter(m => m.team && m.team !== human).map(m => username(m.id)).join(", "),
+      opponentRating:room.settings.bot ? clampTeamComputerRating(room.settings.botRating) : profiles.find(p=>room.members.some(m=>m.id===p.id && m.team && m.team!==human))?.rating,
+      opponent:room.settings.bot ? "Computer" : room.members.filter(m => m.team && m.team !== human).map(m => username(m.id)).join(", "),
       ...(specialVariants.includes(room.variant) && "blocked" in state ? {special:state} : {}),
     };
     setLibrary(l => ({...l, games:[game,...l.games.filter(g => g.id !== id)]}));
@@ -321,7 +323,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       <div className="online-player-identity">{members.map(member => {
         const profile = profiles.find(p => p.id === member.id);
         return <div key={member.id}><b><GameScore result={position?.result} side={side}/> {username(member.id)}</b><span className="caption">{profile?.rating ?? "—"}</span></div>;
-      })}{side === "b" && room.settings.bot && <b>Computer</b>}
+      })}{side === "b" && room.settings.bot && <div><b>Computer</b><span className="caption">{clampTeamComputerRating(room.settings.botRating)}</span></div>}
       {!members.length && !(side === "b" && room.settings.bot) && <b>Waiting for opponent</b>}</div>
     </div>;
   }
@@ -640,18 +642,29 @@ export default function Community({presetMode = "standard", presetVariant = "che
           ) : (
             <Card className="quick-online-play">
               {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>{setBot(e.target.value==="bot");if(e.target.value==="bot")setSelectedFriend(null);}}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
+              {mode === "team" && bot && <Field label="Computer rating">
+                <input className="team-rating-input" type="number" min={teamComputerMinRating} max={teamComputerMaxRating} step={teamComputerRatingStep}
+                  value={botRating} onChange={e=>setBotRating(e.target.value)}
+                  onBlur={()=>setBotRating(String(clampTeamComputerRating(botRating === "" ? undefined : Number(botRating))))}/>
+              </Field>}
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 if(selectedFriend){await challengeFriend(selectedFriend.id);return;}
                 setBusy(true);setError("");
                 try {
+                  if(mode==="team" && bot){
+                    await act("create",{mode,name,variant:"chess",bot:true,
+                      botRating:clampTeamComputerRating(botRating === "" ? undefined : Number(botRating)),
+                      ...(teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
+                    return;
+                  }
                   const listing=online!.from("room_lobby").select("id,name,mode,variant,status,member_count,updated_at,time_control,increment_seconds").eq("mode",mode).eq("variant",variant).order("status",{ascending:true}).order("updated_at",{ascending:true}).limit(40);
                   if(mode==="standard")listing.eq("status","waiting").lt("member_count",variant==="bughouse"?4:2);
                   if(mode==="standard" && variant==="chess")listing.eq("time_control",timeControlSeconds).eq("increment_seconds",incrementSeconds);
                   const {data,error}=await listing;
                   if(error)throw error;
                   const available=(data||[]).filter(r=>mode!=="standard" || variant!=="chess" || (r.time_control===timeControlSeconds && r.increment_seconds===incrementSeconds)).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
-                  if(available && !teammates.length && !(mode === "team" && bot)) await act("join",{room:available.id});
-                  else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot,...(supportsTeammates && teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
+                  if(available && !teammates.length) await act("join",{room:available.id});
+                  else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" ? "chess" : variant,bot:false,...(supportsTeammates && teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
               }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>
 

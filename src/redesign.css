@@ -6132,3 +6132,27 @@ html { scrollbar-gutter:stable; }
   .home-progress dl { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 0; }
   .home-progress dl > div:nth-child(3) { --progress-inset:0px; border:0; }
 }
+
+.variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) {
+  display:grid;
+  grid-template-columns:minmax(0,2.3fr) minmax(0,1fr);
+  column-gap:8px;
+}
+.variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) > :not(.field) {
+  grid-column:1 / -1;
+}
+.variants-hub[data-online-variant="team"] .team-rating-input {
+  min-width:0;
+  height:32px;
+  min-height:0;
+  padding-block:4px;
+}
+.variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) .segmented-control button {
+  padding-inline:4px;
+  font-size:.75rem;
+  white-space:nowrap;
+}
+.variants-hub[data-online-variant="team"] .field:has(.team-rating-input) > span {
+  font-size:clamp(.6rem,2.4vw,.78rem);
+  white-space:nowrap;
+}

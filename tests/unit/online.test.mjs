@@ -179,13 +179,14 @@ before(async () => {
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
     .replace('"./engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/engine.ts")).href))
+    .replace('"../../../src/lib/teamComputer.ts"',JSON.stringify(pathToFileURL(resolve("src/lib/teamComputer.ts")).href))
     .replace('"../../../src/lib/onlineVariants.ts"',JSON.stringify(pathToFileURL(resolve("src/lib/onlineVariants.ts")).href))
     .replace(
       /import \{ createClient \} from ["']npm:@supabase\/supabase-js@2(?:\.\d+\.\d+)?["'];/,
       "",
     )
     .replace(
-      /import \{ Chess \} from ["']npm:chess.js@1.4.0["'];/,
+      /import \{ Chess, type Move \} from ["']npm:chess.js@1.4.0["'];/,
       `import {Chess} from ${JSON.stringify(pathToFileURL(resolve("node_modules/chess.js/dist/esm/chess.js")).href)};`,
     )
     .replace(
@@ -289,9 +290,11 @@ test("Vote Chess balances teams, keeps ballots after joins, closes at one day an
   assert.ok(Date.parse(r.deadline) > Date.now());
 });
 test("Team chess lets teammates move and draw shared arrows, and the server plays the bot", async () => {
-  let game = await room("team", { bot: true });
+  let game = await room("team", { bot: true, botRating: 1800 });
+  assert.equal(game.settings.botRating, 1800);
   game = (await command(users[1], game, "join")).data;
   assert.equal(game.members[1].team, "w");
+  assert.equal(game.settings.botRating, 1800);
   let r = await command(users[1], game, "marks", {
     marks: [{ from: "e2", to: "e4", color: "#63d6a1" }],
   });

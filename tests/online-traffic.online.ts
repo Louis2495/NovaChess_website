@@ -548,3 +548,16 @@ test('Bughouse lets you challenge a rival and pick exactly one teammate',async({
  await page.getByRole('button',{name:'Start',exact:true}).click();
  await expect.poll(()=>env.actions[0]).toMatchObject({action:'create',variant:'bughouse',friend:peer,teammates:[teamFriend]});
 });
+
+test('Team Chess sends the chosen rating when starting a computer game',async({page})=>{
+ const env=await connected(page);
+ await page.goto('/#variants');
+ await page.getByRole('button',{name:'Team Chess',exact:true}).click();
+ const rating=page.getByRole('spinbutton',{name:'Computer rating',exact:true});
+ await expect(rating).toHaveCount(0);
+ await page.locator('.quick-online-play').getByRole('button',{name:'Computer',exact:true}).click();
+ await expect(rating).toHaveValue('1000');
+ await rating.fill('1650');
+ await page.getByRole('button',{name:'Start Team Chess',exact:true}).click();
+ await expect.poll(()=>env.actions[0]).toMatchObject({action:'create',mode:'team',bot:true,botRating:1700});
+});
