@@ -5466,15 +5466,17 @@ html { scrollbar-gutter:stable; }
 .home-page .home-practice-grid .daily-meme { height:var(--home-preview-height,360px); width:100%; box-sizing:border-box; border:8px solid #fff; border-radius:12px; overflow:hidden; background:#fff; }
 .home-page .home-practice-grid .daily-meme .daily-meme-image { width:100%; height:100%; max-width:none; max-height:none; outline:0; border-radius:0; object-fit:contain; background-color:#fff; }
 .home-page > .home-recent { box-sizing:border-box; display:flex; flex-direction:column; min-height:0; }
-.home-recent-empty { margin:0; }
+.home-recent .home-section-heading h2 { font-size:1.2rem; }
+.home-recent .home-section-heading .text-link { font-size:.82rem; }
+.home-recent-empty { margin:0; font-size:1.05rem; }
 .home-recent-list { flex:1; min-height:0; overflow:auto; padding:0 2px; }
 .home-recent .recent-game-entry { background:color-mix(in srgb,var(--recent-color) 9%,var(--panel)); border-color:var(--recent-color); }
 .home-recent .recent-game-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); color:var(--text); align-items:center; }
 .recent-players { display:flex; flex-direction:column; gap:10px; min-width:0; }
 .recent-player { display:flex; align-items:center; gap:8px; min-width:0; }
-.recent-player b { flex:1; min-width:0; overflow-wrap:anywhere; font-size:.82rem; text-align:left; }
+.recent-player b { flex:1; min-width:0; overflow-wrap:anywhere; text-align:left; }
 .recent-player .recent-color-chip { width:10px; height:10px; flex:none; }
-.recent-player-score { font-weight:800; font-size:1rem; }
+.recent-player-score { font-weight:800; font-size:1.12rem; }
 .recent-player-score.score-win { color:#39ed83; }
 .recent-player-score.score-loss { color:#ff5364; }
 .recent-player-score.score-draw { color:#c9ced6; }
@@ -5580,8 +5582,8 @@ html { scrollbar-gutter:stable; }
 .home-page .home-recent .home-recent-list .recent-game-row { flex:1 0 auto; padding:6px 8px; gap:8px; }
 .home-recent .recent-players { gap:6px; }
 .home-recent .recent-player { gap:5px; }
-.home-recent .recent-player b { font-size:.76rem; line-height:1.2; }
-.home-recent .recent-game-details { gap:3px; font-size:.66rem; line-height:1.2; }
+.home-recent .recent-player b { font-size:.88rem; line-height:1.2; }
+.home-recent .recent-game-details { gap:3px; font-size:.78rem; line-height:1.2; }
 .home-recent .recent-game-scrubber { flex:none; height:20px; padding:0 10px 4px; }
 .home-recent .recent-game-scrubber input { height:16px; }
 .home-recent-list { gap:6px; }
