@@ -60,10 +60,9 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
       : "https://www.uschess.org/msa/MbrDtlMain.php?" +
         encodeURIComponent(memberId);
   return (
-    <div className="rankings-page">
+    <div className={`rankings-page ${embedded ? "stats-rankings" : ""}`}>
       {!embedded && <PageTitle title="Rankings" />}
-      <FederationCards />
-      <div className="rank-summary">
+      <div className="rank-summary" aria-label="Your online ranking">
         {mine ? (
           <>
             <Card>
@@ -114,19 +113,21 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
         ) : error ? (
           <p role="alert">{error}</p>
         ) : rankings.length ? (
-          rankings.map((r) => (
-            <div key={r.id} className={r.id === session?.user.id ? "you" : ""}>
-              <b>#{country ? r.country_rank : r.global_rank}</b>
-              <span>
-                {r.country && flag(r.country)} {screenName(r)}
-              </span>
-              <strong>{r.rating}</strong>
-            </div>
-          ))
+          <table className="stats-leaderboard" aria-label="NovaChess leaderboard">
+            <thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Rating</th></tr></thead>
+            <tbody>{rankings.map(r => (
+              <tr key={r.id} className={r.id === session?.user.id ? "you" : ""}>
+                <td>#{country ? r.country_rank : r.global_rank}</td>
+                <td>{r.country && <span aria-hidden="true">{flag(r.country)} </span>}{screenName(r)}</td>
+                <td><strong>{r.rating}</strong></td>
+              </tr>
+            ))}</tbody>
+          </table>
         ) : (
           <p className="caption">No ranked players yet.</p>
         )}
       </Card>
+      <div className="stats-federation"><FederationCards />
       <Card className="rating-lookup">
         <h2>Federation ratings</h2>
         <div className="inline-form">
@@ -162,6 +163,7 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
           )}
         </div>
       </Card>
+      </div>
     </div>
   );
 }

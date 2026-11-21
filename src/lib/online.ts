@@ -42,6 +42,9 @@ export async function requestPasswordReset(email:string){
  const {error}=await online.auth.resetPasswordForEmail(email.trim(),{redirectTo:passwordResetRedirect()});
  if(error)throw error;
 }
+export const oauthSignupIntent = "novachess-oauth-signup-intent";
+export const oauthProfilePending = "novachess-oauth-profile-pending";
+
 export function useOnlineSession() {
   const [session, setSession] = useState<Session | null>(null),
     [ready, setReady] = useState(!online);

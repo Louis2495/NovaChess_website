@@ -499,9 +499,9 @@ test("flags can be selected as backgrounds and persist; harder achievements star
   expect(response.ok()).toBeTruthy();
   await page.goto("/#stats");
   await page.getByRole("button", { name: "Achievements", exact: true }).click();
-  await expect(page.locator(".achievement")).toHaveCount(18);
-  await expect(page.locator(".achievement.unlocked")).toHaveCount(0);
-  await expect(page.locator(".achievement-grid")).toContainText(
+  await expect(page.locator(".stats-achievement-list > li")).toHaveCount(18);
+  await expect(page.locator(".stats-achievement-progress span").filter({ hasText: /^Unlocked$/ })).toHaveCount(0);
+  await expect(page.locator(".stats-achievement-list")).toContainText(
     "90 consecutive days",
   );
 });

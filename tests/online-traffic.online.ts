@@ -137,9 +137,39 @@ test('admin password hashes are not prefetched and hide on request',async({page}
  await page.goto('/#profile/admin');await expect(page.getByRole('columnheader',{name:'Screen name',exact:true})).toBeVisible();await expect(page.getByText('Fork Master',{exact:true})).toBeVisible();expect(reads).toBe(0);await expect(page.locator('body')).not.toContainText('player_internal');await page.getByRole('button',{name:'Show password hash for Fork Master',exact:true}).click();await expect(page.locator('.admin-password-hash')).toHaveText(hash);expect(reads).toBe(1);expect(await page.evaluate(()=>JSON.stringify(localStorage))).not.toContain(hash);await page.getByRole('button',{name:'Hide password hash for Fork Master',exact:true}).click();await expect(page.locator('.admin-password-hash')).toHaveCount(0);
 });
 
-test('signup sends the chosen screen name to the server profile trigger',async({page})=>{
- await connected(page,false);let signup:any;await page.route('**/auth/v1/signup*',async r=>{signup=r.request().postDataJSON();await r.fulfill({json:{id:uid,email:'new@example.test',aud:'authenticated',app_metadata:{provider:'email'},user_metadata:{screen_name:'Queen Bee'},identities:[],created_at:new Date().toISOString()}});});await page.goto('/#signin');await page.getByRole('button',{name:'Create an account',exact:true}).click();await page.getByLabel('Screen name',{exact:true}).fill('Queen Bee');await page.getByLabel('Email',{exact:true}).fill('new@example.test');await page.getByLabel('Password',{exact:true}).fill('Fake-password-123');await page.getByRole('button',{name:'Create account',exact:true}).click();await expect(page.getByRole('status')).toContainText('Check your email');expect(signup.data.screen_name).toBe('Queen Bee');
+test('signup sends name, country and a premade picture to the profile trigger',async({page})=>{
+ await connected(page,false);let signup:any;await page.route('**/auth/v1/signup*',async r=>{signup=r.request().postDataJSON();await r.fulfill({json:{id:uid,email:'new@example.test',aud:'authenticated',app_metadata:{provider:'email'},user_metadata:{screen_name:'Queen Bee'},identities:[],created_at:new Date().toISOString()}});});await page.goto('/#signin');await page.getByRole('button',{name:'Create an account',exact:true}).click();await page.getByLabel('Screen name',{exact:true}).fill('Queen Bee');await page.getByLabel('Country of origin',{exact:true}).selectOption('CA');const pawn=page.getByRole('button',{name:'Sunglasses pawn',exact:true});await pawn.click();await expect(pawn).toHaveAttribute('aria-pressed','true');await page.getByLabel('Email',{exact:true}).fill('new@example.test');await page.getByLabel('Password',{exact:true}).fill('Fake-password-123');await page.getByRole('button',{name:'Create account',exact:true}).click();await expect(page.getByRole('status')).toContainText('Check your email');expect(signup.data).toMatchObject({screen_name:'Queen Bee',country:'CA',avatar:expect.stringMatching(/^data:image\/jpeg;base64,/)});
 });
+
+test('new OAuth users finish their country and uploaded picture after sign-in', async ({page}) => {
+  await connected(page, false);
+  await page.addInitScript(uid => {
+    const now = Date.now();
+    const payload = btoa(JSON.stringify({sub:uid,role:'authenticated',exp:Math.floor(now/1000)+3600}));
+    sessionStorage.setItem('novachess-oauth-signup-intent', String(now-1000));
+    localStorage.setItem('sb-abcdefghijklmnopqrst-auth-token', JSON.stringify({
+      access_token:`e30.${payload}.test`,refresh_token:'refresh',expires_at:Math.floor(now/1000)+3600,token_type:'bearer',
+      user:{id:uid,email:'new@example.test',app_metadata:{provider:'google'},user_metadata:{},aud:'authenticated',created_at:new Date(now).toISOString()},
+    }));
+  },uid);
+  let update: unknown;
+  await page.route('**/rest/v1/profiles?*', async route => {
+    if (route.request().method()==='PATCH') {
+      update = route.request().postDataJSON();
+      return route.fulfill({status:204,body:''});
+    }
+    await route.fulfill({json:{id:uid,username:'player_new',screen_name:'',bio:'',country:'JP',avatar:''}});
+  });
+  await page.goto('/');
+  await expect(page.getByRole('heading',{name:'Set up your profile',level:2})).toBeVisible();
+  await page.getByLabel('Country of origin',{exact:true}).selectOption('JP');
+  await page.getByLabel('Upload a profile picture',{exact:true}).setInputFiles('public/avatars/knight.webp');
+  await expect(page.getByRole('img',{name:'Selected profile picture'})).toBeVisible();
+  await page.getByRole('button',{name:'Save profile',exact:true}).click();
+  await expect(page).toHaveURL(/#profile$/);
+  expect(update).toMatchObject({country:'JP',avatar:expect.stringMatching(/^data:image\/jpeg;base64,/)});
+});
+
 
 
 test('moves render before acknowledgement and an older acknowledgement cannot undo an opponent reply',async({page})=>{

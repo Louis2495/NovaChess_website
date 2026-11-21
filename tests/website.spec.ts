@@ -368,7 +368,7 @@ test("trivia, history, dated ratings and map controls provide real content", asy
   ).toBeGreaterThan(0);
   await page.goto("/#stats");
   await page.getByRole("button", { name: "Achievements", exact: true }).click();
-  await expect(page.locator(".achievement")).toHaveCount(18);
+  await expect(page.locator(".stats-achievement-list > li")).toHaveCount(18);
   await page.getByRole("button", { name: "World map", exact: true }).click();
   await expect(page.locator(".world-map path").first()).toBeVisible();
   await page.getByRole("button", { name: "Zoom in", exact: true }).click();

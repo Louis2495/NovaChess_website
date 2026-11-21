@@ -5690,3 +5690,16 @@ html { scrollbar-gutter:stable; }
  .research-loaded .research-results { grid-column:2; grid-row:1; min-width:0; margin-top:var(--research-board-inset,22px); }
  .research-loaded .research-form { grid-column:3; grid-row:1; min-width:0; margin-top:var(--research-board-inset,22px); }
 }
+
+.signup-avatar-options { margin:16px 0; padding:0; border:0; min-width:0; }
+.signup-avatar-options legend { margin-bottom:8px; font-size:.84rem; font-weight:600; }
+.signup-avatar-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.signup-avatar-grid button { padding:3px; border:2px solid var(--border); border-radius:10px; background:var(--panel); cursor:pointer; }
+.signup-avatar-grid button[aria-pressed="true"] { border-color:var(--accent); }
+.signup-avatar-grid img,.signup-upload-row > img { display:block; aspect-ratio:1; object-fit:cover; border-radius:6px; }
+.signup-avatar-grid img { width:100%; }
+.signup-upload-row { display:flex; align-items:center; gap:8px; margin-top:9px; }
+.signup-upload-row > img { width:40px; }
+.signup-upload-row label { position:relative; display:inline-flex; align-items:center; gap:7px; padding:8px 0; cursor:pointer; }
+.signup-upload-row label:focus-within { outline:2px solid var(--accent); }
+.signup-upload-row input { position:absolute; inset:0; opacity:0; width:100%; cursor:pointer; }

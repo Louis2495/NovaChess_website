@@ -169,6 +169,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180011_players_friends.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180012_friend_activity.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180013_player_challenges.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180014_signup_profile.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -782,4 +783,19 @@ test("friends sort by presence, then game and request activity in either directi
   const invitation = await call(inviter, { action: "create", mode: "standard", variant: "chess", friend: actor });
   assert.equal(invitation.status, 200, JSON.stringify(invitation.data));
   assert.deepEqual(await directory(), [[inviter, true], [opponent, true], [offline, false]]);
+});
+
+test("the sign-up trigger saves country and photo with the public profile", async () => {
+  const valid = "b167c385-4fcc-43df-8da4-a4f22e88e82b";
+  const invalid = "aca9416f-9893-4271-a237-e2c5053f06f0";
+  const avatar = "data:image/jpeg;base64,/9j/2Q==";
+  await pg.query("insert into auth.users(id, raw_user_meta_data) values ($1, $2), ($3, $4)", [
+    valid, JSON.stringify({screen_name:"Test Pawn",country:" ca ",avatar}),
+    invalid, JSON.stringify({screen_name:"Test Rook",country:"invalid",avatar:"https://example.test/a"}),
+  ]);
+  const result = await pg.query("select screen_name, country, avatar from profiles where id in ($1,$2) order by screen_name", [valid,invalid]);
+  assert.deepEqual(result.rows, [
+    {screen_name:"Test Pawn",country:"CA",avatar},
+    {screen_name:"Test Rook",country:"",avatar:""},
+  ]);
 });

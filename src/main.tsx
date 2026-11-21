@@ -1,6 +1,6 @@
 import {online} from "./lib/online";
 import {screenName} from "./lib/screenName";
-import {useOnlineSession,useRecoveryState} from "./lib/online";
+import {useOnlineSession,useRecoveryState,oauthSignupIntent,oauthProfilePending} from "./lib/online";
 import AccountPresence from "./components/AccountPresence";
 import FriendGameInvites from "./components/FriendGameInvites";
 import GlobalChat from "./components/GlobalChat";
@@ -230,6 +230,20 @@ function App() {
     window.scrollTo({ top: 0, behavior: "instant" });
   }
   useEffect(()=>{if(recovery.active || recovery.checking || recovery.error)navigate("signin","reset");},[recovery.active,recovery.checking,recovery.error]);
+  useEffect(() => {
+    if (!authReady || !session || recovery.active || recovery.checking || recovery.error) return;
+    const { user } = session;
+    const started = Number(sessionStorage.getItem(oauthSignupIntent));
+    const provider = user.app_metadata.provider;
+    if (started) {
+      sessionStorage.removeItem(oauthSignupIntent);
+      if ((provider === "google" || provider === "github") && Date.now() - started < 3600000 &&
+          Date.parse(user.created_at) >= started - 30000)
+        sessionStorage.setItem(oauthProfilePending, user.id);
+    }
+    if (sessionStorage.getItem(oauthProfilePending) === user.id) navigate("signin", "setup");
+  }, [authReady, session?.user.id, recovery.active, recovery.checking, recovery.error]);
+
   useEffect(() => {
     const handler = () => setLocation(route());
     window.addEventListener("hashchange", handler);

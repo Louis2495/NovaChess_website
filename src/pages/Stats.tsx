@@ -1,3 +1,4 @@
+import "./stats-dashboard.css";
 import { variantList } from "../lib/variantCatalog";
 import { duration, speedrunBests, throneDuration } from "../lib/speedrun";
 import { online, useOnlineSession } from "../lib/online";
@@ -18,7 +19,6 @@ import {
   RotateCcw,
   Globe,
   Lock,
-  Check,
   Flag,
 } from "lucide-react";
 import type { SavedGame } from "../lib/types";
@@ -26,7 +26,6 @@ import { useApp } from "../lib/context";
 import { useData } from "../lib/store";
 import {
   ChoiceSelect,
-  PageTitle,
   Card,
   Button,
   IconButton,
@@ -37,6 +36,7 @@ export default function Stats() {
   const [tab, setTab] = useState(
     detail === "rankings" ? "Rankings" : "Overview",
   );
+  const [onlyUnlocked, setOnlyUnlocked] = useState(false);
   const games = library.games.filter(
       (g) =>
         g.result !== "*" &&
@@ -178,13 +178,13 @@ export default function Stats() {
     ),
   ];
   return (
-    <div className="stats-page">
-      <PageTitle title="Stats" />
-      <div className="segmented page-segments">
-        {["Overview", "Rankings", "Achievements", "World map"].map((t) => (
+    <div className="stats-page stats-dashboard">
+      <header className="stats-header"><h1>Stats</h1></header>
+      <div className="stats-tabs" role="group" aria-label="Stats sections">
+        {["Overview", "Competition", "Rankings", "Achievements", "World map"].map((t) => (
           <button
             key={t}
-            className={tab === t ? "active" : ""}
+            aria-pressed={tab === t}
             onClick={() => setTab(t)}
           >
             {t}
@@ -192,34 +192,33 @@ export default function Stats() {
         ))}
       </div>
       {tab === "Achievements" ? (
-        <div className="achievement-grid">
-          {badges.map(([name, value, goal]) => (
-            <Card
-              key={name}
-              className={value >= goal ? "achievement unlocked" : "achievement"}
-            >
-              <span className="achievement-icon">
-                {value >= goal ? <Trophy size={25} /> : <Lock size={23} />}
-              </span>
-              <h3>{name}</h3>
-              <p className="caption">{requirements[name]}</p>
-              <p>
-                {Math.min(value, goal)} / {goal}
-              </p>
-              <div className="progress-track">
-                <span
-                  style={{ width: `${Math.min(100, (value / goal) * 100)}%` }}
-                />
-              </div>
-              {value >= goal && (
-                <span className="pill">
-                  <Check size={12} />
-                  Unlocked
+        <section className="stats-achievements" aria-labelledby="achievement-title">
+          <header className="stats-section-heading">
+            <div><h2 id="achievement-title">Achievements</h2><p className="caption">
+              {badges.filter(([, value, goal]) => value >= goal).length} of {badges.length} unlocked
+            </p></div>
+            <Button className="secondary" aria-pressed={onlyUnlocked} onClick={() => setOnlyUnlocked(value => !value)}>
+              Unlocked only
+            </Button>
+          </header>
+          <ul className="stats-achievement-list">
+            {badges.filter(([, value, goal]) => !onlyUnlocked || value >= goal).map(([name, value, goal]) => (
+              <li key={name}>
+                <span className="stats-achievement-icon" aria-hidden="true">
+                  {value >= goal ? <Trophy size={19} /> : <Lock size={17} />}
                 </span>
-              )}
-            </Card>
-          ))}
-        </div>
+                <div><h3>{name}</h3><p className="caption">{requirements[name]}</p></div>
+                <div className="stats-achievement-progress">
+                  <span>{value >= goal ? "Unlocked" : `${value} / ${goal}`}</span>
+                  <progress aria-label={name} value={Math.min(value, goal)} max={goal} />
+                </div>
+              </li>
+            ))}
+          </ul>
+          {onlyUnlocked && !badges.some(([, value, goal]) => value >= goal) && <p>No achievements unlocked yet.</p>}
+        </section>
+      ) : tab === "Competition" ? (
+        <CompetitionStats games={games} />
       ) : tab === "Rankings" ? (
         <Rankings embedded />
       ) : tab === "World map" ? (
@@ -240,7 +239,10 @@ function CompetitionStats({games}: {games:SavedGame[]}) {
  const [total,setTotal]=useState(0),[throneGames,setThroneGames]=useState(0),[metric,setMetric]=useState("Time"),[error,setError]=useState("");
  useEffect(()=>{setTotal(0);setThroneGames(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_stats");if(active){setTotal(Number(r.data?.timeMs)||0);setThroneGames(Number(r.data?.games)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id]);
  const bests=new Map(speedrunBests(library.games));
- return <div className="stats-competition-grid">
+ const [ratingBand, setRatingBand] = useState("all");
+ const ratings = Array.from({length:59}, (_, i) => 100+i*50);
+ const visibleRatings = ratingBand === "all" ? ratings : ratings.filter(elo => Math.floor(elo / 1000) === Number(ratingBand));
+ return <div className="stats-competition">
       <Card className="variant-breakdown-card">
         <div className="variant-breakdown">
           <h2>Variant breakdown</h2>
@@ -256,7 +258,12 @@ function CompetitionStats({games}: {games:SavedGame[]}) {
         </div>
       </Card>
   <Card className="throne-stat"><div className="card-heading"><h2><Crown size={21}/>On the Throne</h2><div className="segmented" role="group" aria-label="Throne metric">{["Time","Games"].map(m=><button key={m} aria-pressed={metric===m} className={metric===m?"active":""} onClick={()=>setMetric(m)}>{m}</button>)}</div></div><strong className="competition-total">{metric==="Time" ? throneDuration(total) : throneGames}</strong>{error && <p className="caption">{error}</p>}</Card>
-  <Card className="speedrun-stats"><h2><Timer size={21}/>Speedrun</h2><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating" tabIndex={0}>{Array.from({length:59},(_,i)=>100+i*50).map(elo=>{const game=bests.get(elo);return <div role="listitem" key={elo}><button type="button" className={`speedrun-rating ${game?"has-record":""}`} aria-label={`Play Speedrun at ${elo} Elo${game?`, best ${duration(game.speedrun!.elapsedMs,true)}`:""}`} onClick={()=>navigate("play",`speedrun/${elo}`)}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs,true):"—"}</strong></button></div>;})}</div></Card>
+  <Card className="speedrun-stats"><div className="stats-section-heading"><h2><Timer size={21}/>Speedrun</h2>
+  <ChoiceSelect aria-label="Speedrun rating range" value={ratingBand} onChange={event => setRatingBand(event.target.value)}>
+    <option value="all">All ratings</option><option value="0">100–950 Elo</option>
+    <option value="1">1,000–1,950 Elo</option><option value="2">2,000–2,950 Elo</option>
+    <option value="3">3,000 Elo</option>
+  </ChoiceSelect></div><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating" tabIndex={0}>{visibleRatings.map(elo=>{const game=bests.get(elo);return <div role="listitem" key={elo}><button type="button" className={`speedrun-rating ${game?"has-record":""}`} aria-label={`Play Speedrun at ${elo} Elo${game?`, best ${duration(game.speedrun!.elapsedMs,true)}`:""}`} onClick={()=>navigate("play",`speedrun/${elo}`)}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs,true):"—"}</strong></button></div>;})}</div></Card>
  </div>;
 }
 
@@ -348,7 +355,7 @@ function StatsOverview({
       </section>
       <div className="stats-visual-grid">
         <Card className="results-card">
-          <h2>Results</h2>
+          <h2>Game results</h2>
           <div className="results-content">
             <div
               className="results-ring"
@@ -449,7 +456,9 @@ function StatsOverview({
           )}
         </Card>
       </div>
-      <div className="stats-detail-grid">
+      <details className="stats-extra">
+        <summary>Training and results by color</summary>
+        <div className="stats-detail-grid">
         <Card className="training-stat">
           <div className="card-heading">
             <h2>Training</h2>
@@ -458,7 +467,7 @@ function StatsOverview({
           <Bar
             label="Opening lessons"
             value={library.progress.learned.length}
-            total={111}
+            total={129}
           />
           <Bar
             label="Endgame Lessons"
@@ -478,8 +487,7 @@ function StatsOverview({
           <div className="color-results-key"><span><i className="outcome-win"/>Wins</span><span><i className="outcome-loss"/>Losses</span><span><i className="outcome-draw"/>Draws</span></div>
         </Card>
       </div>
-      <CompetitionStats games={games} />
-
+      </details>
     </div>
   );
 }
@@ -530,6 +538,7 @@ function WorldMap({ visited }: { visited: string[] }) {
     setPan((p) => clampPan(p.x, p.y, zoom));
   }, [zoom]);
   return (
+    <div className="stats-map-layout">
     <Card className="world-map-card">
       <div className="card-heading">
         <h2>Countries played</h2>
@@ -640,14 +649,18 @@ function WorldMap({ visited }: { visited: string[] }) {
           ? `${names.of(selected) || selected}${visited.includes(selected) ? " · Played" : ""}`
           : "Pinch to zoom. Drag to pan. Double-tap to reset."}
       </p>
-      <div className="puzzle-themes">
-        {visited.map((c) => (
-          <span className="pill" key={c}>
-            <Flag size={13} />
-            {names.of(c) || c}
-          </span>
-        ))}
-      </div>
     </Card>
+    <aside className="stats-map-list">
+      <h2>Opponent countries</h2>
+      {visited.length ? <ul>{visited.map(code => (
+        <li key={code}>
+          <button type="button" className="text-link" aria-pressed={selected === code} onClick={() => setSelected(code)}>
+            <Flag size={14} aria-hidden="true" />
+            {names.of(code) || code}
+          </button>
+        </li>
+      ))}</ul> : <p className="caption">Countries appear here as you play people online.</p>}
+    </aside>
+    </div>
   );
 }

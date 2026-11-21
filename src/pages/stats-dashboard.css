@@ -1,0 +1,99 @@
+.stats-dashboard {
+  --stat-win:#59c397;
+  --stat-draw:#b5bfcc;
+  --stat-loss:#db7787;
+  width:min(100%,1120px);
+  margin-inline:auto;
+  padding-bottom:32px;
+}
+.stats-dashboard :is(.stats-header,.stats-section-heading) h1,
+.stats-dashboard .stats-section-heading h2 { margin:0; }
+.stats-dashboard .stats-header h1 { font-size:clamp(1.9rem,4vw,2.8rem); letter-spacing:-.045em; }
+.stats-dashboard .stats-tabs {
+  display:flex; flex-wrap:wrap; gap:2px 16px; margin:14px 0 24px;
+  border-bottom:1px solid var(--border);
+}
+.stats-dashboard .stats-tabs button {
+  padding:10px 3px; border:0; border-bottom:2px solid transparent;
+  background:none; color:var(--muted); font-weight:600;
+}
+.stats-dashboard .stats-tabs button[aria-pressed="true"] { border-bottom-color:var(--accent); color:var(--text); }
+.stats-dashboard :is(.stats-visual-grid,.stats-detail-grid,.stats-competition,.stats-map-layout) {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.65fr); gap:16px;
+}
+.stats-dashboard :is(.stats-competition,.stats-map-layout) { grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); }
+.stats-dashboard :is(.stats-overview,.stats-competition,.stats-map-layout,.stats-rankings) .card {
+  background:var(--panel); border:1px solid var(--border); box-shadow:none; min-width:0;
+}
+.stats-dashboard :is(.stats-overview,.stats-competition,.stats-map-layout,.stats-rankings) .card h2 {
+  font-size:1.05rem; font-weight:650;
+}
+.stats-dashboard .stats-overview .stats-metrics {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; padding:0; margin:0 0 18px;
+  border:1px solid var(--border); border-radius:14px; overflow:hidden;
+}
+.stats-dashboard .stats-overview .stats-metrics > div:nth-child(n) {
+  border:0; border-radius:0; background:var(--panel); color:var(--text);
+  gap:8px; padding:16px; box-shadow:none;
+}
+.stats-dashboard .stats-overview .stats-metrics > div:not(:first-child) { border-inline-start:1px solid var(--border); }
+.stats-dashboard .stats-overview .stats-metrics > div::after { content:none; }
+.stats-dashboard .stats-overview .stats-metrics .stat-metric-label { color:var(--muted); font-weight:500; }
+.stats-dashboard .stats-overview .stats-metrics svg { color:var(--accent); }
+.stats-dashboard .stats-overview .stats-metrics b { color:var(--text); font-size:clamp(1.35rem,3vw,2.2rem); }
+.stats-dashboard .stats-visual-grid { margin:0; }
+.stats-dashboard .activity-track > span { background:var(--accent); }
+.stats-dashboard .stats-extra { margin-top:16px; border:1px solid var(--border); border-radius:14px; }
+.stats-dashboard .stats-extra > summary { padding:14px 16px; cursor:pointer; font-weight:600; }
+.stats-dashboard .stats-extra .stats-detail-grid { margin:0; padding:0 12px 12px; }
+.stats-dashboard .stats-competition .speedrun-stats { grid-column:1 / -1; }
+.stats-dashboard .stats-section-heading {
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px;
+}
+.stats-dashboard .stats-section-heading .caption { margin:4px 0 0; }
+.stats-dashboard .speedrun-rating-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,96px),1fr));
+  grid-auto-flow:row; grid-auto-columns:auto; gap:8px; max-height:312px; overflow:auto; padding:2px;
+}
+.stats-dashboard .speedrun-rating {
+  border:1px solid var(--border); background:transparent; color:var(--text); box-shadow:none;
+}
+.stats-dashboard .speedrun-rating.has-record { border-color:var(--accent); background:var(--accent-soft); }
+.stats-dashboard .stats-achievement-list {
+  margin:0; padding:0; list-style:none; overflow:hidden;
+  border:1px solid var(--border); border-radius:14px; background:var(--panel);
+}
+.stats-dashboard .stats-achievement-list > li {
+  display:grid; grid-template-columns:34px minmax(0,1fr) minmax(100px,180px);
+  align-items:center; gap:12px; padding:12px 16px;
+}
+.stats-dashboard .stats-achievement-list > li + li { border-top:1px solid var(--border); }
+.stats-dashboard .stats-achievement-list h3 { margin:0; font-size:.95rem; }
+.stats-dashboard .stats-achievement-list p { margin:3px 0 0; }
+.stats-dashboard .stats-achievement-icon { color:var(--accent); }
+.stats-dashboard .stats-achievement-progress { display:grid; gap:4px; color:var(--muted); font-size:.8rem; }
+.stats-dashboard .stats-achievement-progress progress { accent-color:var(--accent); width:100%; height:8px; }
+.stats-dashboard .stats-rankings { display:grid; gap:16px; }
+.stats-dashboard .stats-rankings :is(.rank-summary,.section-toolbar,.rating-lookup) { margin:0; }
+.stats-dashboard .stats-rankings .rank-table { padding:12px 16px; }
+.stats-leaderboard { width:100%; border-collapse:collapse; text-align:left; }
+.stats-leaderboard :is(th,td) { padding:10px 8px; border-bottom:1px solid var(--border); }
+.stats-leaderboard th { color:var(--muted); font-size:.8rem; font-weight:600; }
+.stats-leaderboard td:nth-child(2) { overflow-wrap:anywhere; }
+.stats-leaderboard :is(th,td):last-child { text-align:right; }
+.stats-leaderboard tr.you { background:var(--accent-soft); }
+.stats-dashboard .stats-rankings .stats-federation { display:grid; gap:12px; }
+.stats-dashboard .stats-rankings .federation-cards .card { background:var(--panel); }
+.stats-dashboard .stats-map-list { padding:16px; border:1px solid var(--border); border-radius:14px; background:var(--panel); }
+.stats-dashboard .stats-map-list h2 { font-size:1rem; margin:0 0 10px; }
+.stats-dashboard .stats-map-list ul { display:grid; gap:8px; list-style:none; padding:0; margin:0; }
+.stats-dashboard .stats-map-list button { display:flex; gap:6px; align-items:center; text-align:left; }
+.stats-dashboard .stats-map-list button[aria-pressed="true"] { color:var(--accent); }
+@media (max-width:760px) {
+  .stats-dashboard :is(.stats-visual-grid,.stats-detail-grid,.stats-competition,.stats-map-layout) { grid-template-columns:minmax(0,1fr); }
+  .stats-dashboard .stats-overview .stats-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .stats-dashboard .stats-overview .stats-metrics > div:nth-child(odd) { border-inline-start:0; }
+  .stats-dashboard .stats-overview .stats-metrics > div:nth-child(n+3) { border-top:1px solid var(--border); }
+  .stats-dashboard .stats-achievement-list > li { grid-template-columns:24px minmax(0,1fr); gap:8px; }
+  .stats-dashboard .stats-achievement-progress { grid-column:2; }
+}
