@@ -176,57 +176,59 @@ export default function LibraryPage() {
                 <Board fen={g.positions.at(-1) || g.initial} flipped={g.human === "b"} disabled compact />
                 <SavedBoardPlayer game={g} side={g.human} placement="bottom"/>
               </div>
-              <div className="card-heading">
-                <h3>{g.result === "*" && !isStudy(g) ? g.title.replace(/\s*(?:[·—–-]\s*)?\bunfinished\b/gi, "").trim() || "Game" : g.title}</h3>
-                <span className="pill">
+              <div className="saved-game-details">
+                <div className="card-heading">
+                  <h3>{g.result === "*" && !isStudy(g) ? g.title.replace(/\s*(?:[·—–-]\s*)?\bunfinished\b/gi, "").trim() || "Game" : g.title}</h3>
+                  <span className="pill">
+                    {isStudy(g)
+                      ? "Study"
+                      : g.result === "*"
+                        ? "Unfinished"
+                        : g.result}
+                  </span>
+                </div>
+                <p className="caption">
                   {isStudy(g)
-                    ? "Study"
-                    : g.result === "*"
-                      ? "Unfinished"
-                      : g.result}
-                </span>
-              </div>
-              <p className="caption">
-                {isStudy(g)
-                  ? `${1 + (g.branches?.length || 0)} lines`
-                  : libraryKind(g)}{" "}
-                · {Math.ceil(g.moves.length / 2)} {Math.ceil(g.moves.length / 2) === 1 ? "move" : "moves"}
-              </p>
-              <p className="caption library-game-date"><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})} · {new Date(g.created).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</time></p>
-              <div className="button-row">
-                {isStudy(g) ? (
-                  <>
-                    <Button onClick={() => setTrainingStudy(g)}>
-                      Train lines
-                    </Button>
+                    ? `${1 + (g.branches?.length || 0)} lines`
+                    : libraryKind(g)}{" "}
+                  · {Math.ceil(g.moves.length / 2)} {Math.ceil(g.moves.length / 2) === 1 ? "move" : "moves"}
+                </p>
+                <p className="caption library-game-date"><time dateTime={new Date(g.created).toISOString()}>{new Date(g.created).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})} · {new Date(g.created).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}</time></p>
+                <div className="button-row">
+                  {isStudy(g) ? (
+                    <>
+                      <Button onClick={() => setTrainingStudy(g)}>
+                        Train lines
+                      </Button>
+                      <Button
+                        className="secondary"
+                        onClick={() => navigate("analysis", "game:" + g.id)}
+                      >
+                        Open study
+                      </Button>
+                    </>
+                  ) : (
                     <Button
                       className="secondary"
-                      onClick={() => navigate("analysis", "game:" + g.id)}
+                      onClick={() => navigate("library", g.id)}
                     >
-                      Open study
+                      Review
                     </Button>
-                  </>
-                ) : (
-                  <Button
-                    className="secondary"
-                    onClick={() => navigate("library", g.id)}
+                  )}
+                  <IconButton
+                    className="library-delete"
+                    label={`Delete ${g.title}`}
+                    onClick={() => {
+                      setLibrary((l) => ({
+                        ...l,
+                        games: l.games.filter((v) => v.id !== g.id),
+                      }));
+                      notify("Game removed.");
+                    }}
                   >
-                    Review
-                  </Button>
-                )}
-                <IconButton
-                  className="library-delete"
-                  label={`Delete ${g.title}`}
-                  onClick={() => {
-                    setLibrary((l) => ({
-                      ...l,
-                      games: l.games.filter((v) => v.id !== g.id),
-                    }));
-                    notify("Game removed.");
-                  }}
-                >
-                  <Trash2 size={16} />
-                </IconButton>
+                    <Trash2 size={16} />
+                  </IconButton>
+                </div>
               </div>
             </Card>
           ))}
