@@ -9,6 +9,12 @@ test("recent game scrubber previews positions and colors results without home ac
   await expect(page.locator(".resume-game-button .lucide-chevron-right")).toHaveCount(0);
   await expect(page.locator(".recent-game-entry")).toHaveClass(/result-win/);
   const slider = page.getByRole("slider", { name: "Preview Preview game" });
+  const strip = (await page.locator(".recent-game-scrubber").boundingBox())!;
+  const bar = (await slider.boundingBox())!;
+  expect(bar).toEqual(strip);
+  const card = (await page.locator(".recent-game-entry").boundingBox())!;
+  expect(bar.x - card.x).toBeLessThanOrEqual(2);
+  expect(card.x + card.width - bar.x - bar.width).toBeLessThanOrEqual(2);
   await slider.focus(); await slider.press("End");
   await expect(page.locator(".recent-game-preview").getByRole("button", { name: "e4, white pawn", exact: true })).toBeVisible();
   await slider.press("Home");

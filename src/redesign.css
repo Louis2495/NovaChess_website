@@ -4202,10 +4202,6 @@ select.theme-select {
 .recent-game-entry.result-win { --result-color: #7dc89c; }
 .recent-game-entry.result-loss { --result-color: #e68b91; }
 .recent-game-entry .game-result-label { color: var(--result-color); }
-.recent-game-scrubber { position: relative; height: 14px; display: flex; align-items: center; }
-.recent-game-scrubber input { width: 100%; height: 8px; padding: 0; border: 0; appearance: none; background: var(--result-color); border-radius: 3px; cursor: ew-resize; opacity: .7; }
-.recent-game-scrubber input::-webkit-slider-thumb { appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--result-color); }
-.recent-game-scrubber:hover input { opacity: 1; }
 .recent-game-preview { position: absolute; z-index: 30; bottom: 16px; right: 0; width: min(260px, 70vw); padding: 8px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 35px #0007; pointer-events: none; }
 .recent-game-preview .board-resize-handle { display: none; }
 @media (min-width: 900px) and (max-height: 850px) {
@@ -5495,9 +5491,6 @@ html { scrollbar-gutter:stable; }
 .home-recent-list::-webkit-scrollbar { width:8px; }
 .home-recent-list::-webkit-scrollbar-thumb { background:#fff; border-radius:8px; }
 .home-page .home-recent .home-recent-list .recent-game-entry { margin-block:14px; }
-.home-recent .recent-game-scrubber input { background:#fff; }
-.home-recent .recent-game-scrubber input::-webkit-slider-thumb { background:#fff; }
-.home-recent .recent-game-scrubber input::-moz-range-thumb { background:#fff; }
 .analysis-layout .pv-heading > span { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; flex:none; border:2px solid currentColor; border-radius:50%; box-sizing:border-box; color:var(--text); font-weight:700; }
 .board-player-label { width:var(--actual-board-width,100%); max-width:100%; min-height:26px; display:flex; align-items:center; gap:8px; box-sizing:border-box; font-size:.9rem; }
 .board-player-label.player-top { justify-content:flex-end; text-align:right; }
@@ -5548,17 +5541,23 @@ html { scrollbar-gutter:stable; }
 .puzzle-review-bar .btn { flex:none; padding:8px; }
 .puzzle-review-bar input { width:100%; min-width:0; height:8px; padding:0; accent-color:var(--accent); }
 /* An inset, continuous timeline keeps the preview control inside the card. */
-.home-recent .recent-game-scrubber { height:28px; padding:0 12px 8px; box-sizing:border-box; }
-.home-recent .recent-game-scrubber input { display:block; width:100%; height:20px; min-height:0; margin:0; padding:0; box-sizing:border-box; border:0; border-radius:0; background:transparent; opacity:1; outline-offset:2px; }
-.home-recent .recent-game-scrubber input::-webkit-slider-runnable-track { height:4px; border:0; border-radius:999px; background:#ffffff55; }
-.home-recent .recent-game-scrubber input::-webkit-slider-thumb { appearance:none; width:10px; height:10px; margin-top:-3px; border:0; border-radius:50%; background:#fff; box-shadow:0 1px 4px #0005; }
-.home-recent .recent-game-scrubber input::-moz-range-track { height:4px; border:0; border-radius:999px; background:#ffffff55; }
-.home-recent .recent-game-scrubber input::-moz-range-progress { height:4px; border-radius:999px; background:#ffffffaa; }
-.home-recent .recent-game-scrubber input::-moz-range-thumb { width:10px; height:10px; border:0; border-radius:50%; background:#fff; box-shadow:0 1px 4px #0005; }
-.home-recent .recent-game-scrubber:hover input::-webkit-slider-runnable-track,
-.home-recent .recent-game-scrubber input:focus-visible::-webkit-slider-runnable-track { background:#ffffff99; }
-.home-recent .recent-game-scrubber:hover input::-moz-range-track,
-.home-recent .recent-game-scrubber input:focus-visible::-moz-range-track { background:#ffffff99; }
+.home-recent .recent-game-scrubber { flex:none; height:18px; }
+.home-recent .recent-game-scrubber input {
+  appearance:none; display:block; width:100%; height:100%; min-height:0; margin:0; padding:0;
+  border:0; border-radius:0 0 12px 12px; cursor:ew-resize; outline-offset:-2px;
+  background:color-mix(in srgb,var(--recent-color) 35%,var(--panel-solid));
+}
+.home-recent .recent-game-scrubber input:is(:hover,:focus-visible) {
+  background:color-mix(in srgb,var(--recent-color) 52%,var(--panel-solid));
+}
+.home-recent .recent-game-scrubber input::-webkit-slider-runnable-track { height:100%; background:transparent; }
+.home-recent .recent-game-scrubber input::-moz-range-track { height:100%; background:transparent; }
+.home-recent .recent-game-scrubber input::-webkit-slider-thumb {
+  appearance:none; width:6px; height:14px; margin-top:2px; border:0; border-radius:3px; background:#fff;
+}
+.home-recent .recent-game-scrubber input::-moz-range-thumb {
+  width:6px; height:14px; border:0; border-radius:3px; background:#fff;
+}
 .home-recent .recent-game-row { --recent-art-size:89.6px; grid-template-columns:minmax(0,1fr) var(--recent-art-size) minmax(0,1fr); }
 .recent-variant-picture { width:var(--recent-art-size); height:var(--recent-art-size); display:grid; place-items:center; position:relative; left:6px; }
 .recent-variant-picture > img { display:block; width:100%; height:100%; object-fit:contain; }
@@ -5591,11 +5590,8 @@ html { scrollbar-gutter:stable; }
 .home-recent .recent-player { gap:5px; }
 .home-recent .recent-player b { font-size:1.1rem; line-height:1.2; }
 .home-recent .recent-game-details { gap:3px; font-size:.98rem; line-height:1.2; }
-.home-recent .recent-game-scrubber { flex:none; height:20px; padding:0 10px 4px; }
-.home-recent .recent-game-scrubber input { height:16px; }
 .home-recent-list { gap:6px; }
 .home-page .home-recent .home-recent-list .recent-game-row { padding-block:4px; }
-.home-recent .recent-game-scrubber { height:18px; padding-bottom:2px; }
 .home-recent .home-section-heading { flex-wrap:wrap; gap:8px 15px; }
 .home-recent .recent-game-row { white-space:normal; }
 @container (max-width:520px) {
