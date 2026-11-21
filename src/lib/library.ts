@@ -20,6 +20,6 @@ export function libraryKind(g: SavedGame) {
   return isStudy(g)
     ? "Studies"
     : isNovaChessGame(g)
-      ? "NovaChess games"
+      ? "NovaChess"
       : "Games";
 }

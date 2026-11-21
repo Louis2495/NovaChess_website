@@ -67,7 +67,7 @@ test("Library separates recorded games, branching training studies and NovaChess
     0,
   );
   await sections
-    .getByRole("button", { name: "NovaChess games", exact: true })
+    .getByRole("button", { name: "NovaChess", exact: true })
     .click();
   await expect(page.locator(".saved-game-card")).toHaveCount(1);
   await expect(page.locator(".saved-game-card")).toContainText(

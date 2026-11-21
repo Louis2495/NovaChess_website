@@ -110,7 +110,7 @@ export default function Research() {
     try {
       if (site === "NovaChess") {
         if (name.toLowerCase() !== screenName(library.profile).toLowerCase())
-          throw Error("No saved NovaChess games for that screen name.");
+          throw Error("No games saved on NovaChess for that screen name.");
         const records =
           library.activeGame &&
           !library.games.some((g) => g.id === library.activeGame?.id)

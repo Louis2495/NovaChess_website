@@ -1746,17 +1746,6 @@ option {
 .saved-game-card .button-row {
   margin-top: 18px;
 }
-.saved-game-card.result-win {
-  border-color: #578f615a;
-  background: linear-gradient(#578f610a, #578f610a), var(--panel);
-}
-.saved-game-card.result-loss {
-  border-color: #b759665a;
-  background: linear-gradient(#b759660a, #b759660a), var(--panel);
-}
-.saved-game-card.result-draw {
-  border-color: #a5aaa55a;
-}
 .review-moves {
   display: flex;
   flex-direction: column;
