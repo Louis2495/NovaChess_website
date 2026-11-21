@@ -5534,7 +5534,7 @@ html { scrollbar-gutter:stable; }
 .players-page .players-search-controls .page-segments { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:6px; margin:0 0 24px; padding:6px; border:1px solid var(--border); border-radius:16px; background:var(--panel); box-sizing:border-box; }
 .players-page .players-search-controls .page-segments > button { min-height:58px; padding:12px 20px; border:0; border-radius:11px; font-size:1.15rem; font-weight:700; }
 .players-page .players-search-controls .page-segments > button.active { background:var(--accent) !important; color:#13241b; }
-.players-search-input { display:block; width:100%; min-height:48px; box-sizing:border-box; transform:translateX(var(--players-center-offset,0px)); }
+.players-search-input { display:block; width:100%; min-height:48px; box-sizing:border-box; }
 @media(max-width:600px) {
  .players-search-controls { width:min(100%,440px); }
  .players-page .players-search-controls .page-segments > button { font-size:1rem; min-height:52px; }

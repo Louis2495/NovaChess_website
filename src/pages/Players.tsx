@@ -1,4 +1,4 @@
-import {useLayoutEffect,useRef,useState} from 'react';
+import {useState} from 'react';
 import {UserPlus,Check,X,UserMinus,Play} from 'lucide-react';
 import {useApp} from '../lib/context';
 import {online,onlineAction,useOnlineSession} from '../lib/online';
@@ -8,13 +8,6 @@ import {Card,Button} from '../components/UI';
 export default function Players(){
  const {session}=useOnlineSession(),{navigate,notify}=useApp();
  const [section,setSection]=useState('friends'),[query,setQuery]=useState(''),[page,setPage]=useState(0),[busy,setBusy]=useState(''),[error,setError]=useState('');
- const pageRef=useRef<HTMLDivElement>(null);
- useLayoutEffect(()=>{
-  const el=pageRef.current;if(!el)return;
-  const center=()=>{const rect=el.getBoundingClientRect();el.style.setProperty('--players-center-offset',`${document.documentElement.clientWidth/2-rect.left-rect.width/2}px`);};
-  const observer=new ResizeObserver(center);observer.observe(el);window.addEventListener('resize',center);center();
-  return()=>{observer.disconnect();window.removeEventListener('resize',center);};
- },[]);
  const searchReady=section!=='everyone'||query.trim().length>=2;
  const list=usePlayers(query.trim(),section,page,!!session&&searchReady),requests=usePlayers('','requests',0,!!session);
  async function action(player:Player,act:string){setBusy(player.id);setError('');try{const {error}=await online!.rpc('friend_action',{p_player:player.id,p_action:act});if(error)throw error;list.refresh();requests.refresh();}catch(e){setError((e as Error).message);}finally{setBusy('');}}
@@ -50,7 +43,7 @@ export default function Players(){
     </div>
   </article>;
  }
- return <div className="players-page" ref={pageRef}>
+ return <div className="players-page">
  {!online||!session?<Card><p>Sign in to find players and manage your friends.</p><Button onClick={()=>navigate('signin')}>Sign in</Button></Card>:<>
  <div className="players-search-controls"><div className="segmented page-segments" role="group" aria-label="Player sections">{[['friends','Friends'],['everyone','Everyone']].map(([id,label])=><button key={id} className={section===id?'active':''} aria-pressed={section===id} onClick={()=>{setSection(id);setPage(0);}}>{label}</button>)}</div>
  <input className="players-search-input" aria-label="Search players" type="search" value={query} maxLength={100} placeholder="Search by name" onChange={e=>{setQuery(e.target.value);setPage(0);}}/></div>
