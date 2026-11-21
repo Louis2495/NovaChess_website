@@ -5567,9 +5567,6 @@ html { scrollbar-gutter:stable; }
 
 .puzzle-layout .side-panels > .card:has(.theme-select) .field > span { color:#26143d; }
 
-@media(min-width:1001px) {
- .speedrun-match > .board-column { position:relative; }
-}
 .online-match > .cancel-friend-request { min-height:56px; width:min(100%,var(--cancel-request-width,192px)); justify-content:center; }
 /* Center the board in the viewport while keeping the action rail beside it. */
 @media(min-width:1001px) {
@@ -5584,7 +5581,6 @@ html { scrollbar-gutter:stable; }
   gap:var(--match-gap);
  }
  .workspace .online-match.chess-layout:has(.board-frame:not(.compact-frame)) { --match-rail:240px; }
- .workspace .speedrun-match.chess-layout { --match-left-room:152px; }
  :is(.play-match,.online-match:has(.board-frame:not(.compact-frame))) > .board-column { grid-column:2; grid-row:1; }
  :is(.play-match,.online-match:has(.board-frame:not(.compact-frame))) > .side-panels {
   grid-column:3; grid-row:1; min-width:0; padding-top:var(--board-layout-top,58px);
