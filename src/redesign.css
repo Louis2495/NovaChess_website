@@ -1460,7 +1460,7 @@
 h1,
 h2,
 h3 {
-  font-family: var(--font), "Nunito Sans", sans-serif;
+  font-family: var(--font), "Nunito Variable", sans-serif;
 }
 .card {
   background: var(--panel);
@@ -4216,7 +4216,7 @@ select.theme-select {
   box-sizing:border-box; width:24px; height:24px; border-radius:8px;
   color:#fff; background:var(--quality);
   border:1px solid #fff8; box-shadow:0 2px 0 #0003;
-  font-family:"Nunito Sans",sans-serif; font-weight:900; font-size:15px; line-height:1;
+  font-weight:900; font-size:15px; line-height:1;
 }
 .move-quality svg { width:66%; height:66%; stroke-width:2.5; }
 .quality-book { --quality:#6d28c9; }
@@ -4485,7 +4485,7 @@ img.speedrun-picture { display:block; object-fit:cover; }
 .achievement-grid .achievement:nth-child(3n+2) { border-top-color:#c5a3ff; }
 .achievement-grid .achievement:nth-child(3n) { border-top-color:#ffdb74; }
 /* Distinct metric colors, shared outcome colors, and rounded display headings. */
-.stats-overview h2 { font-family:"Arial Rounded MT Bold","Nunito Sans",sans-serif; font-weight:900; font-size:1.35rem; letter-spacing:.01em; color:#f7fbff; -webkit-text-stroke:.2px currentColor; }
+.stats-overview h2 { font-weight:900; font-size:1.35rem; letter-spacing:.01em; color:#f7fbff; -webkit-text-stroke:.2px currentColor; }
 .stats-overview .throne-stat { background:#ffad9f; color:#47261e; }
 .stats-overview .throne-stat h2,.stats-overview .speedrun-stats h2 { color:inherit; }
 .stats-competition-grid { grid-template-columns:1fr; }
@@ -4509,7 +4509,7 @@ img.speedrun-picture { display:block; object-fit:cover; }
 .stats-overview .playing-color-stat { background:linear-gradient(135deg,#365568,var(--panel)); }
 .stats-overview .improvement-section { border:1px solid #ffc78366; border-radius:var(--radius); padding:22px; background:linear-gradient(125deg,#60472f44,var(--panel)); }
 .improvement-bars .stat-bar i { background:#ffc783; }.variant-breakdown summary { color:#ffc783; }
-.stats-overview .stat-metric-label { font-family:"Nunito Sans",sans-serif; font-weight:900; font-size:.85rem; }
+.stats-overview .stat-metric-label { font-weight:900; font-size:.85rem; }
 .board-result-overlay { container-type:size; position:absolute; inset:0; z-index:20; display:grid; place-items:center; background:#10202d32; border-radius:inherit; }
 .board-result-overlay:has(.game-result-banner):empty { display:none; }
 .board-result-overlay:not(:has(.game-result-banner)) { display:none; }
@@ -4623,7 +4623,6 @@ html { scrollbar-gutter:stable; }
 }
 .new-game-primary {
   display:flex; justify-content:center; align-items:center; text-align:center;
-  font-family:"Nunito Sans","Arial Rounded MT Bold",sans-serif;
   font-size:1.7rem; font-weight:900; line-height:1.2;
 }
 .quick-online-play .new-game-primary { min-height:78px; }
@@ -5428,7 +5427,7 @@ html { scrollbar-gutter:stable; }
   --variant-gallery-gap:clamp(9px,2.3dvh,24px);
   --variant-gallery-rows:3;
   --variant-fit-rows:3;
-  --variant-card-height:min(170px,max(0px,calc((100cqh - var(--variant-setup-space) + var(--variant-gallery-gap)) / var(--variant-fit-rows) - var(--variant-gallery-gap))));
+  --variant-card-height:min(170px,max(0px,calc((100cqh - var(--variant-setup-space) - var(--computer-top-shift,0px) + var(--variant-gallery-gap)) / var(--variant-fit-rows) - var(--variant-gallery-gap))));
   flex:1 1 0; min-height:0; width:min(100%,calc((960px + var(--variant-gallery-gap)) * 7 / 6 - var(--variant-gallery-gap))); margin:0;
   --variant-gallery-height:calc(var(--variant-gallery-rows) * var(--variant-card-height) + (var(--variant-gallery-rows) - 1) * var(--variant-gallery-gap));
   max-height:var(--variant-gallery-height);
@@ -5846,6 +5845,10 @@ html { scrollbar-gutter:stable; }
 }
 .team-friend-settings > .btn { padding-inline:8px; }
 
+.workspace-shell:has(.variants-hub.setup-active.computer-opponent) > .workspace {
+  --computer-top-shift:min(18px,calc(var(--variants-top-inset) - 8px));
+  padding-top:calc(var(--variants-top-inset) - var(--computer-top-shift));
+}
 .game-settings-footer { display:contents; }
 .variants-hub.setup-active .variant-settings-footer {
   flex:none;
@@ -5853,22 +5856,49 @@ html { scrollbar-gutter:stable; }
   align-items:center;
   justify-content:center;
   gap:8px;
-  width:min(100%,440px);
-  min-height:58px;
+  width:min(100%,560px);
+  height:68px;
 }
 .variants-hub.setup-active .variant-settings-footer > .card {
-  width:auto;
+  flex:0 1 260px;
   min-width:0;
+  height:100%;
+  padding-inline:clamp(8px,2vw,18px);
+  display:flex;
+  align-items:center;
 }
-.variants-hub.setup-active .variant-settings-footer .speedrun-setup {
-  flex:0 1 160px;
+.variants-hub.setup-active .variant-settings-footer .options-toggle {
+  height:100%;
+  min-height:0;
+  gap:6px;
+}
+.variants-hub.setup-active .variant-settings-footer .options-toggle > svg {
+  flex:none;
+  transform:none;
 }
 .variants-hub.setup-active .variant-settings-footer .speedrun-setup > .field {
   display:flex;
+  flex-direction:row;
   align-items:center;
-  gap:6px;
+  justify-content:space-between;
+  width:100%;
+  margin:0;
+  gap:8px;
 }
 .variants-hub.setup-active .variant-settings-footer .speedrun-setup input {
   min-width:0;
   width:5.5em;
+  flex-shrink:0;
+  padding-inline:6px;
+}
+@media(max-width:360px) {
+  .variants-hub.setup-active .variant-settings-footer .speedrun-setup > .field {
+    flex-direction:column;
+    justify-content:center;
+    gap:2px;
+  }
+  .variants-hub.setup-active .variant-settings-footer .speedrun-setup input {
+    min-height:0;
+    padding-block:3px;
+  }
 }

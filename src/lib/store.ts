@@ -81,7 +81,7 @@ export const defaults: Appearance = {
   backgroundDim: 65,
   panelOpacity: 92,
   radius: 18,
-  font: "Charlesworth",
+  font: "Nunito",
   fontSize: 16,
   density: "Comfortable",
   coordinates: true,

@@ -321,6 +321,7 @@ export default function Appearance({ onClose, embedded = false }: { onClose: () 
                   onChange={(e) => change("font", e.target.value)}
                 >
                   {[
+                    "Nunito",
                     "DM Sans",
                     "Charlesworth", "Nunito Sans", "Manrope",
                     "Georgia",

@@ -332,8 +332,13 @@ export default function Community({presetMode = "standard", presetVariant = "che
   const [teammateError,setTeammateError]=useState("");
   const [teammates,setTeammates]=useState<Player[]>([]);
   const promptedRoom=useRef<string | undefined>(undefined);
-  const teammateSlots=room && me?.team ? Math.max(0,6-room.members.filter(member=>member.team===me.team).length) : 5;
-  const canInviteTeammates=room?.mode==="team" && !!me?.team && ["waiting","playing"].includes(room.status) && teammateSlots>0;
+  const bughouse=(room?.variant ?? variant)==="bughouse";
+  const supportsTeammates=(room?.mode ?? mode)==="team" || bughouse;
+  const inviteFriendsLabel=bughouse ? "Invite a Friend" : "Invite friends";
+  const teammateSlots=room && me?.team ? Math.max(0,(bughouse ? 2 : 6)-room.members.filter(member=>
+    bughouse && (member.board ?? 0)!==(me.board ?? 0) ? !!member.team && member.team!==me.team : member.team===me.team
+  ).length) : bughouse ? 1 : 5;
+  const canInviteTeammates=!!room && supportsTeammates && !!me?.team && ["waiting","playing"].includes(room.status) && teammateSlots>0;
   useEffect(()=>{
     if(promptForTeammates && canInviteTeammates && room && promptedRoom.current!==room.id){
       promptedRoom.current=room.id;
@@ -355,7 +360,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
   async function challengeFriend(friend:string) {
     setBusy(true); setError("");
     try {
-      const result = await onlineAction({action:"create", mode, name, variant, timeControlSeconds, incrementSeconds, bot:false,friend,...(mode==="team" && teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
+      const result = await onlineAction({action:"create", mode, name, variant, timeControlSeconds, incrementSeconds, bot:false,friend,...(supportsTeammates && teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
       notify("Game invitation sent.");setChoosingFriend(false);
       navigate(mode === "standard" && variant === "chess" ? "play" : "variants", "online/" + result.id);
     } catch (e) { setError((e as Error).message);notify((e as Error).message); }
@@ -368,14 +373,14 @@ export default function Community({presetMode = "standard", presetVariant = "che
     : mode === "team" ? "Invite friends to your side. Share moves and arrows."
     : variant === "speedrun" ? "Beat the computer as fast as possible"
     : variantList.find(v => v.id === variant)?.description;
-  const supportsFriendGame = mode !== "throne" && mode !== "vote" && variant !== "speedrun" && variant !== "bughouse";
-  const friendSettings = !room && supportsFriendGame ? <div className={`friend-game-settings${mode==="team" ? " team-friend-settings" : ""}`}>{selectedFriend ? <div className="friend-selection-field"><input aria-label="Selected friend" readOnly value={screenName(selectedFriend)}/><button type="button" aria-label="Remove selected friend" disabled={busy} onClick={()=>setSelectedFriend(null)}><X size={14}/></button></div> : <Button className="secondary invite-friends-option" disabled={busy || !online || !uid || (mode==="team" && bot)} onClick={()=>setChoosingFriend(true)}><Users size={16}/>Play a Friend</Button>}{mode==="team" && <Button className="secondary" disabled={busy || !online || !uid} onClick={()=>setChoosingTeammates(true)}><Users size={16}/>Invite friends{teammates.length ? ` (${teammates.length})` : ""}</Button>}</div> : null;
+  const supportsFriendGame = mode !== "throne" && mode !== "vote" && variant !== "speedrun";
+  const friendSettings = !room && supportsFriendGame ? <div className={`friend-game-settings${supportsTeammates ? " team-friend-settings" : ""}`}>{selectedFriend ? <div className="friend-selection-field"><input aria-label="Selected friend" readOnly value={screenName(selectedFriend)}/><button type="button" aria-label="Remove selected friend" disabled={busy} onClick={()=>setSelectedFriend(null)}><X size={14}/></button></div> : <Button className="secondary invite-friends-option" disabled={busy || !online || !uid || (mode==="team" && bot)} onClick={()=>setChoosingFriend(true)}><Users size={16}/>Play a Friend</Button>}{supportsTeammates && <Button className="secondary" disabled={busy || !online || !uid} onClick={()=>setChoosingTeammates(true)}><Users size={16}/>{inviteFriendsLabel}{teammates.length ? ` (${teammates.length})` : ""}</Button>}</div> : null;
   return (
     <>
       {friendSettingsHost ? createPortal(friendSettings,friendSettingsHost) : friendSettings}
       {choosingTeammates && <FriendPicker busy={busy} submitError={teammateError} onClose={()=>{setChoosingTeammates(false);setTeammateError("");}}
         teammates={{initial:room ? [] : teammates, excluded:room ? [...room.members.map(member=>member.id),room.settings.invitedFriend ?? ""] : [selectedFriend?.id ?? ""],
-          limit:teammateSlots, allowEmpty:!room, action:room ? "Send invitations" : "Save teammates",onConfirm:players=>void chooseTeammates(players)}} />}
+          limit:teammateSlots, allowEmpty:!room, action:room ? (bughouse ? "Send invitation" : "Send invitations") : (bughouse ? "Save teammate" : "Save teammates"),onConfirm:players=>void chooseTeammates(players)}} />}
       {choosingFriend && <FriendPicker onClose={()=>setChoosingFriend(false)} onChoose={player=>{setSelectedFriend(player);setTeammates(list=>list.filter(friend=>friend.id!==player.id));setChoosingFriend(false);}} busy={busy}/>}
       {!room && tab === "community" && <PageTitle title="Play" />}
       {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div></div>}
@@ -555,7 +560,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
                     ))}
                   </div>}
                   {canInviteTeammates && <Button className="secondary" disabled={busy} onClick={()=>setChoosingTeammates(true)}>
-                    <Users size={16}/>Invite friends
+                    <Users size={16}/>{inviteFriendsLabel}
                   </Button>}
                   {!me && (
                     <Button disabled={busy} onClick={() => void act("join", room?.mode === "team" ? { team: inviteTeam } : {})}>
@@ -645,8 +650,8 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   const {data,error}=await listing;
                   if(error)throw error;
                   const available=(data||[]).filter(r=>mode!=="standard" || variant!=="chess" || (r.time_control===timeControlSeconds && r.increment_seconds===incrementSeconds)).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
-                  if(available && !(mode === "team" && (bot || teammates.length))) await act("join",{room:available.id});
-                  else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot,...(mode==="team" && teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
+                  if(available && !teammates.length && !(mode === "team" && bot)) await act("join",{room:available.id});
+                  else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" || mode === "team" && bot ? "chess" : variant,bot:mode === "team" && bot,...(supportsTeammates && teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
               }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>
 

@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 test('account boxes align, Customize is a profile section, and uploaded move sounds play',async({page,isMobile})=>{
  await page.addInitScript(()=>{(window as any).__soundPlays=[];HTMLMediaElement.prototype.play=function(){(window as any).__soundPlays.push({src:this.src,volume:this.volume});return Promise.resolve();};});
  await page.goto('/#profile');await expect(page.getByRole('checkbox',{name:'Show legal moves',exact:true})).not.toBeChecked();
- await expect(page.locator('.app')).toHaveCSS('font-family',/Charlesworth/);
+ await expect(page.locator('.app')).toHaveCSS('font-family',/Nunito Variable/);
+ expect(await page.evaluate(async()=> (await document.fonts.load('600 16px "Nunito Variable"')).length)).toBeGreaterThan(0);
  if(!isMobile){const left=(await page.locator('.profile-editor').boundingBox())!,right=(await page.locator('.profile-side > .card').boundingBox())!;expect(Math.abs(left.y-right.y)).toBeLessThan(1);expect(Math.abs(left.height-right.height)).toBeLessThan(1);}
  const wav=Buffer.alloc(844);wav.write('RIFF');wav.writeUInt32LE(836,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(8000,24);wav.writeUInt32LE(16000,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(800,40);
  await page.getByLabel('Upload move sound',{exact:true}).setInputFiles({name:'move.wav',mimeType:'audio/wav',buffer:wav});

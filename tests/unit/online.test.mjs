@@ -174,6 +174,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180014_signup_profile.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180015_throne_stats_period.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180016_team_friend_invites.sql','utf8'));
+  await pg.exec(readFileSync("supabase/migrations/202611180017_bughouse_friend_invites.sql","utf8"));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -860,4 +861,41 @@ test("Team Chess invites reserve the correct side and also work after play start
   const full=await command(host,filled.data,"invite_teammates",{friends:friends.slice(5)});
   assert.equal(full.status,400);
   assert.match(full.data.error,/six players/i);
+});
+
+test("Bughouse preserves an invited rival's seat and places invited partners on opposite boards and colors",async()=>{
+  const [host,rival,partner,rivalPartner]=users;
+  await pg.query("insert into friendships(sender,recipient,status) values($1,$2,'accepted'),($3,$4,'accepted'),($1,$4,'accepted') on conflict do nothing",[host,partner,rival,rivalPartner]);
+  const invalid=await call(host,{action:"create",mode:"standard",variant:"bughouse",teammates:[partner,rivalPartner]});
+  assert.match(invalid.data.error,/one Bughouse teammate/);
+  const created=await call(host,{action:"create",mode:"standard",variant:"bughouse",friend:rival,teammates:[partner]});
+  assert.equal(created.status,200,JSON.stringify(created.data));
+  const game=created.data;
+  assert.equal((await pg.query("select member_count from room_lobby where id=$1",[game.id])).rows[0].member_count,3);
+
+  const inviteId=async recipient=>(await pg.query("select id from friend_game_invites where room_id=$1 and recipient=$2",[game.id,recipient])).rows[0].id;
+  const joinedRival=await command(rival,game,"join",{invite:await inviteId(rival)});
+  assert.equal(joinedRival.status,200,JSON.stringify(joinedRival.data));
+  assert.deepEqual(joinedRival.data.members.find(member=>member.id===rival),{id:rival,board:0,team:"b"});
+
+  const extra=await command(host,game,"invite_teammates",{friends:[rivalPartner]});
+  assert.equal(extra.status,400);
+  assert.match(extra.data.error,/pending invitation/);
+  const invited=await command(rival,joinedRival.data,"invite_teammates",{friends:[rivalPartner]});
+  assert.equal(invited.status,200,JSON.stringify(invited.data));
+  assert.equal((await pg.query("select member_count from room_lobby where id=$1",[game.id])).rows[0].member_count,4);
+
+  const allied=await command(partner,joinedRival.data,"join",{invite:await inviteId(partner)});
+  assert.equal(allied.status,200,JSON.stringify(allied.data));
+  assert.deepEqual(allied.data.members.find(member=>member.id===partner),{id:partner,board:1,team:"b"});
+  const fourth=await command(rivalPartner,allied.data,"join",{invite:await inviteId(rivalPartner)});
+  assert.equal(fourth.status,200,JSON.stringify(fourth.data));
+  assert.deepEqual(fourth.data.members.find(member=>member.id===rivalPartner),{id:rivalPartner,board:1,team:"w"});
+  assert.equal(fourth.data.status,"playing");
+
+  const open=await call(host,{action:"create",mode:"standard",variant:"bughouse",friend:rival,teammates:[partner]});
+  assert.equal(open.status,200,JSON.stringify(open.data));
+  const matched=await command(rivalPartner,open.data,"join");
+  assert.equal(matched.status,200,JSON.stringify(matched.data));
+  assert.deepEqual(matched.data.members.find(member=>member.id===rivalPartner),{id:rivalPartner,board:1,team:"w"});
 });

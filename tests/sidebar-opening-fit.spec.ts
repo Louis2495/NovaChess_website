@@ -62,7 +62,7 @@ test('Variants centers its setup and fits all cards without page scrolling',asyn
  expect(await gallery.boundingBox()).toEqual(initialPosition);
  await gallery.getByRole('button',{name:'Speedrun',exact:true}).click();
  expect(await gallery.boundingBox()).toEqual(initialPosition);
- await expect(page.getByRole('spinbutton',{name:'Computer Elo'})).toBeInViewport({ratio:1});
+ await expect(page.getByRole('spinbutton',{name:'Computer Rating'})).toBeInViewport({ratio:1});
  await check('Choose variant','Start game');
  const options = page.getByRole('button',{name:'Game options',exact:true});
  async function checkOptions(){
@@ -71,7 +71,7 @@ test('Variants centers its setup and fits all cards without page scrolling',asyn
   await options.click();
   const dialog = page.getByRole('dialog',{name:'Game options',exact:true});
   await expect(dialog.locator('.variant-summary')).toHaveCount(0);
-  await expect(dialog.getByRole('spinbutton',{name:'Computer Elo'})).toBeInViewport({ratio:1});
+  await expect(dialog.getByRole('spinbutton',{name:'Computer Rating'})).toBeInViewport({ratio:1});
   await expect(dialog.getByRole('button',{name:'Start game',exact:true})).toBeInViewport({ratio:1});
   expect(await gallery.boundingBox()).toEqual(cardsBefore);
   expect(await page.evaluate(()=>window.scrollY)).toBe(0);

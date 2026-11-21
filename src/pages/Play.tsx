@@ -14,6 +14,7 @@ import {
   Flag,
   Handshake,
   ChevronDown,
+  ChevronRight,
   ArrowRight,
   Trash2,
 } from "lucide-react";
@@ -599,7 +600,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
         }}
       />
     );
-  const speedrunEloField = <Field label="Computer Elo"><input type="number" min={speedrunMinRating} max={speedrunMaxRating} step={speedrunRatingStep} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(clampSpeedrunRating(speedrunRating || speedrunMinRating))}/></Field>;
+  const speedrunEloField = <Field label="Computer Rating"><input type="number" min={speedrunMinRating} max={speedrunMaxRating} step={speedrunRatingStep} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(clampSpeedrunRating(speedrunRating || speedrunMinRating))}/></Field>;
   const gameOptions = options && (
     <div className={`game-options${variantsOnly ? " variant-dialog-options" : ""}`}>
       {variantsOnly && <Field label="Variant">
@@ -760,7 +761,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 onClick={() => setOptions(!options)}
               >
                 Game options
-                <ChevronDown size={17} />
+                {variantsOnly ? <ChevronRight size={19} aria-hidden="true" /> : <ChevronDown size={17} aria-hidden="true" />}
               </button>
               {!variantsOnly && gameOptions}
             </Card>

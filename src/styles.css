@@ -1,5 +1,5 @@
 :root {
-  font-family: "Charlesworth", "Nunito Sans", sans-serif;
+  font-family: "Nunito Variable", sans-serif;
   color-scheme: dark;
   font-synthesis: none;
   background: #252e3a;
@@ -22,6 +22,10 @@ input,
 select,
 textarea {
   font: inherit;
+}
+code,
+kbd {
+  font-family: inherit;
 }
 button,
 a,
@@ -161,7 +165,7 @@ option {
   color: var(--text);
   font:
     400 var(--font-size) / 1.5 var(--font),
-    "Nunito Sans", sans-serif;
+    "Nunito Variable", sans-serif;
   min-height: 100dvh;
   isolation: isolate;
 }
@@ -1994,7 +1998,7 @@ option {
   max-height: 88dvh;
   padding: 26px;
   overflow-y: auto;
-  font-family: var(--font), "Nunito Sans", sans-serif;
+  font-family: var(--font), "Nunito Variable", sans-serif;
   font-size: var(--font-size);
 }
 .modal.wide {

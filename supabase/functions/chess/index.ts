@@ -129,6 +129,15 @@ Deno.serve(async (req) => {
       const timed=body.mode==="standard" && variant==="chess" && [180,300,600].includes(body.timeControlSeconds);
       const initial=await fresh(variant,Math.max(1,Math.min(4,+body.dropCount||2)));
       if(timed)initial.clock={incrementMs:increment*1000,remaining:{w:body.timeControlSeconds*1000,b:body.timeControlSeconds*1000},startedAt:null};
+      if(variant==="bughouse" && (body.friend || body.teammates?.length)){
+        const {data,error}=await db.rpc("create_bughouse_friend_game",{
+          p_host:uid,p_opponent:body.friend || null,p_friends:body.teammates || [],
+          p_name:String(body.name||"Bughouse").trim().slice(0,80)||"Bughouse",
+          p_state:initial,p_settings:{bot:false},
+        });
+        if(error)throw error;
+        return json(data);
+      }
       if(body.mode==="team" && (body.friend || body.teammates?.length)){
         const {data,error}=await db.rpc("create_team_friend_game",{
           p_host:uid,p_opponent:body.friend || null,p_friends:body.teammates || [],
@@ -205,6 +214,11 @@ Deno.serve(async (req) => {
       return json(await commit());
     }
     if (status === "cancelled") throw Error("This game request was canceled.");
+    if (action === "join" && r.variant === "bughouse") {
+      const {data,error}=await db.rpc("join_bughouse_room",{p_room:r.id,p_actor:uid,p_invite:body.invite || null});
+      if(error)throw error;
+      return json(data);
+    }
     if (action === "join" && r.mode === "team") {
       const {data,error}=await db.rpc("join_team_room",{p_room:r.id,p_actor:uid,p_team:body.team || null,p_invite:body.invite || null});
       if(error)throw error;
@@ -230,11 +244,7 @@ Deno.serve(async (req) => {
             members.filter((m) => m.team === "b").length ? "w" : "b";
         } else if (!members.some((m) => m.team === "w")) team = "w";
         else if (!members.some((m) => m.team === "b")) team = "b";
-        if(r.variant === "bughouse"){
-          const seat=[{board:0,team:"w"},{board:0,team:"b"},{board:1,team:"w"},{board:1,team:"b"}].find(s=>!members.some(m=>(m.board||0)===s.board && m.team===s.team));
-          if(!seat)throw Error("This game is full.");
-          members=[...members,{id:uid,...seat}];
-        }else members = [...members, { id: uid, team }];
+        members = [...members, { id: uid, team }];
       }
       if (
         r.mode === "throne" &&
@@ -246,7 +256,7 @@ Deno.serve(async (req) => {
         members.some((m) => m.team === "w") &&
         (r.settings.bot || members.some((m) => m.team === "b"))
       ) {
-        status = r.variant === "bughouse" && members.length < 4 ? "waiting" : state.result === "*" ? "playing" : "finished";
+        status = state.result === "*" ? "playing" : "finished";
         if(state.clock && status === "playing" && r.status === "waiting")state={...state,clock:{...state.clock,startedAt:Date.now()}};
         if(state.speedrun && status === "playing" && r.status === "waiting")state={...state,speedrun:{...state.speedrun,startedAt:Date.now()}};
         if (r.mode === "vote" && r.status === "waiting")

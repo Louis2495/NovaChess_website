@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Menu,
 } from "lucide-react";
+import "@fontsource-variable/nunito";
 import "@fontsource/dm-sans/latin-400.css";
 import "@fontsource/dm-sans/latin-500.css";
 import "@fontsource/dm-sans/latin-600.css";
@@ -155,7 +156,7 @@ function App() {
         }
       }
       const board = a.board === "Classic" && a.dark.toLowerCase() === "#5c7866";
-      const font = ["Manrope", "Nunito Sans"].includes(a.font) && !a.fontCustomized;
+      const font = a.font !== defaults.font && !a.fontCustomized;
       return board || changed || font
         ? {
             ...a,
@@ -407,7 +408,7 @@ function App() {
                       a.buttonColor === "#78b58a"
                         ? defaults.buttonColor
                         : a.buttonColor,
-                    font: a.font === "DM Sans" ? defaults.font : a.font,
+                    font: a.fontCustomized ? a.font : defaults.font,
                   }
                 : a,
     );
@@ -449,7 +450,7 @@ function App() {
     "--panel-solid": appearance.panelColor,
     "--base": appearance.backgroundColor,
     "--radius": `${appearance.radius}px`,
-    "--font": appearance.font,
+    "--font": appearance.font === "Nunito" ? "Nunito Variable" : appearance.font,
     "--font-size": `${appearance.fontSize}px`,
     "--space":
       appearance.density === "Compact"

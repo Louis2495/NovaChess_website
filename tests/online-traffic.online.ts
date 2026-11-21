@@ -530,3 +530,21 @@ test('Team Chess opponent acceptance immediately opens the teammate picker and l
  await page.getByRole('button',{name:'Invite friends',exact:true}).click();
  await expect(picker).toBeVisible();
 });
+
+test('Bughouse lets you challenge a rival and pick exactly one teammate',async({page})=>{
+ const env=await connected(page);
+ const alternate={...teamDirectory[1],id:'44444444-4444-4444-8444-444444444444',screen_name:'Alternate Bishop'};
+ await page.route('**/rest/v1/rpc/player_directory',r=>r.fulfill({json:[...teamDirectory,alternate]}));
+ await page.goto('/#variants');
+ await page.getByRole('group',{name:'Online variants',exact:true}).getByRole('button',{name:'Bughouse',exact:true}).click();
+ await page.getByRole('button',{name:'Play a Friend',exact:true}).click();
+ await page.getByRole('dialog',{name:'Play a Friend'}).getByRole('button',{name:/Rival Knight/}).click();
+ await page.getByRole('button',{name:'Invite a Friend',exact:true}).click();
+ const picker=page.getByRole('dialog',{name:'Invite friends to your team'});
+ await expect(picker.getByRole('button',{name:/Rival Knight/})).toHaveCount(0);
+ await picker.getByRole('button',{name:/Allied Rook/}).click();
+ await expect(picker.getByRole('button',{name:/Alternate Bishop/})).toBeDisabled();
+ await picker.getByRole('button',{name:'Save teammate',exact:true}).click();
+ await page.getByRole('button',{name:'Start',exact:true}).click();
+ await expect.poll(()=>env.actions[0]).toMatchObject({action:'create',variant:'bughouse',friend:peer,teammates:[teamFriend]});
+});
