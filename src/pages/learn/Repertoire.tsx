@@ -98,9 +98,9 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
       </div>
       {!!library.repertoire.length && <div className="repertoire-filters">
         <Field label="Search repertoire"><input type="search" placeholder="Opening or line name" value={query} onChange={event => setQuery(event.target.value)} /></Field>
-        <Field label="Review status"><select value={dueOnly ? "due" : "all"} onChange={event => setDueOnly(event.target.value === "due")}>
+        <Field label="Review status"><ChoiceSelect value={dueOnly ? "due" : "all"} onChange={event => setDueOnly(event.target.value === "due")}>
           <option value="all">All lines</option><option value="due">Due for review</option>
-        </select></Field>
+        </ChoiceSelect></Field>
       </div>}
       {!library.repertoire.length ? (
         <Card>
@@ -117,7 +117,7 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
           {visible.map(({ family, lines }) => (
             <section key={family} className="opening-family" aria-label={family}>
               <details open>
-                <summary><span>{family}</span><small>{lines.length} {lines.length === 1 ? "line" : "lines"} · {lines.filter(line => line.due <= now).length} due</small></summary>
+                <summary><span>{family}</span><small>{lines.length} {lines.length === 1 ? "line" : "lines"} · {lines.filter(line => line.due <= now).length} due</small><span className="repertoire-section-action" aria-hidden="true"><span>Show lines</span><span>Hide lines</span></span></summary>
                 <div className="repertoire-grid">
                   {lines.map((line) => (
                     <Card key={line.id}>
@@ -186,7 +186,7 @@ function RepertoireSuggestions({ suggestions, paths, onSelect }: {
     !paths.some(path => lesson.moves.every((move, index) => path[index] === move)));
   if (!missing.length) return <p className="caption repertoire-coverage">You’ve saved all the suggested lines for this opening.</p>;
   return <details className="repertoire-coverage">
-    <summary>Suggested lines to add ({missing.length})</summary>
+    <summary><span>Suggested lines to add ({missing.length})</span><span className="repertoire-section-action" aria-hidden="true"><span>Show</span><span>Hide</span></span></summary>
     <p className="caption">These lessons aren’t covered by the complete move sequences in your saved lines or sidelines.</p>
     <ul>{missing.map(lesson => <li key={lesson.id}>
       <button className="text-link" onClick={() => onSelect(lesson.id)}>{lesson.name}</button>

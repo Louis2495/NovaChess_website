@@ -93,11 +93,14 @@ test("repertoire filters reviews and checks saved sidelines before suggesting mi
   expect(buttons.y).toBeLessThan(section.y);
   expect(buttons.x + buttons.width / 2).toBeCloseTo(workspace.x + workspace.width / 2, 0);
   expect(section.x + section.width / 2).toBeCloseTo(workspace.x + workspace.width / 2, 0);
+  await sicilian.getByText("Hide lines", { exact: true }).click();
+  await expect(sicilian.getByText("White example")).toBeHidden();
+  await sicilian.getByText("Show lines", { exact: true }).click();
   await sicilian.getByText(/Suggested lines to add/).click();
   await expect(sicilian.getByRole("button", { name: "Sicilian Defense: Core plans", exact: true })).toHaveCount(0);
   await page.getByRole("group", { name: "Repertoire color" }).getByRole("button", { name: "White", exact: true }).click();
   await expect(sicilian.getByRole("button", { name: "Sicilian Defense: Core plans", exact: true })).toBeVisible();
-  await page.getByLabel("Review status", { exact: true }).selectOption("due");
+  await page.getByRole("group", { name: "Review status" }).getByRole("button", { name: "Due for review", exact: true }).click();
   await expect(page.getByText("No repertoire lines match these filters.")).toBeVisible();
   await page.getByRole("group", { name: "Repertoire color" }).getByRole("button", { name: "Black", exact: true }).click();
   await expect(sicilian.getByText("Black example")).toBeVisible();

@@ -6205,7 +6205,7 @@ html { scrollbar-gutter:stable; }
   margin-bottom:10px;
   border-bottom:1px solid var(--border-strong);
 }
-.repertoire-families .opening-family > details > summary small { margin-inline-start:12px; color:var(--muted); font-weight:600; }
+.repertoire-families .opening-family > details > summary small { color:var(--muted); font-weight:600; }
 .repertoire-coverage { margin:12px 0 0; }
 .repertoire-coverage > summary { cursor:pointer; font-weight:750; }
 .repertoire-coverage li { margin-block:5px; }
@@ -6213,3 +6213,20 @@ html { scrollbar-gutter:stable; }
 @media(max-width:600px) {
   .repertoire-filters { grid-template-columns:minmax(0,1fr); gap:8px; }
 }
+
+.repertoire-families details > summary {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 10px;
+  list-style:none;
+}
+.repertoire-families details > summary::-webkit-details-marker { display:none; }
+.repertoire-section-action {
+  margin-inline-start:auto;
+  font-size:.82rem;
+  font-weight:700;
+  color:var(--accent);
+}
+.repertoire-families details:not([open]) > summary .repertoire-section-action > :last-child,
+.repertoire-families details[open] > summary .repertoire-section-action > :first-child { display:none; }
