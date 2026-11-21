@@ -5921,7 +5921,7 @@ html { scrollbar-gutter:stable; }
   grid-template-columns:clamp(72px,11vw,148px) minmax(0,1fr);
   gap:clamp(12px,2vw,26px);
   min-height:0;
-  margin:0 0 calc(clamp(10px,2dvh,22px) + 2cm);
+  margin:0 0 calc(clamp(10px,2dvh,22px) + 1cm);
   order:0;
 }
 .home-dashboard .home-welcome-actions h1 {
