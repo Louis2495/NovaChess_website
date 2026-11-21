@@ -1,3 +1,4 @@
+import { Smile } from "lucide-react";
 import { useEffect, useState, type CSSProperties } from "react";
 import { base, today } from "../lib/store";
 type Meme = {
@@ -45,6 +46,7 @@ export default function DailyMeme({onAspectChange}:{onAspectChange?:(aspect:numb
       data-meme-id={meme.id}
       style={{ "--meme-aspect": (meme.width || 720) / (meme.height || 600) } as CSSProperties}
     >
+      <h2 className="daily-meme-title"><Smile size={20} aria-hidden="true" />Chess meme</h2>
       <img
         className="daily-meme-image"
         src={`${base}memes/${meme.image}`}

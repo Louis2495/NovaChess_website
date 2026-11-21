@@ -31,7 +31,7 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Home", exact: true }),
+    page.getByRole("heading", { name: "Welcome to NovaChess", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: /Daily puzzle/ })).toBeVisible();
   await expect(page.locator(".app")).toHaveCSS(
@@ -741,7 +741,7 @@ test("bughouse transfers ordinary pieces normally and reverts captured promotion
     .toContain("[p]");
 });
 
-test("simplified Home has one large New Game action and no repeated tool or stats grids", async ({
+test("Home has one large New Game action and focused shortcuts", async ({
   page,
 }) => {
   await page.goto("/");
@@ -755,9 +755,8 @@ test("simplified Home has one large New Game action and no repeated tool or stat
   await expect(
     page.getByRole("button", { name: "Customize", exact: true }),
   ).toHaveCount(0);
-  await expect(
-    page.locator(".tool-grid,.stats-strip,.home-bottom"),
-  ).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: "Quick actions" }).getByRole("button")).toHaveCount(3);
+  await expect(page.getByRole("button", { name: /tournament/i })).toHaveCount(0);
   await action.click();
   await page.getByRole("button",{name:"Computer",exact:true}).click();
   const start = page.getByRole("button", { name: "Start game", exact: true });
@@ -768,7 +767,7 @@ test("simplified Home has one large New Game action and no repeated tool or stat
   await expect(page.getByLabel("Variant", { exact: true })).toHaveCount(0);
 });
 
-test("Home keeps the unlabelled meme beside the puzzle and opening lessons remain in Learn", async ({
+test("Home shows the meme and links directly to opening lessons", async ({
   page,
 }) => {
   await page.goto("/");
@@ -776,11 +775,10 @@ test("Home keeps the unlabelled meme beside the puzzle and opening lessons remai
     page.locator(".home-practice-grid .daily-meme-image"),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Daily meme", exact: true }),
-  ).toHaveCount(0);
+    page.getByRole("heading", { name: "Chess meme", exact: true }),
+  ).toBeVisible();
   await expect(page.locator(".home-lessons,.suggested-lessons")).toHaveCount(0);
-  await page.goto("/#learn");
-  await page.getByRole("button", { name: /Opening lessons/ }).click();
+  await page.getByRole("navigation", { name: "Quick actions" }).getByRole("button", { name: "Opening lessons" }).click();
   await expect(page.locator(".list-summary")).toHaveText("129 lessons");
 });
 

@@ -6,13 +6,14 @@ import { variantList } from "../lib/variants";
 import { duration } from "../lib/speedrun";
 import DailyMeme from "../components/DailyMeme";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpen, Clock3, Dices, Flame, Plus, Puzzle, RotateCcw, Swords, Target, Trophy, Users } from "lucide-react";
 import { useApp } from "../lib/context";
-import { useData, today, base } from "../lib/store";
+import { useData, today, base, emptyLibrary } from "../lib/store";
 import type { PuzzleData, SavedGame } from "../lib/types";
 import { Chess } from "chess.js";
 import { Board } from "../components/Board";
-import { Button, PageTitle } from "../components/UI";
+import { Button } from "../components/UI";
+import { isStudy } from "../lib/library";
 export function dailyPuzzle(puzzles: PuzzleData[]) {
   const choices = puzzles
     .filter((p) => p.sourceRating >= 1000 && p.sourceRating <= 2200)
@@ -38,28 +39,53 @@ export default function HomePage() {
     const measure=()=>home.style.setProperty("--home-preview-height",`${puzzle.getBoundingClientRect().height}px`);
     const observer=new ResizeObserver(measure);observer.observe(puzzle);measure();return()=>observer.disconnect();
   },[]);
-  const daily = !!library.progress.daily[today()]?.completed;
+  const daily = !!library.progress.daily?.[today()]?.completed;
   const resumable = library.activeGame?.result === "*";
+  const name = screenName(library.profile, "");
+  const welcome = name && name !== emptyLibrary.profile.name ? `Welcome back, ${name}!` : "Welcome to NovaChess";
+  const games = library.games.filter(game => !isStudy(game) && game.folder !== "Studies");
+  const recent = [...games].sort((a, b) => b.created - a.created).slice(0, 3);
+  const completed = games.filter(game => game.result !== "*" && game.origin !== "archive").length;
+  const shortcuts = [
+    { label: "Play a friend", icon: Users, action: () => navigate("players") },
+    { label: "Explore variants", icon: Dices, action: () => navigate("variants") },
+    { label: "Opening lessons", icon: BookOpen, action: () => navigate("learn", "lessons") },
+  ];
+  const progress = [
+    { label: "Local rating", value: Math.round(library.localRating), icon: Trophy },
+    { label: "Completed games", value: completed, icon: Swords },
+    { label: "Puzzles solved", value: library.progress.solved ?? 0, icon: Target },
+    { label: "Puzzle streak", value: library.progress.streak ?? 0, icon: Flame },
+  ];
   return (
-    <div ref={homeRef} className={`home-page ${appearance.showMemes ? "" : "memes-hidden"}`}>
-      <PageTitle title="Home" />
+    <div ref={homeRef} className={`home-page home-dashboard${appearance.showMemes ? "" : " memes-hidden"}`}>
       <section className="new-game-section home-welcome" aria-label="New game">
         <div className="home-welcome-art" aria-hidden="true"><span className="multiplayer-picture home-team-cutout" style={{backgroundImage:`url("${base}home-team.webp")`}}/></div>
         <div className="home-welcome-actions">
-        <Button className="new-game-primary" onClick={() => navigate("play")}>
-          New game
-        </Button>
-        {resumable && (
-          <button
-            className="resume-link resume-game-button"
-            onClick={() => navigate(library.activeGame?.variant !== "chess" || library.activeGame?.speedrun ? "variants" : "play", "resume")}
-          >
-            <RotateCcw size={15} />
-            Resume saved game
-          </button>
-        )}
+          <h1>{welcome}</h1>
+          <Button className="new-game-primary" onClick={() => navigate("play")}>
+            <Plus aria-hidden="true" /> New game
+          </Button>
+          {resumable && (
+            <button
+              className="resume-link resume-game-button"
+              onClick={() => navigate(library.activeGame?.variant !== "chess" || library.activeGame?.speedrun ? "variants" : "play", "resume")}
+            >
+              <RotateCcw size={15} />
+              Resume saved game
+            </button>
+          )}
         </div>
       </section>
+      <nav className="home-shortcuts" aria-label="Quick actions">
+        {shortcuts.map(({ label, icon: Icon, action }) => (
+          <button key={label} className="home-shortcut" onClick={action}>
+            <span className="home-shortcut-icon"><Icon size={21} aria-hidden="true" /></span>
+            <span>{label}</span>
+            <ArrowRight className="home-shortcut-arrow" size={16} aria-hidden="true" />
+          </button>
+        ))}
+      </nav>
       <div className="home-practice-grid">
         <section
           ref={puzzleRef}
@@ -76,8 +102,7 @@ export default function HomePage() {
           }}
         >
           <div className="home-section-heading">
-            <h2 id="daily-title">Daily puzzle</h2>
-
+            <h2 id="daily-title"><Puzzle size={21} aria-hidden="true" />Daily puzzle</h2>
           </div>
           <div className="home-puzzle-content">
             {fen ? (
@@ -93,24 +118,36 @@ export default function HomePage() {
               <div className="daily-board-placeholder" />
             )}
           </div>
+          <span className="home-puzzle-action">{daily ? "View puzzle" : "Solve puzzle"} <ArrowRight size={16} aria-hidden="true" /></span>
         </section>
         {appearance.showMemes && <DailyMeme/>}
       </div>
       <section className="home-recent" aria-labelledby="recent-games-title">
         <div className="home-section-heading">
-          <h2 id="recent-games-title">Recent games</h2>
+          <h2 id="recent-games-title"><Clock3 size={21} aria-hidden="true" />Recent games</h2>
           <button className="text-link" onClick={() => navigate("library")}>
             View all
             <ArrowRight size={14} />
           </button>
         </div>
-        {library.games.length ? (
-          <div className="home-recent-list">{library.games.slice(0, 3).map((g) => (
+        {recent.length ? (
+          <div className="home-recent-list">{recent.map((g) => (
             <RecentGame key={g.id} game={g} open={() => navigate("library", g.id)} />
           ))}</div>
         ) : (
           <p className="muted home-recent-empty">No games yet.</p>
         )}
+      </section>
+      <section className="home-progress" aria-labelledby="home-progress-title">
+        <h2 id="home-progress-title">
+          <button onClick={() => navigate("stats")}><BarChart3 size={20} aria-hidden="true" /> Your progress <ArrowRight size={15} aria-hidden="true" /></button>
+        </h2>
+        <dl>{progress.map(({ label, value, icon: Icon }) => (
+          <div key={label}>
+            <dt><Icon size={20} aria-hidden="true" />{label}</dt>
+            <dd>{value.toLocaleString()}</dd>
+          </div>
+        ))}</dl>
       </section>
     </div>
   );

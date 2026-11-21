@@ -78,3 +78,22 @@ test('Home completion uses a yellow outline and recent games show stacked player
  const popup=(await preview.boundingBox())!;expect(popup.x).toBeGreaterThanOrEqual(0);expect(popup.y).toBeGreaterThanOrEqual(0);expect(popup.x+popup.width).toBeLessThanOrEqual(page.viewportSize()!.width);expect(popup.y+popup.height).toBeLessThanOrEqual(page.viewportSize()!.height);
  const faint=await entries.first().evaluate(e=>{const s=getComputedStyle(e);return s.backgroundColor!==s.borderTopColor});expect(faint).toBe(true);
 });
+
+test('Home shows real progress and links to Friends and Stats',async({page})=>{
+ await page.addInitScript(()=>{
+  localStorage.setItem('novachess-library-v2',JSON.stringify({
+   profile:{name:'Knight'},
+   localRating:1482,
+   progress:{rating:1000,attempts:24,solved:24,streak:5,completed:[],daily:{},learned:[],endgames:[]},
+  }));
+ });
+ await page.goto('/');
+ await expect(page.getByRole('heading',{name:'Welcome back, Knight!'})).toBeVisible();
+ const progress=page.getByRole('region',{name:'Your progress'});
+ await expect(progress.locator('dd')).toHaveText([/1.?482/,'0','24','5']);
+ await progress.getByRole('button',{name:'Your progress'}).click();
+ await expect(page).toHaveURL(/#stats/);
+ await page.goto('/');
+ await page.getByRole('navigation',{name:'Quick actions'}).getByRole('button',{name:'Play a friend'}).click();
+ await expect(page).toHaveURL(/#players/);
+});
