@@ -826,7 +826,7 @@ option {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 5px;
+  padding: 8px 5px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) * 0.6);
@@ -2825,7 +2825,7 @@ option {
     font-size: 0.78rem;
   }
   .board-navigation {
-    padding: 9px 3px;
+    padding: 6px 3px;
   }
   .board-navigation > span {
     font-size: 0.74rem;

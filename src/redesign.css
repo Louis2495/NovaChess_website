@@ -1810,6 +1810,8 @@ h3 {
 .lesson-step-controls > .btn {
   flex: 1;
   min-width: 0;
+  min-height: 36px;
+  padding-block: 7px;
 }
 .lesson-desk .segmented {
   flex-shrink: 0;
@@ -5533,7 +5535,7 @@ html { scrollbar-gutter:stable; }
 }
 .home-page { padding-top:48px; }
 
-.puzzle-review-bar { display:flex; align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+.puzzle-review-bar { display:flex; align-items:center; gap:10px; width:100%; box-sizing:border-box; padding:7px 10px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
 .puzzle-review-bar .btn { flex:none; padding:8px; }
 .puzzle-review-bar input { width:100%; min-width:0; height:8px; padding:0; accent-color:var(--accent); }
 /* An inset, continuous timeline keeps the preview control inside the card. */
