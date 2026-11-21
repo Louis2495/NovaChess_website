@@ -242,6 +242,20 @@ test('Variants stacks its friend control under the right-aligned opponent toggle
     expect(Math.abs(area.x + area.width - toggle.x - toggle.width)).toBeLessThan(2);
     expect(action.y).toBeGreaterThan(toggle.y + toggle.height);
     expect(Math.abs(action.x + action.width - toggle.x - toggle.width)).toBeLessThan(2);
+    const gallery = page.getByRole('group', { name: 'Online variants', exact: true });
+    const galleryTop = () => gallery.evaluate(el => el.getBoundingClientRect().top + window.scrollY);
+    const before = await galleryTop();
+    await gallery.getByRole('button', { name: 'Team Chess', exact: true }).click();
+    const team = page.getByRole('button', { name: 'Start Team Chess', exact: true });
+    await expect(team).toBeVisible();
+    const after = (await gallery.boundingBox())!;
+    const launch = (await team.boundingBox())!;
+    expect(Math.abs(await galleryTop() - before)).toBeLessThan(1);
+    expect(launch.y + launch.height).toBeLessThan(after.y);
+    await gallery.getByRole('button', { name: 'Throne', exact: true }).click();
+    await expect(friend).toHaveCount(0);
+    expect(Math.abs(await galleryTop() - before)).toBeLessThan(1);
+    await gallery.getByRole('button', { name: 'Atomic', exact: true }).click();
   }
   await page.getByRole('button', { name: 'Speedrun', exact: true }).click();
   await expect(friend).toHaveCount(0);
