@@ -752,9 +752,6 @@ function LessonWorkspace({
                     side,
                     initial: initialFen,
                     moves,
-                    due: Date.now(),
-                    trained: 0,
-                    successes: 0,
                   },
                 ],
               }));

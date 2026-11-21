@@ -24,6 +24,7 @@ export function repertoireFamilyLookup(openings: Opening[]) {
   }
   const lookup = (board: Chess) => positions.get(board.fen().split(" ").slice(0, 4).join(" "));
   return (line: Repertoire) => {
+    if (line.category) return line.category;
     let family: string | undefined;
     try {
       const board = new Chess(line.initial);

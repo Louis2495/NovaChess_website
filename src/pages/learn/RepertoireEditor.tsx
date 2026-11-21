@@ -46,7 +46,7 @@ function Notation({ nodes, prefix, cursor, select, label }: {
   </table>;
 }
 
-export default function RepertoireEditor({ line, onBack }: { line?: Repertoire; onBack: () => void }) {
+export default function RepertoireEditor({ line, category, onBack }: { line?: Repertoire; category?: string; onBack: () => void }) {
   const { setLibrary, notify } = useApp();
   const initial = line?.initial ?? initialFen;
   const [name, setName] = useState(line?.name ?? "");
@@ -84,8 +84,7 @@ export default function RepertoireEditor({ line, onBack }: { line?: Repertoire; 
     const [moves, ...branches] = paths;
     if (!name.trim() || !moves.length) return;
     const updated: Repertoire = {
-      id: line?.id ?? uid(), name: name.trim(), side, initial, moves, branches,
-      due: Date.now(), trained: line?.trained ?? 0, successes: line?.successes ?? 0,
+      id: line?.id ?? uid(), category: line?.category ?? category, suggestionId: line?.suggestionId, name: name.trim(), side, initial, moves, branches,
     };
     setLibrary(library => ({
       ...library,
@@ -126,7 +125,7 @@ export default function RepertoireEditor({ line, onBack }: { line?: Repertoire; 
   </section>;
 }
 
-export function RepertoireImport({ onBack }: { onBack: () => void }) {
+export function RepertoireImport({ onBack, sharedPgn }: { onBack: () => void; sharedPgn?: string }) {
   const { setLibrary, notify } = useApp();
   const [url, setUrl] = useState("");
   const [pgn, setPgn] = useState("");
@@ -134,6 +133,17 @@ export function RepertoireImport({ onBack }: { onBack: () => void }) {
   const [busy, setBusy] = useState(false);
   const [request, setRequest] = useState<AbortController>();
   useEffect(() => () => request?.abort(), [request]);
+  const sharedLines = useMemo(() => {
+    if (!sharedPgn || sharedPgn.length > 8000) return [];
+    try { return parseRepertoireStudy(sharedPgn); }
+    catch { return []; }
+  }, [sharedPgn]);
+  function saveChapters(chapters: ReturnType<typeof parseRepertoireStudy>) {
+    const lines = chapters.map(chapter => ({ ...chapter, id: uid() }));
+    setLibrary(library => ({ ...library, repertoire: [...library.repertoire, ...lines] }));
+    notify(`Imported ${lines.length} ${lines.length === 1 ? "line" : "lines"}.`);
+    onBack();
+  }
   async function load() {
     setError("");
     let source: string | undefined;
@@ -156,20 +166,32 @@ export function RepertoireImport({ onBack }: { onBack: () => void }) {
       try { chapters = parseRepertoireStudy(text); }
       catch { throw Error("The PGN could not be read. Use the PGN exported from a standard chess study."); }
       if (!chapters.length) throw Error("The study has no chapters with moves.");
-      const lines = chapters.map(chapter => ({ ...chapter, id: uid(), due: Date.now(), trained: 0, successes: 0 }));
-      setLibrary(library => ({ ...library, repertoire: [...library.repertoire, ...lines] }));
-      notify(`Imported ${lines.length} ${lines.length === 1 ? "chapter" : "chapters"}.`);
-      onBack();
+      saveChapters(chapters);
     } catch (e) {
       if (!controller.signal.aborted) setError((e as Error).message);
     } finally {
       if (!controller.signal.aborted) setBusy(false);
     }
   }
+  if (sharedPgn !== undefined) return <Card className="repertoire-import">
+    <h1>Shared repertoire</h1>
+    {sharedLines.length ? <>
+      <p className="caption">Add these lines and their sidelines to your repertoire.</p>
+      <ul>{sharedLines.map((line, index) => <li key={index}>{line.name} · {line.side === "w" ? "White" : "Black"}</li>)}</ul>
+      <Button onClick={() => saveChapters(sharedLines)}><Download size={16} /> Import lines</Button>
+    </> : <p role="alert">This repertoire link could not be read.</p>}
+  </Card>;
+
   return <Card className="repertoire-import">
     <h1>Import</h1>
     <p className="caption"><BookOpen size={16} aria-hidden="true" /> Each chapter becomes a repertoire line with its own sidelines.</p>
     <Field label="Study link"><input type="url" value={url} onChange={e => setUrl(e.target.value)} /></Field>
+    <Field label="Upload a PGN file"><input type="file" accept=".pgn" onChange={async event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try { setPgn(await file.text()); setError(""); }
+      catch { setError("Could not read this PGN file."); }
+    }} /></Field>
     <Field label="Or paste exported PGN"><textarea value={pgn} onChange={e => setPgn(e.target.value)} rows={6} /></Field>
     {error && <p role="alert" className="error">{error}</p>}
     <Button disabled={busy || !(url.trim() || pgn.trim())} onClick={() => void load()}><Download size={16} /> {busy ? "Importing…" : "Import"}</Button>

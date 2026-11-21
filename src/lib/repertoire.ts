@@ -40,7 +40,7 @@ export function exportRepertoire(line: Repertoire) {
       render(main.children)].filter(Boolean).join(" ");
   }
   const board = new Chess(line.initial);
-  board.setHeader("Event", line.name);
+  board.setHeader("Event", line.name.replace(/[\r\n]+/g, " ").replace(/["\\]/g, character => "\\" + character));
   board.setHeader("Orientation", line.side === "b" ? "Black" : "White");
   const headers = board.pgn().split("\n").filter(line => line.startsWith("[")).join("\n");
   return `${headers}\n\n${render(repertoireTree(line.initial, repertoirePaths(line)))} *\n`;

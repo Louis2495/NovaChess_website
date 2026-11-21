@@ -139,14 +139,13 @@ export type ReviewRow = {
 };
 export type Repertoire = {
   branches?: string[][];
+  category?: string;
+  suggestionId?: string;
   id: string;
   name: string;
   side: "w" | "b";
   initial: string;
   moves: string[];
-  due: number;
-  trained: number;
-  successes: number;
 };
 export type Profile = {
   federations?: Partial<
@@ -181,7 +180,7 @@ export type Library = {
   games: SavedGame[];
   folders: string[];
   repertoire: Repertoire[];
-  repertoireCategories?: { order?: string[]; names?: Record<string, string> };
+  repertoireCategories?: { order?: string[]; names?: Record<string, string>; added?: string[] };
   progress: Progress;
   profile: Profile;
   activeGame: SavedGame | null;

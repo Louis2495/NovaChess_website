@@ -116,7 +116,7 @@ export default function Stats() {
     ["Endgame mastery", library.progress.endgames.length, 17],
     [
       "Deep repertoire",
-      library.repertoire.filter((r) => r.successes >= 10).length,
+      library.repertoire.length,
       25,
     ],
     [
@@ -169,7 +169,7 @@ export default function Stats() {
     "Complete curriculum": "Complete every curated opening lesson",
     "Endgame mastery": "Complete all 17 Endgame Lessons",
     "Deep repertoire":
-      "Train 25 repertoire lines correctly at least 10 times each",
+      "Save 25 lines in your repertoire",
     "Across the board": "Win 10 games in each of 12 variants",
     "Engine challenger": "Win 50 locally rated games against 2000+ bots",
     "Blindfold hundred": "Win 100 blindfold games",

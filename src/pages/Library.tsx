@@ -293,9 +293,6 @@ function StudyTraining({
           side,
           initial: line.initial,
           moves: line.moves,
-          due: 0,
-          trained: 0,
-          successes: 0,
         })),
     [study, side],
   );

@@ -67,7 +67,7 @@ test("saved lines are grouped by their opening even when they have custom names"
   await expect(page.getByRole("region", { name: "French Defense", exact: true })).toContainText("A different defense");
 });
 
-test("repertoire filters reviews and checks saved sidelines before suggesting missing lines", async ({ page }) => {
+test("suggestions are opt-in and check saved sidelines for the selected color", async ({ page }) => {
   const { readFileSync } = await import("node:fs");
   const foundation = JSON.parse(readFileSync("public/data/lessons.json", "utf8"))
     .find((line: { name: string }) => line.name === "Sicilian Defense: Core plans");
@@ -96,14 +96,38 @@ test("repertoire filters reviews and checks saved sidelines before suggesting mi
   await sicilian.getByText("Hide lines", { exact: true }).click();
   await expect(sicilian.getByText("White example")).toBeHidden();
   await sicilian.getByText("Show lines", { exact: true }).click();
-  await sicilian.getByText(/Suggested lines to add/).click();
-  await expect(sicilian.getByRole("button", { name: "Sicilian Defense: Core plans", exact: true })).toHaveCount(0);
-  await page.getByRole("group", { name: "Repertoire color" }).getByRole("button", { name: "White", exact: true }).click();
-  await expect(sicilian.getByRole("button", { name: "Sicilian Defense: Core plans", exact: true })).toBeVisible();
-  await page.getByRole("group", { name: "Review status" }).getByRole("button", { name: "Due for review", exact: true }).click();
-  await expect(page.getByText("No repertoire lines match these filters.")).toBeVisible();
-  await page.getByRole("group", { name: "Repertoire color" }).getByRole("button", { name: "Black", exact: true }).click();
-  await expect(sicilian.getByText("Black example")).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Repertoire suggestions" })).toHaveCount(0);
+  await expect(page.getByText("Due now")).toHaveCount(0);
+  await expect(page.getByText("Review status")).toHaveCount(0);
+  await page.getByRole("button", { name: "Show suggestions" }).click();
+  const suggestions = page.getByRole("dialog", { name: "Repertoire suggestions" });
+  await expect(suggestions.getByRole("heading", { name: "Missing opening categories" })).toBeVisible();
+  await expect(suggestions.getByRole("heading", { name: "Suggested missing lines" })).toBeVisible();
+  await suggestions.getByRole("checkbox", { name: "French Defense", exact: true }).check();
+  await suggestions.getByText(/^Sicilian Defense \(/).click();
+  const corePlans = suggestions.getByRole("checkbox", { name: "Sicilian Defense: Core plans", exact: true });
+  await expect(corePlans).toBeVisible();
+  const color = suggestions.getByRole("group", { name: "Color for new lines" });
+  await color.getByRole("button", { name: "Black", exact: true }).click();
+  await expect(corePlans).toHaveCount(0);
+  await color.getByRole("button", { name: "White", exact: true }).click();
+  await corePlans.check();
+  await suggestions.getByRole("button", { name: "Add selected (2)" }).click();
+  await expect(suggestions).toHaveCount(0);
+  const french = page.getByRole("region", { name: "French Defense", exact: true });
+  await expect(french.getByText("Empty", { exact: true })).toBeVisible();
+  const emptyLine = sicilian.locator(".repertoire-line").filter({ hasText: "Sicilian Defense: Core plans" });
+  await expect(emptyLine.getByText("Empty", { exact: true })).toBeVisible();
+  await expect(emptyLine.getByRole("button", { name: "Train", exact: true })).toHaveCount(0);
+  await emptyLine.getByRole("button", { name: "Edit", exact: true }).click();
+  await move(page, "e2", "e4");
+  await page.getByRole("button", { name: "Save line", exact: true }).click();
+  await expect(emptyLine.getByText("1 moves", { exact: true })).toBeVisible();
+  await expect(french.getByText("Empty", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Show suggestions" }).click();
+  await expect(suggestions.getByRole("checkbox", { name: "French Defense", exact: true })).toHaveCount(0);
+  await suggestions.getByText(/^Sicilian Defense \(/).click();
+  await expect(corePlans).toHaveCount(0);
 });
 
 test("opening categories can be dragged, moved with buttons, and renamed across reloads", async ({ page }) => {
@@ -145,5 +169,38 @@ test("opening categories can be dragged, moved with buttons, and renamed across 
   await page.getByRole("searchbox", { name: "Search repertoire" }).fill("tournament");
   const renamed = page.getByRole("region", { name: "Tournament prep" });
   await expect(renamed.getByRole("heading", { name: "My Sicilian line" })).toBeVisible();
-  await expect(renamed.getByText(/Suggested lines to add/)).toBeVisible();
+  await page.getByRole("button", { name: "Show suggestions" }).click();
+  await expect(page.getByRole("dialog", { name: "Repertoire suggestions" }).getByText(/^Tournament prep \(/)).toBeVisible();
+});
+
+test("a friend can import only the shared repertoire lines with their sidelines", async ({ page, browser }, testInfo) => {
+  await page.addInitScript(() => {
+    const line = {
+      initial: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      side: "b", moves: ["e2e4", "c7c5"], branches: [["e2e4", "e7e6"]],
+    };
+    localStorage.setItem("novachess-library-v2", JSON.stringify({ repertoire: [
+      { ...line, id: "shared", name: 'Shared "defense"' },
+      { ...line, id: "private", name: "Private defense" },
+    ] }));
+  });
+  await page.goto("/#learn/repertoire");
+  await page.getByRole("button", { name: "Share", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Share repertoire" });
+  await dialog.getByRole("checkbox", { name: 'Shared "defense"' }).check();
+  await dialog.getByRole("button", { name: "Copy link" }).click();
+  const link = await dialog.getByRole("textbox", { name: "Share link" }).inputValue();
+  const friend = await browser.newPage({ baseURL: testInfo.project.use.baseURL });
+  try {
+    await friend.goto(link);
+    await expect(friend.getByRole("heading", { name: "Shared repertoire" })).toBeVisible();
+    await expect(friend.getByText('Shared "defense" · Black')).toBeVisible();
+    await expect(friend.getByText("Private defense")).toHaveCount(0);
+    await friend.getByRole("button", { name: "Import lines" }).click();
+    await expect(friend.getByRole("heading", { name: 'Shared "defense"' })).toBeVisible();
+    await friend.getByRole("button", { name: "Edit", exact: true }).click();
+    await expect(friend.getByRole("table", { name: /Sideline.*e6/ })).toBeVisible();
+  } finally {
+    await friend.close();
+  }
 });
