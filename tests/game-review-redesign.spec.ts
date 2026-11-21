@@ -22,7 +22,7 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  await expect(book).toHaveCSS('color', 'rgb(255, 255, 255)');
  const moveText = (await firstMove.locator('span').last().boundingBox())!;
  const badge = (await book.boundingBox())!;
- expect(moveText.x - (badge.x + badge.width)).toBeCloseTo(8, 0);
+ expect(moveText.x - (badge.x + badge.width)).toBeCloseTo(14, 0);
  await expect(page.locator('.evaluation-graph polyline')).toHaveAttribute('points',/\S+ \S+/);
  await expect(page.locator('.review-performance .review-player-metric dd:first-of-type')).not.toHaveText(['—','—']);
  for (const panel of await page.locator('.review-performance dl').all()) {
@@ -91,6 +91,13 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
     expect(Math.abs(moves.height - board.height)).toBeLessThan(1);
     expect(Math.abs(moves.y - board.y)).toBeLessThan(1);
     expect(Math.abs(rating.y - board.y)).toBeLessThan(1);
+    const layout = page.locator('.game-review-layout');
+    await page.setViewportSize({ width: 1920, height: 1000 });
+    await expect.poll(async () => {
+      const bounds = (await layout.boundingBox())!;
+      const panel = (await stats.boundingBox())!;
+      return Math.abs(bounds.x + bounds.width - panel.x - panel.width);
+    }).toBeLessThan(1);
   }
 
   await page.setViewportSize(isMobile ? { width: 390, height: 650 } : { width: 1440, height: 720 });

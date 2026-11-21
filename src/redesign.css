@@ -4249,7 +4249,7 @@ select.theme-select {
 .review-notation th { color:var(--muted); text-align:left; font-size:.72rem; padding-bottom:8px; font-weight:500; }
 .review-notation th:first-child,.review-notation td:first-child { width:29px; color:var(--muted); }
 .review-notation td { padding:2px; }
-.review-notation td button { width:100%; display:flex; justify-content:flex-start; gap:8px; align-items:center; padding:7px 4px; border-radius:6px; text-align:left; }
+.review-notation td button { width:100%; display:flex; justify-content:flex-start; gap:14px; align-items:center; padding:7px 4px; border-radius:6px; text-align:left; }
 .review-notation td button.current { background:var(--accent-soft); color:var(--accent); }
 .review-notation-card { box-sizing:border-box; width:100%; max-height:440px; overflow:auto; }
 .review-board-eval:has(.material-top) > .eval-meter { margin-top:29px; }
@@ -4903,7 +4903,7 @@ html { scrollbar-gutter:stable; }
   margin-block-start:var(--board-layout-top,22px); padding-top:0;
  }
  .workspace .game-review-layout.chess-layout {
-  grid-template-columns:minmax(0,min(calc(var(--auto-board-limit,var(--board-max)) + 29px),calc(var(--board-max) + 29px))) clamp(230px,19vw,270px) clamp(190px,17vw,240px);
+  grid-template-columns:minmax(0,min(calc(var(--auto-board-limit,var(--board-max)) + 29px),calc(var(--board-max) + 29px))) clamp(230px,19vw,270px) minmax(230px,1fr);
   column-gap:clamp(16px,2vw,28px);
  }
  .game-review-layout > .review-notation-card {
