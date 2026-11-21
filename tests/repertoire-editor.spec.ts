@@ -35,9 +35,9 @@ test("Lichess study import saves multiple chapters, their orientation and nested
     body: '[Event "Study: Open game"]\n[Orientation "Black"]\n\n1. e4 e5 (1... c5 2. Nf3 (2. c3)) 2. Nf3 *\n\n[Event "Study: Queen pawn"]\n\n1. d4 d5 *',
   }));
   await page.goto("/#learn/repertoire");
-  await page.getByRole("button", { name: "Import Lichess study", exact: true }).click();
-  await page.getByLabel("Lichess study link").fill("https://lichess.org/study/abc123DE/abc123XY");
-  await page.getByRole("button", { name: "Import study", exact: true }).click();
+  await page.getByRole("button", { name: "Import", exact: true }).click();
+  await page.getByLabel("Study link").fill("https://lichess.org/study/abc123DE/abc123XY");
+  await page.getByRole("button", { name: "Import", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Study: Queen pawn" })).toBeVisible();
   const opening = page.locator(".repertoire-grid .card").filter({ hasText: "Study: Open game" });
   await expect(opening.getByText("Black", { exact: true })).toBeVisible();

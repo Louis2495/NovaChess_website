@@ -139,7 +139,7 @@ export function RepertoireImport({ onBack }: { onBack: () => void }) {
     let source: string | undefined;
     if (!pgn.trim()) {
       try { source = lichessStudyExport(url); }
-      catch { setError("Enter a Lichess study link or paste the study’s PGN."); return; }
+      catch { setError("Enter a supported study link or paste the study’s PGN."); return; }
     }
     const controller = new AbortController();
     setRequest(controller);
@@ -149,7 +149,7 @@ export function RepertoireImport({ onBack }: { onBack: () => void }) {
       if (source) {
         const response = await fetch(source, { signal: controller.signal }).catch(() => null);
         if (controller.signal.aborted) return;
-        if (!response?.ok) throw Error("Could not download this study. Export its PGN from Lichess and paste it below.");
+        if (!response?.ok) throw Error("Could not download this study. Export its PGN and paste it below.");
         text = await response.text();
       }
       let chapters;
@@ -167,11 +167,11 @@ export function RepertoireImport({ onBack }: { onBack: () => void }) {
     }
   }
   return <Card className="repertoire-import">
-    <h1>Import Lichess study</h1>
+    <h1>Import</h1>
     <p className="caption"><BookOpen size={16} aria-hidden="true" /> Each chapter becomes a repertoire line with its own sidelines.</p>
-    <Field label="Lichess study link"><input type="url" placeholder="https://lichess.org/study/…" value={url} onChange={e => setUrl(e.target.value)} /></Field>
+    <Field label="Study link"><input type="url" value={url} onChange={e => setUrl(e.target.value)} /></Field>
     <Field label="Or paste exported PGN"><textarea value={pgn} onChange={e => setPgn(e.target.value)} rows={6} /></Field>
     {error && <p role="alert" className="error">{error}</p>}
-    <Button disabled={busy || !(url.trim() || pgn.trim())} onClick={() => void load()}><Download size={16} /> {busy ? "Importing…" : "Import study"}</Button>
+    <Button disabled={busy || !(url.trim() || pgn.trim())} onClick={() => void load()}><Download size={16} /> {busy ? "Importing…" : "Import"}</Button>
   </Card>;
 }

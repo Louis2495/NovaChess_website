@@ -91,7 +91,7 @@ function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; on
         </p>
         <div className="button-row">
           <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
-            <Download size={16} /> Import Lichess study
+            <Download size={16} /> Import
           </Button>
           <Button onClick={onAdd}><Plus size={16} /> Add line</Button>
         </div>
