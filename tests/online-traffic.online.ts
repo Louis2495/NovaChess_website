@@ -336,21 +336,25 @@ test('game invitations can be accepted from another page',async({page})=>{
 });
 
 test('Friends loads beyond fifty people without pagination controls',async({page})=>{
- await connected(page);const friends=Array.from({length:51},(_,i)=>({id:`00000000-0000-4000-8000-${String(i+100).padStart(12,'0')}`,screen_name:`Friend ${i+1}`,rating:1200,relationship:'friends',online:false}));
+ await connected(page);const friends=Array.from({length:51},(_,i)=>({id:`00000000-0000-4000-8000-${String(i+100).padStart(12,'0')}`,screen_name:`Friend ${i+1}`,rating:1200,relationship:'friends',online:i<2}));
  await page.route('**/rest/v1/rpc/player_directory',async r=>{const body=r.request().postDataJSON();await r.fulfill({json:body.p_section==='requests'?[]:friends.slice(body.p_page*50,body.p_page*50+50)});});
  await page.goto('/#players');await expect(page.getByRole('heading',{name:'Friend 51',exact:true})).toBeVisible();await expect(page.locator('.players-pagination')).toHaveCount(0);
+ const online=page.getByRole('region',{name:'Online',exact:true}),offline=page.getByRole('region',{name:'Offline',exact:true});
+ await expect(online.locator('.player-card').getByRole('heading')).toHaveText(['Friend 1','Friend 2']);
+ await expect(offline.locator('.player-card')).toHaveCount(49);
+ await expect(offline.locator('.player-card').getByRole('heading').last()).toHaveText('Friend 51');
  await page.getByRole('button',{name:'Everyone',exact:true}).click();await page.getByLabel('Search players',{exact:true}).fill('Friend');await expect(page.locator('.players-pagination')).toBeVisible();
  await page.goto('/#play');await page.getByRole('button',{name:'Play a Friend',exact:true}).click();const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:/^Friend 51 /})).toBeVisible();await expect(dialog.getByRole('button',{name:'Previous',exact:true})).toHaveCount(0);await expect(dialog.getByRole('button',{name:'Next',exact:true})).toHaveCount(0);
 });
 
-test('Everyone waits for three search characters and hides results when cleared',async({page})=>{
+test('Everyone waits for two search characters and hides results when cleared',async({page})=>{
  await connected(page);const queries:any[]=[];
  await page.route('**/rest/v1/rpc/player_directory',async r=>{const body=r.request().postDataJSON();queries.push(body);await r.fulfill({json:body.p_section==='everyone'?[{id:peer,screen_name:'Friendly Knight',rating:1450,relationship:'none',online:true}]:[]});});
  await page.goto('/#players');await page.getByRole('button',{name:'Everyone',exact:true}).click();const search=page.getByLabel('Search players',{exact:true});
  await expect(page.locator('.players-results-heading')).toHaveCount(0);await expect(page.locator('.players-page')).not.toContainText('Type at least');
  await expect(page.locator('.players-page').getByRole('heading',{name:'Players',exact:true})).toHaveCount(0);await expect(page.getByText('Search players',{exact:true})).toHaveCount(0);
  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});const toggle=page.getByRole('group',{name:'Player sections',exact:true});await expect.poll(async()=>{const b=(await toggle.boundingBox())!;return Math.abs(b.x+b.width/2-width/2);}).toBeLessThan(1);const box=(await search.boundingBox())!;expect(Math.abs(box.x+box.width/2-width/2)).toBeLessThan(1);expect((await toggle.boundingBox())!.height).toBeGreaterThan(60);}
- await page.setViewportSize({width:1440,height:1000});await search.fill('  Kn  ');await page.waitForTimeout(350);expect(queries.filter(q=>q.p_section==='everyone')).toHaveLength(0);await expect(page.locator('.player-card')).toHaveCount(0);await expect(page.locator('.players-pagination')).toHaveCount(0);
- await search.fill('Kni');await expect(page.getByRole('heading',{name:'Friendly Knight',exact:true})).toBeVisible();expect(queries.some(q=>q.p_section==='everyone'&&q.p_query==='Kni')).toBe(true);
- await search.fill('Kn');await expect(page.locator('.player-card')).toHaveCount(0);await expect(page.locator('.players-pagination')).toHaveCount(0);await search.clear();await expect(page.locator('.players-results-heading')).toHaveCount(0);await expect(page.locator('.players-page')).not.toContainText('Type at least');
+ await page.setViewportSize({width:1440,height:1000});await search.fill('  K  ');await page.waitForTimeout(350);expect(queries.filter(q=>q.p_section==='everyone')).toHaveLength(0);await expect(page.locator('.player-card')).toHaveCount(0);await expect(page.locator('.players-pagination')).toHaveCount(0);
+ await search.fill('  Kn  ');await expect(page.getByRole('heading',{name:'Friendly Knight',exact:true})).toBeVisible();expect(queries.some(q=>q.p_section==='everyone'&&q.p_query==='Kn')).toBe(true);
+ await search.fill('K');await expect(page.locator('.player-card')).toHaveCount(0);await expect(page.locator('.players-pagination')).toHaveCount(0);await search.clear();await expect(page.locator('.players-results-heading')).toHaveCount(0);await expect(page.locator('.players-page')).not.toContainText('Type at least');
 });

@@ -167,6 +167,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180009_account_presence_counts.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180010_daily_puzzle_chat.sql','utf8').replace('alter publication supabase_realtime add table public.puzzle_messages;',''));
   await pg.exec(readFileSync('supabase/migrations/202611180011_players_friends.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180012_friend_activity.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -729,4 +730,40 @@ test('friend requests need acceptance and friend games are reserved and absent f
  assert.equal((await command(users[2],game,'join')).status,400);assert.equal((await command(users[1],game,'join')).status,200);
  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
  try{await assert.rejects(()=>pg.query("insert into friendships(sender,recipient) values($1,$2)",[users[1],users[2]]),/permission denied/);await pg.query('select friend_action($1,$2)',[users[0],'remove']);assert.deepEqual((await pg.query("select player_directory('','friends',0) as players")).rows[0].players,[]);}finally{await pg.exec('reset role');}
+});
+
+test("friends sort by presence, then game and request activity in either direction", async () => {
+  const [actor, opponent, inviter, offline] = users;
+  await pg.exec("delete from friendships; delete from friend_game_invites; delete from account_activity; delete from opponent_activity;");
+  await pg.query(
+    `insert into friendships(sender, recipient, status, created_at) values
+      ($1, $2, 'accepted', now() - interval '3 days'),
+      ($3, $1, 'accepted', now() - interval '2 days'),
+      ($1, $4, 'accepted', now() - interval '1 day')`,
+    users,
+  );
+  await pg.query("insert into account_activity(user_id) values ($1), ($2)", [opponent, inviter]);
+
+  async function directory() {
+    await pg.exec(`set role authenticated; set request.jwt.claim.sub='${actor}';`);
+    try {
+      const { rows } = await pg.query("select player_directory('', 'friends', 0) as players");
+      return rows[0].players.map(({ id, online }) => [id, online]);
+    } finally {
+      await pg.exec("reset role");
+    }
+  }
+
+  assert.deepEqual(await directory(), [[inviter, true], [opponent, true], [offline, false]]);
+  const created = await room();
+  const joined = await command(opponent, created, "join");
+  assert.equal(joined.status, 200);
+  assert.deepEqual(await directory(), [[inviter, true], [opponent, true], [offline, false]]);
+  const moved = await command(actor, joined.data, "move", { move: "e2e4" });
+  assert.equal(moved.status, 200);
+  assert.deepEqual(await directory(), [[opponent, true], [inviter, true], [offline, false]]);
+
+  const invitation = await call(inviter, { action: "create", mode: "standard", variant: "chess", friend: actor });
+  assert.equal(invitation.status, 200, JSON.stringify(invitation.data));
+  assert.deepEqual(await directory(), [[inviter, true], [opponent, true], [offline, false]]);
 });

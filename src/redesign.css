@@ -5309,7 +5309,9 @@ html { scrollbar-gutter:stable; }
 .players-page > .field { max-width:460px; margin-bottom:24px; }
 .player-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:16px; margin-bottom:24px; }
 .player-identity { display:flex; gap:12px; align-items:center; margin-bottom:18px; }
-.player-identity h3 { margin:0 0 5px; }
+.player-presence-group > h3 { margin:0 0 12px; }
+.player-presence-group > .caption { margin:0 0 24px; }
+.player-identity :is(h3,h4) { margin:0 0 5px; font-size:1.17em; }
 .player-identity p { margin:0; }
 .player-card .button-row { flex-wrap:wrap; }
 .players-pagination { align-items:center; margin-top:20px; }
