@@ -32,10 +32,11 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
         {[["online", "Online"], ["computer", "Computer"]].map(([id, label]) =>
           <button key={id} aria-pressed={opponent === id} onClick={() => setOpponent(id)}>{label}</button>)}
       </div>
-      {online && <div className="friend-settings-slot" ref={setFriendSettingsHost}/>}
+      {online && !variants && <div className="friend-settings-slot" ref={setFriendSettingsHost}/>}
     </div>}
 
 
+    {!playing && online && variants && <div className="friend-settings-slot" ref={setFriendSettingsHost}/>}
     {online ? <Community key={variants ? mode : "standard"}
       friendSettingsHost={friendSettingsHost}
       timeControlSeconds={+timeControl.split(":")[0]} incrementSeconds={+timeControl.split(":")[1]}

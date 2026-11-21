@@ -354,7 +354,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
         <>
           <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>{selectedDescription && <p className="caption">{selectedDescription}</p>}</Card>
           {children}
-          <OnlineAccount />
+          {children ? (online ? <Button className="secondary variant-sign-in" onClick={() => navigate("signin")}>Sign in to play online</Button> : <p className="caption variant-sign-in">Online play is unavailable.</p>) : <OnlineAccount />}
         </>
       ) : (
         <>

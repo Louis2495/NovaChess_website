@@ -4941,9 +4941,6 @@ html { scrollbar-gutter:stable; }
  .standard-play-hub.setup-active > .quick-online-play { min-height:calc(100dvh - 32px); margin:0; padding:0; border:0; background:none; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; }
  .standard-play-hub.setup-active .setup-launch { min-height:calc(100dvh - 32px); margin:0; display:flex; align-items:center; justify-content:center; }
  .standard-play-hub .quick-online-play .new-game-primary { margin:0; }
- .variants-hub > .quick-online-play { width:calc(100% - 235px); margin:0 0 16px; padding:0; border:0; background:none; box-shadow:none; }
- .variants-hub > .quick-online-play .new-game-primary { margin-top:0; }
- .variants-hub > .game-setup-page .setup-launch { margin-top:0; padding-top:0; }
 }
 .puzzle-layout .puzzle-actions-right .hint-button { background:#ffd21c; color:#382800; border-color:#ffdf52; }
 .puzzle-layout .puzzle-actions-right > .btn:not(.hint-button) { background:#7428df; color:#fff; border-color:#a36aff; }
@@ -5046,15 +5043,13 @@ html { scrollbar-gutter:stable; }
  .analysis-layout .engine-line table { font-size:.65rem; }
 }
 
-/* A centered queue introduction with balanced space around the gallery. */
+/* Keep the description centered under the online launch button. */
 .variants-hub > .quick-online-play { text-align:center; }
-.variants-hub .online-variant-gallery { margin-bottom:24px; }
 .puzzle-layout .side-panels > .card:has(.puzzle-rating) { background:#c64b13; color:#fff; border-color:#ff975c; }
 .puzzle-layout .side-panels > .card:has(.theme-select) .field { margin-top:0; }
 .puzzle-layout .side-panels > .card:has(.theme-select) .field > span { font-size:1rem; font-weight:700; }
 @media(min-width:1001px) {
  .workspace:has(.variants-hub) { padding-block:24px; }
- .variants-hub > .quick-online-play { width:min(560px,calc(100% - 440px)); max-width:none; margin:0 auto 16px; }
 }
 
 /* Research keeps its search tools beside the board, not above it. */
@@ -5133,7 +5128,6 @@ html { scrollbar-gutter:stable; }
 }
 .standard-play-hub > .play-hub-heading .play-opponent-toggle { margin-inline:auto; }
 
-.variants-hub > .quick-online-play:has(+ .online-variant-gallery) { margin-bottom:32px; }
 @media(min-width:1001px) {
  .workspace .puzzle-layout { grid-template-columns:minmax(0,var(--puzzle-panel-width,150px)) minmax(0,var(--puzzle-board-width,var(--board-max))) minmax(0,var(--puzzle-panel-width,150px)); padding-right:0; }
  .puzzle-layout > .board-column { grid-column:2; }
@@ -5398,38 +5392,87 @@ html { scrollbar-gutter:stable; }
 .board-square.light.selected:after { background:#e5b62f70; }
 .selected-friend-opponent { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--text); text-align:center; }
 
-.variants-hub.setup-active {
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  align-items:start;
-  gap:12px 18px;
+.workspace-shell:has(.variants-hub.setup-active) {
+  height:100dvh;
+}
+.workspace-shell:has(.variants-hub.setup-active) > .workspace {
+  display:block; min-height:0; max-width:none; box-sizing:border-box;
+  padding:clamp(8px,2dvh,18px) clamp(18px,5vw,84px);
+}
+.workspace:has(.variants-hub.setup-active) > div:first-child,
+.workspace:has(.variants-hub.setup-active) > div:first-child > div {
+  height:100%;
+}
+.workspace:has(.variants-hub.setup-active) .variants-hub.setup-active {
+  display:flex; flex-direction:column; align-items:center; gap:clamp(4px,1dvh,10px);
+  width:100%; height:100%; min-height:0;
 }
 .variants-hub.setup-active > .play-hub-heading {
-  grid-column:2; grid-row:1; flex-direction:column; align-items:flex-end; gap:8px; margin:0;
+  position:absolute; inset-block-start:0; inset-inline-end:0; z-index:3; margin:0;
 }
 .variants-hub.setup-active > .game-setup-page { display:contents; }
-.variants-hub.setup-active > :not(.play-hub-heading,.quick-online-play),
-.variants-hub.setup-active > .game-setup-page > :not(.setup-launch) { grid-column:1 / -1; min-width:0; }
 .variants-hub.setup-active > .quick-online-play,
 .variants-hub.setup-active .setup-launch {
-  grid-column:1; grid-row:1; width:min(100%,560px); max-width:none; margin:0;
+  flex:none; order:-2; width:min(38%,440px); max-width:none; margin:0;
   padding:0; border:0; background:none; box-shadow:none;
 }
 .variants-hub.setup-active .setup-launch .play-feature-copy { padding:0; }
 .variants-hub.setup-active :is(.quick-online-play,.setup-launch) .new-game-primary {
-  width:100%; max-width:none; margin:0;
+  width:100%; max-width:none; min-height:clamp(34px,6dvh,58px); margin:0;
+  padding:6px; font-size:clamp(.9rem,2.5dvh,1.45rem); letter-spacing:normal;
 }
 .variants-hub.setup-active > .quick-online-play:has(+ .online-variant-gallery) {
-  min-block-size:184px; display:flex; flex-direction:column; justify-content:flex-start; gap:8px;
+  display:flex; flex-direction:column; justify-content:flex-start; gap:4px;
 }
-.variants-hub > .quick-online-play > :is(.field,.caption) { margin:0; }
-@media(max-width:600px) {
-  .variants-hub.setup-active { column-gap:8px; }
-  .variants-hub .play-opponent-toggle button { padding-inline:8px; }
-  .variants-hub .friend-settings-slot { width:145px; }
-  .variants-hub.setup-active > .quick-online-play:has(+ .online-variant-gallery) { min-block-size:212px; }
-  .variants-hub.setup-active :is(.quick-online-play,.setup-launch) .new-game-primary {
-    min-height:56px; font-size:clamp(.95rem,3.6vw,1.2rem); padding:8px;
+.variants-hub.setup-active > .quick-online-play > :is(.field,.caption) { margin:0; }
+.variants-hub.setup-active > .quick-online-play > .caption { font-size:clamp(.68rem,1.6dvh,.87rem); }
+.variants-hub.setup-active > .friend-settings-slot { flex:none; order:-1; width:min(100%,220px); }
+.variants-hub.setup-active > .variant-sign-in { flex:none; order:-1; margin:0; }
+.variants-hub.setup-active .variant-gallery {
+  flex:1 1 0; min-height:0; width:min(100%,960px); margin:0;
+  grid-template-columns:repeat(7,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr);
+  gap:clamp(4px,.8dvh,9px);
+}
+.variants-hub.setup-active .computer-variant-gallery {
+  grid-template-columns:repeat(6,minmax(0,1fr));
+}
+.variants-hub.setup-active .variant-gallery button {
+  container-type:size; justify-content:center; min-height:0; min-width:0;
+  padding:3px; gap:3px; line-height:1.1; text-align:center;
+  border-radius:clamp(6px,1.4dvh,14px); font-size:clamp(.63rem,1.65dvh,.85rem);
+  overflow-wrap:anywhere;
+}
+.variants-hub.setup-active .variant-gallery :is(.variant-picture,.multiplayer-picture,.speedrun-picture) {
+  width:min(100cqw,max(0px,calc(100cqh - 2.3em - 3px)),104px);
+  height:auto; aspect-ratio:1;
+}
+.variants-hub.setup-active :is(.speedrun-setup,.game-settings-card) {
+  flex:none; width:min(100%,440px); max-height:34dvh; overflow:auto; margin:0;
+  padding:0 12px; text-align:center;
+}
+.variants-hub.setup-active .speedrun-setup > .caption { margin:4px 0; }
+.variants-hub.setup-active .speedrun-setup > .field { margin:4px 0; }
+.variants-hub.setup-active .game-settings-card > .options-toggle { padding:6px 0; }
+.variants-hub.setup-active .resume-game-button { margin-top:4px; padding:4px 8px; }
+@media(max-width:760px) {
+  .workspace-shell:has(.variants-hub.setup-active) > .workspace {
+    padding-bottom:calc(72px + env(safe-area-inset-bottom));
+  }
+  .variants-hub.setup-active :is(.variant-gallery,.computer-variant-gallery) {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+@media(max-width:1000px) {
+  .variants-hub.setup-active > .play-hub-heading {
+    position:static; order:-3; align-self:flex-end;
+  }
+  .variants-hub.setup-active > .play-hub-heading .play-opponent-toggle button { padding:6px 10px; }
+  .variants-hub.setup-active > .quick-online-play,
+  .variants-hub.setup-active .setup-launch { width:min(75%,440px); }
+}
+@media(max-height:480px) {
+  .variants-hub.setup-active :is(.variant-gallery,.computer-variant-gallery) {
+    grid-template-columns:repeat(7,minmax(0,1fr));
   }
 }
 
@@ -5439,12 +5482,6 @@ html { scrollbar-gutter:stable; }
 .friend-selection-field { position:relative; }
 .friend-selection-field input { width:100%; box-sizing:border-box; padding:12px 38px 12px 14px; border:2px solid #43df78; border-radius:10px; background:#153e29; color:#75f59d; font-weight:700; }
 .friend-selection-field button { position:absolute; right:9px; top:50%; transform:translateY(-50%); display:grid; place-items:center; width:22px; height:22px; padding:0; border:0; border-radius:5px; background:#f04452; color:white; cursor:pointer; }
-@media(min-width:1001px) {
- .variants-hub .online-variant-gallery { width:90%; margin-inline:auto; }
-}
-@media(max-width:1000px) {
- .variants-hub .online-variant-gallery { width:94%; margin-inline:auto; }
-}
 
 /* Keep the research resize rail outside the board's requested width. */
 .research-board-with-eval { min-width:0; width:100%; }

@@ -26,18 +26,40 @@ test('time control labels use compact chess notation and main boards stay inside
   expect(rect.x).toBeGreaterThanOrEqual(0);expect(rect.x+rect.width).toBeLessThanOrEqual(viewport.width);expect(rect.y+rect.height).toBeLessThanOrEqual(viewport.height);
  }
 });
-test('desktop variants form three rows and their launch action precedes the gallery',async({page,isMobile})=>{
- await page.goto('/#variants');const gallery=page.getByRole('group',{name:'Online variants',exact:true});await expect(gallery.getByRole('button')).toHaveCount(21);
- const action=(await page.getByRole('button',{name:'Join queue',exact:true}).boundingBox())!,box=(await gallery.boundingBox())!;expect(action.y+action.height).toBeLessThan(box.y);
+test('Variants centers its setup and fits all cards without page scrolling',async({page,isMobile})=>{
+ await page.setViewportSize(isMobile ? {width:390,height:664} : {width:1280,height:720});
+ await page.goto('/#variants');
+ const workspace=page.locator('#workspace');
  const toggle=page.getByRole('group',{name:'Opponent',exact:true});
- expect(Math.abs(action.y-(await toggle.boundingBox())!.y)).toBeLessThan(1);
- const rows=await gallery.getByRole('button').evaluateAll(es=>es.map(e=>Math.round(e.getBoundingClientRect().y)));
- if(!isMobile){expect(new Set(rows).size).toBe(3);for(const y of new Set(rows))expect(rows.filter(r=>r===y)).toHaveLength(7);}
- else expect(new Set(rows).size).toBeGreaterThan(3);
+ async function check(galleryName:string,launchName:string){
+  const gallery=page.getByRole('group',{name:galleryName,exact:true});
+  const launch=page.getByRole('button',{name:launchName,exact:true});
+  await expect(gallery.getByRole('button').last()).toBeInViewport({ratio:1});
+  await expect(launch).toBeVisible();
+  const [frame,cards,action,toggleBox]=(await Promise.all([workspace.boundingBox(),gallery.boundingBox(),launch.boundingBox(),toggle.boundingBox()])).map(box=>box!);
+  const center=frame.x+frame.width/2;
+  expect(Math.abs(cards.x+cards.width/2-center)).toBeLessThan(1);
+  expect(Math.abs(action.x+action.width/2-center)).toBeLessThan(1);
+  expect(cards.x-frame.x).toBeGreaterThan(10);
+  expect(toggleBox.x).toBeGreaterThan(center);
+  expect(action.y+action.height).toBeLessThan(cards.y);
+  if(page.viewportSize()!.width>1000)expect(Math.abs(action.y-toggleBox.y)).toBeLessThan(1);
+  expect(await page.evaluate(()=>document.documentElement.scrollHeight-window.innerHeight)).toBeLessThanOrEqual(1);
+  if(isMobile) expect(cards.y+cards.height).toBeLessThan((await page.locator('.mobile-tabs').boundingBox())!.y);
+ }
+ await expect(page.getByRole('group',{name:'Online variants',exact:true}).getByRole('button')).toHaveCount(21);
+ await check('Online variants','Join queue');
  await toggle.getByRole('button',{name:'Computer',exact:true}).click();
- const start=page.getByRole('button',{name:'Start game',exact:true});
- await expect(start).toBeVisible();
- expect(Math.abs((await start.boundingBox())!.y-(await toggle.boundingBox())!.y)).toBeLessThan(1);
+ await check('Choose variant','Start game');
+ await page.getByRole('button',{name:'Speedrun',exact:true}).click();
+ await expect(page.getByRole('spinbutton',{name:'Computer Elo'})).toBeInViewport({ratio:1});
+ await check('Choose variant','Start game');
+ await page.getByRole('button',{name:'Game options',exact:true}).click();
+ await check('Choose variant','Start game');
+ if(!isMobile){
+  await page.setViewportSize({width:900,height:620});
+  await check('Choose variant','Start game');
+ }
 });
 test('research fields keep a common baseline even with an injected autofill badge',async({page})=>{
  await page.setViewportSize({width:1440,height:900});await page.goto('/#research');await page.getByLabel('Public username').waitFor();
