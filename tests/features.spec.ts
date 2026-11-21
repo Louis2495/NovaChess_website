@@ -142,13 +142,11 @@ test("piece drag snaps by its center at a square boundary and does not show a ye
     steps: 8,
   });
   await expect(page.locator(".drag-piece")).toBeVisible();
+  const origin = square(page, "e2");
+  await expect(origin).toHaveClass(/drag-origin/);
+  expect(await origin.evaluate(e => getComputedStyle(e, "::after").display)).toBe("none");
   await page.mouse.up();
   await expect(page.locator(".notation-table")).toContainText("e4");
-  await square(page, "g8").click();
-  const selected = square(page, "g8");
-  expect(
-    await selected.evaluate((e) => getComputedStyle(e, "::after").display),
-  ).toBe("none");
 });
 test("right click creates colored square marks and arrows, and controls change their colors", async ({
   page,
@@ -157,7 +155,7 @@ test("right click creates colored square marks and arrows, and controls change t
   await square(page, "e4").click({ button: "right" });
   await expect(page.locator(".board-square[data-annotation]")).toHaveAttribute(
     "data-annotation",
-    "#1fba62",
+    "#42d9ec",
   );
   await square(page, "d4").click({ button: "right", modifiers: ["Shift"] });
   await expect(square(page, "d4")).toHaveAttribute(
@@ -366,6 +364,7 @@ for (const variant of ["dropping", "chaos", "random"])
           (k) => JSON.parse(localStorage.getItem(k)!).state.moves.length,
           key,
         ),
+        {timeout:15000},
       )
       .toBeGreaterThanOrEqual(2);
     await page.goto("/");

@@ -38,7 +38,9 @@ These secrets let the setup workflow deploy your project. Backend changes on `ma
 1. In repository **Settings → Pages**, keep **Source: GitHub Actions**.
 2. Open [Actions → Set up multiplayer](https://github.com/Louis2495/NovaChess_website/actions/workflows/deploy-backend.yml).
 3. Click **Run workflow**, select `main`, and run it.
-4. Wait for both jobs to turn green.
+4. Wait for the backend and website jobs to turn green.
+
+To apply the NovaChess account email templates, select **Apply the NovaChess account email templates** when running the workflow manually. This uses the Supabase Management API and requires a token authorized to update Auth configuration. Routine deployments preserve the project’s existing email templates.
 
 It validates configuration, runs backend tests, applies migrations, deploys the `chess` Edge Function, checks that unsigned game actions are rejected, and rebuilds the GitHub Pages website with your public configuration. It also schedules one-minute Vote Chess finalization, daily 30-day chat cleanup, and old-vote cleanup. No browser needs to stay open for Vote Chess to advance.
 

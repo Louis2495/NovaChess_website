@@ -6,5 +6,5 @@ test('Variants exposes online modes without room creation before sign-in',async(
  await modes.getByRole('button',{name:'Throne',exact:true}).click();await expect(page.getByRole('button',{name:'Join queue',exact:true})).toBeDisabled();
  await modes.getByRole('button',{name:'Vote Chess',exact:true}).click();await expect(page.getByRole('button',{name:'Join Vote Chess',exact:true})).toBeDisabled();
  await modes.getByRole('button',{name:'Team Chess',exact:true}).click();await expect(page.getByRole('button',{name:'Start Team Chess',exact:true})).toBeDisabled();
- await expect(page.getByLabel('Room name',{exact:true})).toHaveCount(0);await expect(page.getByText('Not connected yet.',{exact:true})).toBeVisible();
+ await expect(page.getByLabel('Room name',{exact:true})).toHaveCount(0);await expect(page.getByText('Online play is unavailable.',{exact:true})).toBeVisible();
 });

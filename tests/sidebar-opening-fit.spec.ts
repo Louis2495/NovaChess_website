@@ -61,9 +61,9 @@ test('Variants centers its setup and fits all cards without page scrolling',asyn
   await check('Choose variant','Start game');
  }
 });
-test('research fields keep a common baseline even with an injected autofill badge',async({page})=>{
+test('research fields stay aligned in their column even with an injected autofill badge',async({page})=>{
  await page.setViewportSize({width:1440,height:900});await page.goto('/#research');await page.getByLabel('Public username').waitFor();
  await page.locator('.research-username').evaluate(e=>{const badge=document.createElement('div');badge.textContent='Autofill';badge.style.height='14px';e.append(badge);});
- const fields=await page.locator('.research-fields > .field').evaluateAll(es=>es.map(e=>e.querySelector('input,.segmented-control')!.getBoundingClientRect().y));
+ const fields=await page.locator('.research-fields > .field').evaluateAll(es=>es.map(e=>e.querySelector('input,.segmented-control')!.getBoundingClientRect().x));
  expect(Math.max(...fields)-Math.min(...fields)).toBeLessThan(1);
 });

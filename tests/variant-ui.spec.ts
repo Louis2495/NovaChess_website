@@ -25,10 +25,11 @@ test("Variants has distinct artwork and keeps Standard in Play", async ({
   expect(Math.abs(first.y-second.y)).toBeLessThan(1);
   expect(Math.abs(first.width-second.width)).toBeLessThan(1);
   const tiles = page.locator(".variant-gallery .variant-picture");
-  const positions = await tiles.evaluateAll((es) =>
-    es.map((e) => getComputedStyle(e).backgroundPosition),
-  );
-  expect(new Set(positions).size).toBe(17);
+  const images = await tiles.evaluateAll(elements => elements.map(element => {
+    const style = getComputedStyle(element);
+    return style.backgroundImage + " " + style.backgroundPosition;
+  }));
+  expect(new Set(images).size).toBe(17);
   await expect(tiles.first()).toHaveCSS(
     "background-image",
     /illustrations\.webp/,

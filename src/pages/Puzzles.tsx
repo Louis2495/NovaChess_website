@@ -262,8 +262,8 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     () => [...new Set(puzzles.flatMap((p) => p.themes))].sort(),
     [puzzles],
   );
-  const actions = (
-<div className="puzzle-actions-right">
+  const actions = (layout = "") => (
+<div className={`puzzle-actions-right ${layout}`}>
             {!done && <Button
               className="hint-button" aria-label="Hint" title="Hint"
               disabled={done || reviewing || c.turn() !== learner}
@@ -357,7 +357,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
             clear={premove.clear}
           />
-          {daily && actions}
+          {daily ? actions() : actions("puzzle-actions-mobile")}
           <div className="puzzle-feedback" role="status">
             {reviewing ? reviewMistake && "Try another move." : message}
           </div>
@@ -394,7 +394,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
               </div>
             </Card>
           )}
-          {actions}
+          {actions("puzzle-actions-desktop")}
           </>}
         </div>
       </div>

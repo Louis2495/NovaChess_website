@@ -38,7 +38,6 @@ test("analysis keeps all four tools visible in one menu", async ({
 });
 test("Research source/color toggles align with username and NovaChess explores real local games", async ({
   page,
-  isMobile,
 }) => {
   const c = new Chess(),
     initial = c.fen();
@@ -78,12 +77,11 @@ test("Research source/color toggles align with username and NovaChess explores r
   await expect(page.getByLabel("Public username")).toHaveValue("Tester");
   const userBox = (await page.getByLabel("Public username").boundingBox())!,
     colorBox = (await color.boundingBox())!;
-  expect(Math.abs(userBox.y - colorBox.y)).toBeLessThan(1);
-  expect(colorBox.x).toBeGreaterThan(userBox.x);
-  if (!isMobile)
-    expect(Math.abs((await source.boundingBox())!.y - userBox.y)).toBeLessThan(
-      1,
-    );
+  const sourceBox = (await source.boundingBox())!;
+  expect(Math.abs(userBox.x - colorBox.x)).toBeLessThan(1);
+  expect(Math.abs(userBox.x - sourceBox.x)).toBeLessThan(1);
+  expect(sourceBox.y + sourceBox.height).toBeLessThan(userBox.y);
+  expect(userBox.y + userBox.height).toBeLessThan(colorBox.y);
   await page.getByRole("button", { name: "Load games", exact: true }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "1 games loaded" }),

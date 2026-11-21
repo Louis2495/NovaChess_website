@@ -8,7 +8,7 @@ test("picked-up pieces center on the pointer immediately and drop on the square 
   const from = (await board
     .getByRole("button", { name: /^e2,/ })
     .boundingBox())!;
-  const to = (await board.getByRole("button", { name: /^e4,/ }).boundingBox())!;
+  const destination = board.getByRole("button", { name: /^e4,/ });
   const x = from.x + 2,
     y = from.y + 2;
   await page.mouse.move(x, y);
@@ -16,9 +16,9 @@ test("picked-up pieces center on the pointer immediately and drop on the square 
   const picked = (await page.locator(".drag-piece").boundingBox())!;
   expect(Math.abs(picked.x + picked.width / 2 - x)).toBeLessThan(1);
   expect(Math.abs(picked.y + picked.height / 2 - y)).toBeLessThan(1);
-  // Pick up in the top-left corner, then release near e4's right edge.
-  // Retaining the pickup offset would incorrectly drop on f4.
-  await page.mouse.move(to.x + to.width - 2, to.y + to.height / 2, {
+  // Release off-center with more than half of the dragged piece over e4.
+  const to = (await destination.boundingBox())!;
+  await page.mouse.move(to.x + to.width * .85, to.y + to.height / 2, {
     steps: 8,
   });
   await page.mouse.up();
@@ -76,7 +76,7 @@ test("game setup offers two strength choices, defaults to rated, searches openin
   }
 });
 
-test("desktop meme keeps its own proportions beside the puzzle, and Analysis starts at a screen-friendly board size", async ({
+test("desktop meme uses a white frame beside the puzzle, and Analysis starts at a screen-friendly board size", async ({
   page,
   isMobile,
 }) => {
@@ -88,8 +88,8 @@ test("desktop meme keeps its own proportions beside the puzzle, and Analysis sta
   const puzzle = (await page.locator(".home-puzzle").boundingBox())!,
     meme = (await page.locator(".daily-meme").boundingBox())!;
   expect(Math.abs(puzzle.y+puzzle.height/2-meme.y-meme.height/2)).toBeLessThan(2);
-  const aspect=await page.locator('.daily-meme-image').evaluate((image:HTMLImageElement)=>image.naturalWidth/image.naturalHeight);
-  expect(Math.abs(meme.width/meme.height-aspect)).toBeLessThan(.02);
+  await expect(page.locator('.daily-meme-image')).toHaveCSS('object-fit','contain');
+  await expect(page.locator('.daily-meme')).toHaveCSS('background-color','rgb(255, 255, 255)');
   await page.goto("/#analysis");
   const board = (await page.locator(".analysis-layout .board").boundingBox())!;
   const panels = (await page

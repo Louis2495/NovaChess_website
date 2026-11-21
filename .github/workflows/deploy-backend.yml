@@ -1,6 +1,11 @@
 name: Set up multiplayer
 on:
   workflow_dispatch:
+    inputs:
+      configure_email_templates:
+        description: Apply the NovaChess account email templates
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -9,7 +14,6 @@ on:
       - 'src/lib/variantCatalog.ts'
       - 'src/lib/specialRules.ts'
       - 'scripts/prepare-assets.mjs'
-      - 'scripts/configure-auth-recovery.mjs'
       - '.github/workflows/deploy-backend.yml'
 permissions:
   contents: read
@@ -48,8 +52,6 @@ jobs:
           supabase db push --linked --yes
       - name: Deploy game validation
         run: supabase functions deploy chess --project-ref "$SUPABASE_PROJECT_REF" --use-docker --no-verify-jwt --yes
-      - name: Configure account email templates
-        run: node scripts/configure-auth-recovery.mjs
       - name: Verify deployed services
         run: node scripts/check-online-backend.mjs
       - name: Deployment summary
@@ -61,3 +63,15 @@ jobs:
       pages: write
       id-token: write
     uses: ./.github/workflows/deploy.yml
+  email-templates:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.configure_email_templates
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/configure-auth-recovery.mjs

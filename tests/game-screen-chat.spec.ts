@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-test("games maximize the board, omit typing/pause/game settings, use profile images and put actions above narrow notation", async ({
+test("games maximize the board, omit typing/pause/game settings, show player names and put actions above narrow notation", async ({
   page,
   isMobile,
 }) => {
@@ -27,8 +27,8 @@ test("games maximize the board, omit typing/pause/game settings, use profile ima
     ).toBeLessThanOrEqual(220);
   }
   await expect(
-    page.locator(".play-match .player-strip .avatar img"),
-  ).toHaveCount(1);
+    page.locator(".play-match .board-player-label b"),
+  ).toHaveText(["Computer", "You"]);
   const actions = (await page
       .locator(".match-sidebar .game-actions")
       .boundingBox())!,

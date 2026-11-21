@@ -14,11 +14,16 @@ test('account boxes align, Customize is a profile section, and uploaded move sou
  await page.getByRole('button',{name:'Use default move sound',exact:true}).click();await expect(page.getByRole('button',{name:'Preview move sound',exact:true})).toHaveCount(0);
  await page.getByRole('button',{name:'Customize',exact:true}).click();await expect(page.getByRole('region',{name:'Appearance',exact:true})).toBeVisible();await expect(page.getByRole('dialog',{name:'Appearance'})).toHaveCount(0);await page.getByRole('tab',{name:'Layout',exact:true}).click();await page.getByLabel('Font',{exact:true}).selectOption('Manrope');await page.reload();await expect(page.locator('.app')).toHaveCSS('font-family',/Manrope/);await page.getByRole('button',{name:'Account',exact:true}).click();await expect(page.locator('.profile-editor')).toBeVisible();
 });
-test('Research controls share a baseline and chat opens from the sidebar',async({page,isMobile})=>{
+test('Research controls stack in the search panel and chat opens from the sidebar',async({page,isMobile})=>{
  await page.goto('/#research');
- const user=(await page.getByLabel('Public username').boundingBox())!,color=(await page.getByRole('group',{name:'Player’s color',exact:true}).boundingBox())!;
- expect(Math.abs(user.y-color.y)).toBeLessThan(1);expect(Math.abs(user.height-color.height)).toBeLessThan(1);
- if(!isMobile){const source=(await page.getByRole('group',{name:'Source',exact:true}).boundingBox())!;expect(Math.abs(user.y-source.y)).toBeLessThan(1);}
+ const user=(await page.getByLabel('Public username').boundingBox())!;
+ const color=(await page.getByRole('group',{name:'Player’s color',exact:true}).boundingBox())!;
+ const source=(await page.getByRole('group',{name:'Source',exact:true}).boundingBox())!;
+ expect(Math.abs(user.x-color.x)).toBeLessThan(1);
+ expect(Math.abs(user.x-source.x)).toBeLessThan(1);
+ expect(Math.abs(user.height-color.height)).toBeLessThan(1);
+ expect(source.y+source.height).toBeLessThan(user.y);
+ expect(user.y+user.height).toBeLessThan(color.y);
  await expect(page.locator('.chat-launcher')).toHaveCount(0);if(isMobile)await page.getByRole('button',{name:'Open navigation',exact:true}).click();
  const chat=page.getByRole('navigation',{name:'Main navigation',exact:true}).getByRole('button',{name:'Open global chat',exact:true});await chat.click();await expect(page.getByRole('complementary',{name:'Global chat',exact:true})).toBeVisible();
 });

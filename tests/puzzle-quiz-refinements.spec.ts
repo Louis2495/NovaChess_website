@@ -56,7 +56,7 @@ test("puzzles hide turn/status text and move history until the first answer, wit
   await expect(page.locator(".puzzle-moves")).toContainText(answer.san);
 });
 
-test("black-to-move positions open correctly in Analysis, Guess the Eval and saved game previews", async ({
+test("black-to-move positions face the mover in Analysis and Guess the Eval, and the player in Library", async ({
   page,
 }) => {
   const c = new Chess();
@@ -98,5 +98,5 @@ test("black-to-move positions open correctly in Analysis, Guess the Eval and sav
   );
   await page.goto("/#library");
   await page.reload();
-  await expect(squares(page).last()).toHaveAttribute("aria-label", /^a8,/);
+  await expect(squares(page).last()).toHaveAttribute("aria-label", /^h1,/);
 });

@@ -5772,3 +5772,15 @@ html { scrollbar-gutter:stable; }
 .signup-upload-row label { position:relative; display:inline-flex; align-items:center; gap:7px; padding:8px 0; cursor:pointer; }
 .signup-upload-row label:focus-within { outline:2px solid var(--accent); }
 .signup-upload-row input { position:absolute; inset:0; opacity:0; width:100%; cursor:pointer; }
+
+
+.puzzle-layout .puzzle-actions-mobile { display:none; }
+@media(max-width:760px) {
+  .puzzle-layout .puzzle-actions-desktop { display:none; }
+  .puzzle-layout .puzzle-actions-mobile {
+    display:flex; flex-direction:row; justify-content:center; margin-top:8px;
+  }
+}
+@media(min-width:1001px) {
+  .workspace:has(.analysis-layout) { justify-content:flex-start; }
+}

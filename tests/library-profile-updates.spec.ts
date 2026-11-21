@@ -109,7 +109,7 @@ test("profile photo is inside the cover with a small accessible upload icon and 
     .first()
     .locator("button")
     .allTextContents();
-  expect(tabs.slice(-3)).toEqual(["Stats", "Library", "Chat"]);
+  expect(tabs.slice(-3)).toEqual(["Stats", "Players", "Chat"]);
 });
 test("analysis keeps the same engine searching beyond the old time budget and cancels it when leaving", async ({
   page,
@@ -136,7 +136,7 @@ test("analysis keeps the same engine searching beyond the old time budget and ca
     .poll(
       async () =>
         Number(
-          (await page.locator(".page-title p").innerText()).match(
+          (await page.locator(".analysis-engine-label").innerText()).match(
             /Depth (\d+)/,
           )?.[1],
         ),
