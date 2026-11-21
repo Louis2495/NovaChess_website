@@ -5466,17 +5466,19 @@ html { scrollbar-gutter:stable; }
 .home-page .home-practice-grid .daily-meme { height:var(--home-preview-height,360px); width:100%; box-sizing:border-box; border:8px solid #fff; border-radius:12px; overflow:hidden; background:#fff; }
 .home-page .home-practice-grid .daily-meme .daily-meme-image { width:100%; height:100%; max-width:none; max-height:none; outline:0; border-radius:0; object-fit:contain; background-color:#fff; }
 .home-page > .home-recent { container-type:inline-size; box-sizing:border-box; display:flex; flex-direction:column; min-height:0; }
-.home-recent .home-section-heading h2 { font-size:1.8rem; line-height:1.1; }
-.home-recent .home-section-heading .text-link { font-size:1.23rem; }
-.home-recent-empty { margin:0; font-size:1.575rem; }
+.home-recent .home-section-heading h2 { font-size:1.6rem; line-height:1.1; }
+.home-recent .home-section-heading .text-link { font-size:1.08rem; }
+.home-recent-empty { margin:0; font-size:1.35rem; }
 .home-recent-list { flex:1; min-height:0; overflow:auto; padding:0 2px; }
 .home-recent .recent-game-entry { background:color-mix(in srgb,var(--recent-color) 9%,var(--panel)); border-color:var(--recent-color); }
 .home-recent .recent-game-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); color:var(--text); align-items:center; }
 .recent-players { display:flex; flex-direction:column; gap:10px; min-width:0; }
 .recent-player { display:flex; align-items:center; gap:8px; min-width:0; }
-.recent-player b { flex:1; min-width:0; overflow-wrap:anywhere; text-align:left; }
+.recent-player b { display:flex; align-items:baseline; gap:.25em; flex:1; min-width:0; white-space:nowrap; text-align:left; }
+.recent-player-name,.recent-game-details > :is(span,time) { min-width:0; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.recent-player b > span:last-child { flex:none; }
 .recent-player .recent-color-chip { width:10px; height:10px; flex:none; }
-.recent-player-score { font-weight:800; font-size:1.68rem; line-height:1; }
+.recent-player-score { font-weight:800; font-size:1.45rem; line-height:1; }
 .recent-player-score.score-win { color:#39ed83; }
 .recent-player-score.score-loss { color:#ff5364; }
 .recent-player-score.score-draw { color:#c9ced6; }
@@ -5582,8 +5584,8 @@ html { scrollbar-gutter:stable; }
 .home-page .home-recent .home-recent-list .recent-game-row { flex:1 0 auto; padding:6px 8px; gap:8px; }
 .home-recent .recent-players { gap:6px; }
 .home-recent .recent-player { gap:5px; }
-.home-recent .recent-player b { font-size:1.32rem; line-height:1.2; }
-.home-recent .recent-game-details { gap:3px; font-size:1.17rem; line-height:1.2; }
+.home-recent .recent-player b { font-size:1.1rem; line-height:1.2; }
+.home-recent .recent-game-details { gap:3px; font-size:.98rem; line-height:1.2; }
 .home-recent .recent-game-scrubber { flex:none; height:20px; padding:0 10px 4px; }
 .home-recent .recent-game-scrubber input { height:16px; }
 .home-recent-list { gap:6px; }
@@ -5591,7 +5593,7 @@ html { scrollbar-gutter:stable; }
 .home-recent .recent-game-scrubber { height:18px; padding-bottom:2px; }
 .home-recent .home-section-heading { flex-wrap:wrap; gap:8px 15px; }
 .home-recent .recent-game-row { white-space:normal; }
-@container (max-width:420px) {
+@container (max-width:520px) {
  .home-recent .recent-game-row { grid-template-columns:minmax(0,1fr) var(--recent-art-size); }
  .home-recent .recent-game-details {
   grid-column:1 / -1; flex-direction:row; flex-wrap:wrap; gap:4px 12px; text-align:left;
