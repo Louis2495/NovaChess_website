@@ -66,7 +66,8 @@ test('Home completion uses a yellow outline and recent games show stacked player
  for(const entry of await entries.all()){const players=entry.locator('.recent-player');await expect(players.first()).toContainText('Opponent name (1567)');await expect(players.last()).toContainText('My name (1234)');expect((await players.first().boundingBox())!.y).toBeLessThan((await players.last().boundingBox())!.y);const date=entry.locator('time span').first(),time=entry.locator('time span').last();await expect(date).toContainText('2026');await expect(time).toHaveText(/\d.*:\d\d/);expect((await time.boundingBox())!.y).toBeGreaterThan((await date.boundingBox())!.y);await expect(entry.locator('.game-result-label')).toHaveCount(0);}
  const player = entries.first().locator('.recent-player').first();
  const nameSize = await player.locator('.recent-player-name').evaluate(el => getComputedStyle(el).fontSize);
- await expect(player.locator('.recent-player-score')).toHaveCSS('font-size', nameSize);
+ const scoreSize = await player.locator('.recent-player-score').evaluate(el => getComputedStyle(el).fontSize);
+ expect(parseFloat(scoreSize)).toBeCloseTo(parseFloat(nameSize) * .85, 1);
  await expect(entries.first().locator('.recent-player-score').first()).toHaveText('1');await expect(entries.first().locator('.recent-player-score').first()).toHaveCSS('color','rgb(57, 237, 131)');await expect(entries.first().locator('.recent-player-score').last()).toHaveCSS('color','rgb(255, 83, 100)');await expect(entries.last().locator('.recent-player-score').first()).toHaveText('½');
  await expect(page.locator('.home-recent-list')).toHaveCSS('scrollbar-color','rgb(255, 255, 255) rgba(0, 0, 0, 0)');
  await expect(entries.first()).toHaveCSS('margin-bottom','0px');

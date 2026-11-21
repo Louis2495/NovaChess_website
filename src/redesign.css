@@ -5479,7 +5479,7 @@ html { scrollbar-gutter:stable; }
 .recent-player-name,.recent-game-details > span,.recent-game-details time > span { min-width:0; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .recent-player b > span:last-child { flex:none; }
 .recent-player .recent-color-chip { width:10px; height:10px; flex:none; }
-.recent-player-score { margin-inline:3px 4px; font-weight:800; line-height:1; }
+.recent-player-score { margin-inline:3px 4px; font-size:.85em; font-weight:800; line-height:1; }
 .recent-player-score.score-win { color:#39ed83; }
 .recent-player-score.score-loss { color:#ff5364; }
 .recent-player-score.score-draw { color:#c9ced6; }
