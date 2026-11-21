@@ -6,7 +6,7 @@ import { variantList } from "../lib/variants";
 import { duration } from "../lib/speedrun";
 import DailyMeme from "../components/DailyMeme";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Plus, RotateCcw } from "lucide-react";
+import { ArrowRight, BookOpen, Plus, RotateCcw, Smartphone, Target } from "lucide-react";
 import { useApp } from "../lib/context";
 import { useData, today, base, emptyLibrary } from "../lib/store";
 import type { PuzzleData, SavedGame } from "../lib/types";
@@ -45,6 +45,8 @@ export default function HomePage() {
   const welcome = name && name !== emptyLibrary.profile.name ? `Welcome back, ${name}!` : "Welcome to NovaChess";
   const games = library.games.filter(game => !isStudy(game) && game.folder !== "Studies");
   const recent = [...games].sort((a, b) => b.created - a.created).slice(0, 3);
+  const dueOpenings = library.repertoire.filter(line => line.due <= Date.now()).length;
+  const appStoreUrl = import.meta.env.VITE_APP_STORE_URL?.trim();
   return (
     <div ref={homeRef} className={`home-page home-dashboard${appearance.showMemes ? "" : " memes-hidden"}`}>
       <section className="new-game-section home-welcome" aria-label="New game">
@@ -117,6 +119,32 @@ export default function HomePage() {
           <p className="muted home-recent-empty">No games yet.</p>
         )}
       </section>
+      <div className="home-extras">
+        <section className="home-next" aria-labelledby="home-next-title">
+          <h2 id="home-next-title">Next up</h2>
+          <button className="home-next-action" onClick={() => navigate("learn", dueOpenings ? "repertoire" : "train")}>
+            <BookOpen size={20} aria-hidden="true" />
+            <span><strong>{dueOpenings ? "Review your repertoire" : "Practice an opening"}</strong>
+              {dueOpenings > 0 && <small>{dueOpenings} {dueOpenings === 1 ? "line" : "lines"} due</small>}
+            </span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
+          <button className="home-next-action" onClick={() => navigate("puzzles")}>
+            <Target size={20} aria-hidden="true" />
+            <span><strong>Train tactics</strong><small>Puzzles matched to your rating</small></span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
+        </section>
+        <section className="home-app" aria-labelledby="home-app-title">
+          <div className="home-app-icon"><Smartphone size={28} aria-hidden="true" /></div>
+          <div>
+            <h2 id="home-app-title">Try the app</h2>
+            {appStoreUrl ? (
+              <a className="btn" href={appStoreUrl}>View on the App Store <ArrowRight size={16} aria-hidden="true" /></a>
+            ) : <p>Coming soon to the App Store</p>}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

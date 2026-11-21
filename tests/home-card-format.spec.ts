@@ -78,3 +78,19 @@ test('Home completion uses a yellow outline and recent games show stacked player
  const popup=(await preview.boundingBox())!;expect(popup.x).toBeGreaterThanOrEqual(0);expect(popup.y).toBeGreaterThanOrEqual(0);expect(popup.x+popup.width).toBeLessThanOrEqual(page.viewportSize()!.width);expect(popup.y+popup.height).toBeLessThanOrEqual(page.viewportSize()!.height);
  const faint=await entries.first().evaluate(e=>{const s=getComputedStyle(e);return s.backgroundColor!==s.borderTopColor});expect(faint).toBe(true);
 });
+
+test('Home surfaces opening reviews that are due and shows the app launch status',async({page})=>{
+ await page.addInitScript(()=>{
+  localStorage.setItem('novachess-library-v2',JSON.stringify({
+   repertoire:[{id:'due-opening',name:'Italian Game',due:0,side:'w',moves:[]}],
+  }));
+ });
+ await page.goto('/');
+ const next=page.getByRole('region',{name:'Next up'});
+ await expect(next.getByRole('button',{name:/Review your repertoire/})).toContainText('1 line due');
+ const app=page.getByRole('region',{name:'Try the app'});
+ await expect(app.getByText('Coming soon to the App Store')).toBeVisible();
+ await expect(app.getByRole('link')).toHaveCount(0);
+ await next.getByRole('button',{name:/Review your repertoire/}).click();
+ await expect(page).toHaveURL(/#learn\/repertoire$/);
+});

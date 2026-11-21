@@ -5925,7 +5925,7 @@ html { scrollbar-gutter:stable; }
   order:0;
 }
 .home-dashboard .home-welcome-actions {
-  max-width:520px;
+  max-width:720px;
 }
 .home-dashboard .home-welcome-actions h1 {
   margin:0;
@@ -6021,6 +6021,61 @@ html { scrollbar-gutter:stable; }
 .home-dashboard .home-recent .home-section-heading { margin-bottom:12px; }
 .home-dashboard .home-recent .home-section-heading .text-link { font-size:.9rem; }
 .home-dashboard .home-recent-empty { margin:auto; padding:18px 0; font-size:1rem; }
+.home-extras {
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
+  gap:var(--home-gap);
+}
+.home-next,
+.home-app {
+  min-width:0;
+  padding:clamp(14px,1.65vw,24px);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius);
+  background:var(--panel);
+}
+.home-extras h2 {
+  margin:0 0 8px;
+  font-size:clamp(1.05rem,1.55vw,1.42rem);
+  font-weight:800;
+  line-height:1.15;
+}
+.home-next-action {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  min-height:44px;
+  padding:8px 6px;
+  text-align:left;
+  background:none;
+}
+.home-next-action + .home-next-action { border-top:1px solid var(--border); }
+.home-next-action:hover { background:var(--input); }
+.home-next-action :is(small,strong) { display:block; }
+.home-next-action small,
+.home-app p { color:var(--muted); }
+.home-next-action > svg:first-child { color:var(--accent); }
+.home-app {
+  display:flex;
+  align-items:center;
+  gap:clamp(12px,2vw,24px);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--panel-solid) 87%,var(--accent)),var(--panel-solid));
+}
+.home-app-icon {
+  display:grid;
+  flex:none;
+  place-items:center;
+  width:clamp(46px,5vw,70px);
+  aspect-ratio:1;
+  border-radius:var(--radius);
+  background:var(--button);
+  color:var(--button-text);
+}
+.home-app p { margin:0; }
+.home-app .btn { margin-top:6px; }
 @media(min-width:1001px) {
   .home-page.home-dashboard:has(.daily-meme) {
     grid-template-columns:minmax(0,1fr) minmax(0,.88fr) minmax(0,1.58fr);
@@ -6037,6 +6092,7 @@ html { scrollbar-gutter:stable; }
 @media(max-width:600px) {
   .home-page.home-dashboard > .home-practice-grid { display:contents; }
   .home-page.home-dashboard .daily-meme { order:1; }
+  .home-extras { grid-template-columns:minmax(0,1fr); }
 }
 
 .variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) {

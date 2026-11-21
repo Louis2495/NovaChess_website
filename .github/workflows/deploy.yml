@@ -32,6 +32,7 @@ jobs:
 
       - run: npm run build
         env:
+          VITE_APP_STORE_URL: ${{ vars.VITE_APP_STORE_URL }}
           VITE_FEDERATION_LOOKUP_URL: ${{ vars.VITE_FEDERATION_LOOKUP_URL }}
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
