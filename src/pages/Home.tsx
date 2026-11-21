@@ -6,7 +6,7 @@ import { variantList } from "../lib/variants";
 import { duration } from "../lib/speedrun";
 import DailyMeme from "../components/DailyMeme";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, BookOpen, Plus, RotateCcw, Smartphone, Target } from "lucide-react";
+import { ArrowRight, BookOpen, Plus, RotateCcw, Target } from "lucide-react";
 import { useApp } from "../lib/context";
 import { useData, today, base, emptyLibrary } from "../lib/store";
 import type { PuzzleData, SavedGame } from "../lib/types";
@@ -14,6 +14,10 @@ import { Chess } from "chess.js";
 import { Board } from "../components/Board";
 import { Button } from "../components/UI";
 import { isStudy } from "../lib/library";
+const featuredVariants = variantList.filter(variant =>
+  ["crazyhouse", "duck", "atomic", "kingofthehill", "horde", "chess960"].includes(variant.id),
+);
+
 export function dailyPuzzle(puzzles: PuzzleData[]) {
   const choices = puzzles
     .filter((p) => p.sourceRating >= 1000 && p.sourceRating <= 2200)
@@ -46,6 +50,8 @@ export default function HomePage() {
   const games = library.games.filter(game => !isStudy(game) && game.folder !== "Studies");
   const recent = [...games].sort((a, b) => b.created - a.created).slice(0, 3);
   const dueOpenings = library.repertoire.filter(line => line.due <= Date.now()).length;
+  const week = Math.floor(Date.parse(today()) / (7 * 86400000));
+  const featured = featuredVariants[week % featuredVariants.length];
   const appStoreUrl = import.meta.env.VITE_APP_STORE_URL?.trim();
   return (
     <div ref={homeRef} className={`home-page home-dashboard${appearance.showMemes ? "" : " memes-hidden"}`}>
@@ -135,16 +141,19 @@ export default function HomePage() {
             <ArrowRight size={16} aria-hidden="true" />
           </button>
         </section>
-        <section className="home-app" aria-labelledby="home-app-title">
-          <div className="home-app-icon"><Smartphone size={28} aria-hidden="true" /></div>
+        <section className="home-featured" aria-labelledby="home-featured-title">
+          <div className="home-featured-art" aria-hidden="true"><VariantIcon id={featured.id} size={112} /></div>
           <div>
-            <h2 id="home-app-title">Try the app</h2>
-            {appStoreUrl ? (
-              <a className="btn" href={appStoreUrl}>View on the App Store <ArrowRight size={16} aria-hidden="true" /></a>
-            ) : <p>Coming soon to the App Store</p>}
+            <h2 id="home-featured-title">Featured variant</h2>
+            <strong className="home-featured-name">{featured.name}</strong>
+            <p>{featured.description}</p>
+            <button className="text-link" onClick={() => navigate("variants", `choose/${featured.id}`)}>
+              Try {featured.name} <ArrowRight size={16} aria-hidden="true" />
+            </button>
           </div>
         </section>
       </div>
+      {appStoreUrl && <a className="home-app-link text-link" href={appStoreUrl}>Get NovaChess on the App Store <ArrowRight size={14} aria-hidden="true" /></a>}
     </div>
   );
 }

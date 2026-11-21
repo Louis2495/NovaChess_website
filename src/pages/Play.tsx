@@ -112,13 +112,13 @@ function variantMove(
     worker.postMessage({ variant, initial, moves, budget });
   });
 }
-export default function Play({variantsOnly = false, onPlayingChange, speedrunElo}: {variantsOnly?: boolean; onPlayingChange?: (playing:boolean)=>void; speedrunElo?:number}) {
+export default function Play({variantsOnly = false, onPlayingChange, speedrunElo, initialVariant}: {variantsOnly?: boolean; initialVariant?:string; onPlayingChange?: (playing:boolean)=>void; speedrunElo?:number}) {
   const { library, setLibrary, appearance, navigate, detail, notify } =
     useApp();
   const [ff, setFF] = useState<FairyStockfish | null>(null),
     [error, setError] = useState(""),
     [playing, setPlaying] = useState(detail === "resume"),
-    [variant, setVariant] = useState(variantsOnly ? variantList.find(v=>v.id!=="chess")!.id : "chess"),
+    [variant, setVariant] = useState(variantsOnly ? initialVariant ?? variantList.find(v=>v.id!=="chess")!.id : "chess"),
     [speedrunMode, setSpeedrunMode] = useState(speedrunElo !== undefined),
     [speedrunRating, setSpeedrunRating] = useState(speedrunElo ?? 1000),
     [clockNow, setClockNow] = useState(Date.now()),

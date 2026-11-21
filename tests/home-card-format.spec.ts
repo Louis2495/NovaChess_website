@@ -79,7 +79,7 @@ test('Home completion uses a yellow outline and recent games show stacked player
  const faint=await entries.first().evaluate(e=>{const s=getComputedStyle(e);return s.backgroundColor!==s.borderTopColor});expect(faint).toBe(true);
 });
 
-test('Home surfaces opening reviews that are due and shows the app launch status',async({page})=>{
+test('Home surfaces opening reviews that are due and opens the featured variant against the computer',async({page})=>{
  await page.addInitScript(()=>{
   localStorage.setItem('novachess-library-v2',JSON.stringify({
    repertoire:[{id:'due-opening',name:'Italian Game',due:0,side:'w',moves:[]}],
@@ -87,10 +87,17 @@ test('Home surfaces opening reviews that are due and shows the app launch status
  });
  await page.goto('/');
  const next=page.getByRole('region',{name:'Next up'});
+ const launch=(await page.getByRole('button',{name:'New game',exact:true}).boundingBox())!;
+ const recent=(await page.getByRole('region',{name:'Recent games'}).boundingBox())!;
+ expect(launch.x+launch.width).toBeCloseTo(recent.x+recent.width,0);
  await expect(next.getByRole('button',{name:/Review your repertoire/})).toContainText('1 line due');
- const app=page.getByRole('region',{name:'Try the app'});
- await expect(app.getByText('Coming soon to the App Store')).toBeVisible();
- await expect(app.getByRole('link')).toHaveCount(0);
+ const featured=page.getByRole('region',{name:'Featured variant'});
+ const tryVariant=featured.getByRole('button',{name:/^Try /});
+ const name=(await tryVariant.innerText()).trim().slice(4);
+ await tryVariant.click();
+ await expect(page.getByRole('group',{name:'Opponent',exact:true}).getByRole('button',{name:'Computer',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('group',{name:'Choose variant'}).getByRole('button',{name,exact:true})).toHaveAttribute('aria-pressed','true');
+ await page.goto('/');
  await next.getByRole('button',{name:/Review your repertoire/}).click();
  await expect(page).toHaveURL(/#learn\/repertoire$/);
 });

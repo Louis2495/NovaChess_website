@@ -16,8 +16,11 @@ const onlineVariants = [
 const teamModes = ["throne", "vote", "team"];
 export default function PlayHub({ variants = false }: { variants?: boolean }) {
   const { detail } = useApp();
-  const [opponent, setOpponent] = useState("online"),
-    [mode, setMode] = useState("throne"),
+  const selectedVariant = variants && detail.startsWith("choose/")
+    ? variantList.find(variant => variant.id !== "chess" && variant.id === detail.slice("choose/".length))
+    : undefined;
+  const [opponent, setOpponent] = useState(selectedVariant ? "computer" : "online"),
+    [mode, setMode] = useState(selectedVariant?.id ?? "throne"),
     [playing, setPlaying] = useState(false),[timeControl,setTimeControl]=useState("180:0");
   const [friendSettingsHost,setFriendSettingsHost]=useState<HTMLDivElement|null>(null);
   const online = opponent === "online";
@@ -50,6 +53,6 @@ export default function PlayHub({ variants = false }: { variants?: boolean }) {
       </button>)}
     </div>}
     </Community>
-      : <Play variantsOnly={variants} onPlayingChange={setPlaying} />}
+      : <Play variantsOnly={variants} initialVariant={selectedVariant?.id} onPlayingChange={setPlaying} />}
   </div>;
 }
