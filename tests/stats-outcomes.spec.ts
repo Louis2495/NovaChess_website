@@ -57,6 +57,20 @@ test('Stats period follows the user across the overview, competition, achievemen
   await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();
   const ratings = page.getByRole('list',{name:'Fastest wins by computer rating'});
   await expect(ratings.getByRole('listitem')).toHaveCount(59);
+  const positions = await ratings.getByRole('button').evaluateAll(buttons => {
+    const cards = buttons.map(button => button.getBoundingClientRect());
+    const firstRow = cards.filter(card => card.top === cards[0].top);
+    const lastRow = cards.filter(card => card.top === cards.at(-1)!.top);
+    const grid = buttons[0].closest('[role="list"]')!.getBoundingClientRect();
+    return {
+      gap: firstRow[1].left - firstRow[0].right,
+      firstRowOffset: (firstRow[0].left + firstRow.at(-1)!.right - grid.left - grid.right) / 2,
+      lastRowOffset: (lastRow[0].left + lastRow.at(-1)!.right - grid.left - grid.right) / 2,
+    };
+  });
+  expect(positions.gap).toBeCloseTo(4, 0);
+  expect(Math.abs(positions.firstRowOffset)).toBeLessThan(1);
+  expect(Math.abs(positions.lastRowOffset)).toBeLessThan(1);
   expect(await ratings.evaluate(grid => grid.scrollHeight - grid.clientHeight)).toBeLessThanOrEqual(1);
   await expect(page.getByRole('button',{name:'Play Speedrun at 850 Elo',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'Achievements',exact:true}).click();
