@@ -1,3 +1,4 @@
+import { groupByOpening, repertoireFamilyLookup } from "../../lib/openingFamilies";
 import { exportRepertoire, repertoirePaths } from "../../lib/repertoire";
 import RepertoireEditor, { RepertoireImport } from "./RepertoireEditor";
 import { usePremoves } from "../../lib/usePremoves";
@@ -14,8 +15,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useApp } from "../../lib/context";
-import { download, dateLabel } from "../../lib/store";
-import type { Repertoire as Line } from "../../lib/types";
+import { download, dateLabel, useData } from "../../lib/store";
+import type { Opening, Repertoire as Line } from "../../lib/types";
 import { Board } from "../../components/Board";
 import {
   Card,
@@ -27,7 +28,7 @@ function key(c: Chess) {
   return c.fen().split(" ").slice(0, 4).join(" ");
 }
 export default function Repertoire() {
-  const { library, setLibrary, detail, navigate, notify } = useApp();
+  const { library, detail, navigate } = useApp();
   const [training, setTraining] = useState<Line | null>(null);
   const route = detail.slice("repertoire".length + 1);
   const back = () => navigate("learn", "repertoire");
@@ -43,6 +44,15 @@ export default function Repertoire() {
     return (
       <RepertoireTrainer line={training} onClose={() => setTraining(null)} />
     );
+  return <RepertoireLines onTrain={setTraining} onAdd={add} />;
+}
+
+function RepertoireLines({ onTrain, onAdd }: { onTrain: (line: Line) => void; onAdd: () => void }) {
+  const { library, setLibrary, navigate, notify } = useApp();
+  const { data: openings } = useData<Opening[]>("openings");
+  const groups = useMemo(() => groupByOpening(library.repertoire, repertoireFamilyLookup(openings ?? []))
+    .sort((a, b) => (a.family === "Other lines" ? 1 : 0) - (b.family === "Other lines" ? 1 : 0) || a.family.localeCompare(b.family)),
+    [library.repertoire, openings]);
   return (
     <>
       <div className="section-toolbar">
@@ -54,7 +64,7 @@ export default function Repertoire() {
           <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
             <Download size={16} /> Import Lichess study
           </Button>
-          <Button onClick={add}><Plus size={16} /> Add line</Button>
+          <Button onClick={onAdd}><Plus size={16} /> Add line</Button>
         </div>
       </div>
       {!library.repertoire.length ? (
@@ -64,54 +74,61 @@ export default function Repertoire() {
             title="No saved lines"
             description="Build a line and train either color with spaced review."
           >
-            <Button onClick={add}>Build repertoire</Button>
+            <Button onClick={onAdd}>Build repertoire</Button>
           </Empty>
         </Card>
       ) : (
-        <div className="repertoire-grid">
-          {library.repertoire.map((line) => (
-            <Card key={line.id}>
-              <div className="card-heading">
-                <h3>{line.name}</h3>
-                <span className="pill">
-                  {line.side === "w" ? "White" : "Black"}
-                </span>
+        <div className="repertoire-families">
+          {groups.map(({ family, lines }) => (
+            <section key={family} className="opening-family" aria-label={family}>
+              <h2>{family}</h2>
+              <div className="repertoire-grid">
+                {lines.map((line) => (
+                  <Card key={line.id}>
+                    <div className="card-heading">
+                      <h3>{line.name}</h3>
+                      <span className="pill">
+                        {line.side === "w" ? "White" : "Black"}
+                      </span>
+                    </div>
+                    <p className="caption">
+                      {Math.ceil(line.moves.length / 2)} moves · {line.trained}{" "}
+                      reviews ·{" "}
+                      {line.due <= Date.now()
+                        ? "Due now"
+                        : `Due ${dateLabel(line.due)}`}
+                    </p>
+                    <div className="button-row">
+                      <Button onClick={() => onTrain(line)}>
+                        <GraduationCap size={15} />
+                        Train
+                      </Button>
+                      <Button className="secondary" onClick={() => navigate("learn", "repertoire:edit/" + line.id)}>
+                        Edit
+                      </Button>
+                      <IconButton
+                        label={`Export ${line.name}`}
+                        onClick={() => download("repertoire.pgn", exportRepertoire(line), "application/x-chess-pgn")}
+                      >
+                        <Download size={16} />
+                      </IconButton>
+                      <IconButton
+                        label={`Delete ${line.name}`}
+                        onClick={() => {
+                          setLibrary((l) => ({
+                            ...l,
+                            repertoire: l.repertoire.filter((v) => v.id !== line.id),
+                          }));
+                          notify("Line deleted.");
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </IconButton>
+                    </div>
+                  </Card>
+                ))}
               </div>
-              <p className="caption">
-                {Math.ceil(line.moves.length / 2)} moves · {line.trained}{" "}
-                reviews ·{" "}
-                {line.due <= Date.now()
-                  ? "Due now"
-                  : `Due ${dateLabel(line.due)}`}
-              </p>
-              <div className="button-row">
-                <Button onClick={() => setTraining(line)}>
-                  <GraduationCap size={15} />
-                  Train
-                </Button>
-                <Button className="secondary" onClick={() => navigate("learn", "repertoire:edit/" + line.id)}>
-                  Edit
-                </Button>
-                <IconButton
-                  label={`Export ${line.name}`}
-                  onClick={() => download("repertoire.pgn", exportRepertoire(line), "application/x-chess-pgn")}
-                >
-                  <Download size={16} />
-                </IconButton>
-                <IconButton
-                  label={`Delete ${line.name}`}
-                  onClick={() => {
-                    setLibrary((l) => ({
-                      ...l,
-                      repertoire: l.repertoire.filter((v) => v.id !== line.id),
-                    }));
-                    notify("Line deleted.");
-                  }}
-                >
-                  <Trash2 size={16} />
-                </IconButton>
-              </div>
-            </Card>
+            </section>
           ))}
         </div>
       )}

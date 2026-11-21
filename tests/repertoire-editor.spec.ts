@@ -46,3 +46,23 @@ test("Lichess study import saves multiple chapters, their orientation and nested
   await nested.getByRole("button", { name: "c3", exact: true }).click();
   await expect(page.getByRole("button", { name: "c3, white pawn", exact: true })).toBeVisible();
 });
+
+test("saved lines are grouped by their opening even when they have custom names", async ({ page }) => {
+  await page.addInitScript(() => {
+    const line = {
+      initial: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      side: "w", due: Date.now(), trained: 0, successes: 0,
+    };
+    localStorage.setItem("novachess-library-v2", JSON.stringify({
+      repertoire: [
+        { ...line, id: "one", name: "First draft", moves: ["e2e4", "c7c5"] },
+        { ...line, id: "two", name: "A different defense", moves: ["e2e4", "e7e6"] },
+        { ...line, id: "three", name: "My tournament line", moves: ["e2e4", "c7c5", "g1f3", "d7d6"] },
+      ],
+    }));
+  });
+  await page.goto("/#learn/repertoire");
+  const sicilian = page.getByRole("region", { name: "Sicilian Defense", exact: true });
+  await expect(sicilian.getByRole("heading", { level: 3 })).toHaveText(["First draft", "My tournament line"]);
+  await expect(page.getByRole("region", { name: "French Defense", exact: true })).toContainText("A different defense");
+});

@@ -1,3 +1,4 @@
+import { groupByOpening, openingFamily } from "../../lib/openingFamilies";
 import { usePremoves } from "../../lib/usePremoves";
 import PremoveQueue from "../../components/PremoveQueue";
 import { useEffect, useMemo, useState } from "react";
@@ -129,7 +130,7 @@ function LessonWorkspace({
     [decisionActive, setDecisionActive] = useState(false),
     [answer, setAnswer] = useState<number | null>(null),
     [autoplay, setAutoplay] = useState(false);
-  const family = selected.name.split(":")[0],
+  const family = openingFamily(selected.name),
     guide =
       guides.find((g) => g.family === family) ||
       guides.find((g) => selected.name.startsWith(g.family))!;
@@ -165,6 +166,13 @@ function LessonWorkspace({
         : lessons,
     [all, lessons, search],
   );
+  const openingGroups = useMemo(() => groupByOpening(candidates, opening => openingFamily(opening.name)), [candidates]);
+  let remaining = limit;
+  const visibleGroups = openingGroups.flatMap(group => {
+    const lines = group.lines.slice(0, remaining);
+    remaining -= lines.length;
+    return lines.length ? [{ family: group.family, lines }] : [];
+  });
   function studyPosition(ply: number, decision = false) {
     const index = lines.findIndex(
       (l) => l.name === "Study: " + workbook?.title,
@@ -366,21 +374,26 @@ function LessonWorkspace({
                   : `${lessons.length} lessons`}
               </div>
               <div className="scroll-list">
-                {candidates.slice(0, limit).map((o) => (
-                  <button
-                    className={`opening-row ${selected.id === o.id ? "active" : ""}`}
-                    key={o.id}
-                    onClick={() => choose(o)}
-                  >
-                    <span className="eco">{o.eco}</span>
-                    <span>
-                      {o.name}
-                      <small>{Math.ceil(o.moves.length / 2)} moves</small>
-                    </span>
-                    {library.progress.learned.includes(o.id) && (
-                      <Check size={15} />
-                    )}
-                  </button>
+                {visibleGroups.map(({ family, lines }) => (
+                  <section className="opening-family" key={family} aria-label={family}>
+                    <h3>{family}</h3>
+                    {lines.map((o) => (
+                      <button
+                        className={`opening-row ${selected.id === o.id ? "active" : ""}`}
+                        key={o.id}
+                        onClick={() => choose(o)}
+                      >
+                        <span className="eco">{o.eco}</span>
+                        <span>
+                          {o.name}
+                          <small>{Math.ceil(o.moves.length / 2)} moves</small>
+                        </span>
+                        {library.progress.learned.includes(o.id) && (
+                          <Check size={15} />
+                        )}
+                      </button>
+                    ))}
+                  </section>
                 ))}
                 {candidates.length > limit && (
                   <Button

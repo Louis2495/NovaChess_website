@@ -6171,3 +6171,15 @@ html { scrollbar-gutter:stable; }
 @media(max-width:760px) {
   .workspace .repertoire-workspace.chess-layout { grid-template-columns:minmax(0,1fr); }
 }
+
+.opening-list .scroll-list { display:flex; flex-direction:column; gap:12px; }
+.opening-list .opening-family > h3 {
+  margin:0;
+  padding:6px 8px;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+  font-size:.88rem;
+  font-weight:800;
+}
+.repertoire-families { display:grid; gap:24px; }
+.repertoire-families .opening-family > h2 { margin:0 0 10px; font-size:1.15rem; font-weight:800; }
