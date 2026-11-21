@@ -5397,14 +5397,14 @@ html { scrollbar-gutter:stable; }
 }
 .workspace-shell:has(.variants-hub.setup-active) > .workspace {
   display:block; min-height:0; max-width:none; box-sizing:border-box;
-  padding:clamp(8px,2dvh,18px) clamp(18px,5vw,84px);
+  padding:clamp(14px,3.4dvh,32px) clamp(18px,5vw,84px) clamp(8px,1.8dvh,16px);
 }
 .workspace:has(.variants-hub.setup-active) > div:first-child,
 .workspace:has(.variants-hub.setup-active) > div:first-child > div {
   height:100%;
 }
 .workspace:has(.variants-hub.setup-active) .variants-hub.setup-active {
-  display:flex; flex-direction:column; align-items:center; gap:clamp(4px,1dvh,10px);
+  display:flex; flex-direction:column; align-items:center; gap:clamp(7px,1.8dvh,19px);
   width:100%; height:100%; min-height:0;
 }
 .variants-hub.setup-active > .play-hub-heading {
@@ -5422,16 +5422,16 @@ html { scrollbar-gutter:stable; }
   padding:6px; font-size:clamp(.9rem,2.5dvh,1.45rem); letter-spacing:normal;
 }
 .variants-hub.setup-active > .quick-online-play:has(+ .online-variant-gallery) {
-  display:flex; flex-direction:column; justify-content:flex-start; gap:4px;
+  display:flex; flex-direction:column; justify-content:flex-start; gap:clamp(5px,1dvh,10px);
 }
 .variants-hub.setup-active > .quick-online-play > :is(.field,.caption) { margin:0; }
 .variants-hub.setup-active > .quick-online-play > .caption { font-size:clamp(.68rem,1.6dvh,.87rem); }
 .variants-hub.setup-active > .friend-settings-slot { flex:none; order:-1; width:min(100%,220px); }
 .variants-hub.setup-active > .variant-sign-in { flex:none; order:-1; margin:0; }
 .variants-hub.setup-active .variant-gallery {
-  --variant-gallery-gap:clamp(4px,.8dvh,9px);
+  --variant-gallery-gap:clamp(6px,1.4dvh,15px);
   --variant-gallery-rows:3;
-  --variant-card-height:126px;
+  --variant-card-height:170px;
   flex:1 1 0; min-height:0; width:min(100%,960px); margin:0;
   max-height:calc(var(--variant-gallery-rows) * var(--variant-card-height) + (var(--variant-gallery-rows) - 1) * var(--variant-gallery-gap));
   grid-template-columns:repeat(7,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr);
@@ -5447,7 +5447,7 @@ html { scrollbar-gutter:stable; }
   overflow-wrap:anywhere;
 }
 .variants-hub.setup-active .variant-gallery :is(.variant-picture,.multiplayer-picture,.speedrun-picture) {
-  width:min(100cqw,max(0px,calc(100cqh - 2.3em - 3px)),104px);
+  width:min(100cqw,max(0px,calc(100cqh - 2.3em - 3px)),128px);
   height:auto; aspect-ratio:1;
 }
 .variants-hub.setup-active :is(.speedrun-setup,.game-settings-card) {
@@ -5464,7 +5464,7 @@ html { scrollbar-gutter:stable; }
   }
   .variants-hub.setup-active :is(.variant-gallery,.computer-variant-gallery) {
     --variant-gallery-rows:6;
-    --variant-card-height:84px;
+    --variant-card-height:94px;
     grid-template-columns:repeat(4,minmax(0,1fr));
   }
   .variants-hub.setup-active .computer-variant-gallery { --variant-gallery-rows:5; }
