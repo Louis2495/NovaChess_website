@@ -281,7 +281,7 @@ test("curated opening lesson and searchable full opening library work", async ({
   expect((await stored(page)).repertoire).toHaveLength(1);
 });
 
-test("repertoire building, saving, training and spaced review work", async ({
+test("repertoire lines can be built, saved, and trained without scheduling", async ({
   page,
 }) => {
   await page.goto("/#learn/repertoire");
@@ -294,8 +294,8 @@ test("repertoire building, saving, training and spaced review work", async ({
   await uiMove(page, "e2e4");
   await expect(page.locator(".feedback")).toContainText("Line completed");
   const saved = (await stored(page)).repertoire[0];
-  expect(saved.successes).toBe(1);
-  expect(saved.due).toBeGreaterThan(Date.now());
+  expect(saved.moves).toEqual(["e2e4"]);
+  expect(saved).not.toHaveProperty("due");
 });
 
 test("endgame trainer uses legal goals and saves completion", async ({
