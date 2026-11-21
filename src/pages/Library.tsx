@@ -18,7 +18,8 @@ import {
   ChevronsRight,
   Play,
   Square,
-  ScanLine,
+  ListChecks,
+  ChartLine,
   Share2,
   LoaderCircle,
   Save,
@@ -608,14 +609,14 @@ function GameViewer({
         {game.variant === "cvfog" && <Toggle label="Fog" checked={fogEnabled} onChange={setFogEnabled} />}
         <Button className="secondary" onClick={() => setSharing(true)}><Share2 size={16}/>Share</Button>
         {!game.special && <Button disabled={reviewing || rows.length >= game.moves.length && rows.every(r=>r.afterScore!==undefined)} onClick={() => void review()}>
-          {reviewing ? <LoaderCircle className="spin" size={16}/> : <ScanLine size={16}/>}
+          {reviewing ? <LoaderCircle className="spin" size={16}/> : <ListChecks size={16} aria-hidden="true" />}
           {reviewing ? `${rows.length} / ${game.moves.length}` : rows.length && rows.length<game.moves.length ? "Resume review" : "Review game"}
         </Button>}
         <Button
           onClick={() => navigate("analysis", "game:" + game.id)}
           disabled={!standard}
         >
-          <ScanLine size={15} />
+          <ChartLine size={15} aria-hidden="true" />
           Analyze
         </Button>
       </PageTitle>

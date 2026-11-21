@@ -11,7 +11,7 @@ import {
   Download,
   Film,
   ArrowUpRight,
-  ScanLine,
+  ChartLine,
   Bookmark,
 } from "lucide-react";
 import { useControl } from "../../lib/controls";
@@ -306,7 +306,7 @@ function Archive({ games }: { games: FamousGame[] }) {
             <Bookmark size={17} />
           </IconButton>
           <IconButton label="Analyze game" onClick={() => save(true)}>
-            <ScanLine size={18} />
+            <ChartLine size={18} aria-hidden="true" />
           </IconButton>
           <a
             className="icon-btn"
