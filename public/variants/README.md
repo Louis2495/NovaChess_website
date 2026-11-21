@@ -6,11 +6,13 @@
 - Row 2: Crazyhouse, Duck, Atomic, Fog of War, 3-Check, King of the Hill.
 - Row 3: Horde, Antichess, Pawn Wars, Pawn race, Chess960, Bughouse.
 
-The sheet is encoded as WebP at its original resolution. Each picture has a distinct visual motif; only Atomic uses a board as part of its illustration.
+The sheet is encoded as WebP at its original resolution. Each tile has a distinct visual motif.
 
 Pawns use traditional pedestal bodies with no legs or feet. Dropping Squares, Random, Fog of War, 3-Check, Antichess, Bughouse and Pawn race were revised to preserve that rule, clarify the cubic die and show three plus signs.
 
-`horde.webp` overrides only the Horde tile. Its two front pawns have faces aligned with the row behind them; the other 17 illustrations continue to use the original sheet.
+`horde.webp` overrides only the Horde tile. Its two front pawns have faces aligned with the row behind them.
+
+`blind.webp` overrides Blindfold-board with the original blindfolded king design with a Horde-style collar and pedestal.
 
 `multiplayer.png` contains three square panels in one horizontal sheet (Throne, Vote Chess, Team Chess). Each scene uses open, expressive eyes and traditional chess-piece bases. `MultiplayerPicture.tsx` selects the panels without cropping the source file.
 

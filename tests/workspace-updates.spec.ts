@@ -160,10 +160,10 @@ test("Stats has configurable activity periods and embeds Rankings with attached 
       .getByRole("navigation")
       .getByRole("button", { name: "Rankings", exact: true }),
   ).toHaveCount(0);
-  await page.getByLabel("Activity period").selectOption("30");
+  await page.getByLabel("Stats period").selectOption("30");
   await expect(page.locator(".activity-day")).toHaveCount(30);
-  await page.getByLabel("Activity period").selectOption("custom");
-  await page.getByLabel("Activity days").fill("45");
+  await page.getByLabel("Stats period").selectOption("custom");
+  await page.getByLabel("Stats days").fill("45");
   await expect(page.locator(".activity-day")).toHaveCount(23);
   await expect(
     page.getByRole("button", { name: "Train", exact: true }),

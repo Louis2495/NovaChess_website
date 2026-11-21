@@ -170,6 +170,7 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180012_friend_activity.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180013_player_challenges.sql','utf8'));
   await pg.exec(readFileSync('supabase/migrations/202611180014_signup_profile.sql','utf8'));
+  await pg.exec(readFileSync('supabase/migrations/202611180015_throne_stats_period.sql','utf8'));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -600,6 +601,18 @@ test('Throne announces the finished round, counts the first win and queued Finis
  const reign=await pg.query('select games from throne_reigns where room_id=$1',[game.id]);assert.equal(reign.rows[0].games,1);
  const logged=await pg.query('select * from throne_results where room_id=$1',[game.id]);assert.equal(logged.rows.length,1);assert.equal(logged.rows[0].black,users[1]);
  game=(await command(users[0],game,'finish')).data;assert.ok(!game.members.some(m=>m.id===users[0]));assert.ok(!game.queue.includes(users[0]));
+ assert.equal(game.state.lastWinner,undefined);
+ const ended=(await pg.query('select ended_at from throne_reigns where room_id=$1',[game.id])).rows[0].ended_at;
+ assert.ok(ended);
+ assert.equal((await command(users[0],game,'finish')).status,200);
+ assert.deepEqual((await pg.query('select ended_at from throne_reigns where room_id=$1',[game.id])).rows[0].ended_at,ended);
+ await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+ try {
+  const recent=(await pg.query("select throne_stats(now()-interval '1 minute') as stats")).rows[0].stats;
+  const future=(await pg.query("select throne_stats(now()+interval '1 minute') as stats")).rows[0].stats;
+  assert.ok(recent.games>=1);
+  assert.deepEqual(future,{timeMs:0,games:0});
+ } finally {await pg.exec('reset role');}
 });
 test('online clocks start on joining, deduct only the mover and reject premature flags',async()=>{
  await pg.exec("update profiles set banned=false;update rooms set created_at=now()-interval '2 hours'");let game=await room('standard',{variant:'chess',timeControlSeconds:300});assert.equal(game.state.clock.startedAt,null);assert.equal(game.settings.timeControlSeconds,300);game=(await command(users[1],game,'join')).data;assert.ok(game.state.clock.startedAt);

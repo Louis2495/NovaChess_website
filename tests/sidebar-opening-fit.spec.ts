@@ -29,9 +29,15 @@ test('time control labels use compact chess notation and main boards stay inside
 test('desktop variants form three rows and their launch action precedes the gallery',async({page,isMobile})=>{
  await page.goto('/#variants');const gallery=page.getByRole('group',{name:'Online variants',exact:true});await expect(gallery.getByRole('button')).toHaveCount(21);
  const action=(await page.getByRole('button',{name:'Join queue',exact:true}).boundingBox())!,box=(await gallery.boundingBox())!;expect(action.y+action.height).toBeLessThan(box.y);
+ const toggle=page.getByRole('group',{name:'Opponent',exact:true});
+ expect(Math.abs(action.y-(await toggle.boundingBox())!.y)).toBeLessThan(1);
  const rows=await gallery.getByRole('button').evaluateAll(es=>es.map(e=>Math.round(e.getBoundingClientRect().y)));
  if(!isMobile){expect(new Set(rows).size).toBe(3);for(const y of new Set(rows))expect(rows.filter(r=>r===y)).toHaveLength(7);}
  else expect(new Set(rows).size).toBeGreaterThan(3);
+ await toggle.getByRole('button',{name:'Computer',exact:true}).click();
+ const start=page.getByRole('button',{name:'Start game',exact:true});
+ await expect(start).toBeVisible();
+ expect(Math.abs((await start.boundingBox())!.y-(await toggle.boundingBox())!.y)).toBeLessThan(1);
 });
 test('research fields keep a common baseline even with an injected autofill badge',async({page})=>{
  await page.setViewportSize({width:1440,height:900});await page.goto('/#research');await page.getByLabel('Public username').waitFor();

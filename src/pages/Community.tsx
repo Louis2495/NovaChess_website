@@ -30,7 +30,7 @@ import {
   ArrowLeftRight,
   LogOut,
 } from "lucide-react";
-import { online, onlineAction, useOnlineSession, roomBroadcastReady, onlineNow, syncOnlineClock } from "../lib/online";
+import { online, onlineAction, finishThroneOnPageExit, useOnlineSession, roomBroadcastReady, onlineNow, syncOnlineClock } from "../lib/online";
 import { useApp } from "../lib/context";
 import { base } from "../lib/store";
 import { specialLegal, type SpecialState } from "../lib/specialRules";
@@ -103,6 +103,28 @@ export default function Community({presetMode = "standard", presetVariant = "che
     screenName(profiles.find((p) => p.id === id));
   const routeRef=useRef(roomId);routeRef.current=roomId;
   useEffect(()=>{setConfirmed(null);setPrediction(null);pending.current=false;pendingPrediction.current=false;submitted.current=null;requestId.current++;setBusy(false);},[roomId]);
+  const tokenRef = useRef(session?.access_token);
+  tokenRef.current = session?.access_token;
+  useEffect(() => {
+    if (!uid || !roomId) return;
+    const isInThrone = () => {
+      const current = confirmedRef.current;
+      return current?.id === roomId && current.mode === "throne" && current.members.some(member => member.id === uid);
+    };
+    let pageExited = false;
+    const onPageExit = () => {
+      if (!isInThrone() || !tokenRef.current) return;
+      pageExited = true;
+      finishThroneOnPageExit(roomId, tokenRef.current);
+    };
+    window.addEventListener("pagehide", onPageExit);
+    return () => {
+      window.removeEventListener("pagehide", onPageExit);
+      if (pageExited || !isInThrone()) return;
+      const request = { action: "finish", room: roomId };
+      void onlineAction(request).catch(() => onlineAction(request)).catch(() => {});
+    };
+  }, [roomId, uid]);
   const profileCache=useRef(new Map<string,Profile>());
   const loadProfiles=useCallback(async(ids:string[])=>{
     if(!online)return;const missing=[...new Set(ids)].filter(id=>!profileCache.current.has(id));

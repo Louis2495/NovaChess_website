@@ -190,6 +190,22 @@ test('Throne has one illustrated title, scoped chat and a persistent resignation
  await page.goto('/#variants/online/'+roomId);await expect(page.getByRole('heading',{name:'Throne',exact:true})).toHaveCount(1);await expect(page.locator('.online-game-heading .multiplayer-picture')).toBeVisible();await expect(page.getByRole('button',{name:'Invite friends',exact:true})).toHaveCount(0);await page.getByLabel('Game chat message',{exact:true}).fill('Good game!');await page.getByRole('button',{name:'Send chat message',exact:true}).click();await expect(page.getByRole('log',{name:'Game chat',exact:true})).toContainText('Good game!');expect(sent.p_room).toBe(roomId);
  await expect.poll(()=>env.joins.some(j=>j.topic==='realtime:room-'+roomId)).toBe(true);env.emit('rooms',{...env.room,revision:1,members:[{id:uid,team:'w'},{id:peer,team:null}],status:'waiting',state:{...env.room.state,gameKey:'round2',lastWinner:uid,lastGame:{id:'round1',result:'1-0',white:uid,black:peer,reason:'resignation',resignedBy:peer}}});await expect(page.getByText('You won!',{exact:true})).toBeVisible();await expect(page.getByText('Opponent resigned.',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Continue',exact:true}).click();await expect(page.locator('.throne-round-result')).toHaveCount(0);
 });
+test('leaving the Throne variant sends Finish for the waiting champion', async ({page}) => {
+ const env = await connected(page);
+ env.room.mode = 'throne';
+ env.room.status = 'waiting';
+ env.room.members = [{id:uid,team:'w'}];
+ env.room.state.lastWinner = uid;
+ await page.route('**/rest/v1/room_messages?*', route => route.fulfill({json:[]}));
+ await page.route('**/functions/v1/chess', route => {
+  env.actions.push(route.request().postDataJSON());
+  return route.fulfill({json:{...env.room,members:[],revision:1}});
+ });
+ await page.goto('/#variants/online/'+roomId);
+ await expect(page.getByRole('button',{name:'Finish',exact:true})).toBeVisible();
+ await page.evaluate(() => { location.hash = '#stats'; });
+ await expect.poll(() => env.actions).toEqual([{action:'finish',room:roomId}]);
+});
 test('standard online games expose 3, 3+2, 5 and 10 minute controls',async({page})=>{
  const env=await connected(page);await page.route('**/rest/v1/room_lobby?*',r=>r.fulfill({json:[]}));await page.goto('/#play');const controls=page.getByRole('group',{name:'Time control',exact:true});await expect(controls.getByRole('button')).toHaveCount(4);await controls.getByRole('button',{name:'10',exact:true}).click();await page.getByRole('button',{name:'Start',exact:true}).click();await expect.poll(()=>env.actions.length).toBe(1);expect(env.actions[0].timeControlSeconds).toBe(600);
 });
@@ -260,7 +276,7 @@ test('Variants stacks its friend control under the right-aligned opponent toggle
   await connected(page);
   await page.goto('/#variants');
   const hub = page.locator('.variants-hub');
-  const opponent = page.getByRole('group', { name: 'Opponent', exact: true });
+  const opponent = hub.locator('.play-opponent-toggle');
   const friend = page.getByRole('button', { name: 'Play a Friend', exact: true });
   await page.getByRole('button', { name: 'Atomic', exact: true }).click();
   await expect(friend).toBeEnabled();
@@ -280,6 +296,9 @@ test('Variants stacks its friend control under the right-aligned opponent toggle
     await expect(team).toBeVisible();
     const after = (await gallery.boundingBox())!;
     const launch = (await team.boundingBox())!;
+    const teamSettings = (await hub.locator('.quick-online-play > .field').boundingBox())!;
+    const teamToggle = (await opponent.boundingBox())!;
+    expect(Math.abs(teamSettings.y-teamToggle.y)).toBeLessThan(1);
     expect(Math.abs(await galleryTop() - before)).toBeLessThan(1);
     expect(launch.y + launch.height).toBeLessThan(after.y);
     await gallery.getByRole('button', { name: 'Throne', exact: true }).click();

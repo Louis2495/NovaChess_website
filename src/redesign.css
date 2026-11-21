@@ -5398,15 +5398,39 @@ html { scrollbar-gutter:stable; }
 .board-square.light.selected:after { background:#e5b62f70; }
 .selected-friend-opponent { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--text); text-align:center; }
 
-.variants-hub > .play-hub-heading { flex-direction:column; align-items:flex-end; gap:8px; }
-.variants-hub.online-opponent > .play-hub-heading { min-block-size:104px; }
-.variants-hub > .quick-online-play:has(+ .online-variant-gallery) {
-  min-block-size:216px; display:flex; flex-direction:column; justify-content:flex-end; gap:8px;
+.variants-hub.setup-active {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:12px 18px;
 }
-.variants-hub > .quick-online-play > .field { margin:0; }
-.variants-hub > .quick-online-play > .caption { min-block-size:2.6em; margin:0; }
-@media(max-width:1000px) {
- .variants-hub > .quick-online-play:has(+ .online-variant-gallery) { min-block-size:234px; }
+.variants-hub.setup-active > .play-hub-heading {
+  grid-column:2; grid-row:1; flex-direction:column; align-items:flex-end; gap:8px; margin:0;
+}
+.variants-hub.setup-active > .game-setup-page { display:contents; }
+.variants-hub.setup-active > :not(.play-hub-heading,.quick-online-play),
+.variants-hub.setup-active > .game-setup-page > :not(.setup-launch) { grid-column:1 / -1; min-width:0; }
+.variants-hub.setup-active > .quick-online-play,
+.variants-hub.setup-active .setup-launch {
+  grid-column:1; grid-row:1; width:min(100%,560px); max-width:none; margin:0;
+  padding:0; border:0; background:none; box-shadow:none;
+}
+.variants-hub.setup-active .setup-launch .play-feature-copy { padding:0; }
+.variants-hub.setup-active :is(.quick-online-play,.setup-launch) .new-game-primary {
+  width:100%; max-width:none; margin:0;
+}
+.variants-hub.setup-active > .quick-online-play:has(+ .online-variant-gallery) {
+  min-block-size:184px; display:flex; flex-direction:column; justify-content:flex-start; gap:8px;
+}
+.variants-hub > .quick-online-play > :is(.field,.caption) { margin:0; }
+@media(max-width:600px) {
+  .variants-hub.setup-active { column-gap:8px; }
+  .variants-hub .play-opponent-toggle button { padding-inline:8px; }
+  .variants-hub .friend-settings-slot { width:145px; }
+  .variants-hub.setup-active > .quick-online-play:has(+ .online-variant-gallery) { min-block-size:212px; }
+  .variants-hub.setup-active :is(.quick-online-play,.setup-launch) .new-game-primary {
+    min-height:56px; font-size:clamp(.95rem,3.6vw,1.2rem); padding:8px;
+  }
 }
 
 .friend-settings-slot { order:3; width:276px; max-width:100%; }

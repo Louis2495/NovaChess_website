@@ -76,6 +76,16 @@ export async function onlineAction(body: Record<string, unknown>) {
   return data;
 }
 
+export function finishThroneOnPageExit(room: string, token: string) {
+  if (!url || !key) return;
+  void fetch(`${url.replace(/\/$/, "")}/functions/v1/chess`, {
+    method: "POST",
+    headers: { apikey: key, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "finish", room }),
+    keepalive: true,
+  }).catch(() => {});
+}
+
 export async function onlineAuthOptions(){
  if(!url || !key)return {providers:[],emailEnabled:true};
  const response=await fetch(`${url.replace(/\/$/,"")}/auth/v1/settings`,{headers:{apikey:key},signal:AbortSignal.timeout(10000)});

@@ -12,14 +12,12 @@ import {
   Trophy,
   Flame,
   Puzzle,
-  BookOpen,
   Target,
   Plus,
   Minus,
   RotateCcw,
   Globe,
   Lock,
-  Flag,
 } from "lucide-react";
 import type { SavedGame } from "../lib/types";
 import { useApp } from "../lib/context";
@@ -37,7 +35,16 @@ export default function Stats() {
     detail === "rankings" ? "Rankings" : "Overview",
   );
   const [onlyUnlocked, setOnlyUnlocked] = useState(false);
-  const games = library.games.filter(
+  const [period, setPeriod] = useState("all");
+  const [customDays, setCustomDays] = useState(7);
+  const dayRange = period === "all" ? null : period === "custom" ? customDays : Number(period);
+  const sinceDate = new Date();
+  sinceDate.setHours(0, 0, 0, 0);
+  if (dayRange !== null) sinceDate.setDate(sinceDate.getDate() - dayRange + 1);
+  const since = dayRange === null ? null : sinceDate.getTime();
+  const inPeriod = (g: SavedGame) => since === null || g.created >= since;
+  const periodGames = library.games.filter(inPeriod);
+  const games = periodGames.filter(
       (g) =>
         g.result !== "*" &&
         g.folder !== "Studies" &&
@@ -81,7 +88,7 @@ export default function Stats() {
     } catch {}
   }
   const days = Object.entries(library.progress.daily)
-    .filter(([, v]) => v.correct)
+    .filter(([d, v]) => v.correct && (since === null || Date.parse(d + "T00:00:00") >= since))
     .map(([d]) => d)
     .sort();
   let dailyRun = 0,
@@ -136,7 +143,7 @@ export default function Stats() {
     ["Underpromotion artist", underpromotionMates, 5],
     [
       "Study the evidence",
-      library.games.filter(
+      periodGames.filter(
         (g) =>
           g.review && g.review.length >= g.moves.length && g.moves.length >= 40,
       ).length,
@@ -170,7 +177,7 @@ export default function Stats() {
   };
   const visited = [
     ...new Set(
-      library.games
+      periodGames
         .filter(
           (g) => g.moves.length && g.country && /^[A-Z]{2}$/.test(g.country),
         )
@@ -179,7 +186,18 @@ export default function Stats() {
   ];
   return (
     <div className="stats-page stats-dashboard">
-      <header className="stats-header"><h1>Stats</h1></header>
+      <header className="stats-header">
+        <h1>Stats</h1>
+        <div className="activity-range">
+          <ChoiceSelect aria-label="Stats period" value={period} onChange={event => setPeriod(event.target.value)}>
+            <option value="all">All time</option>
+            {[7, 14, 30, 90, 365].map(n => <option value={n} key={n}>Last {n} days</option>)}
+            <option value="custom">Custom</option>
+          </ChoiceSelect>
+          {period === "custom" && <input type="number" aria-label="Stats days" min={1} max={3650}
+            value={customDays} onChange={event => setCustomDays(Math.max(1, Math.min(3650, Number(event.target.value) || 1)))} />}
+        </div>
+      </header>
       <div className="stats-tabs" role="group" aria-label="Stats sections">
         {["Overview", "Competition", "Rankings", "Achievements", "World map"].map((t) => (
           <button
@@ -195,7 +213,7 @@ export default function Stats() {
         <section className="stats-achievements" aria-labelledby="achievement-title">
           <header className="stats-section-heading">
             <div><h2 id="achievement-title">Achievements</h2><p className="caption">
-              {badges.filter(([, value, goal]) => value >= goal).length} of {badges.length} unlocked
+              {badges.filter(([, value, goal]) => value >= goal).length} of {badges.length} unlocked{since !== null && " · Undated progress shows lifetime totals"}
             </p></div>
             <Button className="secondary" aria-pressed={onlyUnlocked} onClick={() => setOnlyUnlocked(value => !value)}>
               Unlocked only
@@ -218,9 +236,12 @@ export default function Stats() {
           {onlyUnlocked && !badges.some(([, value, goal]) => value >= goal) && <p>No achievements unlocked yet.</p>}
         </section>
       ) : tab === "Competition" ? (
-        <CompetitionStats games={games} />
+        <CompetitionStats games={games} speedrunGames={periodGames} since={since} />
       ) : tab === "Rankings" ? (
-        <Rankings embedded />
+        <>
+          {since !== null && <p className="caption">Rankings show current standings.</p>}
+          <Rankings embedded />
+        </>
       ) : tab === "World map" ? (
         <WorldMap visited={visited} />
       ) : (
@@ -229,16 +250,17 @@ export default function Stats() {
           wins={wins}
           draws={draws}
           losses={losses}
+          daysSelected={dayRange}
         />
       )}
     </div>
   );
 }
-function CompetitionStats({games}: {games:SavedGame[]}) {
- const {library,navigate}=useApp(), {session}=useOnlineSession();
+function CompetitionStats({games, speedrunGames, since}: {games:SavedGame[]; speedrunGames:SavedGame[]; since:number|null}) {
+ const {navigate}=useApp(), {session}=useOnlineSession();
  const [total,setTotal]=useState(0),[throneGames,setThroneGames]=useState(0),[metric,setMetric]=useState("Time"),[error,setError]=useState("");
- useEffect(()=>{setTotal(0);setThroneGames(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_stats");if(active){setTotal(Number(r.data?.timeMs)||0);setThroneGames(Number(r.data?.games)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id]);
- const bests=new Map(speedrunBests(library.games));
+ useEffect(()=>{setTotal(0);setThroneGames(0);setError("");if(!online || !session)return;let active=true;const load=async()=>{const r=await online!.rpc("throne_stats", since === null ? {} : {p_since:new Date(since).toISOString()});if(active){setTotal(Number(r.data?.timeMs)||0);setThroneGames(Number(r.data?.games)||0);setError(r.error?"Throne stats unavailable":"");}};void load();const t=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(t);};},[session?.user.id,since]);
+ const bests=new Map(speedrunBests(speedrunGames));
  const [ratingBand, setRatingBand] = useState("all");
  const ratings = Array.from({length:59}, (_, i) => 100+i*50);
  const visibleRatings = ratingBand === "all" ? ratings : ratings.filter(elo => Math.floor(elo / 1000) === Number(ratingBand));
@@ -263,7 +285,7 @@ function CompetitionStats({games}: {games:SavedGame[]}) {
     <option value="all">All ratings</option><option value="0">100–950 Elo</option>
     <option value="1">1,000–1,950 Elo</option><option value="2">2,000–2,950 Elo</option>
     <option value="3">3,000 Elo</option>
-  </ChoiceSelect></div><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating" tabIndex={0}>{visibleRatings.map(elo=>{const game=bests.get(elo);return <div role="listitem" key={elo}><button type="button" className={`speedrun-rating ${game?"has-record":""}`} aria-label={`Play Speedrun at ${elo} Elo${game?`, best ${duration(game.speedrun!.elapsedMs,true)}`:""}`} onClick={()=>navigate("play",`speedrun/${elo}`)}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs,true):"—"}</strong></button></div>;})}</div></Card>
+  </ChoiceSelect></div><div className="speedrun-rating-grid" role="list" aria-label="Fastest wins by computer rating">{visibleRatings.map(elo=>{const game=bests.get(elo);return <div role="listitem" key={elo}><button type="button" className={`speedrun-rating ${game?"has-record":""}`} aria-label={`Play Speedrun at ${elo} Elo${game?`, best ${duration(game.speedrun!.elapsedMs,true)}`:""}`} onClick={()=>navigate("play",`speedrun/${elo}`)}><span>{elo}</span><strong>{game?duration(game.speedrun!.elapsedMs,true):"—"}</strong></button></div>;})}</div></Card>
  </div>;
 }
 
@@ -272,22 +294,25 @@ function StatsOverview({
   wins,
   draws,
   losses,
+  daysSelected,
 }: {
   games: SavedGame[];
   wins: number;
   draws: number;
   losses: number;
+  daysSelected: number | null;
 }) {
   const { library } = useApp();
   const rate = games.length ? Math.round((wins / games.length) * 100) : null;
-  const [dayRange, setDayRange] = useState(7),
-    [customRange, setCustomRange] = useState(false);
+
   const completedByDay = new Map<number, number>();
   for (const game of games) {
     const d = new Date(game.created);
     d.setHours(0, 0, 0, 0);
     completedByDay.set(d.getTime(), (completedByDay.get(d.getTime()) || 0) + 1);
   }
+  const oldest = Math.min(Date.now(), ...completedByDay.keys());
+  const dayRange = daysSelected ?? Math.max(7, Math.round((Date.now() - oldest) / 86400000) + 1);
   const dayFormatter = new Intl.DateTimeFormat(
     undefined,
     dayRange <= 7
@@ -329,18 +354,18 @@ function StatsOverview({
         {[
           {
             icon: Target,
-            label: "Rating",
+            label: daysSelected === null ? "Rating" : "Current rating",
             value: Math.round(library.localRating),
           },
           { icon: Trophy, label: "Games played", value: games.length },
           {
             icon: Puzzle,
-            label: "Puzzles solved",
+            label: daysSelected === null ? "Puzzles solved" : "Lifetime puzzles solved",
             value: library.progress.solved,
           },
           {
             icon: Flame,
-            label: "Puzzle streak",
+            label: daysSelected === null ? "Puzzle streak" : "Current puzzle streak",
             value: library.progress.streak,
           },
         ].map(({ icon: Icon, label, value }) => (
@@ -387,107 +412,48 @@ function StatsOverview({
             </div>
           </div>
         </Card>
-        <Card className="activity-card">
-          <div className="card-heading">
-            <h2>Activity</h2>
-            <div className="activity-range">
-              <ChoiceSelect
-                aria-label="Activity period"
-                value={customRange ? "custom" : dayRange}
-                onChange={(e) => {
-                  setCustomRange(e.target.value === "custom");
-                  if (e.target.value !== "custom")
-                    setDayRange(Number(e.target.value));
-                }}
-              >
-                {[7, 14, 30, 90, 365].map((n) => (
-                  <option value={n} key={n}>
-                    Last {n} days
-                  </option>
-                ))}
-                <option value="custom">Custom</option>
-              </ChoiceSelect>
-              {customRange && (
-                <input
-                  type="number"
-                  aria-label="Activity days"
-                  min={1}
-                  max={3650}
-                  value={dayRange}
-                  onChange={(e) =>
-                    setDayRange(
-                      Math.max(1, Math.min(3650, Number(e.target.value) || 1)),
-                    )
-                  }
-                />
-              )}
-            </div>
-          </div>
-          <div
-            className="activity-chart"
-            style={{
-              gap: activity.length > 14 ? 4 : 12,
-              gridTemplateColumns: `repeat(${activity.length},minmax(6px,1fr))`,
-            }}
-          >
-            {activity.map((d, i) => (
-              <div className="activity-day" key={i}>
-                <div className="activity-track">
-                  <span
-                    role="img"
-                    title={`${d.range}: ${d.count} completed games`}
-                    aria-label={`${d.range}: ${d.count} completed games`}
-                    style={{ height: `${(d.count / max) * 100}%` }}
-                  >
-                    {d.count > 0 && activity.length <= 14 && <b>{d.count}</b>}
-                  </span>
-                </div>
-                <small>
-                  {i % Math.ceil(activity.length / 7) === 0 ||
-                  i === activity.length - 1
-                    ? d.label
-                    : ""}
-                </small>
-              </div>
-            ))}
-          </div>
-          {!days.some((d) => d.count) && (
-            <p className="activity-empty">No completed games in this period.</p>
-          )}
-        </Card>
-      </div>
-      <details className="stats-extra">
-        <summary>Training and results by color</summary>
-        <div className="stats-detail-grid">
-        <Card className="training-stat">
-          <div className="card-heading">
-            <h2>Training</h2>
-            <BookOpen size={18} />
-          </div>
-          <Bar
-            label="Opening lessons"
-            value={library.progress.learned.length}
-            total={129}
-          />
-          <Bar
-            label="Endgame Lessons"
-            value={library.progress.endgames.length}
-            total={17}
-          />
-          <div className="stats-training-footer">
-            <span>{library.repertoire.length} repertoire lines</span>
-          </div>
-        </Card>
         <Card className="playing-color-stat">
           <h2>Playing color</h2>
           {["w","b"].map(side=>{
             const chosen=games.filter(g=>g.human===side),win=chosen.filter(g=>g.result===(side==="w"?"1-0":"0-1")).length,draw=chosen.filter(g=>g.result==="1/2-1/2").length,loss=chosen.length-win-draw;
             return <div className="playing-color-row" key={side}><div className="playing-color-label"><span>{side==="w"?"White":"Black"}</span><b>{chosen.length}</b></div><div className="playing-color-stack" role="img" aria-label={`${side==="w"?"White":"Black"}: ${win} wins, ${loss} losses, ${draw} draws`}>{[["win",win],["loss",loss],["draw",draw]].map(([kind,count])=><span key={kind} className={`outcome-${kind}`} style={{width:`${Number(count)/Math.max(1,chosen.length)*100}%`}} title={`${count} ${kind === "win"?"wins":kind === "loss"?"losses":"draws"}`}>{Number(count)>0?count:""}</span>)}</div></div>;
           })}
-          <div className="color-results-key"><span><i className="outcome-win"/>Wins</span><span><i className="outcome-loss"/>Losses</span><span><i className="outcome-draw"/>Draws</span></div>
         </Card>
       </div>
-      </details>
+      <Card className="activity-card">
+        <h2>Activity</h2>
+        <div
+          className="activity-chart"
+          style={{
+            gap: activity.length > 14 ? 4 : 12,
+            gridTemplateColumns: `repeat(${activity.length},minmax(6px,1fr))`,
+          }}
+        >
+          {activity.map((d, i) => (
+            <div className="activity-day" key={i}>
+              <div className="activity-track">
+                <span
+                  role="img"
+                  title={`${d.range}: ${d.count} completed game${d.count === 1 ? "" : "s"}`}
+                  aria-label={`${d.range}: ${d.count} completed game${d.count === 1 ? "" : "s"}`}
+                  style={{ height: `${(d.count / max) * 100}%` }}
+                >
+                  {d.count > 0 && activity.length <= 14 && <b>{d.count}</b>}
+                </span>
+              </div>
+              <small>
+                {i % Math.ceil(activity.length / 7) === 0 ||
+                i === activity.length - 1
+                  ? d.label
+                  : ""}
+              </small>
+            </div>
+          ))}
+        </div>
+        {!days.some((d) => d.count) && (
+          <p className="activity-empty">No completed games in this period.</p>
+        )}
+      </Card>
     </div>
   );
 }
@@ -650,17 +616,6 @@ function WorldMap({ visited }: { visited: string[] }) {
           : "Pinch to zoom. Drag to pan. Double-tap to reset."}
       </p>
     </Card>
-    <aside className="stats-map-list">
-      <h2>Opponent countries</h2>
-      {visited.length ? <ul>{visited.map(code => (
-        <li key={code}>
-          <button type="button" className="text-link" aria-pressed={selected === code} onClick={() => setSelected(code)}>
-            <Flag size={14} aria-hidden="true" />
-            {names.of(code) || code}
-          </button>
-        </li>
-      ))}</ul> : <p className="caption">Countries appear here as you play people online.</p>}
-    </aside>
     </div>
   );
 }

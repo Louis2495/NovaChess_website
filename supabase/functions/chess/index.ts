@@ -241,6 +241,7 @@ Deno.serve(async (req) => {
       }
       return json(await commit());
     }
+    if (!me && finishing && r.mode === "throne") return json(r);
     if (!me) throw Error("Join the room first.");
     if (action === "marks") {
       if (r.mode !== "team" || !me.team)
