@@ -44,7 +44,7 @@
 .stats-dashboard .stats-visual-grid { margin:0; }
 .stats-dashboard .stats-overview .results-ring > div { background:var(--panel-solid); }
 .stats-dashboard .stats-overview .results-ring > div > span { color:var(--text); }
-.stats-dashboard .activity-track > span { background:var(--accent); }
+.stats-dashboard .stats-overview .activity-track > span { background:#5b93ca; }
 .stats-dashboard .stats-competition .speedrun-stats { grid-column:1 / -1; }
 .stats-dashboard .stats-section-heading {
   display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px;
