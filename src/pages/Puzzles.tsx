@@ -88,6 +88,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     [played, setPlayed] = useState<string[]>([]);
   const [mistake,setMistake]=useState<PuzzleMistakePosition|null>(null);
   const [reviewIndex,setReviewIndex]=useState<number|null>(null);
+  const [reviewMistake, setReviewMistake] = useState<PuzzleMistakePosition | null>(null);
   const reviewing=reviewIndex!==null;
   const history=useMemo(()=>{const board=new Chess(puzzle.fen);board.move(puzzle.moves[0]);const positions=[board.fen()];for(const move of played){board.move(move);positions.push(board.fen());}return positions;},[puzzle,played]);
   const layoutRef = useRef<HTMLDivElement>(null),
@@ -118,6 +119,10 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     return c.turn();
   }, [puzzle]);
   const c = new Chess(fen);
+  const reviewFen = reviewIndex === null ? null : history[reviewIndex];
+  const canTryReviewMove = reviewFen?.split(" ")[1] === learner;
+  const displayedMistake = reviewing ? reviewMistake : mistake;
+
   function grade(correct: boolean) {
     if (graded.current) return;
     graded.current = true;
@@ -184,18 +189,27 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     setMistake(null);
     setPlayed([]);
     setReviewIndex(null);
+    setReviewMistake(null);
     graded.current = daily && !!library.progress.daily[today()];
   }
   function attempt(from: string, to: string, promotion?: string) {
-    if (done || reviewing || c.turn() !== learner) return;
+    if (reviewing ? !canTryReviewMove : done || c.turn() !== learner) return;
     try {
-      const ch = new Chess(fen),
-        m = ch.move({ from, to, promotion: promotion || "q" }),
-        uci = m.from + m.to + (m.promotion || "");
-      if (uci !== puzzle.moves[cursor] && !ch.isCheckmate()) {
+      const before = reviewFen ?? fen;
+      const ch = new Chess(before);
+      const m = ch.move({ from, to, promotion: promotion || "q" });
+      const uci = m.from + m.to + (m.promotion || "");
+      const expected = puzzle.moves[reviewIndex === null ? cursor : reviewIndex + 1];
+      const failed = uci !== expected && !ch.isCheckmate();
+      if (reviewIndex !== null) {
+        if (failed) setReviewMistake({ before, after: ch.fen(), move: m.san });
+        else seekReview(reviewIndex + 1);
+        return;
+      }
+      if (failed) {
         grade(false);
         setWrong(true);
-        setMistake({before:fen,after:ch.fen(),move:m.san});
+        setMistake({ before, after: ch.fen(), move: m.san });
         setMessage("Try another move.");
         return;
       }
@@ -240,6 +254,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
     premove.clear();
     const next=Math.max(0,Math.min(played.length,index));
     setReviewIndex(next===played.length?null:next);
+    setReviewMistake(null);
   }
   useControl('previous',()=>seekReview((reviewIndex ?? played.length)-1));
   useControl('next',()=>seekReview((reviewIndex ?? played.length)+1));
@@ -318,19 +333,19 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           <div className="puzzle-board-area">
           <div
             ref={puzzleBoardRef}
-            className={`puzzle-board ${wrong ? "wrong" : ""} ${done ? "solved" : ""}`}
+            className={`puzzle-board ${(reviewing ? reviewMistake : wrong) ? "wrong" : ""} ${done && !reviewing ? "solved" : ""}`}
           >
             <Board
-              fen={reviewing ? history[reviewIndex] : premove.preview}
-              materialFen={reviewing ? history[reviewIndex] : fen}
+              fen={reviewFen ?? premove.preview}
+              materialFen={reviewFen ?? fen}
               onCancelPremoves={premove.cancelOnRightClick}
-              legalMoves={reviewing ? [] : c.turn() === learner ? undefined : premove.options}
+              legalMoves={reviewing || c.turn() === learner ? undefined : premove.options}
               onMove={(from, to, promotion) =>
-                c.turn() === learner
+                reviewing || c.turn() === learner
                   ? attempt(from, to, promotion)
                   : premove.enqueue(from + to + (promotion || ""))
               }
-              disabled={done || reviewing || (c.turn() !== learner && !appearance.premoves)}
+              disabled={reviewing ? !canTryReviewMove : done || (c.turn() !== learner && !appearance.premoves)}
               flipped={learner === "b"}
               hint={reviewing ? "" : hint}
               guides={!reviewing && hintArrow?[hintArrow]:[]}
@@ -344,7 +359,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           />
           {daily && actions}
           <div className="puzzle-feedback" role="status">
-            {message}
+            {reviewing ? reviewMistake && "Try another move." : message}
           </div>
 
         </div>
@@ -360,7 +375,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
             <input aria-label="Puzzle replay position" type="range" min={0} max={played.length} value={reviewIndex ?? played.length} disabled={!played.length} onChange={e=>seekReview(Number(e.target.value))}/>
             <Button className="secondary" aria-label="Next puzzle move" disabled={!reviewing} onClick={()=>seekReview((reviewIndex ?? played.length)+1)}><ChevronRight size={19}/></Button>
           </div>
-          {mistake && <PuzzleMistake position={mistake}/>}
+          {displayedMistake && <PuzzleMistake position={displayedMistake}/>}
           {daily ? <PuzzleChat key={`${today()}/${puzzle.id}`} puzzleKey={`${today()}/${puzzle.id}`}/> : <>
           <Card>
             <div className="large-metric puzzle-rating">
