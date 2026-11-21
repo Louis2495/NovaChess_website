@@ -180,6 +180,7 @@ before(async () => {
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
+    .replace('"./team-engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/team-engine.ts")).href))
     .replace('"./engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/engine.ts")).href))
     .replace('"../../../src/lib/teamComputer.ts"',JSON.stringify(pathToFileURL(resolve("src/lib/teamComputer.ts")).href))
     .replace('"../../../src/lib/onlineVariants.ts"',JSON.stringify(pathToFileURL(resolve("src/lib/onlineVariants.ts")).href))
@@ -308,6 +309,18 @@ test("Vote Chess shares one room across simultaneous entries and creates a new g
   const next=await call(users[0],{action:"create",mode:"vote"});
   assert.equal(next.status,200,JSON.stringify(next.data));
   assert.notEqual(next.data.id,active.id);
+});
+
+test("Team Chess max strength uses the server Stockfish build and returns a legal move", async () => {
+  const game = await room("team", { bot: true, botRating: 3200 });
+  assert.equal(game.settings.botRating, 3200);
+  const moved = await command(users[0], game, "move", { move: "e2e4" });
+  assert.equal(moved.status, 200, JSON.stringify(moved.data));
+  const [human, bot] = moved.data.state.moves;
+  const board = new Chess();
+  board.move(human);
+  assert.ok(board.move(bot));
+  assert.equal(moved.data.state.fen, board.fen());
 });
 
 test("Team chess lets teammates move and draw shared arrows, and the server plays the bot", async () => {

@@ -577,6 +577,17 @@ test('Team Chess sends the chosen rating when starting a computer game',async({p
  await expect.poll(()=>env.actions[0]).toMatchObject({action:'create',mode:'team',bot:true,botRating:1700});
 });
 
+test("Team Chess can start a game at max computer strength", async ({ page }) => {
+  const env = await connected(page);
+  await page.goto("/#variants");
+  await page.getByRole("button", { name: "Team Chess", exact: true }).click();
+  await page.locator(".quick-online-play").getByRole("button", { name: "Computer", exact: true }).click();
+  await page.getByRole("button", { name: "Max strength", exact: true }).click();
+  await expect(page.getByRole("spinbutton", { name: "Computer rating" })).toHaveValue("3200");
+  await page.getByRole("button", { name: "Start Team Chess", exact: true }).click();
+  await expect.poll(() => env.actions[0]).toMatchObject({ action: "create", mode: "team", bot: true, botRating: 3200 });
+});
+
 test('Vote Chess opens the shared game through the server entry point',async({page})=>{
  const env=await connected(page);
  Object.assign(env.room,{mode:'vote',deadline:new Date(Date.now()+86400000).toISOString()});

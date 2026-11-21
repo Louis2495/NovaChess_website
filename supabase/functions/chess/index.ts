@@ -1,9 +1,10 @@
 declare const EdgeRuntime: {waitUntil(task:Promise<unknown>):void};
+import { strongTeamComputerMove } from "./team-engine.ts";
 import {onlineEngine} from "./engine.ts";
 import {freshOnline,applyOnline,onlineVariantIds,specialVariants} from "../../../src/lib/onlineVariants.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.119.0";
 import { Chess, type Move } from "npm:chess.js@1.4.0";
-import { clampTeamComputerRating, teamComputerMaxRating } from "../../../src/lib/teamComputer.ts";
+import { clampTeamComputerRating, teamComputerCasualMaxRating } from "../../../src/lib/teamComputer.ts";
 import {
   newSpecial,
   specialApply,
@@ -75,7 +76,7 @@ function tacticalValue(move: Move) {
 
 function teamBotMove(fen: string, rating: number) {
   const moves = new Chess(fen).moves({ verbose: true });
-  const variation = (teamComputerMaxRating - rating) * 0.45;
+  const variation = (teamComputerCasualMaxRating - rating) * 0.45;
   let best: Move | undefined;
   let bestScore = -Infinity;
   for (const move of moves) {
@@ -377,7 +378,10 @@ Deno.serve(async (req) => {
       state.result === "*" &&
       state.fen.split(" ")[1] === "b"
     ) {
-      const move = teamBotMove(state.fen, clampTeamComputerRating(r.settings.botRating));
+      const rating = clampTeamComputerRating(r.settings.botRating);
+      const move = rating > teamComputerCasualMaxRating
+        ? await strongTeamComputerMove(state.fen, rating)
+        : teamBotMove(state.fen, rating);
       if (move) state = standardApply(state, move);
     }
     if(state.result!=="*" && state.clock)state={...state,clock:{...state.clock,startedAt:null}};

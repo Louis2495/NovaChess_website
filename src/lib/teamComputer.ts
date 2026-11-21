@@ -1,5 +1,6 @@
 export const teamComputerMinRating = 400;
-export const teamComputerMaxRating = 2000;
+export const teamComputerMaxRating = 3200;
+export const teamComputerCasualMaxRating = 2000;
 export const teamComputerDefaultRating = 1000;
 export const teamComputerRatingStep = 100;
 

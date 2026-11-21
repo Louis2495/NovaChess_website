@@ -338,7 +338,7 @@ export default function Community({presetMode = "standard", presetVariant = "che
       <div className="online-player-identity">{members.map(member => {
         const profile = profiles.find(p => p.id === member.id);
         return <div key={member.id}><b><GameScore result={position?.result} side={side}/> {username(member.id)}</b><span className="caption">{profile?.rating ?? "—"}</span></div>;
-      })}{side === "b" && room.settings.bot && <div><b>Computer</b><span className="caption">{clampTeamComputerRating(room.settings.botRating)}</span></div>}
+      })}{side === "b" && room.settings.bot && <div><b>Computer</b><span className="caption">{clampTeamComputerRating(room.settings.botRating) === teamComputerMaxRating ? "Max strength" : clampTeamComputerRating(room.settings.botRating)}</span></div>}
       {!members.length && !(side === "b" && room.settings.bot) && <b>Waiting for opponent</b>}</div>
     </div>;
   }
@@ -656,11 +656,14 @@ export default function Community({presetMode = "standard", presetVariant = "che
           ) : (
             <Card className="quick-online-play">
               {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>{setBot(e.target.value==="bot");if(e.target.value==="bot")setSelectedFriend(null);}}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
-              {mode === "team" && bot && <Field label="Computer rating">
+              {mode === "team" && bot && <div className="team-computer-rating"><Field label="Computer rating">
                 <input className="team-rating-input" type="number" min={teamComputerMinRating} max={teamComputerMaxRating} step={teamComputerRatingStep}
                   value={botRating} onChange={e=>setBotRating(e.target.value)}
                   onBlur={()=>setBotRating(String(clampTeamComputerRating(botRating === "" ? undefined : Number(botRating))))}/>
-              </Field>}
+              </Field>
+                <Button className="secondary" aria-pressed={Number(botRating) === teamComputerMaxRating}
+                  onClick={() => setBotRating(String(teamComputerMaxRating))}>Max strength</Button>
+              </div>}
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 if(selectedFriend){await challengeFriend(selectedFriend.id);return;}
                 setBusy(true);setError("");
