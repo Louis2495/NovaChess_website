@@ -21,3 +21,33 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  await page.getByRole('button',{name:'Share',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Share game',exact:true});await expect(dialog.getByRole('button',{name:'Download PGN',exact:true})).toBeVisible();await expect(dialog.getByRole('button',{name:'Game GIF',exact:true})).toBeVisible();
  const download=page.waitForEvent('download');await dialog.getByRole('button',{name:'Download PGN',exact:true}).click();expect((await download).suggestedFilename()).toMatch(/\.pgn$/);
 });
+
+test('game review runs real Stockfish when WASM is served as binary', async ({ page, context, isMobile }) => {
+  const game = new Chess();
+  const initial = game.fen();
+  game.move('e4');
+  await page.addInitScript(saved => localStorage.setItem(
+    'novachess-library-v2', JSON.stringify({ games: [saved] }),
+  ), {
+    id: 'engine-fixture', title: 'Engine fixture', created: Date.now(),
+    initial, positions: [initial, game.fen()], moves: ['e2e4'], notation: ['e4'],
+    result: '1-0', human: 'w', variant: 'chess', kind: 'game', origin: 'archive', folder: 'Games',
+  });
+  let wasmRequests = 0;
+  await context.route('**/engine/stockfish-19-lite-single.wasm', async route => {
+    wasmRequests++;
+    const response = await route.fetch();
+    await route.fulfill({ response, contentType: 'application/octet-stream' });
+  });
+
+  await page.goto('/#library/engine-fixture');
+  await expect(page.locator('.review-status')).toHaveText('Review complete.', { timeout: 15000 });
+  expect(wasmRequests).toBeGreaterThan(0);
+  await expect(page.locator('.review-notation .move-quality')).toHaveCount(1);
+
+  if (!isMobile) {
+    const board = (await page.locator('.game-review-layout .board').boundingBox())!;
+    const summary = (await page.locator('.game-review-layout .review-summary').boundingBox())!;
+    expect(summary.x - (board.x + board.width)).toBeGreaterThanOrEqual(36);
+  }
+});

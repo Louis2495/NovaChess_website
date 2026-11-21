@@ -428,7 +428,7 @@ function GameViewer({
     setReviewing(true);
     const ctrl = new AbortController();
     controller.current = ctrl;
-    const worker = standard ? new Worker(new URL(`${base}engine/stockfish-19-lite-single.js`, document.baseURI)) : undefined;
+    let worker: Worker | undefined;
     const openings = standard ? await loadData<import("../lib/types").Opening[]>("openings").catch(() => []) : [];
     const cache = new Map<string, Awaited<ReturnType<typeof search>>>();
     const evaluate = async (fen: string, deeper = false) => {
@@ -454,6 +454,8 @@ function GameViewer({
           best: "",
           lines: [{ score: 0, depth: 0, mate: null, moves: [], rank: 1 }],
         };
+      // Start the worker when the first search can listen for startup errors.
+      worker ??= new Worker(new URL(`${base}engine/stockfish-19-lite-single.js`, document.baseURI));
       const result = await search(fen, {
         time: deeper ? 900 : c.isCheck() ? 650 : 350,
         depth: deeper ? 22 : 18, worker, signal: ctrl.signal,
