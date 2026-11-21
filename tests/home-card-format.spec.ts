@@ -15,6 +15,36 @@ test('Recent games stays visible when the library is empty', async ({ page }) =>
   await expect(recent.locator('.recent-game-entry')).toHaveCount(0);
 });
 
+test('the meme image area fills both empty bands with white over a custom background', async ({ page }) => {
+  await page.route('**/memes/candidates.json', route => route.fulfill({
+    json: [{ id: 'wide-meme', image: 'wide-meme.svg', alt: 'Wide test meme', width: 800, height: 100, status: 'approved' }],
+  }));
+  await page.route('**/memes/wide-meme.svg', route => route.fulfill({
+    contentType: 'image/svg+xml',
+    body: '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="100"><rect width="800" height="100" fill="#182460"/></svg>',
+  }));
+  await page.goto('/');
+  await page.locator('.app').evaluate(el => { (el as HTMLElement).style.backgroundColor = '#301a55'; });
+  const image = page.locator('.daily-meme-image');
+  await image.evaluate((meme: HTMLImageElement) => meme.decode());
+  await expect(image).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  const screenshot = await image.screenshot();
+  const colors = await page.evaluate(async (png) => {
+    const image = new Image();
+    image.src = 'data:image/png;base64,' + png;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(image, 0, 0);
+    return [.12, .5, .88].map(row => Array.from(
+      ctx.getImageData(Math.floor(image.width / 2), Math.floor(image.height * row), 1, 1).data,
+    ));
+  }, screenshot.toString('base64'));
+  expect(colors).toEqual([[255, 255, 255, 255], [24, 36, 96, 255], [255, 255, 255, 255]]);
+});
+
 test('desktop Home places equally tall Recent games beside the meme',async({page})=>{
  await page.addInitScript(()=>{const initial='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';localStorage.setItem('novachess-library-v2',JSON.stringify({games:['1-0','0-1','1/2-1/2'].map((result,i)=>({id:String(i),title:'Standard',initial,positions:[initial],moves:[],notation:[],result,human:'w',variant:'chess',folder:'Games',kind:'game',created:Date.now(),opponent:'Computer',botRating:1200}))}));});
  for(const meme of [memes.reduce((a:any,b:any)=>a.width/a.height<b.width/b.height?a:b),memes.reduce((a:any,b:any)=>a.width/a.height>b.width/b.height?a:b)]){

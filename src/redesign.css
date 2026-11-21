@@ -5266,7 +5266,7 @@ html { scrollbar-gutter:stable; }
 .home-page .home-practice-grid { align-items:center; }
 .home-page .home-practice-grid .home-puzzle { height:auto; min-height:0; }
 .home-page .home-practice-grid .home-puzzle-content > .daily-board-preview { width:min(100%,360px); }
-.home-page .home-practice-grid .daily-meme { width:fit-content; max-width:100%; height:auto; min-height:0; padding:0; justify-self:center; align-self:center; background:transparent; border:0; box-shadow:none; }
+.home-page .home-practice-grid .daily-meme { width:fit-content; max-width:100%; height:auto; min-height:0; padding:0; justify-self:center; align-self:center; background:#fff; border:0; box-shadow:none; }
 .home-page .home-practice-grid .daily-meme-image { display:block; width:auto; height:auto; max-width:100%; max-height:min(560px,65dvh); object-fit:contain; border-radius:12px; }
 .home-recent .recent-game-entry { --recent-color:#fff; background:var(--recent-color); border:2px solid var(--recent-color); border-radius:14px; margin-block:12px; overflow:visible; }
 .home-recent .recent-game-entry.result-win { --recent-color:#39ed83; }
@@ -5323,7 +5323,6 @@ html { scrollbar-gutter:stable; }
  .home-page:has(.home-recent):not(.memes-hidden) .home-puzzle { grid-column:1; align-self:stretch; padding:18px; }
  .home-page:has(.home-recent):not(.memes-hidden) .daily-meme { grid-column:2; align-self:stretch; height:auto; position:relative; }
  .home-page:has(.home-recent):not(.memes-hidden) .daily-meme-image { position:absolute; inset:0; }
- .home-page:has(.home-recent):not(.memes-hidden) .daily-meme-image { max-height:min(420px,calc(100dvh - 310px)); }
  .home-page:has(.home-recent):not(.memes-hidden) > .home-recent { grid-column:3; margin-top:0; min-width:0; align-self:stretch; }
  .home-page:has(.home-recent):not(.memes-hidden) .recent-game-entry { margin-block:10px; }
  .home-page:has(.home-recent):not(.memes-hidden) .recent-game-row { padding:12px 10px; gap:8px; }
@@ -5364,7 +5363,6 @@ html { scrollbar-gutter:stable; }
 }
 
 @media(min-width:1001px) {
- .home-page:has(.home-recent):not(.memes-hidden) .daily-meme-image { max-height:min(380px,calc(100dvh - 370px)); }
  .home-page:has(.home-recent):not(.memes-hidden) .recent-game-entry { margin-block:8px; }
  .home-page:has(.home-recent):not(.memes-hidden) .recent-game-row { padding:10px; }
  .home-page:has(.home-recent):not(.memes-hidden) .recent-game-info small { line-height:1.25; }
@@ -5466,7 +5464,7 @@ html { scrollbar-gutter:stable; }
 }
 .home-page .home-puzzle.is-completed { outline:4px solid #ffdf00; outline-offset:0; }
 .home-page .home-practice-grid .daily-meme { height:var(--home-preview-height,360px); width:100%; box-sizing:border-box; border:8px solid #fff; border-radius:12px; overflow:hidden; background:#fff; }
-.home-page .home-practice-grid .daily-meme .daily-meme-image { width:100%; height:100%; max-width:none; max-height:none; outline:0; border-radius:0; object-fit:contain; }
+.home-page .home-practice-grid .daily-meme .daily-meme-image { width:100%; height:100%; max-width:none; max-height:none; outline:0; border-radius:0; object-fit:contain; background-color:#fff; }
 .home-page > .home-recent { box-sizing:border-box; display:flex; flex-direction:column; min-height:0; }
 .home-recent-empty { margin:0; }
 .home-recent-list { flex:1; min-height:0; overflow:auto; padding:0 2px; }
