@@ -565,3 +565,13 @@ test('Team Chess sends the chosen rating when starting a computer game',async({p
  await page.getByRole('button',{name:'Start Team Chess',exact:true}).click();
  await expect.poll(()=>env.actions[0]).toMatchObject({action:'create',mode:'team',bot:true,botRating:1700});
 });
+
+test('Vote Chess opens the shared game through the server entry point',async({page})=>{
+ const env=await connected(page);
+ Object.assign(env.room,{mode:'vote',deadline:new Date(Date.now()+86400000).toISOString()});
+ await page.goto('/#variants/choose/vote');
+ await page.getByRole('button',{name:'Join Vote Chess',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Vote Chess',exact:true})).toBeVisible();
+ expect(env.actions).toEqual([expect.objectContaining({action:'create',mode:'vote'})]);
+ expect(env.requests.some(url=>url.pathname.endsWith('/room_lobby'))).toBe(false);
+});

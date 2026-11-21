@@ -655,6 +655,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
                 if(selectedFriend){await challengeFriend(selectedFriend.id);return;}
                 setBusy(true);setError("");
                 try {
+                  if(mode==="vote"){
+                    await act("create",{mode});
+                    return;
+                  }
                   if(mode==="team" && bot){
                     await act("create",{mode,name,variant:"chess",bot:true,
                       botRating:clampTeamComputerRating(botRating === "" ? undefined : Number(botRating)),
@@ -666,9 +670,9 @@ export default function Community({presetMode = "standard", presetVariant = "che
                   if(mode==="standard" && variant==="chess")listing.eq("time_control",timeControlSeconds).eq("increment_seconds",incrementSeconds);
                   const {data,error}=await listing;
                   if(error)throw error;
-                  const available=(data||[]).filter(r=>mode!=="standard" || variant!=="chess" || (r.time_control===timeControlSeconds && r.increment_seconds===incrementSeconds)).find(r=>mode === "throne" || mode === "vote" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
+                  const available=(data||[]).filter(r=>mode!=="standard" || variant!=="chess" || (r.time_control===timeControlSeconds && r.increment_seconds===incrementSeconds)).find(r=>mode === "throne" || (mode === "standard" && r.status === "waiting" && r.member_count < (variant === "bughouse" ? 4 : 2)));
                   if(available && !teammates.length) await act("join",{room:available.id});
-                  else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant:mode === "vote" ? "chess" : variant,bot:false,...(supportsTeammates && teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
+                  else await act("create",{mode,name,timeControlSeconds,incrementSeconds,variant,bot:false,...(supportsTeammates && teammates.length ? {teammates:teammates.map(player=>player.id)} : {})});
                 }catch(e){setError((e as Error).message);}finally{setBusy(false);}
               }}>{busy ? "Connecting…" : mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>
 

@@ -118,6 +118,11 @@ Deno.serve(async (req) => {
       if(active!==true)return json({error:"Account unavailable."},403);
       if (!["standard", "throne", "vote", "team"].includes(body.mode))
         throw Error("Unknown game mode.");
+      if (body.mode === "vote") {
+        const {data,error}=await db.rpc("enter_vote_chess",{p_actor:uid,p_room:null,p_initial:await fresh("chess")});
+        if(error)throw error;
+        return json(data);
+      }
       const { count } = await db
         .from("rooms")
         .select("id", { count: "exact", head: true })
@@ -126,11 +131,7 @@ Deno.serve(async (req) => {
       if ((count || 0) >= 120)
         throw Error("Too many new games. Please try again later.");
       const variant =
-        body.mode === "vote"
-          ? "chess"
-          : onlineVariantIds.includes(body.variant)
-            ? body.variant
-            : "chess";
+        onlineVariantIds.includes(body.variant) ? body.variant : "chess";
       if(body.variant && !onlineVariantIds.includes(body.variant))throw Error("Unknown variant.");
       if (body.bot && variant !== "chess")
         throw Error("Online team bots currently use standard chess.");
@@ -184,10 +185,6 @@ Deno.serve(async (req) => {
             incrementSeconds:timed?increment:0,
           },
           status: teamBot ? "playing" : "waiting",
-          deadline:
-            body.mode === "vote"
-              ? new Date(Date.now() + 86400000).toISOString()
-              : null,
         })
         .select()
         .single();
@@ -228,6 +225,11 @@ Deno.serve(async (req) => {
       return json(await commit());
     }
     if (status === "cancelled") throw Error("This game request was canceled.");
+    if (action === "join" && r.mode === "vote") {
+      const {data,error}=await db.rpc("enter_vote_chess",{p_actor:uid,p_room:r.id,p_initial:null});
+      if(error)throw error;
+      return json(data);
+    }
     if (action === "join" && r.variant === "bughouse") {
       const {data,error}=await db.rpc("join_bughouse_room",{p_room:r.id,p_actor:uid,p_invite:body.invite || null});
       if(error)throw error;
@@ -252,11 +254,7 @@ Deno.serve(async (req) => {
       }
       if (!me) {
         let team: "w" | "b" | null = null;
-        if (r.mode === "vote") {
-          if (members.length >= 32) throw Error("This team room is full.");
-          team = r.settings.bot || members.filter((m) => m.team === "w").length <=
-            members.filter((m) => m.team === "b").length ? "w" : "b";
-        } else if (!members.some((m) => m.team === "w")) team = "w";
+        if (!members.some((m) => m.team === "w")) team = "w";
         else if (!members.some((m) => m.team === "b")) team = "b";
         members = [...members, { id: uid, team }];
       }
@@ -273,13 +271,12 @@ Deno.serve(async (req) => {
         status = state.result === "*" ? "playing" : "finished";
         if(state.clock && status === "playing" && r.status === "waiting")state={...state,clock:{...state.clock,startedAt:Date.now()}};
         if(state.speedrun && status === "playing" && r.status === "waiting")state={...state,speedrun:{...state.speedrun,startedAt:Date.now()}};
-        if (r.mode === "vote" && r.status === "waiting")
-          deadline = new Date(Date.now() + 86400000).toISOString();
       }
       return json(await commit());
     }
     if (!me && finishing && r.mode === "throne") return json(r);
     if (!me) throw Error("Join the room first.");
+    if (r.mode === "vote" && action !== "vote") throw Error("Submit a move ballot.");
     if (action === "marks") {
       if (r.mode !== "team" || !me.team)
         throw Error("Only team players can draw shared arrows.");

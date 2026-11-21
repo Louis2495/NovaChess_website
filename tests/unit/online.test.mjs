@@ -176,6 +176,8 @@ before(async () => {
   await pg.exec(readFileSync('supabase/migrations/202611180016_team_friend_invites.sql','utf8'));
   await pg.exec(readFileSync("supabase/migrations/202611180017_bughouse_friend_invites.sql","utf8"));
 
+  await pg.exec(readFileSync("supabase/migrations/202611180018_single_vote_chess.sql","utf8"));
+
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
     .replace('"./engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/engine.ts")).href))
@@ -289,6 +291,25 @@ test("Vote Chess balances teams, keeps ballots after joins, closes at one day an
   assert.deepEqual(r.state.moves, ["d2d4"]);
   assert.ok(Date.parse(r.deadline) > Date.now());
 });
+test("Vote Chess shares one room across simultaneous entries and creates a new game after it ends", async () => {
+  await pg.query("update rooms set status='finished',deadline=null where mode='vote'");
+  const joined = await Promise.all(users.map(user => call(user, {action:"create",mode:"vote"})));
+  for (const result of joined) assert.equal(result.status,200,JSON.stringify(result.data));
+  assert.equal(new Set(joined.map(result=>result.data.id)).size,1);
+  const [active] = (await pg.query("select * from rooms where mode='vote' and status in ('waiting','playing')")).rows;
+  assert.equal(active.members.length,4);
+  assert.equal(active.members.filter(member=>member.team==="w").length,2);
+  assert.equal(active.status,"playing");
+  assert.equal((await command(users[0],active,"resign")).status,400);
+  const again=await call(users[0],{action:"create",mode:"vote"});
+  assert.equal(again.data.id,active.id);
+  assert.equal(again.data.members.length,4);
+  await pg.query("update rooms set status='finished',deadline=null where id=$1",[active.id]);
+  const next=await call(users[0],{action:"create",mode:"vote"});
+  assert.equal(next.status,200,JSON.stringify(next.data));
+  assert.notEqual(next.data.id,active.id);
+});
+
 test("Team chess lets teammates move and draw shared arrows, and the server plays the bot", async () => {
   let game = await room("team", { bot: true, botRating: 1800 });
   assert.equal(game.settings.botRating, 1800);
@@ -480,6 +501,7 @@ test("Team invitations join the requested side while Vote Chess always balances 
   assert.equal(game.members.find(m=>m.id===users[2]).team,"b");
   const moved = await command(users[0], game, "move", {move:"e2e4"});
   assert.equal(moved.status,200);
+  await pg.query("update rooms set status='finished', deadline=null where mode='vote'");
   const createdVote = await call(users[3], {action:"create",mode:"vote"});
   assert.equal(createdVote.status,200,JSON.stringify(createdVote.data));
   let vote = createdVote.data;
