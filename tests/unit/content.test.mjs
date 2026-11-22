@@ -131,3 +131,21 @@ test("advanced opening continuations cover every workbook family with deep lines
     }
   }
 });
+
+test("every endgame demo replays legally to the lesson goal", () => {
+  for (const exercise of read("endgames")) {
+    const board = new Chess(exercise.fen);
+    assert.ok(exercise.demo.length, exercise.id);
+    let last;
+    for (const move of exercise.demo) last = board.move(move);
+    if (exercise.goal === "mate") {
+      assert.ok(board.isCheckmate(), exercise.id);
+      assert.equal(last.color, exercise.side);
+    } else if (exercise.goal === "promote") {
+      assert.ok(last.promotion, exercise.id);
+      assert.equal(last.color, exercise.side);
+    } else {
+      assert.ok(board.isDraw(), exercise.id);
+    }
+  }
+});

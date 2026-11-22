@@ -311,6 +311,18 @@ test("endgame trainer uses legal goals and saves completion", async ({
   expect((await stored(page)).progress.endgames).toContain("queen-finish");
 });
 
+test("endgame demo plays the goal and returns to practice without awarding progress", async ({ page }) => {
+  await page.goto("/#learn/endgames");
+  await page.getByRole("button", { name: "Demo", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Demo complete" })).toBeVisible();
+  await expect(page.getByRole("status")).toContainText("Checkmate shown.");
+  expect((await stored(page))?.progress?.endgames ?? []).not.toContain("queen-finish");
+  await page.getByRole("button", { name: "Return to practice" }).click();
+  await expect(page.getByRole("button", { name: "f7, white queen", exact: true })).toBeVisible();
+  await uiMove(page, "f7g7");
+  await expect(page.getByRole("heading", { name: "Completed", exact: true })).toBeVisible();
+});
+
 test("Research loads public games and calculates real opening frequencies", async ({
   page,
 }) => {

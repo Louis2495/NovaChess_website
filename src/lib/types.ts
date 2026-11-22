@@ -38,6 +38,7 @@ export type Endgame = {
   side: "w" | "b";
   goal: "mate" | "promote" | "draw";
   tip: string;
+  demo?: string[];
 };
 export type Appearance = {
   controls?: Record<string, string>;

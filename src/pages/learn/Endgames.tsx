@@ -3,7 +3,7 @@ import { usePremoves } from "../../lib/usePremoves";
 import PremoveQueue from "../../components/PremoveQueue";
 import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
-import { Flag, Check, RotateCcw, Lightbulb, ChevronDown } from "lucide-react";
+import { Flag, Check, RotateCcw, Lightbulb, ChevronDown, Play, Square } from "lucide-react";
 import { useApp } from "../../lib/context";
 import { useData } from "../../lib/store";
 import { search } from "../../lib/engine";
@@ -24,13 +24,21 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
     [outcome, setOutcome] = useState(""),
     [busy, setBusy] = useState(false),
     [hint, setHint] = useState(""),
-    [tip, setTip] = useState(false);
+    [tip, setTip] = useState(false),
+    [demoStep, setDemoStep] = useState<number | null>(null);
   const generation = useRef(0);
   const hintController = useRef<AbortController | null>(null);
   useEffect(() => () => hintController.current?.abort(), []);
+  const demo = demoStep !== null;
+  const demoFinished = demo && demoStep === exercise.demo?.length;
+  const playedMoves = demoStep === null ? moves : (exercise.demo ?? []).slice(0, demoStep);
   const c = new Chess(exercise.fen);
-  for (const move of moves) c.move(move);
+  let lastMove;
+  for (const move of playedMoves) lastMove = c.move(move);
   const fen = c.fen();
+  const demoResult = demoFinished && (exercise.goal === "promote" ? "Promotion shown." :
+    exercise.goal === "mate" ? "Checkmate shown." :
+    c.isThreefoldRepetition() ? "Draw by repetition shown." : "Draw shown.");
   function finish(success: boolean, reason: string) {
     setOutcome(success ? "Completed" : "Try again");
     setMessage(reason);
@@ -82,7 +90,7 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
     else setMessage("");
   }
   useEffect(() => {
-    if (outcome || c.turn() === exercise.side) return;
+    if (demo || outcome || c.turn() === exercise.side) return;
     const controller = new AbortController();
     setBusy(true);
     search(fen, { time: 900, signal: controller.signal })
@@ -100,7 +108,12 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
       controller.abort();
       setBusy(false);
     };
-  }, [fen, exercise, outcome]);
+  }, [fen, exercise, outcome, demo]);
+  useEffect(() => {
+    if (demoStep === null || demoFinished) return;
+    const timer = window.setTimeout(() => setDemoStep(demoStep + 1), 550);
+    return () => window.clearTimeout(timer);
+  }, [demoStep, demoFinished, exercise.id]);
   const claimable =
     c.isThreefoldRepetition() || Number(fen.split(" ")[4]) >= 100;
   function reset(ex = exercise) {
@@ -113,6 +126,7 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
     setMessage("");
     setHint("");
     setTip(false);
+    setDemoStep(null);
   }
   const premove = usePremoves({
     fen,
@@ -120,7 +134,7 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
     legal: c
       .moves({ verbose: true })
       .map((m) => m.from + m.to + (m.promotion || "")),
-    active: !outcome,
+    active: !demo && !outcome,
     identity: exercise.id,
     execute: playMove,
   });
@@ -135,16 +149,17 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
         </div>
         <div className="lesson-board-slot">
           <Board
-            fen={premove.preview}
+            fen={demo ? fen : premove.preview}
             materialFen={fen}
             onCancelPremoves={premove.cancelOnRightClick}
             premoveDestinations={premove.destinations}
             legalMoves={c.turn() === exercise.side ? undefined : premove.options}
             flipped={exercise.side === "b"}
             disabled={
-              !!outcome || (c.turn() !== exercise.side && !appearance.premoves)
+              demo || !!outcome || (c.turn() !== exercise.side && !appearance.premoves)
             }
-            hint={hint}
+            hint={demo ? undefined : hint}
+            highlights={demo && lastMove ? [lastMove.from, lastMove.to] : undefined}
             onMove={(from, to, promotion) => {
               if (c.turn() !== exercise.side) {
                 premove.enqueue(from + to + (promotion || ""));
@@ -177,7 +192,7 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
           </select>
           <div className="card-heading">
             <h3>
-              {outcome ||
+              {demo ? demoFinished ? "Demo complete" : "Playing demo…" : outcome ||
                 (busy
                   ? "Stockfish is replying…"
                   : exercise.goal === "mate"
@@ -186,16 +201,25 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
                       ? "Promote a pawn"
                       : "Hold the draw")}
             </h3>
-            <span className="caption">{Math.ceil(moves.length / 2)} moves</span>
+            <span className="caption">{Math.ceil(playedMoves.length / 2)} moves</span>
           </div>
-          {message && (
-            <p className="feedback" role="status">
-              {message}
-            </p>
-          )}
           <div className="button-row">
+            {!!exercise.demo?.length && <Button aria-pressed={demo} onClick={() => {
+              if (demo) {
+                setDemoStep(null);
+                return;
+              }
+              generation.current++;
+              hintController.current?.abort();
+              premove.clear();
+              setBusy(false);
+              setDemoStep(0);
+            }}>
+              {demo ? <Square size={16} /> : <Play size={16} />}
+              {demo ? demoFinished ? "Return to practice" : "Stop demo" : "Demo"}
+            </Button>}
             <Button
-              disabled={!!outcome || busy}
+              disabled={demo || !!outcome || busy}
               onClick={async () => {
                 const current = generation.current;
                 const ctrl = new AbortController();
@@ -232,12 +256,15 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
             </Button>
             <Button
               className="secondary"
-              disabled={!claimable || !!outcome}
+              disabled={demo || !claimable || !!outcome}
               onClick={() => finish(exercise.goal === "draw", "Draw claimed.")}
             >
               Claim draw
             </Button>
           </div>
+          {demo ? <p className="caption" role="status">
+            {demoFinished ? demoResult : lastMove ? `${lastMove.color === "w" ? "White" : "Black"} played ${lastMove.san}.` : "Starting position."}
+          </p> : message && <p className="feedback" role="status">{message}</p>}
           <button className="options-toggle" onClick={() => setTip(!tip)}>
             Technique tip
             <ChevronDown size={15} />
