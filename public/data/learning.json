@@ -1,6 +1,4 @@
 {
-  "coverageThrough": 2024,
-  "ratingNote": "Recorded event Elo with its year—not peak ratings. — means no contemporaneous event rating supplied. Early titles predate published FIDE lists.",
   "facts": [
     {
       "id": "insight-1",
@@ -692,177 +690,193 @@
       "id": "event-600",
       "year": 600,
       "title": "An Indian beginning",
-      "detail": "Chaturanga emerges: an ancestor of modern chess.",
-      "symbol": "globe.asia.australia.fill",
-      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+      "detail": "By about the sixth century, a game called chaturanga was played in India. Its Sanskrit name refers to four divisions of an army: infantry, cavalry, elephants, and chariots. Those pieces are ancestors of today’s pawns, knights, bishops, and rooks. The exact rules and date of origin remain uncertain.",
+      "source": "https://en.wikipedia.org/wiki/Chaturanga",
+      "imageArticle": "Chaturanga",
+      "imageFallback": "Chaturaji"
     },
     {
       "id": "event-900",
       "year": 900,
       "title": "A game travels",
-      "detail": "Shatranj spreads across cultures and into Europe.",
-      "symbol": "globe.europe.africa.fill",
-      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+      "detail": "Chess traveled from India to Persia and then through the Islamic world, where it was played as shatranj. Skilled players composed problems and recorded openings. In shatranj, the piece that became the queen moved only one square diagonally, making it far weaker than the modern queen.",
+      "source": "https://en.wikipedia.org/wiki/Shatranj",
+      "imageArticle": "Shatranj",
+      "imageFallback": "Lewis chessmen"
     },
     {
       "id": "event-1497",
       "year": 1497,
       "title": "The powerful queen era",
-      "detail": "Lucena’s printed book records an early form of modern chess.",
-      "symbol": "book.closed.fill",
-      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+      "detail": "Luis Ramírez de Lucena’s book, printed in Salamanca around 1497, describes positions from both the older game and the emerging modern one. The queen and bishop had gained their long-range moves in Europe by this period. Players could now create threats much earlier, and opening mistakes became more costly.",
+      "source": "https://en.wikipedia.org/wiki/Repetición_de_Amores_y_Arte_de_Ajedrez",
+      "imageArticle": "Repetición de Amores y Arte de Ajedrez",
+      "imageFallback": "Luis Ramírez de Lucena"
     },
     {
       "id": "event-1769",
-      "year": 1769,
+      "year": 1770,
       "title": "The Mechanical Turk",
-      "detail": "A famous apparent chess automaton was secretly operated by a human.",
-      "symbol": "gearshape.fill",
-      "source": "https://en.wikipedia.org/wiki/Mechanical_Turk"
+      "detail": "Wolfgang von Kempelen built the Turk for Empress Maria Theresa and first demonstrated it in 1770. It appeared to play chess by machinery, but a skilled player concealed inside controlled the moves. The device toured Europe and America and was destroyed by fire in Philadelphia in 1854.",
+      "source": "https://en.wikipedia.org/wiki/Mechanical_Turk",
+      "imageArticle": "Mechanical Turk"
     },
     {
       "id": "event-1849",
       "year": 1849,
       "title": "The Staunton shape",
-      "detail": "The familiar tournament-piece design is introduced.",
-      "symbol": "square.grid.3x3.fill",
-      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+      "detail": "In 1849, London maker Jaques introduced a set based on Nathaniel Cooke’s design and endorsed by Howard Staunton. Its distinctive silhouettes made the pieces easier to identify across the board. The design became the model for the pieces used in most modern tournaments.",
+      "source": "https://en.wikipedia.org/wiki/Staunton_chess_set",
+      "imageArticle": "Staunton chess set"
     },
     {
       "id": "event-1851",
       "year": 1851,
       "title": "London gathers the masters",
-      "detail": "Anderssen wins a landmark international tournament.",
-      "symbol": "person.3.fill",
-      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+      "detail": "Howard Staunton organized the 1851 London tournament during the year of the Great Exhibition. Sixteen players competed in a knockout format, and Adolf Anderssen defeated Marmaduke Wyvill in the final. The event showed that leading players from different countries could meet in a single organized international competition.",
+      "source": "https://en.wikipedia.org/wiki/London_1851_chess_tournament",
+      "imageArticle": "London 1851 chess tournament",
+      "imageFallback": "Adolf Anderssen"
     },
     {
       "id": "event-1858",
       "year": 1858,
       "title": "Morphy’s European tour",
-      "detail": "A brilliant attacking player dominates before the official world title.",
-      "symbol": "bolt.fill",
-      "source": "https://en.wikipedia.org/wiki/History_of_chess"
+      "detail": "After winning the First American Chess Congress, Paul Morphy traveled to Europe in 1858. He defeated leading players including Adolf Anderssen and Daniel Harrwitz. His Paris Opera Game illustrates a recurring strength of his play: rapid development and open lines mattered more than holding on to material.",
+      "source": "https://en.wikipedia.org/wiki/Paul_Morphy",
+      "imageArticle": "Paul Morphy"
     },
     {
       "id": "event-1886",
       "year": 1886,
       "title": "The world title begins",
-      "detail": "Steinitz defeats Zukertort in the first official championship match.",
-      "symbol": "crown.fill",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "Wilhelm Steinitz and Johannes Zukertort played in New York, St. Louis, and New Orleans. The first player to win ten games would take the title. Steinitz recovered from a 4–1 deficit and won 10 games to 5, with five draws.",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship_1886",
+      "imageArticle": "World Chess Championship 1886",
+      "imageFallback": "Wilhelm Steinitz"
     },
     {
       "id": "event-1924",
       "year": 1924,
       "title": "FIDE is founded",
-      "detail": "A world federation is established in Paris.",
-      "symbol": "globe.europe.africa.fill",
-      "source": "https://en.wikipedia.org/wiki/FIDE"
+      "detail": "FIDE was founded in Paris on July 20, 1924, during an international team chess tournament held alongside the Olympic Games. The new federation gave national associations a way to coordinate international competition. It later took responsibility for major titles, ratings, and international chess rules.",
+      "source": "https://en.wikipedia.org/wiki/1st_Unofficial_Chess_Olympiad",
+      "imageArticle": "1st Unofficial Chess Olympiad",
+      "imageFallback": "Alexander Rueb"
     },
     {
       "id": "event-1927",
       "year": 1927,
       "title": "A women’s world title",
-      "detail": "Vera Menchik wins the inaugural championship.",
-      "symbol": "crown.fill",
-      "source": "https://en.wikipedia.org/wiki/Women%27s_World_Chess_Championship"
+      "detail": "Vera Menchik won the inaugural Women’s World Chess Championship at the 1927 London Chess Olympiad. She retained the title until her death in 1944 and also competed in major open tournaments, where she defeated several leading players of her era.",
+      "source": "https://en.wikipedia.org/wiki/Vera_Menchik",
+      "imageArticle": "Vera Menchik"
     },
     {
       "id": "event-1948",
       "year": 1948,
       "title": "A title decided by tournament",
-      "detail": "Botvinnik wins the five-player championship after Alekhine’s death.",
-      "symbol": "person.3.fill",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "Alexander Alekhine died in 1946 while still world champion. FIDE organized a five-player tournament in The Hague and Moscow to fill the vacancy. Mikhail Botvinnik won with 14 points from 20 games, beginning a period in which Soviet players dominated the title.",
+      "source": "https://en.wikipedia.org/wiki/1948_World_Chess_Championship",
+      "imageArticle": "1948 World Chess Championship",
+      "imageFallback": "Mikhail Botvinnik"
     },
     {
       "id": "event-1950",
       "year": 1950,
       "title": "Official GM titles",
-      "detail": "FIDE awards the first 27 grandmaster titles.",
-      "symbol": "star.fill",
-      "source": "https://en.wikipedia.org/wiki/Grandmaster_(chess)"
+      "detail": "FIDE formally awarded the grandmaster title to 27 players in 1950. The first group included active stars and older players recognized for their past achievements. Later, the federation established a system with rating thresholds and tournament norms for earning the title.",
+      "source": "https://en.wikipedia.org/wiki/Grandmaster_(chess)",
+      "imageArticle": "Grandmaster (chess)",
+      "imageFallback": "Miguel Najdorf"
     },
     {
       "id": "event-1971",
       "year": 1971,
       "title": "Published Elo lists",
-      "detail": "FIDE’s published Elo lists establish a new way to compare results.",
-      "symbol": "chart.bar.fill",
-      "source": "https://en.wikipedia.org/wiki/FIDE_world_rankings"
+      "detail": "FIDE adopted the Elo system in 1970 and published its first official rating list in 1971. Named for physicist and chess player Arpad Elo, the system estimated a player’s expected score from the difference in ratings. Results against stronger and weaker opponents could now be compared on a common scale.",
+      "source": "https://en.wikipedia.org/wiki/Arpad_Elo",
+      "imageArticle": "Arpad Elo"
     },
     {
       "id": "event-1972",
       "year": 1972,
       "title": "Reykjavík captures attention",
-      "detail": "Fischer defeats Spassky in a globally watched match.",
-      "symbol": "globe.europe.africa.fill",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "Bobby Fischer challenged Boris Spassky in Reykjavík at the height of the Cold War. After losing the first game and forfeiting the second, Fischer recovered to win the match 12½–8½. He became the first American-born official world champion.",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship_1972",
+      "imageArticle": "World Chess Championship 1972",
+      "imageFallback": "Bobby Fischer"
     },
     {
       "id": "event-1978",
       "year": 1978,
       "title": "A milestone for women",
-      "detail": "Gaprindashvili receives the open grandmaster title.",
-      "symbol": "star.fill",
-      "source": "https://en.wikipedia.org/wiki/Nona_Gaprindashvili"
+      "detail": "Nona Gaprindashvili became the first woman awarded FIDE’s open grandmaster title in 1978. She had held the Women’s World Championship since 1962 and achieved strong results in open competition. In 1977 she shared first place at the Lone Pine International in California.",
+      "source": "https://en.wikipedia.org/wiki/Nona_Gaprindashvili",
+      "imageArticle": "Nona Gaprindashvili"
     },
     {
       "id": "event-1985",
       "year": 1985,
       "title": "Kasparov takes the crown",
-      "detail": "The 22-year-old begins a fifteen-year title reign.",
-      "symbol": "crown.fill",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "Garry Kasparov defeated Anatoly Karpov 13–11 in their 1985 rematch, becoming world champion at age 22. Their previous match had been stopped after 48 games without a winner. They met in three more title matches, and Kasparov held the classical title until 2000.",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship_1985",
+      "imageArticle": "World Chess Championship 1985",
+      "imageFallback": "Garry Kasparov"
     },
     {
       "id": "event-1993",
       "year": 1993,
       "title": "Two championship branches",
-      "detail": "The classical and FIDE titles split.",
-      "symbol": "arrow.triangle.branch",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "Garry Kasparov and challenger Nigel Short organized their 1993 match outside FIDE. FIDE staged its own championship, won by Anatoly Karpov against Jan Timman, while Kasparov defeated Short. The two title lines coexisted until 2006.",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship_1993",
+      "imageArticle": "World Chess Championship 1993",
+      "imageFallback": "Nigel Short"
     },
     {
       "id": "event-1997",
       "year": 1997,
       "title": "Deep Blue’s breakthrough",
-      "detail": "A computer defeats the reigning champion in a classical match.",
-      "symbol": "desktopcomputer",
-      "source": "https://en.wikipedia.org/wiki/Deep_Blue_versus_Garry_Kasparov"
+      "detail": "IBM’s Deep Blue defeated reigning world champion Garry Kasparov 3½–2½ in their six-game 1997 rematch in New York. Kasparov had won their 1996 match. Deep Blue combined purpose-built hardware with rapid search and chess evaluation, and clinched the rematch by winning game six.",
+      "source": "https://en.wikipedia.org/wiki/Deep_Blue_versus_Garry_Kasparov",
+      "imageArticle": "Deep Blue versus Garry Kasparov",
+      "imageFallback": "Deep Blue (chess computer)"
     },
     {
       "id": "event-2006",
       "year": 2006,
       "title": "Reunification",
-      "detail": "Kramnik defeats Topalov; the world title is reunited.",
-      "symbol": "arrow.triangle.merge",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "Classical champion Vladimir Kramnik and FIDE champion Veselin Topalov met in Elista to reunify the title. Their classical games ended 6–6. Kramnik won the rapid tiebreak 2½–1½, ending 13 years of rival championship lines.",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship_2006",
+      "imageArticle": "World Chess Championship 2006",
+      "imageFallback": "Vladimir Kramnik"
     },
     {
       "id": "event-2013",
       "year": 2013,
       "title": "The Carlsen era",
-      "detail": "Carlsen defeats Anand in Chennai.",
-      "symbol": "crown.fill",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "Magnus Carlsen defeated defending champion Viswanathan Anand 6½–3½ in Chennai. He won games five, six, and nine and drew the tenth to clinch the title. It was the first of Carlsen’s five world championship match victories.",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship_2013",
+      "imageArticle": "World Chess Championship 2013",
+      "imageFallback": "Magnus Carlsen"
     },
     {
       "id": "event-2023",
       "year": 2023,
       "title": "Ding wins the tiebreak",
-      "detail": "Ding Liren becomes champion after a tied classical match.",
-      "symbol": "clock.fill",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "After Magnus Carlsen declined to defend his title, Ding Liren and Ian Nepomniachtchi contested the championship in Astana. They tied 7–7 in the classical games. Ding won the fourth rapid game with Black to take the tiebreak 2½–1½ and become China’s first open world champion.",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship_2023",
+      "imageArticle": "World Chess Championship 2023",
+      "imageFallback": "Ding Liren"
     },
     {
       "id": "event-2024",
       "year": 2024,
       "title": "A teenage champion",
-      "detail": "Gukesh defeats Ding Liren in Singapore.",
-      "symbol": "crown.fill",
-      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship"
+      "detail": "Gukesh Dommaraju defeated defending champion Ding Liren 7½–6½ in Singapore. The match was level before the final scheduled game, when Gukesh converted a pawn ending after a late error by Ding. At 18, Gukesh became the youngest undisputed world champion.",
+      "source": "https://en.wikipedia.org/wiki/World_Chess_Championship_2024",
+      "imageArticle": "World Chess Championship 2024",
+      "imageFallback": "Gukesh Dommaraju"
     }
   ],
   "champions": [
@@ -1095,7 +1109,8 @@
       "elo": 2783,
       "ratingYear": 2024,
       "source": "https://ratings.fide.com/profile/46616543/calculations",
-      "highlight": "Wins the title at 18"
+      "highlight": "Wins the title at 18",
+      "imageArticle": "Gukesh Dommaraju"
     },
     {
       "id": "fide-karpov",

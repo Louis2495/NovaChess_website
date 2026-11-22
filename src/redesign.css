@@ -6629,3 +6629,34 @@ html { scrollbar-gutter:stable; }
   .opening-training .lesson-board-slot { padding-inline-start:20px; }
   .opening-training .board-edge-evaluation { inset-block:12px; }
 }
+
+.history-event-year { color:var(--accent); font-size:1.2rem; font-weight:850; }
+.history-event-image,.champion-portrait { margin:0; min-width:0; }
+.history-event-image img {
+  display:block;
+  width:100%;
+  height:clamp(190px, 40dvh, 390px);
+  object-fit:contain;
+  background:var(--input);
+  border-radius:10px;
+}
+.history-event-image figcaption,.champion-portrait figcaption { margin-top:5px; font-size:.7rem; color:var(--muted); }
+.history-event-image figcaption a,.champion-portrait figcaption a { text-decoration:underline; }
+.champion-timeline { width:min(100%, 760px); margin-inline:auto; gap:16px; }
+.champion-timeline > .card { min-height:172px; gap:20px; }
+.champion-portrait { flex:0 0 126px; }
+.champion-portrait img { display:block; width:100%; height:142px; object-fit:contain; background:var(--input); border-radius:8px; }
+@media(max-width:600px) {
+  .champion-timeline { width:calc(100% - 20px); }
+  .champion-timeline > .card {
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    gap:8px 12px;
+    padding:14px;
+  }
+  .champion-portrait { grid-row:1/3; grid-column:1; width:92px; }
+  .champion-portrait img { height:110px; }
+  .champion-reign { grid-column:2; font-size:1rem; }
+  .champion-timeline > .card > div { grid-column:2; }
+  .champion-timeline > .card > .external { grid-column:3; grid-row:1; }
+}

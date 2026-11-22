@@ -1,26 +1,15 @@
-import { useMemo, useState } from "react";
-import {
-  ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
-  Crown,
-  Search,
-  ScrollText,
-  Sparkles,
-  Cpu,
-  Swords,
-  Globe,
-  Trophy,
-} from "lucide-react";
-import { ChoiceSelect, Card, IconButton, Toggle } from "../../components/UI";
+import { useState } from "react";
+import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChoiceSelect, Card, IconButton } from "../../components/UI";
+import { useHistoryImages, type HistoryImage } from "../../lib/historyImages";
 export type HistoryData = {
-  coverageThrough: number;
-  ratingNote: string;
   milestones: {
     id: string;
     year: number;
     title: string;
     detail: string;
+    imageArticle?: string;
+    imageFallback?: string;
     source: string;
   }[];
   champions: {
@@ -33,47 +22,36 @@ export type HistoryData = {
     ratingYear: number | null;
     source: string;
     highlight: string;
+    imageArticle?: string;
   }[];
 };
-const eras = [
-  { name: "All eras", from: 0, to: 9999, icon: Globe },
-  { name: "Origins", from: 0, to: 1499, icon: ScrollText },
-  { name: "Modern rules", from: 1500, to: 1849, icon: Sparkles },
-  { name: "First champions", from: 1850, to: 1947, icon: Crown },
-  { name: "Soviet era", from: 1948, to: 1971, icon: Trophy },
-  { name: "Rivalries", from: 1972, to: 1999, icon: Swords },
-  { name: "Digital era", from: 2000, to: 9999, icon: Cpu },
-];
+function Picture({ image, description, className }: {
+  image?: HistoryImage | null;
+  description: string;
+  className: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  if (!image || failed) return null;
+  return <figure className={className}>
+    <img src={image.url} alt={description} loading="lazy" onError={() => setFailed(true)} />
+    <figcaption><a href={image.credits} target="_blank" rel="noreferrer">Image credits</a></figcaption>
+  </figure>;
+}
+
 export default function History({ data }: { data: HistoryData }) {
   const [view, setView] = useState("Timeline"),
-    [era, setEra] = useState(0),
-    [search, setSearch] = useState(""),
     [selected, setSelected] = useState(""),
-    [track, setTrack] = useState("main"),
-    [ratings, setRatings] = useState(false);
-  const milestones = useMemo(
-    () =>
-      data.milestones
-        .filter(
-          (m) =>
-            m.year >= eras[era].from &&
-            m.year <= eras[era].to &&
-            (m.title + " " + m.year + " " + m.detail)
-              .toLowerCase()
-              .includes(search.toLowerCase()),
-        )
-        .sort((a, b) => a.year - b.year),
-    [data, era, search],
-  );
-  const champions = data.champions
-    .filter(
-      (c) =>
-        c.track === (track === "fide" ? "split" : track) &&
-        (c.name + " " + c.start).toLowerCase().includes(search.toLowerCase()),
-    )
+    [track, setTrack] = useState("main");
+  const milestones = [...data.milestones].sort((a, b) => a.year - b.year);
+  const champions = data.champions.filter(c => c.track === (track === "fide" ? "split" : track))
     .sort((a, b) => a.start - b.start);
+  const images = useHistoryImages(view === "Timeline"
+    ? milestones.flatMap(item => [item.imageArticle ?? "", item.imageFallback ?? ""])
+    : champions.map(champion => champion.imageArticle ?? champion.name));
   const active = milestones.find((m) => m.id === selected) || milestones[0],
     index = milestones.findIndex((m) => m.id === active?.id);
+  const imageArticle = active && (images.get(active.imageArticle ?? "")
+    ? active.imageArticle : active.imageFallback);
   return (
     <div className="history-explorer">
       <div className="section-toolbar">
@@ -81,46 +59,17 @@ export default function History({ data }: { data: HistoryData }) {
           {["Timeline", "World champions"].map((v) => (
             <button
               key={v}
-              onClick={() => {
-                setView(v);
-                setSearch("");
-              }}
+              onClick={() => setView(v)}
+              aria-pressed={v === view}
               className={v === view ? "active" : ""}
             >
               {v}
             </button>
           ))}
         </div>
-        <span className="caption">Through {data.coverageThrough}</span>
-      </div>
-      <div className="search-field">
-        <Search size={17} />
-        <input
-          aria-label="Search history"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={
-            view === "Timeline" ? "Event or year" : "Champion or year"
-          }
-        />
       </div>
       {view === "Timeline" ? (
         <>
-          <div className="era-picker" aria-label="History era">
-            {eras.map(({ name, icon: Icon }, i) => (
-              <button
-                key={name}
-                aria-pressed={era === i}
-                onClick={() => {
-                  setEra(i);
-                  setSelected("");
-                }}
-              >
-                <Icon size={19} />
-                {name}
-              </button>
-            ))}
-          </div>
           {active ? (
             <div className="history-explorer-layout">
               <div
@@ -141,19 +90,10 @@ export default function History({ data }: { data: HistoryData }) {
                 ))}
               </div>
               <Card className="history-detail">
-                <div className="history-year-art" aria-hidden="true">
-                  <span>{active.year}</span>
-                  <ScrollText size={62} />
-                </div>
-                <span className="eyebrow">
-                  {
-                    eras.find(
-                      (e, i) =>
-                        i > 0 && active.year >= e.from && active.year <= e.to,
-                    )?.name
-                  }
-                </span>
+                <time className="history-event-year">{active.year}</time>
                 <h2>{active.title}</h2>
+                <Picture key={imageArticle} className="history-event-image"
+                  image={images.get(imageArticle ?? "")} description={imageArticle ?? active.title} />
                 <p>{active.detail}</p>
                 <a
                   className="external"
@@ -186,7 +126,7 @@ export default function History({ data }: { data: HistoryData }) {
               </Card>
             </div>
           ) : (
-            <p className="muted">No matching events.</p>
+            <p className="muted">No historical events available.</p>
           )}
         </>
       ) : (
@@ -203,16 +143,12 @@ export default function History({ data }: { data: HistoryData }) {
                 <option value="fide">FIDE split, 1993–2006</option>
               </ChoiceSelect>
             </label>
-            <Toggle
-              label="Show event ratings"
-              checked={ratings}
-              onChange={setRatings}
-            />
           </div>
-          {ratings && <p className="caption">{data.ratingNote}</p>}
           <div className="champion-timeline">
             {champions.map((c) => (
               <Card key={c.id}>
+                <Picture key={c.imageArticle ?? c.name} className="champion-portrait"
+                  image={images.get(c.imageArticle ?? c.name)} description={c.name} />
                 <span className="champion-reign">
                   {c.start}
                   <span>{c.end ? `– ${c.end}` : "Title won"}</span>
@@ -220,13 +156,7 @@ export default function History({ data }: { data: HistoryData }) {
                 <div>
                   <h2>{c.name}</h2>
                   <p className="caption">{c.highlight}</p>
-                  {ratings && (
-                    <span className="pill">
-                      {c.elo
-                        ? `${c.elo} · ${c.ratingYear}`
-                        : "Before event ratings"}
-                    </span>
-                  )}
+                  {c.elo && <span className="pill">{c.elo} · {c.ratingYear}</span>}
                 </div>
                 <a
                   className="external"

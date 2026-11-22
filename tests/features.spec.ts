@@ -248,21 +248,38 @@ test("opening desk collapses the catalog, exposes deep plans and branches and fi
       ),
     ).toBeTruthy();
 });
-test("history era navigation and champion ratings are intuitive and factual", async ({
+test("history shows one timeline, event images, and champion portraits with ratings", async ({
   page,
 }) => {
+  await page.route("https://en.wikipedia.org/w/api.php?**", route => {
+    const params = new URL(route.request().url()).searchParams;
+    expect(params.get("pilicense")).toBe("free");
+    const titles = params.get("titles")!.split("|");
+    return route.fulfill({ headers: { "access-control-allow-origin": "*" }, json: {
+      query: { pages: titles.map(title => ({
+        title, pageimage: title + ".jpg",
+        thumbnail: { source: "https://upload.wikimedia.org/test/history.png" },
+      })) },
+    } });
+  });
+  await page.route("https://upload.wikimedia.org/test/history.png", route => route.fulfill({
+    contentType: "image/png",
+    body: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEgQGA6WNimgAAAABJRU5ErkJggg==", "base64"),
+  }));
   await page.goto("/#learn/history");
-  await page.getByRole("button", { name: "Digital era", exact: true }).click();
-  for (const year of await page
-    .locator(".history-event-list time")
-    .allTextContents())
-    expect(+year).toBeGreaterThanOrEqual(2000);
+  await expect(page.locator(".history-event-list time").first()).toHaveText("600");
+  await expect(page.locator(".history-event-list time").last()).toHaveText("2024");
+  await expect(page.getByRole("searchbox", { name: "Search history" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "All eras" })).toHaveCount(0);
+  await expect(page.getByText("Through 2024")).toHaveCount(0);
+  await expect(page.getByRole("img", { name: "Chaturanga", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Next event", exact: true }).click();
   await expect(page.locator(".history-paging")).toContainText("2 /");
   await page
     .getByRole("button", { name: "World champions", exact: true })
     .click();
-  await page.getByLabel("Show event ratings", { exact: true }).check();
+  await expect(page.getByRole("img", { name: "Wilhelm Steinitz", exact: true })).toBeVisible();
+  await expect(page.getByLabel("Show event ratings", { exact: true })).toHaveCount(0);
   await expect(
     page
       .locator(".champion-timeline .pill")
