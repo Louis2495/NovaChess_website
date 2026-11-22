@@ -6691,9 +6691,10 @@ html { scrollbar-gutter:stable; }
 
 .workspace:has(.master-archive) { padding-block:6px 28px; }
 .workspace .master-archive {
+  position:relative;
   --replay-rail:clamp(208px, 23%, 300px);
   --replay-gap:clamp(110px, 15vw, 216px);
-  --replay-board:min(var(--board-max), calc(100% - var(--replay-rail) - var(--replay-gap)),
+  --replay-board:min(var(--board-max), calc(100% - var(--replay-rail) - var(--replay-gap) - 76px),
     max(0px, calc(var(--lesson-height, 100dvh) - var(--replay-chrome, 200px) - 2px)));
   height:var(--lesson-height, calc(100dvh - 110px));
   grid-template-columns:minmax(0,var(--replay-board)) var(--replay-rail);
@@ -6807,4 +6808,19 @@ html { scrollbar-gutter:stable; }
     line-height:20px;
     white-space:nowrap;
   }
+}
+
+
+.master-archive > .master-back {
+  position:absolute;
+  inset-block-start:0;
+  inset-inline-start:0;
+  z-index:3;
+  width:34px;
+  height:34px;
+  min-height:0;
+  padding:4px;
+}
+@media(max-width:1000px) {
+  .workspace .master-archive { padding-top:36px; }
 }

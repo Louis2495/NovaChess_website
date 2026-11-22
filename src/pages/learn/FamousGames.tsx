@@ -176,6 +176,7 @@ function Archive({ games }: { games: FamousGame[] }) {
   return (
     <>
       <div className="master-archive" ref={layout}>
+        <IconButton className="master-back" label="Back to Learn" onClick={() => navigate("learn")}><ArrowLeft size={18} /></IconButton>
         <div className="master-replay">
           <BoardPlayer placement="top" side={flipped?'w':'b'} name={flipped?game.white:game.black} rating={flipped?game.whiteRating:game.blackRating} result={game.result}/>
           <div className="master-board-slot">
@@ -254,7 +255,6 @@ function Archive({ games }: { games: FamousGame[] }) {
               <p className="caption">{game.event} {game.year}</p>
             </div>
             <div className="master-game-actions">
-              <IconButton label="Back to Learn" onClick={() => navigate("learn")}><ArrowLeft size={18} /></IconButton>
               <Button className="secondary master-explore" aria-haspopup="dialog" onClick={() => {
                 setPlaying(false);
                 setExploring(true);

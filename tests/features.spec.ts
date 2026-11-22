@@ -595,6 +595,12 @@ test("Famous Games centers the board and move list and keeps playback and Explor
   const mobile = testInfo.project.name === "mobile";
   await page.setViewportSize({ width: mobile ? 390 : 1280, height: 664 });
   await page.goto("/#learn/famous");
+  const back = page.getByRole("button", { name: "Back to Learn", exact: true });
+  await expect(back).toBeInViewport({ ratio: 1 });
+  const archive = (await page.locator(".master-archive").boundingBox())!;
+  const backBounds = (await back.boundingBox())!;
+  expect(Math.abs(backBounds.x - archive.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(backBounds.y - archive.y)).toBeLessThanOrEqual(1);
   const explore = page.getByRole("button", { name: "Explore", exact: true });
   const playback = page.getByRole("group", { name: "Replay controls" });
   const heading = page.locator(".master-notes .master-game-heading");
