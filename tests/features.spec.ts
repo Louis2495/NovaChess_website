@@ -539,6 +539,10 @@ test("opening, trap, and endgame boards are large and fit the viewport", async (
       const tabs = page.locator(".opening-lesson-panels").getByRole("group", { name: "Opening lessons section" });
       await expect(tabs.getByRole("button", { name: route === "traps" ? "Traps" : "Lessons" }))
         .toHaveAttribute("aria-pressed", "true");
+      if (!mobile) {
+        const browse = page.getByRole("button", { name: route === "traps" ? "Browse traps" : "Browse openings", exact: true });
+        expect(Math.abs((await browse.boundingBox())!.y - (await tabs.boundingBox())!.y)).toBeLessThanOrEqual(1);
+      }
     }
     await expect.poll(async () => {
       const bounds = (await board.boundingBox())!;

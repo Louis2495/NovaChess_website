@@ -312,7 +312,7 @@ function LessonWorkspace({
       guide?.quiz.answers.map((_, i) => guide.quiz.answers[(i + shift) % 3]) ||
       [];
   const navigation = (
-    <div className="lesson-step-controls">
+    <div className="lesson-step-controls lesson-playback-panel" role="group" aria-label="Lesson playback">
       <IconButton
         label="Restart lesson"
         onClick={() => {
@@ -635,9 +635,6 @@ function LessonWorkspace({
               }
               hint={hint ? expected?.from : undefined}
             />
-          </div>
-          <div className="lesson-bar">
-            <span style={{ width: `${(step / moves.length) * 100}%` }} />
           </div>
           {navigation}
         </div>

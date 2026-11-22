@@ -121,10 +121,7 @@ function TrapArchive({ traps, sectionTabs }: { traps: Trap[]; sectionTabs: React
               }}
             />
           </div>
-          <div className="lesson-bar" aria-hidden="true">
-            <span style={{ width: `${(cursor / moves.length) * 100}%` }} />
-          </div>
-          <div className="lesson-step-controls">
+          <div className="lesson-step-controls lesson-playback-panel" role="group" aria-label="Trap playback">
             <Button className="secondary" onClick={() => seek(trap.setup.length)}>
               <RotateCcw size={15} />
               Position

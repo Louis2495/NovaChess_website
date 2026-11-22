@@ -6593,9 +6593,15 @@ html { scrollbar-gutter:stable; }
 .lesson-workspace > .lesson-board-area { container-type:inline-size; }
 .lesson-workspace .lesson-board-area > .card-heading { flex:none; gap:8px; }
 .lesson-workspace .lesson-board-area > .card-heading h2 { margin:0; min-width:0; }
-.lesson-workspace .lesson-board-area > .card-heading .btn { flex:none; padding-inline:8px; }
+.lesson-workspace .lesson-board-area > .card-heading .btn { flex:none; align-self:flex-start; padding-inline:8px; }
 .lesson-workspace .lesson-board-slot { flex:0 1 auto; height:calc(100cqw + 44px); }
-.lesson-workspace .lesson-board-area > .lesson-step-controls { flex:none; }
+.lesson-workspace .lesson-playback-panel {
+  flex:none;
+  padding:4px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--panel);
+}
 .modal .opening-list { position:static; }
 .modal .opening-list .scroll-list { max-height:min(46dvh, 460px); }
 @media(max-width:1000px) {
