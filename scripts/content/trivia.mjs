@@ -1,5 +1,46 @@
 import { readFileSync, writeFileSync } from "node:fs";
 const entries = JSON.parse(readFileSync("public/data/encyclopedia.json"));
+const plainQuestions = {
+  skewer: "What is it called when you attack a valuable piece so that moving it exposes a piece behind it?",
+  "discovered-attack": "What is it called when moving one piece reveals an attack by another piece behind it?",
+  "double-check": "What is it called when two pieces give check at the same time?",
+  deflection: "What is it called when you lure a defender away from the piece or square it protects?",
+  overloading: "What is it called when one piece has too many things to defend?",
+  interference: "What is it called when you block the line between an enemy piece and the piece it protects?",
+  novotny: "What is the name of a sacrifice on a square where a rook and bishop can both capture, but either capture blocks the other piece?",
+  grimshaw: "What is the name of a chess problem in which a rook and bishop can each move to the same square and block the other?",
+  plachutta: "What is the name of a sacrifice on a square where two pieces that move the same way, such as two rooks, can each capture and block the other?",
+  clearance: "What is it called when you free up a square or open a line so another piece can use it?",
+  zwischenzug: "What is it called when you play an unexpected move, such as a check, before making the obvious recapture?",
+  desperado: "What do you call a piece that takes something or creates a threat just before it is lost?",
+  windmill: "What is it called when repeated discovered checks let you take pieces between checks?",
+  "x-ray-attack": "What is it called when a bishop, rook, or queen attacks a target through a piece in the way?",
+  undermining: "What is it called when you attack the piece or pawn that protects your real target?",
+  "back-rank-mate": "What is it called when a rook or queen mates a king trapped on its starting rank by its own pieces?",
+  "smothered-mate": "What is it called when a knight mates a king whose own pieces block every escape?",
+  "arabian-mate": "Which mating pattern uses a rook and knight to trap a king in a corner?",
+  "dovetail-mate": "Which mate uses a queen one diagonal square from the king, with the king’s own pieces blocking its two straight retreats?",
+  "swallow-s-tail-mate": "Which mate uses a queen right beside the king, with the king’s own pieces blocking its two diagonal retreats?",
+  "perpetual-check": "What is it called when one side can give check again and again and the other side cannot get away?",
+  battery: "What do you call two pieces lined up to attack along the same file, rank, or diagonal?",
+  rundlauf: "What is the name of a chess problem in which a piece makes a loop and returns to its starting square by a different route?",
+  switchback: "What is it called when a piece retraces its move and returns to its starting square?",
+  excelsior: "What is the name of a chess problem in which a pawn starts on its original square and plays all the way to promotion?",
+  "babson-task": "What is the name of a mate problem in which White must match whichever of the four pieces Black promotes to?",
+  allumwandlung: "What is the name of a chess problem whose solutions show all four promotion choices?",
+  outpost: "What do you call an advanced square where a piece can sit without being chased away by enemy pawns?",
+  prophylaxis: "What do you call playing a move to prevent your opponent’s plan before they can carry it out?",
+  "minority-attack": "What is it called when you advance fewer pawns against a larger group of pawns to create a weakness?",
+  "isolated-queen-s-pawn": "What do you call a pawn on the d-file with no friendly pawn on either neighboring file?",
+  "hanging-pawns": "What do you call two side-by-side pawns that have no other friendly pawns to defend them?",
+  "backward-pawn": "What do you call a pawn that has fallen behind its neighbors and cannot safely advance?",
+  "color-complex": "What do you call a group of light squares or dark squares you can attack or defend together?",
+  "exchange-sacrifice": "What is it called when you deliberately give up a rook for a bishop or knight?",
+  "pawn-break": "What do you call a pawn move that challenges the opponent’s pawn chain and can open lines?",
+  "principle-of-two-weaknesses": "What is the strategy of creating a second target far from the first so your opponent has to defend both?",
+  "transformation-of-advantage": "What is it called when you trade one advantage for another, such as giving up an attack to enter a winning endgame?",
+  "rook-lift": "What do you call bringing a rook up from the back rank so it can move sideways and join the attack?",
+};
 const questions = entries
   .filter(
     (e) =>
@@ -18,16 +59,17 @@ const questions = entries
     ].slice(0, 3);
     return {
       id: e.id,
-      prompt:
+      prompt: plainQuestions[e.id] ??
         {
-          Players: "Which player is described here?",
+          Players: "Who is this chess player?",
           "Events & history":
-            "Which answer matches this moment in chess history?",
-          Strategy: "Which strategic idea does this describe?",
-          History: "Which part of chess history does this describe?",
-          Tactics: "Which tactical idea does this describe?",
-        }[e.category] || "Which chess concept does this describe?",
-      clue: e.body.split(/(?<=\.)\s/)[0],
+            "What event is this clue about?",
+          Strategy: "What is this strategy called?",
+          History: "What is this clue about?",
+          Tactics: "What is this tactic called?",
+        }[e.category] ?? "What is this called?",
+      clue: plainQuestions[e.id] ? undefined : e.body.split(/(?<=\.)\s/)[0]
+        .replace(/: (classical \/ unified|FIDE split-era) world title\.$/, "."),
       category: e.category,
       answers: [e.title, ...wrong],
       correct: 0,
@@ -38,7 +80,7 @@ const questions = entries
   .filter((q) => q.answers.length === 4);
 const extra = [
   [
-    "How many non-attacking eight-queen arrangements exist, counting rotations separately?",
+    "How many ways can you place eight queens so none attacks another? Count rotations and reflections separately.",
     "92",
     "64",
     "128",
@@ -66,21 +108,21 @@ const extra = [
     "Magnus Carlsen",
   ],
   [
-    "Which promotion solves the Saavedra study?",
+    "In the Saavedra puzzle, what piece should the winning pawn promote to?",
     "Rook",
     "Queen",
     "Bishop",
     "Knight",
   ],
   [
-    "What is the minimum number of queens needed to dominate an empty 8×8 board?",
+    "What is the fewest queens you can place so every square is occupied or attacked?",
     "5",
     "4",
     "6",
     "8",
   ],
   [
-    "How many square sub-boards of all sizes are on an 8×8 board?",
+    "How many squares of all sizes can you count on a chessboard, from 1×1 to 8×8?",
     "204",
     "64",
     "128",
@@ -108,28 +150,28 @@ const extra = [
     "Samuel Reshevsky",
   ],
   [
-    "Which two pieces deliver the standard Arabian mating pattern?",
+    "Which two pieces work together in an Arabian mate?",
     "Rook and knight",
     "Queen and bishop",
     "Two bishops",
     "Two knights",
   ],
   [
-    "What is the key freeing break for Black in many Sicilian positions?",
+    "Which pawn move often helps Black open up the position in the Sicilian Defense?",
     "...d5",
     "...h5",
     "...a5",
     "...g5",
   ],
   [
-    "Which side normally benefits from exchanges against an isolated queen’s pawn?",
-    "The blockading side",
+    "Who usually benefits from trading pieces when one player has an isolated d-pawn?",
+    "The player blocking the pawn",
     "Always the pawn’s owner",
     "Neither side ever",
     "Only the side with a queen",
   ],
   [
-    "What distinguishes a Novotny from a Grimshaw theme?",
+    "What does a Novotny chess problem add that a Grimshaw does not?",
     "A sacrifice on the interference square",
     "A knight promotion",
     "A forced perpetual check",
@@ -143,14 +185,14 @@ const extra = [
     "Howard Staunton",
   ],
   [
-    "Which rook-ending defense uses side attacks against a rook pawn?",
+    "Which rook endgame defense uses checks or attacks from the side against a pawn on the a- or h-file?",
     "Vancura",
     "Lucena",
     "Greek gift",
     "Boden",
   ],
   [
-    "Which square color changes on every legal knight move?",
+    "What happens to the square color each time a knight moves?",
     "The knight always changes color",
     "It always stays on its color",
     "Only on captures",
@@ -164,7 +206,7 @@ const extra = [
     "Became FIDE champion",
   ],
   [
-    "Which federation maintains the international GM title?",
+    "Which organization awards the international Grandmaster title?",
     "FIDE",
     "US Chess alone",
     "The IOC directly",

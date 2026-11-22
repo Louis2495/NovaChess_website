@@ -15,7 +15,7 @@
   },
   {
     "id": "fact-trivia-insight-2",
-    "prompt": "What distinguishes a closed knight’s tour from an open one?",
+    "prompt": "What makes a knight’s tour a closed tour?",
     "category": "Mathematics",
     "answers": [
       "The last square is a knight move from the first",
@@ -57,7 +57,7 @@
   },
   {
     "id": "fact-trivia-insight-6",
-    "prompt": "What allows some rook-and-pawn positions to hold against a queen?",
+    "prompt": "How can a rook and pawn sometimes draw against a queen?",
     "category": "Endgames",
     "answers": [
       "A fortress that prevents progress",
@@ -71,7 +71,7 @@
   },
   {
     "id": "fact-trivia-insight-7",
-    "prompt": "In the endgame position called a trebuchet, what is the problem for the player whose turn it is?",
+    "prompt": "In the endgame called a trebuchet, why is it bad to be the player who has to move?",
     "category": "Endgames",
     "answers": [
       "Moving loses a defended pawn",
@@ -197,7 +197,7 @@
   },
   {
     "id": "fact-trivia-insight-16",
-    "prompt": "Where should the defending king head against a wrong bishop and rook pawn?",
+    "prompt": "Which corner should the defending king aim for against a rook pawn and a bishop that cannot guard its promotion square?",
     "category": "Endgames",
     "answers": [
       "The promotion corner not controlled by the bishop",
@@ -211,7 +211,7 @@
   },
   {
     "id": "fact-trivia-insight-17",
-    "prompt": "Why can a tablebase win fail to be a practical tournament win?",
+    "prompt": "Why might a position listed as a win in an endgame database still be drawn in a tournament?",
     "category": "Computers",
     "answers": [
       "The fifty-move rule may prevent completing the win",
@@ -253,7 +253,7 @@
   },
   {
     "id": "fact-trivia-insight-20",
-    "prompt": "Which technology carried moves in the 1844 Washington–Baltimore correspondence match?",
+    "prompt": "How did players send their moves during the 1844 Washington–Baltimore match?",
     "category": "History",
     "answers": [
       "Electric telegraph",
@@ -323,7 +323,7 @@
   },
   {
     "id": "fact-trivia-insight-25",
-    "prompt": "Whose grandmaster age record did Judit Polgár surpass in 1991?",
+    "prompt": "Who held the record for youngest grandmaster before Judit Polgár broke it in 1991?",
     "category": "People",
     "answers": [
       "Bobby Fischer’s",
@@ -337,7 +337,7 @@
   },
   {
     "id": "fact-trivia-insight-26",
-    "prompt": "What was the purpose of a sealed move when a game was adjourned?",
+    "prompt": "Why did players write down and seal their next move when a game stopped for the day?",
     "category": "History",
     "answers": [
       "Commit to the next move before overnight analysis",
@@ -393,7 +393,7 @@
   },
   {
     "id": "fact-trivia-insight-30",
-    "prompt": "Why could one square have different names in descriptive notation?",
+    "prompt": "Why could White and Black use different names for the same square in descriptive notation?",
     "category": "History",
     "answers": [
       "Names depended on each player’s perspective",
@@ -463,7 +463,7 @@
   },
   {
     "id": "fact-trivia-shannon",
-    "prompt": "What does Shannon’s estimate of roughly 10¹²⁰ describe?",
+    "prompt": "What was Claude Shannon counting when he estimated a number around 10¹²⁰ for chess?",
     "category": "Numbers",
     "answers": [
       "The approximate chess game-tree complexity",
@@ -533,7 +533,7 @@
   },
   {
     "id": "fact-trivia-seventy-five",
-    "prompt": "What takes priority if the last move also reaches the automatic 75-move limit?",
+    "prompt": "What happens if the same move delivers checkmate and reaches the automatic 75-move draw limit?",
     "category": "Rules",
     "answers": [
       "Checkmate",
@@ -743,7 +743,7 @@
   },
   {
     "id": "fact-trivia-elo",
-    "prompt": "Why aren’t ratings from different player pools automatically interchangeable?",
+    "prompt": "Why can two players with the same rating in different rating systems be different in strength?",
     "category": "Numbers",
     "answers": [
       "Elo is relative to results within its pool",

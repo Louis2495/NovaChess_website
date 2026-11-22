@@ -6670,3 +6670,20 @@ html { scrollbar-gutter:stable; }
 @media(max-width:700px) {
   .history-event-explanation > .history-event-image { float:none; width:100%; margin:0 0 14px; }
 }
+
+.workspace .trivia-game {
+  width:min(100%, 940px);
+  max-width:none;
+  margin-inline:auto;
+  padding:clamp(20px, 4vw, 48px);
+}
+.trivia-game .trivia-question h2 {
+  font-size:clamp(1.45rem, 3vw, 2.25rem);
+  line-height:1.35;
+}
+.trivia-game .trivia-clue { font-size:clamp(1.05rem, 2vw, 1.2rem); }
+.trivia-game .trivia-options > button {
+  min-height:58px;
+  font-size:clamp(.96rem, 1.8vw, 1.12rem);
+}
+.trivia-game .trivia-explanation { font-size:1rem; }

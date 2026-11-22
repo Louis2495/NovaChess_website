@@ -1,8 +1,7 @@
 [
   {
     "id": "skewer",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A valuable front piece is attacked along a line; when it moves, a target behind it is lost.",
+    "prompt": "What is it called when you attack a valuable piece so that moving it exposes a piece behind it?",
     "category": "Tactics",
     "answers": [
       "Skewer",
@@ -16,8 +15,7 @@
   },
   {
     "id": "discovered-attack",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A moving piece uncovers an attack by a bishop, rook or queen behind it.",
+    "prompt": "What is it called when moving one piece reveals an attack by another piece behind it?",
     "category": "Tactics",
     "answers": [
       "Discovered attack",
@@ -31,8 +29,7 @@
   },
   {
     "id": "double-check",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "Both the moving piece and an uncovered piece give check.",
+    "prompt": "What is it called when two pieces give check at the same time?",
     "category": "Tactics",
     "answers": [
       "Double check",
@@ -46,8 +43,7 @@
   },
   {
     "id": "deflection",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A defender is lured away from an important square or duty.",
+    "prompt": "What is it called when you lure a defender away from the piece or square it protects?",
     "category": "Tactics",
     "answers": [
       "Deflection",
@@ -61,8 +57,7 @@
   },
   {
     "id": "overloading",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "One defender has more tasks than it can maintain.",
+    "prompt": "What is it called when one piece has too many things to defend?",
     "category": "Tactics",
     "answers": [
       "Overloading",
@@ -76,8 +71,7 @@
   },
   {
     "id": "interference",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A move blocks an enemy line of defense or attack.",
+    "prompt": "What is it called when you block the line between an enemy piece and the piece it protects?",
     "category": "Tactics",
     "answers": [
       "Interference",
@@ -91,8 +85,7 @@
   },
   {
     "id": "novotny",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A sacrifice on the intersection of two differently moving line pieces creates interference whichever piece captures.",
+    "prompt": "What is the name of a sacrifice on a square where a rook and bishop can both capture, but either capture blocks the other piece?",
     "category": "Tactics",
     "answers": [
       "Novotny",
@@ -106,8 +99,7 @@
   },
   {
     "id": "grimshaw",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "Two defending line pieces interfere with one another on the same square in different variations, without an initial sacrifice on that square.",
+    "prompt": "What is the name of a chess problem in which a rook and bishop can each move to the same square and block the other?",
     "category": "Tactics",
     "answers": [
       "Grimshaw",
@@ -121,8 +113,7 @@
   },
   {
     "id": "plachutta",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A sacrifice creates mutual interference between two similarly moving line pieces.",
+    "prompt": "What is the name of a sacrifice on a square where two pieces that move the same way, such as two rooks, can each capture and block the other?",
     "category": "Tactics",
     "answers": [
       "Plachutta",
@@ -151,8 +142,7 @@
   },
   {
     "id": "zwischenzug",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "An in-between move interrupts an expected sequence, often a recapture.",
+    "prompt": "What is it called when you play an unexpected move, such as a check, before making the obvious recapture?",
     "category": "Tactics",
     "answers": [
       "Zwischenzug",
@@ -166,8 +156,7 @@
   },
   {
     "id": "desperado",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A piece that will be lost anyway captures or creates a threat before disappearing.",
+    "prompt": "What do you call a piece that takes something or creates a threat just before it is lost?",
     "category": "Tactics",
     "answers": [
       "Desperado",
@@ -181,8 +170,7 @@
   },
   {
     "id": "windmill",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A repeated discovered-check mechanism lets an attacking piece collect material between checks.",
+    "prompt": "What is it called when repeated discovered checks let you take pieces between checks?",
     "category": "Tactics",
     "answers": [
       "Windmill",
@@ -196,8 +184,7 @@
   },
   {
     "id": "x-ray-attack",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A line piece influences a target through an intervening piece that may move or be exchanged.",
+    "prompt": "What is it called when a bishop, rook, or queen attacks a target through a piece in the way?",
     "category": "Tactics",
     "answers": [
       "X-ray attack",
@@ -211,8 +198,7 @@
   },
   {
     "id": "undermining",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "The supporting pawn or piece beneath a target is attacked.",
+    "prompt": "What is it called when you attack the piece or pawn that protects your real target?",
     "category": "Tactics",
     "answers": [
       "Undermining",
@@ -226,8 +212,7 @@
   },
   {
     "id": "back-rank-mate",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A rook or queen mates a king confined by its own pawns or pieces on the back rank.",
+    "prompt": "What is it called when a rook or queen mates a king trapped on its starting rank by its own pieces?",
     "category": "Tactics",
     "answers": [
       "Back-rank mate",
@@ -241,8 +226,7 @@
   },
   {
     "id": "smothered-mate",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A knight mates a king whose own pieces occupy all escape squares.",
+    "prompt": "What is it called when a knight mates a king whose own pieces block every escape?",
     "category": "Tactics",
     "answers": [
       "Smothered mate",
@@ -256,8 +240,7 @@
   },
   {
     "id": "arabian-mate",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A rook and knight coordinate against a king near a corner.",
+    "prompt": "Which mating pattern uses a rook and knight to trap a king in a corner?",
     "category": "Tactics",
     "answers": [
       "Arabian mate",
@@ -271,8 +254,8 @@
   },
   {
     "id": "anastasia-s-mate",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A rook or queen checks along an edge while a knight seals escape squares, often with an enemy pawn blocking the remaining route.",
+    "prompt": "What is this tactic called?",
+    "clue": "A rook or queen mates along a file near the edge while a knight controls the king's escape squares and an enemy pawn helps confine it.",
     "category": "Tactics",
     "answers": [
       "Anastasia’s mate",
@@ -286,8 +269,8 @@
   },
   {
     "id": "boden-s-mate",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "Two bishops on crossing diagonals mate a king trapped by its own pieces, often after queenside castling.",
+    "prompt": "What is this tactic called?",
+    "clue": "Two bishops on crossing diagonals checkmate a king whose own pieces obstruct its escape.",
     "category": "Tactics",
     "answers": [
       "Boden’s mate",
@@ -301,7 +284,7 @@
   },
   {
     "id": "greek-gift",
-    "prompt": "Which tactical idea does this describe?",
+    "prompt": "What is this tactic called?",
     "clue": "A bishop sacrifice on h7 or h2 draws the king out so a knight and queen can attack.",
     "category": "Tactics",
     "answers": [
@@ -316,7 +299,7 @@
   },
   {
     "id": "legal-s-mate",
-    "prompt": "Which tactical idea does this describe?",
+    "prompt": "What is this tactic called?",
     "clue": "A pinned knight moves to allow a queen capture, while minor pieces force mate.",
     "category": "Tactics",
     "answers": [
@@ -331,7 +314,7 @@
   },
   {
     "id": "epaulette-mate",
-    "prompt": "Which tactical idea does this describe?",
+    "prompt": "What is this tactic called?",
     "clue": "A queen mates a king whose two sideways escape squares are blocked by its own pieces.",
     "category": "Tactics",
     "answers": [
@@ -346,8 +329,7 @@
   },
   {
     "id": "dovetail-mate",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A queen checks a diagonally adjacent king while friendly pieces block the king’s rear diagonal escapes.",
+    "prompt": "Which mate uses a queen one diagonal square from the king, with the king’s own pieces blocking its two straight retreats?",
     "category": "Tactics",
     "answers": [
       "Dovetail mate",
@@ -361,8 +343,7 @@
   },
   {
     "id": "swallow-s-tail-mate",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "The checking queen stands immediately beside the king, and the king’s pieces block diagonal retreats on the other side.",
+    "prompt": "Which mate uses a queen right beside the king, with the king’s own pieces blocking its two diagonal retreats?",
     "category": "Tactics",
     "answers": [
       "Swallow’s-tail mate",
@@ -376,8 +357,8 @@
   },
   {
     "id": "underpromotion",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A pawn promotes to a rook, bishop or knight rather than a queen.",
+    "prompt": "What is this tactic called?",
+    "clue": "A pawn reaching its final rank may promote to a rook, bishop, or knight instead of a queen.",
     "category": "Tactics",
     "answers": [
       "Underpromotion",
@@ -406,8 +387,8 @@
   },
   {
     "id": "domination",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "One piece controls all useful destinations of an opposing piece.",
+    "prompt": "What is this tactic called?",
+    "clue": "A piece is dominated when every useful escape square is covered.",
     "category": "Tactics",
     "answers": [
       "Domination",
@@ -421,8 +402,8 @@
   },
   {
     "id": "cross-check",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A check is answered by blocking it with a piece that itself gives check.",
+    "prompt": "What is this tactic called?",
+    "clue": "A response to check also checks the opposing king.",
     "category": "Tactics",
     "answers": [
       "Cross-check",
@@ -451,8 +432,7 @@
   },
   {
     "id": "rundlauf",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A piece travels a circuit and returns to its starting square, while the position has changed in a useful way.",
+    "prompt": "What is the name of a chess problem in which a piece makes a loop and returns to its starting square by a different route?",
     "category": "Tactics",
     "answers": [
       "Rundlauf",
@@ -466,8 +446,7 @@
   },
   {
     "id": "switchback",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A piece moves to a square and later returns to its original square, often after forcing a weakening response.",
+    "prompt": "What is it called when a piece retraces its move and returns to its starting square?",
     "category": "Tactics",
     "answers": [
       "Switchback",
@@ -481,8 +460,7 @@
   },
   {
     "id": "excelsior",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A pawn travels from its starting rank to promotion during a composed solution.",
+    "prompt": "What is the name of a chess problem in which a pawn starts on its original square and plays all the way to promotion?",
     "category": "Tactics",
     "answers": [
       "Excelsior",
@@ -496,8 +474,7 @@
   },
   {
     "id": "babson-task",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A direct-mate composition answers each of Black’s four promotion choices with the corresponding White promotion.",
+    "prompt": "What is the name of a mate problem in which White must match whichever of the four pieces Black promotes to?",
     "category": "Tactics",
     "answers": [
       "Babson task",
@@ -511,8 +488,7 @@
   },
   {
     "id": "allumwandlung",
-    "prompt": "Which tactical idea does this describe?",
-    "clue": "A composed solution or its variations feature all four promotion types.",
+    "prompt": "What is the name of a chess problem whose solutions show all four promotion choices?",
     "category": "Tactics",
     "answers": [
       "Allumwandlung",
@@ -526,8 +502,7 @@
   },
   {
     "id": "outpost",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A secure advanced square supports a piece, often a knight, without easy challenge by enemy pawns.",
+    "prompt": "What do you call an advanced square where a piece can sit without being chased away by enemy pawns?",
     "category": "Strategy",
     "answers": [
       "Outpost",
@@ -541,8 +516,7 @@
   },
   {
     "id": "prophylaxis",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "Anticipate the opponent’s useful plan and limit it while improving your position.",
+    "prompt": "What do you call playing a move to prevent your opponent’s plan before they can carry it out?",
     "category": "Strategy",
     "answers": [
       "Prophylaxis",
@@ -556,8 +530,7 @@
   },
   {
     "id": "minority-attack",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "Fewer pawns advance against a larger pawn group to create a fixed weakness, commonly b4–b5 against c6 in the Carlsbad structure.",
+    "prompt": "What is it called when you advance fewer pawns against a larger group of pawns to create a weakness?",
     "category": "Strategy",
     "answers": [
       "Minority attack",
@@ -571,8 +544,7 @@
   },
   {
     "id": "isolated-queen-s-pawn",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "An isolated d-pawn has no adjacent friendly pawn to support it.",
+    "prompt": "What do you call a pawn on the d-file with no friendly pawn on either neighboring file?",
     "category": "Strategy",
     "answers": [
       "Isolated queen’s pawn",
@@ -586,8 +558,7 @@
   },
   {
     "id": "hanging-pawns",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "Adjacent pawns on open neighboring files, often c4 and d4, support each other but cannot be defended by other pawns.",
+    "prompt": "What do you call two side-by-side pawns that have no other friendly pawns to defend them?",
     "category": "Strategy",
     "answers": [
       "Hanging pawns",
@@ -601,8 +572,7 @@
   },
   {
     "id": "backward-pawn",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A pawn lags behind neighboring pawns and cannot safely advance.",
+    "prompt": "What do you call a pawn that has fallen behind its neighbors and cannot safely advance?",
     "category": "Strategy",
     "answers": [
       "Backward pawn",
@@ -616,7 +586,7 @@
   },
   {
     "id": "good-bishop-bad-bishop",
-    "prompt": "Which strategic idea does this describe?",
+    "prompt": "What is this strategy called?",
     "clue": "A bishop blocked by its own fixed pawns is conventionally “bad,” but it may still defend important squares.",
     "category": "Strategy",
     "answers": [
@@ -631,8 +601,7 @@
   },
   {
     "id": "color-complex",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A network of squares of one color can become weak after pawn moves or a bishop exchange.",
+    "prompt": "What do you call a group of light squares or dark squares you can attack or defend together?",
     "category": "Strategy",
     "answers": [
       "Color complex",
@@ -646,8 +615,7 @@
   },
   {
     "id": "exchange-sacrifice",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A rook is given for a bishop or knight to gain positional or tactical compensation.",
+    "prompt": "What is it called when you deliberately give up a rook for a bishop or knight?",
     "category": "Strategy",
     "answers": [
       "Exchange sacrifice",
@@ -661,8 +629,8 @@
   },
   {
     "id": "space-advantage",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "Advanced pawns control territory and restrict the opponent’s maneuvering.",
+    "prompt": "What is this strategy called?",
+    "clue": "Advanced pawns and controlled territory give pieces more room to maneuver.",
     "category": "Strategy",
     "answers": [
       "Space advantage",
@@ -676,8 +644,7 @@
   },
   {
     "id": "pawn-break",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A pawn move challenges an opposing pawn chain and changes the available files or diagonals.",
+    "prompt": "What do you call a pawn move that challenges the opponent’s pawn chain and can open lines?",
     "category": "Strategy",
     "answers": [
       "Pawn break",
@@ -691,7 +658,7 @@
   },
   {
     "id": "candidate-passed-pawn",
-    "prompt": "Which strategic idea does this describe?",
+    "prompt": "What is this strategy called?",
     "clue": "A pawn may become passed after a favorable exchange or breakthrough.",
     "category": "Strategy",
     "answers": [
@@ -706,8 +673,8 @@
   },
   {
     "id": "outside-passed-pawn",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A passed pawn far from the main pawn mass can distract the enemy king.",
+    "prompt": "What is this strategy called?",
+    "clue": "A passed pawn far from the main pawn group can distract the enemy king, allowing the friendly king to collect pawns elsewhere.",
     "category": "Strategy",
     "answers": [
       "Outside passed pawn",
@@ -721,8 +688,7 @@
   },
   {
     "id": "principle-of-two-weaknesses",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A defender may hold one target but struggle when a second target is created far away.",
+    "prompt": "What is the strategy of creating a second target far from the first so your opponent has to defend both?",
     "category": "Strategy",
     "answers": [
       "Principle of two weaknesses",
@@ -736,8 +702,7 @@
   },
   {
     "id": "transformation-of-advantage",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A temporary edge can be converted into a different lasting asset, such as exchanging an attack for a favorable endgame.",
+    "prompt": "What is it called when you trade one advantage for another, such as giving up an attack to enter a winning endgame?",
     "category": "Strategy",
     "answers": [
       "Transformation of advantage",
@@ -751,8 +716,7 @@
   },
   {
     "id": "rook-lift",
-    "prompt": "Which strategic idea does this describe?",
-    "clue": "A rook develops along a rank before moving to another file, often joining a kingside attack through the third rank.",
+    "prompt": "What do you call bringing a rook up from the back rank so it can move sideways and join the attack?",
     "category": "Strategy",
     "answers": [
       "Rook lift",
@@ -766,8 +730,8 @@
   },
   {
     "id": "player-steinitz",
-    "prompt": "Which player is described here?",
-    "clue": "The first official champion 1886–1894: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Steinitz won the 1886 match against Zukertort and is recognized as the first official World Champion.",
     "category": "Players",
     "answers": [
       "Wilhelm Steinitz",
@@ -781,8 +745,8 @@
   },
   {
     "id": "player-lasker",
-    "prompt": "Which player is described here?",
-    "clue": "A 27-year reign 1894–1921: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Lasker held the world title from 1894 to 1921, the longest recognized reign.",
     "category": "Players",
     "answers": [
       "Emanuel Lasker",
@@ -796,8 +760,8 @@
   },
   {
     "id": "player-capablanca",
-    "prompt": "Which player is described here?",
-    "clue": "Renowned for endgame clarity 1921–1927: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Capablanca became World Champion in 1921 and lost the title to Alekhine in 1927.",
     "category": "Players",
     "answers": [
       "José Raúl Capablanca",
@@ -811,8 +775,8 @@
   },
   {
     "id": "player-alekhine-first",
-    "prompt": "Which player is described here?",
-    "clue": "Takes the title from Capablanca 1927–1935: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Alekhine defeated Capablanca in 1927, lost the title to Euwe in 1935, and regained it in 1937.",
     "category": "Players",
     "answers": [
       "Alexander Alekhine",
@@ -826,8 +790,8 @@
   },
   {
     "id": "player-euwe",
-    "prompt": "Which player is described here?",
-    "clue": "The Dutch mathematician wins 1935–1937: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Euwe defeated Alekhine in 1935 to become World Champion, then lost the return match in 1937.",
     "category": "Players",
     "answers": [
       "Max Euwe",
@@ -841,8 +805,8 @@
   },
   {
     "id": "player-alekhine-second",
-    "prompt": "Which player is described here?",
-    "clue": "Regains the title 1937–1946: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Regains the title 1937–1946.",
     "category": "Players",
     "answers": [
       "Alexander Alekhine",
@@ -856,8 +820,8 @@
   },
   {
     "id": "player-botvinnik-first",
-    "prompt": "Which player is described here?",
-    "clue": "Wins the 1948 championship tournament 1948–1957: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Botvinnik won the 1948 championship tournament and held the title in three periods, regaining it in return matches against Smyslov and Tal.",
     "category": "Players",
     "answers": [
       "Mikhail Botvinnik",
@@ -871,8 +835,8 @@
   },
   {
     "id": "player-smyslov",
-    "prompt": "Which player is described here?",
-    "clue": "Harmony and endgame mastery 1957–1958: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Smyslov became World Champion by defeating Botvinnik in 1957 and lost the return match in 1958.",
     "category": "Players",
     "answers": [
       "Vasily Smyslov",
@@ -886,8 +850,8 @@
   },
   {
     "id": "player-botvinnik-second",
-    "prompt": "Which player is described here?",
-    "clue": "Wins the return match 1958–1960: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Wins the return match 1958–1960.",
     "category": "Players",
     "answers": [
       "Mikhail Botvinnik",
@@ -901,8 +865,8 @@
   },
   {
     "id": "player-tal",
-    "prompt": "Which player is described here?",
-    "clue": "The Wizard of Riga 1960–1961: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Tal won the world title in 1960 and lost the return match to Botvinnik in 1961.",
     "category": "Players",
     "answers": [
       "Mikhail Tal",
@@ -916,8 +880,8 @@
   },
   {
     "id": "player-botvinnik-third",
-    "prompt": "Which player is described here?",
-    "clue": "A third title reign 1961–1963: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "A third title reign 1961–1963.",
     "category": "Players",
     "answers": [
       "Mikhail Botvinnik",
@@ -931,8 +895,8 @@
   },
   {
     "id": "player-petrosian",
-    "prompt": "Which player is described here?",
-    "clue": "Famous for resilient defense 1963–1969: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Petrosian defeated Botvinnik in 1963, defended the title against Spassky in 1966, and lost it to Spassky in 1969.",
     "category": "Players",
     "answers": [
       "Tigran Petrosian",
@@ -946,8 +910,8 @@
   },
   {
     "id": "player-spassky",
-    "prompt": "Which player is described here?",
-    "clue": "An exceptionally versatile player 1969–1972: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Spassky became World Champion in 1969 and lost the title to Fischer in 1972.",
     "category": "Players",
     "answers": [
       "Boris Spassky",
@@ -961,8 +925,8 @@
   },
   {
     "id": "player-fischer",
-    "prompt": "Which player is described here?",
-    "clue": "Wins in Reykjavík 1972–1975: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Fischer won the world title by defeating Spassky in 1972.",
     "category": "Players",
     "answers": [
       "Bobby Fischer",
@@ -976,8 +940,8 @@
   },
   {
     "id": "player-karpov",
-    "prompt": "Which player is described here?",
-    "clue": "Awarded the title; defends it in 1978 1975–1985: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Karpov became World Champion in 1975 and defended the title against Korchnoi in 1978 and 1981.",
     "category": "Players",
     "answers": [
       "Anatoly Karpov",
@@ -991,8 +955,8 @@
   },
   {
     "id": "player-kasparov",
-    "prompt": "Which player is described here?",
-    "clue": "Classical title branch after 1993 1985–2000: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Kasparov became World Champion in 1985 and held the classical title until 2000.",
     "category": "Players",
     "answers": [
       "Garry Kasparov",
@@ -1006,8 +970,8 @@
   },
   {
     "id": "player-kramnik",
-    "prompt": "Which player is described here?",
-    "clue": "Reunites the title in 2006 2000–2007: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Kramnik defeated Kasparov in 2000 to win the classical title and won the 2006 reunification match against Topalov.",
     "category": "Players",
     "answers": [
       "Vladimir Kramnik",
@@ -1021,8 +985,8 @@
   },
   {
     "id": "player-anand",
-    "prompt": "Which player is described here?",
-    "clue": "Wins the unified title tournament 2007–2013: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Anand won the FIDE knockout world title in 2000 and the unified championship tournament in 2007.",
     "category": "Players",
     "answers": [
       "Viswanathan Anand",
@@ -1036,8 +1000,8 @@
   },
   {
     "id": "player-carlsen",
-    "prompt": "Which player is described here?",
-    "clue": "Five successful title matches 2013–2023: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Carlsen won the classical world title in 2013 and defended it four times before choosing not to defend it in the 2023 cycle.",
     "category": "Players",
     "answers": [
       "Magnus Carlsen",
@@ -1066,8 +1030,8 @@
   },
   {
     "id": "player-gukesh",
-    "prompt": "Which player is described here?",
-    "clue": "Wins the title at 18 2024: classical / unified world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Wins the title at 18 2024.",
     "category": "Players",
     "answers": [
       "Gukesh D",
@@ -1081,8 +1045,8 @@
   },
   {
     "id": "player-fide-karpov",
-    "prompt": "Which player is described here?",
-    "clue": "FIDE title during the split 1993–1999: FIDE split-era world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "FIDE title during the split 1993–1999.",
     "category": "Players",
     "answers": [
       "Anatoly Karpov",
@@ -1096,8 +1060,8 @@
   },
   {
     "id": "player-fide-khalifman",
-    "prompt": "Which player is described here?",
-    "clue": "FIDE title during the split 1999–2000: FIDE split-era world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "FIDE title during the split 1999–2000.",
     "category": "Players",
     "answers": [
       "Alexander Khalifman",
@@ -1111,8 +1075,8 @@
   },
   {
     "id": "player-fide-anand",
-    "prompt": "Which player is described here?",
-    "clue": "FIDE title during the split 2000–2002: FIDE split-era world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "FIDE title during the split 2000–2002.",
     "category": "Players",
     "answers": [
       "Viswanathan Anand",
@@ -1126,8 +1090,8 @@
   },
   {
     "id": "player-fide-ponomariov",
-    "prompt": "Which player is described here?",
-    "clue": "FIDE title during the split 2002–2004: FIDE split-era world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "FIDE title during the split 2002–2004.",
     "category": "Players",
     "answers": [
       "Ruslan Ponomariov",
@@ -1141,8 +1105,8 @@
   },
   {
     "id": "player-fide-kasimdzhanov",
-    "prompt": "Which player is described here?",
-    "clue": "FIDE title during the split 2004–2005: FIDE split-era world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "FIDE title during the split 2004–2005.",
     "category": "Players",
     "answers": [
       "Rustam Kasimdzhanov",
@@ -1156,8 +1120,8 @@
   },
   {
     "id": "player-fide-topalov",
-    "prompt": "Which player is described here?",
-    "clue": "FIDE title during the split 2005–2006: FIDE split-era world title.",
+    "prompt": "Who is this chess player?",
+    "clue": "Topalov won the 2005 FIDE World Championship tournament and played the 2006 reunification match against Kramnik.",
     "category": "Players",
     "answers": [
       "Veselin Topalov",
@@ -1171,7 +1135,7 @@
   },
   {
     "id": "event-event-600",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "600: Chaturanga emerges: an ancestor of modern chess.",
     "category": "Events & history",
     "answers": [
@@ -1186,7 +1150,7 @@
   },
   {
     "id": "event-event-900",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "900: Shatranj spreads across cultures and into Europe.",
     "category": "Events & history",
     "answers": [
@@ -1201,7 +1165,7 @@
   },
   {
     "id": "event-event-1497",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1497: Lucena’s printed book records an early form of modern chess.",
     "category": "Events & history",
     "answers": [
@@ -1216,7 +1180,7 @@
   },
   {
     "id": "event-event-1769",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1769: A famous apparent chess automaton was secretly operated by a human.",
     "category": "Events & history",
     "answers": [
@@ -1231,7 +1195,7 @@
   },
   {
     "id": "event-event-1849",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1849: The familiar tournament-piece design is introduced.",
     "category": "Events & history",
     "answers": [
@@ -1246,7 +1210,7 @@
   },
   {
     "id": "event-event-1851",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1851: Anderssen wins a landmark international tournament.",
     "category": "Events & history",
     "answers": [
@@ -1261,7 +1225,7 @@
   },
   {
     "id": "event-event-1858",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1858: A brilliant attacking player dominates before the official world title.",
     "category": "Events & history",
     "answers": [
@@ -1276,7 +1240,7 @@
   },
   {
     "id": "event-event-1886",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1886: Steinitz defeats Zukertort in the first official championship match.",
     "category": "Events & history",
     "answers": [
@@ -1291,7 +1255,7 @@
   },
   {
     "id": "event-event-1924",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1924: A world federation is established in Paris.",
     "category": "Events & history",
     "answers": [
@@ -1306,7 +1270,7 @@
   },
   {
     "id": "event-event-1927",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1927: Vera Menchik wins the inaugural championship.",
     "category": "Events & history",
     "answers": [
@@ -1321,7 +1285,7 @@
   },
   {
     "id": "event-event-1948",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1948: Botvinnik wins the five-player championship after Alekhine’s death.",
     "category": "Events & history",
     "answers": [
@@ -1336,7 +1300,7 @@
   },
   {
     "id": "event-event-1950",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1950: FIDE awards the first 27 grandmaster titles.",
     "category": "Events & history",
     "answers": [
@@ -1351,7 +1315,7 @@
   },
   {
     "id": "event-event-1972",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1972: Fischer defeats Spassky in a globally watched match.",
     "category": "Events & history",
     "answers": [
@@ -1366,7 +1330,7 @@
   },
   {
     "id": "event-event-1978",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1978: Gaprindashvili receives the open grandmaster title.",
     "category": "Events & history",
     "answers": [
@@ -1381,7 +1345,7 @@
   },
   {
     "id": "event-event-1985",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1985: The 22-year-old begins a fifteen-year title reign.",
     "category": "Events & history",
     "answers": [
@@ -1396,7 +1360,7 @@
   },
   {
     "id": "event-event-1993",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1993: The classical and FIDE titles split.",
     "category": "Events & history",
     "answers": [
@@ -1411,7 +1375,7 @@
   },
   {
     "id": "event-event-1997",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "1997: A computer defeats the reigning champion in a classical match.",
     "category": "Events & history",
     "answers": [
@@ -1426,7 +1390,7 @@
   },
   {
     "id": "event-event-2006",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "2006: Kramnik defeats Topalov; the world title is reunited.",
     "category": "Events & history",
     "answers": [
@@ -1441,7 +1405,7 @@
   },
   {
     "id": "event-event-2013",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "2013: Carlsen defeats Anand in Chennai.",
     "category": "Events & history",
     "answers": [
@@ -1456,7 +1420,7 @@
   },
   {
     "id": "event-event-2023",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "2023: Ding Liren becomes champion after a tied classical match.",
     "category": "Events & history",
     "answers": [
@@ -1471,7 +1435,7 @@
   },
   {
     "id": "event-event-2024",
-    "prompt": "Which answer matches this moment in chess history?",
+    "prompt": "What event is this clue about?",
     "clue": "2024: Gukesh defeats Ding Liren in Singapore.",
     "category": "Events & history",
     "answers": [
@@ -1486,7 +1450,7 @@
   },
   {
     "id": "master-jean-dufresne",
-    "prompt": "Which player is described here?",
+    "prompt": "Who is this chess player?",
     "clue": "Featured in The Evergreen Game, Berlin 1852.",
     "category": "Players",
     "answers": [
@@ -1501,8 +1465,8 @@
   },
   {
     "id": "master-paul-morphy",
-    "prompt": "Which player is described here?",
-    "clue": "Featured in The Opera Game, Paris 1858.",
+    "prompt": "Who is this chess player?",
+    "clue": "Morphy dominated leading opposition during his brief nineteenth-century career and is famous for rapid development and open-line attacks.",
     "category": "Players",
     "answers": [
       "Paul Morphy",
@@ -1516,7 +1480,7 @@
   },
   {
     "id": "master-curt-von-bardeleben",
-    "prompt": "Which player is described here?",
+    "prompt": "Who is this chess player?",
     "clue": "Featured in The king in the crossfire, Hastings 1895.",
     "category": "Players",
     "answers": [
@@ -1531,7 +1495,7 @@
   },
   {
     "id": "master-johann-bauer",
-    "prompt": "Which player is described here?",
+    "prompt": "Who is this chess player?",
     "clue": "Featured in The double bishop sacrifice, Amsterdam 1889.",
     "category": "Players",
     "answers": [
@@ -1546,7 +1510,7 @@
   },
   {
     "id": "master-donald-byrne",
-    "prompt": "Which player is described here?",
+    "prompt": "Who is this chess player?",
     "clue": "Featured in The Game of the Century, New York 1956.",
     "category": "Players",
     "answers": [
@@ -1561,7 +1525,7 @@
   },
   {
     "id": "master-levon-aronian",
-    "prompt": "Which player is described here?",
+    "prompt": "Who is this chess player?",
     "clue": "Featured in A modern black-piece attack, Wijk aan Zee 2013.",
     "category": "Players",
     "answers": [
@@ -1576,7 +1540,7 @@
   },
   {
     "id": "trivia-extra-0",
-    "prompt": "How many non-attacking eight-queen arrangements exist, counting rotations separately?",
+    "prompt": "How many ways can you place eight queens so none attacks another? Count rotations and reflections separately.",
     "category": "Chess knowledge",
     "answers": [
       "92",
@@ -1632,7 +1596,7 @@
   },
   {
     "id": "trivia-extra-4",
-    "prompt": "Which promotion solves the Saavedra study?",
+    "prompt": "In the Saavedra puzzle, what piece should the winning pawn promote to?",
     "category": "Chess knowledge",
     "answers": [
       "Rook",
@@ -1646,7 +1610,7 @@
   },
   {
     "id": "trivia-extra-5",
-    "prompt": "What is the minimum number of queens needed to dominate an empty 8×8 board?",
+    "prompt": "What is the fewest queens you can place so every square is occupied or attacked?",
     "category": "Chess knowledge",
     "answers": [
       "5",
@@ -1660,7 +1624,7 @@
   },
   {
     "id": "trivia-extra-6",
-    "prompt": "How many square sub-boards of all sizes are on an 8×8 board?",
+    "prompt": "How many squares of all sizes can you count on a chessboard, from 1×1 to 8×8?",
     "category": "Chess knowledge",
     "answers": [
       "204",
@@ -1716,7 +1680,7 @@
   },
   {
     "id": "trivia-extra-10",
-    "prompt": "Which two pieces deliver the standard Arabian mating pattern?",
+    "prompt": "Which two pieces work together in an Arabian mate?",
     "category": "Chess knowledge",
     "answers": [
       "Rook and knight",
@@ -1730,7 +1694,7 @@
   },
   {
     "id": "trivia-extra-11",
-    "prompt": "What is the key freeing break for Black in many Sicilian positions?",
+    "prompt": "Which pawn move often helps Black open up the position in the Sicilian Defense?",
     "category": "Chess knowledge",
     "answers": [
       "...d5",
@@ -1744,21 +1708,21 @@
   },
   {
     "id": "trivia-extra-12",
-    "prompt": "Which side normally benefits from exchanges against an isolated queen’s pawn?",
+    "prompt": "Who usually benefits from trading pieces when one player has an isolated d-pawn?",
     "category": "Chess knowledge",
     "answers": [
-      "The blockading side",
+      "The player blocking the pawn",
       "Always the pawn’s owner",
       "Neither side ever",
       "Only the side with a queen"
     ],
     "correct": 0,
-    "explanation": "The blockading side",
+    "explanation": "The player blocking the pawn",
     "source": "https://en.wikipedia.org/w/index.php?search=Which%20side%20normally%20benefits%20from%20exchanges%20against%20an%20isolated%20queen%E2%80%99s%20pawn%3F%20chess"
   },
   {
     "id": "trivia-extra-13",
-    "prompt": "What distinguishes a Novotny from a Grimshaw theme?",
+    "prompt": "What does a Novotny chess problem add that a Grimshaw does not?",
     "category": "Chess knowledge",
     "answers": [
       "A sacrifice on the interference square",
@@ -1786,7 +1750,7 @@
   },
   {
     "id": "trivia-extra-15",
-    "prompt": "Which rook-ending defense uses side attacks against a rook pawn?",
+    "prompt": "Which rook endgame defense uses checks or attacks from the side against a pawn on the a- or h-file?",
     "category": "Chess knowledge",
     "answers": [
       "Vancura",
@@ -1800,7 +1764,7 @@
   },
   {
     "id": "trivia-extra-16",
-    "prompt": "Which square color changes on every legal knight move?",
+    "prompt": "What happens to the square color each time a knight moves?",
     "category": "Chess knowledge",
     "answers": [
       "The knight always changes color",
@@ -1828,7 +1792,7 @@
   },
   {
     "id": "trivia-extra-18",
-    "prompt": "Which federation maintains the international GM title?",
+    "prompt": "Which organization awards the international Grandmaster title?",
     "category": "Chess knowledge",
     "answers": [
       "FIDE",
@@ -1870,7 +1834,7 @@
   },
   {
     "id": "fact-trivia-insight-2",
-    "prompt": "What distinguishes a closed knight’s tour from an open one?",
+    "prompt": "What makes a knight’s tour a closed tour?",
     "category": "Mathematics",
     "answers": [
       "The last square is a knight move from the first",
@@ -1912,7 +1876,7 @@
   },
   {
     "id": "fact-trivia-insight-6",
-    "prompt": "What allows some rook-and-pawn positions to hold against a queen?",
+    "prompt": "How can a rook and pawn sometimes draw against a queen?",
     "category": "Endgames",
     "answers": [
       "A fortress that prevents progress",
@@ -1926,7 +1890,7 @@
   },
   {
     "id": "fact-trivia-insight-7",
-    "prompt": "In the endgame position called a trebuchet, what is the problem for the player whose turn it is?",
+    "prompt": "In the endgame called a trebuchet, why is it bad to be the player who has to move?",
     "category": "Endgames",
     "answers": [
       "Moving loses a defended pawn",
@@ -2052,7 +2016,7 @@
   },
   {
     "id": "fact-trivia-insight-16",
-    "prompt": "Where should the defending king head against a wrong bishop and rook pawn?",
+    "prompt": "Which corner should the defending king aim for against a rook pawn and a bishop that cannot guard its promotion square?",
     "category": "Endgames",
     "answers": [
       "The promotion corner not controlled by the bishop",
@@ -2066,7 +2030,7 @@
   },
   {
     "id": "fact-trivia-insight-17",
-    "prompt": "Why can a tablebase win fail to be a practical tournament win?",
+    "prompt": "Why might a position listed as a win in an endgame database still be drawn in a tournament?",
     "category": "Computers",
     "answers": [
       "The fifty-move rule may prevent completing the win",
@@ -2108,7 +2072,7 @@
   },
   {
     "id": "fact-trivia-insight-20",
-    "prompt": "Which technology carried moves in the 1844 Washington–Baltimore correspondence match?",
+    "prompt": "How did players send their moves during the 1844 Washington–Baltimore match?",
     "category": "History",
     "answers": [
       "Electric telegraph",
@@ -2178,7 +2142,7 @@
   },
   {
     "id": "fact-trivia-insight-25",
-    "prompt": "Whose grandmaster age record did Judit Polgár surpass in 1991?",
+    "prompt": "Who held the record for youngest grandmaster before Judit Polgár broke it in 1991?",
     "category": "People",
     "answers": [
       "Bobby Fischer’s",
@@ -2192,7 +2156,7 @@
   },
   {
     "id": "fact-trivia-insight-26",
-    "prompt": "What was the purpose of a sealed move when a game was adjourned?",
+    "prompt": "Why did players write down and seal their next move when a game stopped for the day?",
     "category": "History",
     "answers": [
       "Commit to the next move before overnight analysis",
@@ -2248,7 +2212,7 @@
   },
   {
     "id": "fact-trivia-insight-30",
-    "prompt": "Why could one square have different names in descriptive notation?",
+    "prompt": "Why could White and Black use different names for the same square in descriptive notation?",
     "category": "History",
     "answers": [
       "Names depended on each player’s perspective",
@@ -2318,7 +2282,7 @@
   },
   {
     "id": "fact-trivia-shannon",
-    "prompt": "What does Shannon’s estimate of roughly 10¹²⁰ describe?",
+    "prompt": "What was Claude Shannon counting when he estimated a number around 10¹²⁰ for chess?",
     "category": "Numbers",
     "answers": [
       "The approximate chess game-tree complexity",
@@ -2388,7 +2352,7 @@
   },
   {
     "id": "fact-trivia-seventy-five",
-    "prompt": "What takes priority if the last move also reaches the automatic 75-move limit?",
+    "prompt": "What happens if the same move delivers checkmate and reaches the automatic 75-move draw limit?",
     "category": "Rules",
     "answers": [
       "Checkmate",
@@ -2598,7 +2562,7 @@
   },
   {
     "id": "fact-trivia-elo",
-    "prompt": "Why aren’t ratings from different player pools automatically interchangeable?",
+    "prompt": "Why can two players with the same rating in different rating systems be different in strength?",
     "category": "Numbers",
     "answers": [
       "Elo is relative to results within its pool",

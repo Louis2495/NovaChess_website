@@ -83,11 +83,11 @@ function Trivia({ questions }: { questions: Question[] }) {
     <Card className={done ? "trivia-game quiz-result results-screen" : "trivia-game"}>
       {done ? (
         <>
-          <div className="result-banner"><span><CheckCircle2 size={16}/>Round complete</span><span>10 questions explored</span></div>
-          <div className="result-hero"><div className="result-art"><QuizPicture tile={7} result/></div><div className="result-introduction"><span className="result-eyebrow"><Trophy size={16}/>Your trivia result</span><h2>{score} points</h2><p>{correctCount===10?"A perfect round. You know your chess facts inside out.":correctCount>=7?"A strong round. Your chess knowledge is paying off.":correctCount>=4?"A solid foundation, with a few new discoveries along the way.":"Every round is a chance to discover something new. Keep your curiosity in play."}</p><div className="result-seal">Best: {library.progress.triviaBest || 0}</div></div></div>
+          <div className="result-banner"><span><CheckCircle2 size={16}/>Round complete</span><span>10 questions answered</span></div>
+          <div className="result-hero"><div className="result-art"><QuizPicture tile={7} result/></div><div className="result-introduction"><span className="result-eyebrow"><Trophy size={16}/>Your trivia result</span><h2>{score} points</h2><p>{correctCount===10?"You got every question right.":correctCount>=7?"You got most of the questions right.":correctCount>=4?"See which answers you got right and what you missed.":"Review the answers below before trying another round."}</p><div className="result-seal">Best: {library.progress.triviaBest || 0}</div></div></div>
           <div className="result-metrics"><div><strong>{correctCount}<small> / 10</small></strong><span>Correct answers</span></div><div><strong>{correctCount*10}%</strong><span>Accuracy</span></div><div><strong>{bestStreak}</strong><span>Best streak this round</span></div></div>
-          <section className="result-review"><h3>Your round, revisited</h3><p>Take the answers—and the stories behind them—into your next round.</p>{review.map((answer,index)=><details key={answer.question.id} className={answer.correct?"review-correct":"review-incorrect"}><summary><span className="review-number">{index+1}</span><span>{answer.question.prompt}{answer.question.clue && <small className="review-clue">{answer.question.clue}</small>}</span><span className="review-verdict">{answer.correct?"Correct":"Review"}</span></summary><div className="review-answer">{!answer.correct&&<p>Your answer: {answer.selected}</p>}<p><b>Correct answer:</b> {answer.question.answers[answer.question.correct]}</p><p>{answer.question.explanation}</p><a className="external" href={answer.question.source} target="_blank" rel="noreferrer">Read the source<ArrowUpRight size={14}/></a></div></details>)}</section>
-          <div className="result-footer"><div><h3>Ready for another round?</h3><p>Ten more questions. A new chance to beat your best.</p></div><div className="result-actions"><Button onClick={() => {
+          <section className="result-review"><h3>Review your answers</h3>{review.map((answer,index)=><details key={answer.question.id} className={answer.correct?"review-correct":"review-incorrect"}><summary><span className="review-number">{index+1}</span><span>{answer.question.prompt}{answer.question.clue && <small className="review-clue">{answer.question.clue}</small>}</span><span className="review-verdict">{answer.correct?"Correct":"Review"}</span></summary><div className="review-answer">{!answer.correct&&<p>Your answer: {answer.selected}</p>}<p><b>Correct answer:</b> {answer.question.answers[answer.question.correct]}</p><p>{answer.question.explanation}</p><a className="external" href={answer.question.source} target="_blank" rel="noreferrer">Read the source<ArrowUpRight size={14}/></a></div></details>)}</section>
+          <div className="result-footer"><div><h3>Ready for another round?</h3></div><div className="result-actions"><Button onClick={() => {
       const next = shuffle(questions); setDeck(next); setRound(0); setScore(0);
       setChoice(null); setStreak(0); setBestStreak(0); setReview([]);
       setAnswers(shuffle(next[0].answers)); setDone(false);
@@ -96,8 +96,8 @@ function Trivia({ questions }: { questions: Question[] }) {
       ) : (
         <>
           <div className="game-score-row">
-            <span>{(round % 10) + 1} / 10</span>
-            <b>{score} pts</b>
+            <span>Question {(round % 10) + 1} of 10</span>
+            <b>{score} points</b>
           </div>
           <span className="pill">{q.category}</span>
           <div className="trivia-question">
