@@ -12,8 +12,8 @@ import {
   Film,
   ArrowUpRight,
   ChartLine,
-  Bookmark,
 } from "lucide-react";
+import { useLessonViewport } from "../../lib/useLessonViewport";
 import { useControl } from "../../lib/controls";
 import { Board } from "../../components/Board";
 import {
@@ -22,6 +22,7 @@ import {
   Button,
   IconButton,
   Loading,
+  Modal,
 } from "../../components/UI";
 import { useApp } from "../../lib/context";
 import { download, useData } from "../../lib/store";
@@ -52,8 +53,10 @@ export default function FamousGames() {
   return <Archive games={data} />;
 }
 function Archive({ games }: { games: FamousGame[] }) {
-  const { appearance, library, setLibrary, navigate, notify } = useApp();
+  const { appearance, setLibrary, navigate, notify } = useApp();
+  const layout = useLessonViewport();
   const [search, setSearch] = useState(""),
+    [exploring, setExploring] = useState(false),
     [id, setId] = useState(games[0].id),
     [cursor, setCursor] = useState(0),
     [playing, setPlaying] = useState(false),
@@ -113,7 +116,7 @@ function Archive({ games }: { games: FamousGame[] }) {
       },
     }));
   }, [cursor, game.id]);
-  function save(analyze = false) {
+  function analyzeGame() {
     const saved: SavedGame = {
       id: `famous-${game.id}`,
       title: `${game.white} – ${game.black} (${game.year})`,
@@ -137,8 +140,7 @@ function Archive({ games }: { games: FamousGame[] }) {
         ? l.games
         : [saved, ...l.games],
     }));
-    if (analyze) navigate("analysis", "game:" + saved.id);
-    else notify("Game saved to Studies.");
+    navigate("analysis", "game:" + saved.id);
   }
   async function gif() {
     setExporting(true);
@@ -156,172 +158,179 @@ function Archive({ games }: { games: FamousGame[] }) {
     }
   }
   return (
-    <div className="master-archive">
-      <aside className="master-game-list card">
-        <div className="search-field">
-          <Search size={16} />
-          <input
-            aria-label="Search famous games"
-            placeholder="Player, game or year"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="master-game-rows">
-          {filtered.map((g) => (
-            <button
-              key={g.id}
-              className={g.id === id ? "active" : ""}
-              aria-pressed={g.id === id}
-              onClick={() => {
-                setId(g.id);
-                seek(0);
-              }}
-            >
-              <span className="master-year">{g.year}</span>
-              <span>
-                <b>{g.title}</b>
-                <small>
-                  {g.white.split(" ").at(-1)} · {g.black.split(" ").at(-1)}
-                </small>
+    <>
+      <div className="master-archive" ref={layout}>
+        <div className="master-replay">
+          <div className="card-heading">
+            <div>
+              <span className="eyebrow">
+                {game.event} · {game.year}
               </span>
-
-            </button>
-          ))}
-          {!filtered.length && <p className="caption">No matching games.</p>}
-        </div>
-      </aside>
-      <div className="master-replay">
-        <div className="card-heading">
-          <div>
-            <span className="eyebrow">
-              {game.event} · {game.year}
-            </span>
-            <h2>{game.title}</h2>
+              <h2>{game.title}</h2>
+            </div>
+            <Button className="secondary" aria-haspopup="dialog" onClick={() => {
+              setPlaying(false);
+              setExploring(true);
+            }}><Search size={15} /> Explore</Button>
+          </div>
+          <BoardPlayer placement="top" side={flipped?'w':'b'} name={flipped?game.white:game.black} rating={flipped?game.whiteRating:game.blackRating} result={game.result}/>
+          <div className="master-board-slot">
+            <Board
+              fen={game.positions[cursor]}
+              disabled
+              flipped={flipped}
+              onFlip={() => setFlipped((v) => !v)}
+              highlights={
+                cursor
+                  ? [
+                      game.moves[cursor - 1].slice(0, 2),
+                      game.moves[cursor - 1].slice(2, 4),
+                    ]
+                  : []
+              }
+            />
+          </div>
+          <BoardPlayer placement="bottom" side={flipped?'b':'w'} name={flipped?game.black:game.white} rating={flipped?game.blackRating:game.whiteRating} result={game.result}/>
+          <div className="master-playback" role="group" aria-label="Replay controls">
+            <div className="board-navigation">
+              <IconButton
+                label="First move"
+                onClick={() => seek(0)}
+                disabled={!cursor}
+              >
+                <ChevronsLeft size={18} />
+              </IconButton>
+              <IconButton
+                label="Previous move"
+                onClick={() => seek(cursor - 1)}
+                disabled={!cursor}
+              >
+                <ChevronLeft size={18} />
+              </IconButton>
+              <IconButton
+                label={playing ? "Stop replay" : "Play replay"}
+                onClick={() => {
+                  if (cursor === game.moves.length) setCursor(0);
+                  setPlaying(!playing);
+                }}
+              >
+                {playing ? <Square size={18} /> : <Play size={18} />}
+              </IconButton>
+              <IconButton
+                label="Next move"
+                disabled={cursor === game.moves.length}
+                onClick={() => seek(cursor + 1)}
+              >
+                <ChevronRight size={18} />
+              </IconButton>
+              <IconButton
+                label="Last move"
+                disabled={cursor === game.moves.length}
+                onClick={() => seek(game.moves.length)}
+              >
+                <ChevronsRight size={18} />
+              </IconButton>
+            </div>
+            <input
+              aria-label="Replay position"
+              className="replay-slider"
+              type="range"
+              min={0}
+              max={game.moves.length}
+              value={cursor}
+              onChange={(e) => seek(+e.target.value)}
+            />
+            <div className="replay-speed">
+              <span>
+                {Math.ceil(cursor / 2)} / {Math.ceil(game.moves.length / 2)}
+              </span>
+              <label>
+                Speed
+                <ChoiceSelect
+                  aria-label="Replay speed"
+                  value={speed}
+                  onChange={(e) => setSpeed(+e.target.value)}
+                >
+                  <option value={3000}>3s / move</option>
+                  <option value={2000}>2s / move</option>
+                  <option value={1000}>1s / move</option>
+                  <option value={500}>0.5s / move</option>
+                  <option value={250}>0.25s / move</option>
+                </ChoiceSelect>
+              </label>
+            </div>
           </div>
         </div>
-        <BoardPlayer placement="top" side={flipped?'w':'b'} name={flipped?game.white:game.black} rating={flipped?game.whiteRating:game.blackRating} result={game.result}/>
-        <Board
-          fen={game.positions[cursor]}
-          disabled
-          flipped={flipped}
-          onFlip={() => setFlipped((v) => !v)}
-          highlights={
-            cursor
-              ? [
-                  game.moves[cursor - 1].slice(0, 2),
-                  game.moves[cursor - 1].slice(2, 4),
-                ]
-              : []
-          }
-        />
-        <BoardPlayer placement="bottom" side={flipped?'b':'w'} name={flipped?game.black:game.white} rating={flipped?game.blackRating:game.whiteRating} result={game.result}/>
-        <div className="board-navigation">
-          <IconButton
-            label="First move"
-            onClick={() => seek(0)}
-            disabled={!cursor}
-          >
-            <ChevronsLeft size={18} />
-          </IconButton>
-          <IconButton
-            label="Previous move"
-            onClick={() => seek(cursor - 1)}
-            disabled={!cursor}
-          >
-            <ChevronLeft size={18} />
-          </IconButton>
-          <IconButton
-            label={playing ? "Stop replay" : "Play replay"}
-            onClick={() => {
-              if (cursor === game.moves.length) setCursor(0);
-              setPlaying(!playing);
-            }}
-          >
-            {playing ? <Square size={18} /> : <Play size={18} />}
-          </IconButton>
-          <IconButton
-            label="Next move"
-            disabled={cursor === game.moves.length}
-            onClick={() => seek(cursor + 1)}
-          >
-            <ChevronRight size={18} />
-          </IconButton>
-          <IconButton
-            label="Last move"
-            disabled={cursor === game.moves.length}
-            onClick={() => seek(game.moves.length)}
-          >
-            <ChevronsRight size={18} />
-          </IconButton>
-        </div>
-        <input
-          aria-label="Replay position"
-          className="replay-slider"
-          type="range"
-          min={0}
-          max={game.moves.length}
-          value={cursor}
-          onChange={(e) => seek(+e.target.value)}
-        />
-        <div className="replay-speed">
-          <span>
-            {Math.ceil(cursor / 2)} / {Math.ceil(game.moves.length / 2)}
-          </span>
-          <label>
-            Speed
-            <ChoiceSelect
-              aria-label="Replay speed"
-              value={speed}
-              onChange={(e) => setSpeed(+e.target.value)}
+        <div className="master-notes">
+          <Card className="master-score">
+            <table className="paired-game-moves" aria-label="Famous game moves"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead><tbody>{Array.from({length:Math.ceil(game.notation.length/2)},(_,row)=><tr key={row}><th scope="row">{row+1}.</th>{[0,1].map(side=>{const i=row*2+side;return <td key={side}>{game.notation[i] && <button className={cursor===i+1?'current':''} onClick={()=>seek(i+1)} aria-label={`Move ${row+1}, ${side?'Black':'White'}: ${game.notation[i]}`}>{game.notation[i]}</button>}</td>;})}</tr>)}</tbody></table>
+          </Card>
+          <div className="button-row">
+            <Button className="secondary" disabled={exporting} onClick={gif}>
+              <Film size={16} />
+              {exporting ? `${progress}%` : "Game GIF"}
+            </Button>
+            <Button
+              className="secondary"
+              onClick={() =>
+                download(game.id + ".pgn", game.pgn, "application/x-chess-pgn")
+              }
             >
-              <option value={3000}>3s / move</option>
-              <option value={2000}>2s / move</option>
-              <option value={1000}>1s / move</option>
-              <option value={500}>0.5s / move</option>
-              <option value={250}>0.25s / move</option>
-            </ChoiceSelect>
-          </label>
+              <Download size={16} />
+              PGN
+            </Button>
+            <IconButton label="Analyze game" onClick={analyzeGame}>
+              <ChartLine size={18} aria-hidden="true" />
+            </IconButton>
+            <a
+              className="icon-btn"
+              aria-label="Game source"
+              href={game.source}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ArrowUpRight size={17} />
+            </a>
+          </div>
         </div>
       </div>
-      <div className="master-notes">
-        <Card className="master-score">
-          <table className="paired-game-moves" aria-label="Famous game moves"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead><tbody>{Array.from({length:Math.ceil(game.notation.length/2)},(_,row)=><tr key={row}><th scope="row">{row+1}.</th>{[0,1].map(side=>{const i=row*2+side;return <td key={side}>{game.notation[i] && <button className={cursor===i+1?'current':''} onClick={()=>seek(i+1)} aria-label={`Move ${row+1}, ${side?'Black':'White'}: ${game.notation[i]}`}>{game.notation[i]}</button>}</td>;})}</tr>)}</tbody></table>
-        </Card>
-        <div className="button-row">
-          <Button className="secondary" disabled={exporting} onClick={gif}>
-            <Film size={16} />
-            {exporting ? `${progress}%` : "Game GIF"}
-          </Button>
-          <Button
-            className="secondary"
-            onClick={() =>
-              download(game.id + ".pgn", game.pgn, "application/x-chess-pgn")
-            }
-          >
-            <Download size={16} />
-            PGN
-          </Button>
-          <IconButton label="Save game" onClick={() => save()}>
-            <Bookmark size={17} />
-          </IconButton>
-          <IconButton label="Analyze game" onClick={() => save(true)}>
-            <ChartLine size={18} aria-hidden="true" />
-          </IconButton>
-          <a
-            className="icon-btn"
-            aria-label="Game source"
-            href={game.source}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <ArrowUpRight size={17} />
-          </a>
+      {exploring && <Modal title="Explore famous games" wide onClose={() => setExploring(false)}>
+        <div className="master-game-list">
+          <div className="search-field">
+            <Search size={16} />
+            <input
+              aria-label="Search famous games"
+              placeholder="Player, game or year"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="master-game-rows">
+            {filtered.map((g) => (
+              <button
+                key={g.id}
+                className={g.id === id ? "active" : ""}
+                aria-pressed={g.id === id}
+                onClick={() => {
+                  setId(g.id);
+                  seek(0);
+                  setExploring(false);
+                }}
+              >
+                <span className="master-year">{g.year}</span>
+                <span>
+                  <b>{g.title}</b>
+                  <small>
+                    {g.white.split(" ").at(-1)} · {g.black.split(" ").at(-1)}
+                  </small>
+                </span>
+
+              </button>
+            ))}
+            {!filtered.length && <p className="caption">No matching games.</p>}
+          </div>
         </div>
-        {library.progress.famous?.includes(game.id) && (
-          <span className="caption">Viewed</span>
-        )}
-      </div>
-    </div>
+      </Modal>}
+    </>
   );
 }

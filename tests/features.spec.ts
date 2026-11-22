@@ -300,6 +300,7 @@ test("famous games replay, autoplay speeds and complete GIF export work", async 
 }) => {
   test.setTimeout(45000);
   await page.goto("/#learn/famous");
+  await page.getByRole("button", { name: "Explore", exact: true }).click();
   await page.getByRole("button", { name: /1858.*Opera Game/ }).click();
   await expect(
     page.getByRole("heading", { name: "The Opera Game", exact: true }),
@@ -322,9 +323,8 @@ test("famous games replay, autoplay speeds and complete GIF export work", async 
     buffer = fs.readFileSync((await d.path())!);
   expect(buffer.subarray(0, 3).toString()).toBe("GIF");
   expect(countFrames(buffer)).toBe(34);
-  await page.getByRole("button", { name: "Save game", exact: true }).click();
-  await page.goto("/#library");
-  await expect(page.locator(".saved-game-card")).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Save game", exact: true })).toHaveCount(0);
+  await expect(page.getByText("Viewed", { exact: true })).toHaveCount(0);
 });
 function countFrames(b: Buffer) {
   let i = 13,
@@ -590,4 +590,29 @@ test("Train an opening shows three Stockfish lines and a left-side evaluation ba
   expect(Math.abs(meter.y - board.y)).toBeLessThanOrEqual(1);
   expect(Math.abs(meter.height - board.height)).toBeLessThanOrEqual(1);
   expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
+});
+
+test("Famous Games centers the board and keeps playback and Explore in view", async ({ page }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  await page.setViewportSize({ width: mobile ? 390 : 1280, height: 664 });
+  await page.goto("/#learn/famous");
+  const explore = page.getByRole("button", { name: "Explore", exact: true });
+  const playback = page.getByRole("group", { name: "Replay controls" });
+  await expect(explore).toBeInViewport({ ratio: 1 });
+  await expect(playback).toBeInViewport({ ratio: 1 });
+  await expect.poll(async () => {
+    const board = (await page.locator(".master-replay .board").boundingBox())!;
+    const workspace = (await page.locator("#workspace").boundingBox())!;
+    return Math.abs(board.x + board.width / 2 - workspace.x - workspace.width / 2);
+  }).toBeLessThanOrEqual(1);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
+  await explore.click();
+  const dialog = page.getByRole("dialog", { name: "Explore famous games" });
+  await expect(dialog.getByRole("textbox", { name: "Search famous games" })).toBeVisible();
+  const another = dialog.locator(".master-game-rows button").nth(1);
+  const title = await another.locator("b").innerText();
+  await another.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
+  await expect(playback).toBeInViewport({ ratio: 1 });
 });
