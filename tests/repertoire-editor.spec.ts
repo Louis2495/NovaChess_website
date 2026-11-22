@@ -148,7 +148,7 @@ test("opening categories can be dragged, moved with buttons, and renamed across 
   await page.goto("/#learn/repertoire");
   const headings = page.locator(".repertoire-family-name");
   await expect(headings).toHaveText(["French Defense", "Sicilian Defense"]);
-  await page.getByRole("button", { name: "Manage categories" }).click();
+  await page.getByRole("button", { name: "Manage" }).click();
   const manager = page.getByRole("region", { name: "Manage opening categories" });
   const labels = manager.locator(".repertoire-category-name");
   await manager.getByRole("button", { name: "Move Sicilian Defense up" }).click();

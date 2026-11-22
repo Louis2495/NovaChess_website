@@ -120,7 +120,7 @@ function RepertoireLines({ onTrain, onTrainAll, onAdd }: {
               <Share2 size={16} /> Share
             </Button>}
             {(groups.length > 0 || managing) && <Button className="secondary" onClick={() => setManaging(!managing)}>
-              {managing ? "Done" : "Manage categories"}
+              {managing ? "Done" : "Manage"}
             </Button>}
             <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
               <Download size={16} /> Import
