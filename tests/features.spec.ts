@@ -607,8 +607,8 @@ test("Famous Games centers the board and move list and keeps playback and Explor
   if (!mobile) {
     await expect.poll(async () => {
       const title = (await heading.getByRole("heading").boundingBox())!;
-      const player = (await page.locator(".master-replay .player-top b").boundingBox())!;
-      return Math.abs(title.y - player.y);
+      const board = (await page.locator(".master-replay .board").boundingBox())!;
+      return Math.abs(title.y - board.y);
     }).toBeLessThanOrEqual(1);
   }
   await expect.poll(async () => {

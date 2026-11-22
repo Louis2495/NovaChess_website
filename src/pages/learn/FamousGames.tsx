@@ -63,18 +63,12 @@ function Archive({ games }: { games: FamousGame[] }) {
     const chrome = [...archive.querySelectorAll<HTMLElement>(
       ".master-replay > :is(.board-player-label, .master-playback)",
     )];
-    const topName = archive.querySelector(".master-replay .player-top b");
     const measure = () => {
       const height = chrome.reduce((sum, element) => sum + element.offsetHeight, 44);
       archive.style.setProperty("--replay-chrome", `${height}px`);
-      if (topName) {
-        const offset = topName.getBoundingClientRect().top - archive.getBoundingClientRect().top;
-        archive.style.setProperty("--replay-title-offset", `${offset}px`);
-      }
     };
     const observer = new ResizeObserver(measure);
     chrome.forEach(element => observer.observe(element));
-    if (topName) observer.observe(topName);
     measure();
     return () => observer.disconnect();
   }, [layout]);
