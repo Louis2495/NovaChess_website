@@ -615,7 +615,13 @@ test("Famous Games centers the board and move list and keeps playback and Explor
     const board = (await page.locator(".master-replay .board").boundingBox())!;
     const workspace = (await page.locator("#workspace").boundingBox())!;
     const moves = (await page.locator(".master-score").boundingBox())!;
-    if (!mobile) expect(moves.x - board.x - board.width).toBeGreaterThan(140);
+    if (!mobile) {
+      const label = (await explore.locator("span").boundingBox())!;
+      expect(moves.x - board.x - board.width).toBeGreaterThan(155);
+      expect(label.x).toBeGreaterThan(board.x + board.width);
+      expect(label.x + label.width).toBeLessThan(moves.x);
+      expect(Math.abs(label.y - board.y)).toBeLessThanOrEqual(1);
+    }
     const right = mobile ? board.x + board.width : moves.x + moves.width;
     return Math.abs((board.x + right) / 2 - workspace.x - workspace.width / 2);
   }).toBeLessThanOrEqual(2);

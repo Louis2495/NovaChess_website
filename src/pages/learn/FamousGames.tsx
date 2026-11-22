@@ -261,10 +261,10 @@ function Archive({ games }: { games: FamousGame[] }) {
             </div>
             <div className="master-game-actions">
               <IconButton label="Back to Learn" onClick={() => navigate("learn")}><ArrowLeft size={18} /></IconButton>
-              <Button className="secondary" aria-haspopup="dialog" onClick={() => {
+              <Button className="secondary master-explore" aria-haspopup="dialog" onClick={() => {
                 setPlaying(false);
                 setExploring(true);
-              }}><Search size={15} /> Explore</Button>
+              }}><Search size={15} /> <span>Explore</span></Button>
             </div>
           </div>
           <Card className="master-score">

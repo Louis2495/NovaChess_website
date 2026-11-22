@@ -6692,7 +6692,7 @@ html { scrollbar-gutter:stable; }
 .workspace:has(.master-archive) { padding-block:6px 28px; }
 .workspace .master-archive {
   --replay-rail:clamp(208px, 23%, 300px);
-  --replay-gap:clamp(90px, 13.3vw, 192px);
+  --replay-gap:clamp(110px, 15vw, 216px);
   --replay-board:min(var(--board-max), calc(100% - var(--replay-rail) - var(--replay-gap)),
     max(0px, calc(var(--lesson-height, 100dvh) - var(--replay-chrome, 200px) - 2px)));
   height:var(--lesson-height, calc(100dvh - 110px));
@@ -6792,4 +6792,19 @@ html { scrollbar-gutter:stable; }
   .master-board-slot { height:calc(min(100cqw, var(--board-max)) + 24px); }
   .master-replay .board-player-label.player-top { top:7px; }
   .master-replay .board-player-label.player-bottom { top:-7px; }
+}
+
+@media(min-width:1001px) {
+  .master-archive > .master-notes { position:relative; }
+  .master-game-actions .master-explore {
+    position:absolute;
+    inset-block-start:calc(var(--replay-board-top, 48px) - 8px);
+    inset-inline-end:calc(100% + var(--replay-gap) / 2);
+    transform:translateX(50%);
+    height:36px;
+    min-height:0;
+    padding-block:0;
+    line-height:20px;
+    white-space:nowrap;
+  }
 }
