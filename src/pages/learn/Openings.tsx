@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useApp } from "../../lib/context";
 import { useData, initialFen, uid } from "../../lib/store";
+import { useEngine, useSettledEvaluation, scoreLabel, sanLine } from "../../lib/engine";
 import { useControl } from "../../lib/controls";
 import type { Opening } from "../../lib/types";
 import { Board } from "../../components/Board";
@@ -169,6 +170,9 @@ function LessonWorkspace({
   for (const m of moves.slice(0, step)) currentMove = c.move(m);
   const fen = c.fen(),
     expected = step < moves.length ? new Chess(fen).move(moves[step]) : null;
+  const showEngine = mode === "train";
+  const engine = useEngine(fen, showEngine, 3);
+  const evaluation = useSettledEvaluation(fen, engine.lines[0]) ?? engine.lines[0];
   const families = useMemo(() => [...new Set(lessons.map(line => openingFamily(line.name)))].sort(), [lessons]);
   const candidates = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -361,10 +365,26 @@ function LessonWorkspace({
     <>
       <div
         ref={layout}
-        className="viewport-lesson lesson-workspace"
+        className={`viewport-lesson lesson-workspace${showEngine ? " opening-training" : ""}`}
       >
         <div className="lesson-sidebar opening-lesson-panels">
           {sectionTabs}
+          {showEngine && <Card className="opening-training-engine" aria-label="Stockfish analysis">
+            <div className="card-heading">
+              <h3>Stockfish</h3>
+              <strong aria-label="Evaluation value">{scoreLabel(evaluation)}</strong>
+            </div>
+            {engine.error ? <p className="caption" role="status">{engine.error}</p> :
+              <ol aria-label="Top engine lines">
+                {[0, 1, 2].map(index => {
+                  const line = engine.lines[index];
+                  return <li key={index}>
+                    <strong>{scoreLabel(line)}</strong>
+                    <span>{line ? sanLine(fen, line.moves.slice(0, 8)) : "—"}</span>
+                  </li>;
+                })}
+              </ol>}
+          </Card>}
           <div className="lesson-variation-panel">
             <Field label="Lesson variation">
               <ChoiceSelect
@@ -599,6 +619,10 @@ function LessonWorkspace({
             <Board
               fen={premove.preview}
               materialFen={fen}
+              evaluation={showEngine ? {
+                label: scoreLabel(evaluation),
+                whitePercent: 50 + Math.tanh((evaluation?.score ?? 0) / 450) * 46,
+              } : undefined}
               onCancelPremoves={premove.cancelOnRightClick}
               premoveDestinations={premove.destinations}
               legalMoves={

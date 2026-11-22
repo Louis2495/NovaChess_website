@@ -558,3 +558,18 @@ test("opening, trap, and endgame boards are large and fit the viewport", async (
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
   }
 });
+
+test("Train an opening shows three Stockfish lines and a left-side evaluation bar", async ({ page }) => {
+  await page.goto("/#learn/train");
+  const panel = page.getByRole("region", { name: "Stockfish analysis" });
+  const lines = panel.getByRole("list", { name: "Top engine lines" }).getByRole("listitem");
+  await expect(lines).toHaveCount(3);
+  await expect(lines.last()).toContainText(/[+-]\d+\.\d+/, { timeout: 15000 });
+  await expect(panel.locator("[aria-label='Evaluation value']")).toHaveText(/[+-]\d+\.\d+/);
+  const meter = (await page.getByRole("img", { name: /^Evaluation [+-]/ }).boundingBox())!;
+  const board = (await page.locator(".opening-training .board").boundingBox())!;
+  expect(meter.x + meter.width).toBeLessThan(board.x);
+  expect(Math.abs(meter.y - board.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(meter.height - board.height)).toBeLessThanOrEqual(1);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
+});

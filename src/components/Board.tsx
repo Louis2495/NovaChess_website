@@ -60,6 +60,7 @@ export function Board({
   premoveDestinations,
   onFlip,
   materialFen,
+  evaluation,
   guides = [],
   badge,
   overlay,
@@ -90,6 +91,7 @@ export function Board({
   premoveDestinations?: ReadonlySet<string>;
   onFlip?: () => void;
   materialFen?: string;
+  evaluation?: { label: string; whitePercent: number };
   guides?: BoardMark[];
 }) {
   const { appearance, setAppearance, tab, detail } = useApp();
@@ -492,6 +494,10 @@ export function Board({
         }
       }
     >
+      {evaluation && <div className="eval-meter board-edge-evaluation" role="img"
+        aria-label={`Evaluation ${evaluation.label}`} data-flipped={flipped}>
+        <div style={{ height: `${evaluation.whitePercent}%` }} />
+      </div>}
       {imbalance < 0 && (
         <div
           className="material-advantage material-top"

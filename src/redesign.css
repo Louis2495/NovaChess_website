@@ -6612,3 +6612,20 @@ html { scrollbar-gutter:stable; }
   .lesson-workspace .lesson-board-slot { height:calc(100cqw + 24px); }
   .lesson-workspace .lesson-board-area > .card-heading .btn { font-size:.72rem; min-height:32px; }
 }
+
+.opening-training .board-edge-evaluation {
+  position:absolute;
+  inset:22px calc(100% + 6px) 22px auto;
+  width:14px;
+}
+.opening-training .board-edge-evaluation[data-flipped="true"] { justify-content:flex-start; }
+.opening-training-engine { padding:12px; }
+.opening-training-engine .card-heading { margin-bottom:6px; }
+.opening-training-engine h3 { margin:0; }
+.opening-training-engine ol { margin:0; padding-inline-start:20px; }
+.opening-training-engine li { padding:5px 0; border-top:1px solid var(--border); overflow-wrap:anywhere; }
+.opening-training-engine li strong { display:inline-block; min-width:3.5em; color:var(--accent); }
+@media(max-width:1000px) {
+  .opening-training .lesson-board-slot { padding-inline-start:20px; }
+  .opening-training .board-edge-evaluation { inset-block:12px; }
+}
