@@ -1,3 +1,4 @@
+import { useLessonViewport } from "../../lib/useLessonViewport";
 import { groupByOpening, openingFamily } from "../../lib/openingFamilies";
 import { usePremoves } from "../../lib/usePremoves";
 import PremoveQueue from "../../components/PremoveQueue";
@@ -109,6 +110,7 @@ function LessonWorkspace({
   selectedId?: string;
 }) {
   const { library, setLibrary, notify, appearance } = useApp();
+  const layout = useLessonViewport();
   const [search, setSearch] = useState(query),
     [familyFilter, setFamilyFilter] = useState(""),
     [selected, setSelected] = useState(
@@ -352,7 +354,8 @@ function LessonWorkspace({
   return (
     <>
       <div
-        className={`lesson-workspace ${catalog ? "catalog-open" : "catalog-closed"}`}
+        ref={layout}
+        className={`viewport-lesson lesson-workspace ${catalog ? "catalog-open" : "catalog-closed"}`}
       >
         <div className="lesson-sidebar">
           <Button
@@ -366,6 +369,14 @@ function LessonWorkspace({
             )}
             Openings<span>{catalog ? "Hide" : "Browse"}</span>
           </Button>
+          {catalog && (
+            <div className="lesson-compact-controls">
+              {navigation}
+              <p className="caption">
+                {expected ? `Next: ${expected.san}` : "Line complete"}
+              </p>
+            </div>
+          )}
           {catalog ? (
             <Card className="opening-list">
               <div className="search-field">
@@ -641,85 +652,82 @@ function LessonWorkspace({
           )}
         </div>
         <div className="lesson-board-area">
-          <div className="card-heading">
-            <div>
-              <span className="eyebrow">{selected.eco}</span>
-              <h2>{selected.name}</h2>
+          <div className="lesson-board-heading">
+            <div className="card-heading">
+              <div>
+                <span className="eyebrow">{selected.eco}</span>
+                <h2>{selected.name}</h2>
+              </div>
             </div>
+            <ChoiceSelect
+              aria-label="Lesson variation"
+              value={branch}
+              onChange={(e) => {
+                setDecisionActive(false);
+                setBranch(+e.target.value);
+                setStep(0);
+                setHint(false);
+                setPerfect(true);
+                setMessage("");
+              }}
+            >
+              {lines.map((l, i) => (
+                <option key={i} value={i}>
+                  {l.name}
+                </option>
+              ))}
+            </ChoiceSelect>
           </div>
           <PremoveQueue
             moves={premove.queue}
             undo={() => premove.setQueue((q) => q.slice(0, -1))}
             clear={premove.clear}
           />
-          <ChoiceSelect
-            aria-label="Lesson variation"
-            value={branch}
-            onChange={(e) => {
-              setDecisionActive(false);
-              setBranch(+e.target.value);
-              setStep(0);
-              setHint(false);
-              setPerfect(true);
-              setMessage("");
-            }}
-          >
-            {lines.map((l, i) => (
-              <option key={i} value={i}>
-                {l.name}
-              </option>
-            ))}
-          </ChoiceSelect>
-          <Board
-            fen={premove.preview}
-            materialFen={fen}
-            onCancelPremoves={premove.cancelOnRightClick}
-            premoveDestinations={premove.destinations}
-            legalMoves={
-              practice && c.turn() !== side ? premove.options : undefined
-            }
-            onMove={(from, to, promotion) =>
-              practice && c.turn() !== side
-                ? premove.enqueue(from + to + (promotion || ""))
-                : play(from, to, promotion)
-            }
-            disabled={
-              !decisionActive &&
-              (!practice ||
-                !expected ||
-                (c.turn() !== side && !appearance.premoves))
-            }
-            flipped={
-              info === "Decisions" && workbook
-                ? (() => {
-                    const b = new Chess();
-                    workbook.moves
-                      .slice(0, workbook.challenge)
-                      .forEach((m) => b.move(m));
-                    return b.turn() === "b";
-                  })()
-                : practice
-                  ? side === "b"
-                  : c.turn() === "b"
-            }
-            highlights={
-              step
-                ? [moves[step - 1].slice(0, 2), moves[step - 1].slice(2, 4)]
-                : []
-            }
-            hint={hint ? expected?.from : undefined}
-          />
+          <div className="lesson-board-slot">
+            <Board
+              fen={premove.preview}
+              materialFen={fen}
+              onCancelPremoves={premove.cancelOnRightClick}
+              premoveDestinations={premove.destinations}
+              legalMoves={
+                practice && c.turn() !== side ? premove.options : undefined
+              }
+              onMove={(from, to, promotion) =>
+                practice && c.turn() !== side
+                  ? premove.enqueue(from + to + (promotion || ""))
+                  : play(from, to, promotion)
+              }
+              disabled={
+                !decisionActive &&
+                (!practice ||
+                  !expected ||
+                  (c.turn() !== side && !appearance.premoves))
+              }
+              flipped={
+                info === "Decisions" && workbook
+                  ? (() => {
+                      const b = new Chess();
+                      workbook.moves
+                        .slice(0, workbook.challenge)
+                        .forEach((m) => b.move(m));
+                      return b.turn() === "b";
+                    })()
+                  : practice
+                    ? side === "b"
+                    : c.turn() === "b"
+              }
+              highlights={
+                step
+                  ? [moves[step - 1].slice(0, 2), moves[step - 1].slice(2, 4)]
+                  : []
+              }
+              hint={hint ? expected?.from : undefined}
+            />
+          </div>
           <div className="lesson-bar">
             <span style={{ width: `${(step / moves.length) * 100}%` }} />
           </div>
-          {catalog && (
-            <div className="lesson-compact-controls">
-              {navigation}
-              <p className="caption">
-                {expected ? `Next: ${expected.san}` : "Line complete"}
-              </p>
-            </div>
-          )}
+
         </div>
       </div>
       {saving && (

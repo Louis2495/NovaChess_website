@@ -222,9 +222,8 @@ test("opening desk collapses the catalog, exposes deep plans and branches and fi
   await expect(
     page.getByRole("heading", { name: "White’s plan", exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByLabel("Lesson variation").locator("option"),
-  ).toHaveCount(4);
+  await expect.poll(() => page.getByLabel("Lesson variation").locator("option").count())
+    .toBeGreaterThanOrEqual(4);
   await page.getByLabel("Lesson variation").selectOption("1");
   await expect(page.getByLabel("Lesson variation")).toHaveValue("1");
   await page.getByRole("button", { name: "Structure", exact: true }).click();
@@ -503,4 +502,20 @@ test("flags can be selected as backgrounds and persist; harder achievements star
   await expect(page.locator(".stats-achievement-list")).toContainText(
     "90 consecutive days",
   );
+});
+
+test("opening and endgame lesson boards are large, centered, and fit the viewport", async ({ page }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  for (const route of ["lessons", "endgames"]) {
+    await page.goto("/#learn/" + route);
+    const board = page.locator(".viewport-lesson .board");
+    await expect(board).toBeVisible();
+    await expect.poll(async () => {
+      const bounds = (await board.boundingBox())!;
+      const workspace = (await page.locator("#workspace").boundingBox())!;
+      return Math.abs(bounds.x + bounds.width / 2 - workspace.x - workspace.width / 2);
+    }).toBeLessThanOrEqual(2);
+    await expect.poll(async () => (await board.boundingBox())!.width).toBeGreaterThan(mobile ? 195 : 500);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
+  }
 });

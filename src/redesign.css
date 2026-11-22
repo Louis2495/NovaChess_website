@@ -6446,3 +6446,92 @@ html { scrollbar-gutter:stable; }
   border-radius:5px;
   pointer-events:none;
 }
+
+.workspace:has(.viewport-lesson) { padding-bottom:14px; }
+.workspace .viewport-lesson {
+  --lesson-rail:clamp(195px, 23%, 285px);
+  display:grid;
+  grid-template-columns:minmax(0, var(--lesson-rail)) minmax(0, 1fr) minmax(0, var(--lesson-rail));
+  grid-template-rows:minmax(0, 1fr);
+  align-items:stretch;
+  height:var(--lesson-height, calc(100dvh - 170px));
+  max-height:none;
+  gap:14px;
+}
+.workspace .viewport-lesson > .lesson-board-area {
+  display:flex;
+  flex-direction:column;
+  grid-column:2;
+  grid-row:1;
+  width:100%;
+  min-height:0;
+  max-width:none;
+  gap:6px;
+}
+.viewport-lesson .lesson-board-slot {
+  container-type:size;
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.viewport-lesson .lesson-board-slot > .board-frame {
+  flex:0 0 auto;
+  max-width:min(100%, var(--board-max), max(0px, calc(100cqh - 44px))) !important;
+}
+.viewport-lesson .lesson-board-area > .card-heading,
+.viewport-lesson .lesson-board-area > select { margin:0; }
+.viewport-lesson .lesson-board-area > .lesson-bar { flex:none; margin:0; }
+.viewport-lesson .lesson-sidebar { min-height:0; max-height:none; }
+.viewport-lesson .lesson-sidebar > .catalog-toggle,
+.viewport-lesson .lesson-compact-controls { flex:none; }
+.viewport-lesson .lesson-sidebar > :is(.opening-list, .lesson-desk) { min-height:0; max-height:none; overflow:auto; }
+.viewport-lesson .lesson-sidebar .lesson-info-scroll { min-height:90px; }
+.viewport-lesson .lesson-sidebar .lesson-compact-controls { display:block; }
+.viewport-lesson .lesson-compact-controls > p { margin:5px 0 0; }
+.endgame-lesson > :is(.opening-list, .lesson-controls) { position:static; min-height:0; overflow:auto; align-self:start; max-height:100%; }
+.endgame-lesson > .opening-list .scroll-list { max-height:none; }
+.endgame-lesson > .lesson-controls { margin-top:0; }
+.endgame-position-picker { display:none; }
+.viewport-lesson .queued-moves { padding:4px 0; flex-wrap:nowrap; }
+.viewport-lesson .queued-moves > span { min-width:0; overflow:auto; white-space:nowrap; }
+@media(max-width:1000px) {
+  .workspace:has(.viewport-lesson) { padding-bottom:max(76px, calc(55px + env(safe-area-inset-bottom))); }
+  .workspace .viewport-lesson {
+    grid-template-columns:minmax(0, 1fr);
+    grid-template-rows:minmax(0, 1fr) clamp(140px, 26dvh, 235px);
+    gap:8px;
+  }
+  .workspace .viewport-lesson > .lesson-board-area { grid-column:1; }
+  .viewport-lesson .lesson-sidebar { overflow:auto; }
+  .viewport-lesson .lesson-sidebar > .lesson-desk { overflow:visible; }
+  .viewport-lesson .lesson-sidebar > .opening-list { flex:none; overflow:visible; }
+  .viewport-lesson .lesson-sidebar .opening-list .scroll-list { max-height:260px; }
+  .viewport-lesson .lesson-board-area h2 { font-size:.92rem; }
+  .viewport-lesson .lesson-board-area > :is(.card-heading, select, .choice-select) { flex:none; }
+  .endgame-lesson > .opening-list { display:none; }
+  .endgame-lesson > .lesson-controls { align-self:stretch; padding:10px 12px; }
+  .endgame-position-picker { display:block; width:100%; min-height:32px; padding-block:4px; margin:0 0 6px; }
+  .endgame-lesson .lesson-controls .card-heading { margin-bottom:4px; }
+  .endgame-lesson .lesson-controls .button-row { margin-top:6px; }
+}
+
+.viewport-lesson .lesson-board-heading {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+}
+.viewport-lesson .lesson-board-heading > :is(.card-heading, select) { margin:0; }
+.viewport-lesson .lesson-board-heading .card-heading > div { min-width:0; }
+.viewport-lesson .lesson-board-heading > :is(select, .choice-select) { min-width:0; }
+@media(max-width:1000px) {
+  .learn-page-heading:has(+ .learn-section-tabs + .viewport-lesson) { position:absolute; margin:0; }
+  .learn-section-tabs:has(+ .viewport-lesson) { margin:0 0 10px 52px; }
+  .workspace .viewport-lesson { grid-template-rows:minmax(0,1fr) clamp(128px, 22dvh, 220px); }
+  .viewport-lesson .lesson-board-slot > .board-frame { max-width:min(100%, var(--board-max), max(0px, calc(100cqh - 24px))) !important; }
+  .viewport-lesson .lesson-board-slot > .board-frame:not(.compact-frame) { padding-block:12px; }
+  .viewport-lesson .board-frame > :is(.material-top, .material-imbalance) { height:12px; min-height:12px; font-size:.63rem; line-height:1; }
+  .viewport-lesson .lesson-board-heading h2 { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+}

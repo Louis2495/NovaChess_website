@@ -1,3 +1,4 @@
+import { useLessonViewport } from "../../lib/useLessonViewport";
 import { usePremoves } from "../../lib/usePremoves";
 import PremoveQueue from "../../components/PremoveQueue";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +17,7 @@ export default function Endgames() {
 }
 function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
   const { library, setLibrary, notify, appearance } = useApp();
+  const layout = useLessonViewport();
   const [exercise, setExercise] = useState(exercises[0]),
     [moves, setMoves] = useState<string[]>([]),
     [message, setMessage] = useState(""),
@@ -123,7 +125,7 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
     execute: playMove,
   });
   return (
-    <div className="learning-layout">
+    <div className="viewport-lesson endgame-lesson learning-layout" ref={layout}>
       <Card className="opening-list">
         <h2>Positions</h2>
         <div className="scroll-list">
@@ -150,119 +152,127 @@ function EndgameTrainer({ exercises }: { exercises: Endgame[] }) {
           ))}
         </div>
       </Card>
-      <div className="board-column">
+      <div className="board-column lesson-board-area">
         <div className="card-heading">
           <h2>{exercise.title}</h2>
           <span className="pill">
             {exercise.side === "w" ? "White" : "Black"}
           </span>
         </div>
-        <Board
-          fen={premove.preview}
-          materialFen={fen}
-          onCancelPremoves={premove.cancelOnRightClick}
-          premoveDestinations={premove.destinations}
-          legalMoves={c.turn() === exercise.side ? undefined : premove.options}
-          flipped={exercise.side === "b"}
-          disabled={
-            !!outcome || (c.turn() !== exercise.side && !appearance.premoves)
-          }
-          hint={hint}
-          onMove={(from, to, promotion) => {
-            if (c.turn() !== exercise.side) {
-              premove.enqueue(from + to + (promotion || ""));
-              return;
+        <div className="lesson-board-slot">
+          <Board
+            fen={premove.preview}
+            materialFen={fen}
+            onCancelPremoves={premove.cancelOnRightClick}
+            premoveDestinations={premove.destinations}
+            legalMoves={c.turn() === exercise.side ? undefined : premove.options}
+            flipped={exercise.side === "b"}
+            disabled={
+              !!outcome || (c.turn() !== exercise.side && !appearance.premoves)
             }
-            try {
-              const m = new Chess(fen).move({
-                from,
-                to,
-                promotion: promotion || "q",
-              });
-              playMove(m.from + m.to + (m.promotion || ""));
-            } catch {}
-          }}
-        />
+            hint={hint}
+            onMove={(from, to, promotion) => {
+              if (c.turn() !== exercise.side) {
+                premove.enqueue(from + to + (promotion || ""));
+                return;
+              }
+              try {
+                const m = new Chess(fen).move({
+                  from,
+                  to,
+                  promotion: promotion || "q",
+                });
+                playMove(m.from + m.to + (m.promotion || ""));
+              } catch {}
+            }}
+          />
+        </div>
         <PremoveQueue
           moves={premove.queue}
           undo={() => premove.setQueue((q) => q.slice(0, -1))}
           clear={premove.clear}
         />
-        <Card className="lesson-controls">
-          <div className="card-heading">
-            <h3>
-              {outcome ||
-                (busy
-                  ? "Stockfish is replying…"
-                  : exercise.goal === "mate"
-                    ? "Checkmate the king"
-                    : exercise.goal === "promote"
-                      ? "Promote a pawn"
-                      : "Hold the draw")}
-            </h3>
-            <span className="caption">{Math.ceil(moves.length / 2)} moves</span>
-          </div>
-          {message && (
-            <p className="feedback" role="status">
-              {message}
-            </p>
-          )}
-          <div className="button-row">
-            <Button
-              disabled={!!outcome || busy}
-              onClick={async () => {
-                const current = generation.current;
-                const ctrl = new AbortController();
-                hintController.current = ctrl;
-                setBusy(true);
-                try {
-                  const { best } = await search(fen, {
-                    time: 1500,
-                    signal: ctrl.signal,
-                  });
-                  if (
-                    current === generation.current &&
-                    best &&
-                    best !== "(none)"
-                  ) {
-                    const m = new Chess(fen).move(best);
-                    setHint(m.from);
-                    setMessage(`Try ${m.san}.`);
-                  }
-                } catch (e) {
-                  if ((e as Error).name !== "AbortError")
-                    notify((e as Error).message);
-                } finally {
-                  if (current === generation.current) setBusy(false);
-                }
-              }}
-            >
-              <Lightbulb size={16} />
-              Hint
-            </Button>
-            <Button className="secondary" onClick={() => reset()}>
-              <RotateCcw size={16} />
-              Restart
-            </Button>
-            <Button
-              className="secondary"
-              disabled={!claimable || !!outcome}
-              onClick={() => finish(exercise.goal === "draw", "Draw claimed.")}
-            >
-              Claim draw
-            </Button>
-          </div>
-          <button className="options-toggle" onClick={() => setTip(!tip)}>
-            Technique tip
-            <ChevronDown size={15} />
-          </button>
-          {tip && <p className="caption">{exercise.tip}</p>}
-          <p className="caption">
-            Stockfish 19 Lite replies locally. No tablebase-perfect-play
-            guarantee.
-          </p>
-        </Card>
       </div>
+      <Card className="lesson-controls">
+        <select className="endgame-position-picker" aria-label="Position" value={exercise.id} onChange={event => {
+          const next = exercises.find(item => item.id === event.target.value);
+          if (next) reset(next);
+        }}>
+          {exercises.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+        </select>
+        <div className="card-heading">
+          <h3>
+            {outcome ||
+              (busy
+                ? "Stockfish is replying…"
+                : exercise.goal === "mate"
+                  ? "Checkmate the king"
+                  : exercise.goal === "promote"
+                    ? "Promote a pawn"
+                    : "Hold the draw")}
+          </h3>
+          <span className="caption">{Math.ceil(moves.length / 2)} moves</span>
+        </div>
+        {message && (
+          <p className="feedback" role="status">
+            {message}
+          </p>
+        )}
+        <div className="button-row">
+          <Button
+            disabled={!!outcome || busy}
+            onClick={async () => {
+              const current = generation.current;
+              const ctrl = new AbortController();
+              hintController.current = ctrl;
+              setBusy(true);
+              try {
+                const { best } = await search(fen, {
+                  time: 1500,
+                  signal: ctrl.signal,
+                });
+                if (
+                  current === generation.current &&
+                  best &&
+                  best !== "(none)"
+                ) {
+                  const m = new Chess(fen).move(best);
+                  setHint(m.from);
+                  setMessage(`Try ${m.san}.`);
+                }
+              } catch (e) {
+                if ((e as Error).name !== "AbortError")
+                  notify((e as Error).message);
+              } finally {
+                if (current === generation.current) setBusy(false);
+              }
+            }}
+          >
+            <Lightbulb size={16} />
+            Hint
+          </Button>
+          <Button className="secondary" onClick={() => reset()}>
+            <RotateCcw size={16} />
+            Restart
+          </Button>
+          <Button
+            className="secondary"
+            disabled={!claimable || !!outcome}
+            onClick={() => finish(exercise.goal === "draw", "Draw claimed.")}
+          >
+            Claim draw
+          </Button>
+        </div>
+        <button className="options-toggle" onClick={() => setTip(!tip)}>
+          Technique tip
+          <ChevronDown size={15} />
+        </button>
+        {tip && <p className="caption">{exercise.tip}</p>}
+        <p className="caption">
+          Stockfish 19 Lite replies locally. No tablebase-perfect-play
+          guarantee.
+        </p>
+      </Card>
     </div>
   );
 }
