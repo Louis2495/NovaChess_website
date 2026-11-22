@@ -6449,14 +6449,16 @@ html { scrollbar-gutter:stable; }
 
 .workspace:has(.viewport-lesson) { padding-bottom:14px; }
 .workspace .viewport-lesson {
-  --lesson-rail:clamp(195px, 23%, 285px);
+  --lesson-board-track:min(var(--board-max), calc((100% - 240px) / 1.625), calc(var(--lesson-height, 100dvh) - 76px));
+  --lesson-left-gap:max(0px, calc(var(--lesson-board-track) * .375 - 24px));
+  --lesson-right-gap:calc(var(--lesson-board-track) * .25);
   display:grid;
-  grid-template-columns:minmax(0, var(--lesson-rail)) minmax(0, 1fr) minmax(0, var(--lesson-rail));
+  grid-template-columns:var(--lesson-left-gap) minmax(0, var(--lesson-board-track)) var(--lesson-right-gap) minmax(0, 1fr);
   grid-template-rows:minmax(0, 1fr);
   align-items:stretch;
   height:var(--lesson-height, calc(100dvh - 170px));
   max-height:none;
-  gap:14px;
+  gap:0;
 }
 .workspace .viewport-lesson > .lesson-board-area {
   display:flex;
@@ -6474,7 +6476,7 @@ html { scrollbar-gutter:stable; }
   min-height:0;
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-start;
 }
 .viewport-lesson .lesson-board-slot > .board-frame {
   flex:0 0 auto;
@@ -6483,16 +6485,17 @@ html { scrollbar-gutter:stable; }
 .viewport-lesson .lesson-board-area > .card-heading,
 .viewport-lesson .lesson-board-area > select { margin:0; }
 .viewport-lesson .lesson-board-area > .lesson-bar { flex:none; margin:0; }
-.viewport-lesson .lesson-sidebar { min-height:0; max-height:none; }
+.viewport-lesson > :is(.lesson-sidebar, .endgame-lesson-panels) { grid-column:4; grid-row:1; min-height:0; max-height:none; }
 .viewport-lesson .lesson-sidebar > .catalog-toggle,
 .viewport-lesson .lesson-compact-controls { flex:none; }
 .viewport-lesson .lesson-sidebar > :is(.opening-list, .lesson-desk) { min-height:0; max-height:none; overflow:auto; }
 .viewport-lesson .lesson-sidebar .lesson-info-scroll { min-height:90px; }
 .viewport-lesson .lesson-sidebar .lesson-compact-controls { display:block; }
 .viewport-lesson .lesson-compact-controls > p { margin:5px 0 0; }
-.endgame-lesson > :is(.opening-list, .lesson-controls) { position:static; min-height:0; overflow:auto; align-self:start; max-height:100%; }
-.endgame-lesson > .opening-list .scroll-list { max-height:none; }
-.endgame-lesson > .lesson-controls { margin-top:0; }
+.endgame-lesson-panels { display:flex; flex-direction:column; gap:12px; overflow:auto; }
+.endgame-lesson-panels > .opening-list { position:static; min-height:0; overflow:auto; }
+.endgame-lesson-panels > .opening-list .scroll-list { max-height:none; }
+.endgame-lesson-panels > .lesson-controls { flex:none; margin-top:0; }
 .endgame-position-picker { display:none; }
 .viewport-lesson .queued-moves { padding:4px 0; flex-wrap:nowrap; }
 .viewport-lesson .queued-moves > span { min-width:0; overflow:auto; white-space:nowrap; }
@@ -6504,14 +6507,16 @@ html { scrollbar-gutter:stable; }
     gap:8px;
   }
   .workspace .viewport-lesson > .lesson-board-area { grid-column:1; }
+  .viewport-lesson > :is(.lesson-sidebar, .endgame-lesson-panels) { grid-column:1; grid-row:2; }
+  .viewport-lesson .lesson-board-slot { justify-content:center; }
   .viewport-lesson .lesson-sidebar { overflow:auto; }
   .viewport-lesson .lesson-sidebar > .lesson-desk { overflow:visible; }
   .viewport-lesson .lesson-sidebar > .opening-list { flex:none; overflow:visible; }
   .viewport-lesson .lesson-sidebar .opening-list .scroll-list { max-height:260px; }
   .viewport-lesson .lesson-board-area h2 { font-size:.92rem; }
   .viewport-lesson .lesson-board-area > :is(.card-heading, select, .choice-select) { flex:none; }
-  .endgame-lesson > .opening-list { display:none; }
-  .endgame-lesson > .lesson-controls { align-self:stretch; padding:10px 12px; }
+  .endgame-lesson-panels > .opening-list { display:none; }
+  .endgame-lesson-panels > .lesson-controls { padding:10px 12px; }
   .endgame-position-picker { display:block; width:100%; min-height:32px; padding-block:4px; margin:0 0 6px; }
   .endgame-lesson .lesson-controls .card-heading { margin-bottom:4px; }
   .endgame-lesson .lesson-controls .button-row { margin-top:6px; }

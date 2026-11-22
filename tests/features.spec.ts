@@ -504,7 +504,7 @@ test("flags can be selected as backgrounds and persist; harder achievements star
   );
 });
 
-test("opening and endgame lesson boards are large, centered, and fit the viewport", async ({ page }, testInfo) => {
+test("opening and endgame lesson boards are large and fit the viewport", async ({ page }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
   for (const route of ["lessons", "endgames"]) {
     await page.goto("/#learn/" + route);
@@ -513,8 +513,12 @@ test("opening and endgame lesson boards are large, centered, and fit the viewpor
     await expect.poll(async () => {
       const bounds = (await board.boundingBox())!;
       const workspace = (await page.locator("#workspace").boundingBox())!;
-      return Math.abs(bounds.x + bounds.width / 2 - workspace.x - workspace.width / 2);
-    }).toBeLessThanOrEqual(2);
+      if (mobile) return Math.abs(bounds.x + bounds.width / 2 - workspace.x - workspace.width / 2);
+      const panel = (await page.locator(".viewport-lesson > :is(.lesson-sidebar, .endgame-lesson-panels)").boundingBox())!;
+      const square = bounds.width / 8;
+      return Math.max(Math.abs(bounds.x - workspace.x - square * 3),
+        Math.abs(panel.x - bounds.x - bounds.width - square * 2));
+    }).toBeLessThanOrEqual(mobile ? 2 : 24);
     await expect.poll(async () => (await board.boundingBox())!.width).toBeGreaterThan(mobile ? 195 : 500);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
   }
