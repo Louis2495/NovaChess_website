@@ -165,7 +165,8 @@ function LessonWorkspace({
   const lessonId = lines[branch]?.id ?? selected.id;
   const moves = lines[branch]?.moves || selected.moves,
     c = new Chess();
-  for (const m of moves.slice(0, step)) c.move(m);
+  let currentMove: ReturnType<Chess["move"]> | undefined;
+  for (const m of moves.slice(0, step)) currentMove = c.move(m);
   const fen = c.fen(),
     expected = step < moves.length ? new Chess(fen).move(moves[step]) : null;
   const families = useMemo(() => [...new Set(lessons.map(line => openingFamily(line.name)))].sort(), [lessons]);
@@ -293,10 +294,12 @@ function LessonWorkspace({
     execute: (move) => play(move.slice(0, 2), move.slice(2, 4), move[4]),
   });
   const activeContinuation = lines[branch]?.continuation;
-  const study = activeContinuation
-    ? { title: lines[branch].name, ...activeContinuation }
-    : workbook;
-  const jumpToNote = activeContinuation ? show : studyPosition;
+  const matchesWorkbook = workbook &&
+    moves.slice(0, step).every((move, index) => move === workbook.moves[index]);
+  const currentNote = currentMove &&
+    (activeContinuation?.notes.find(note => note.ply === step)?.text ||
+      (matchesWorkbook ? workbook.notes.find(note => note.ply === step)?.text : undefined) ||
+      moveNote(new Chess(currentMove.before), currentMove, guide));
   const lessonNote =
     workbook &&
     moves.slice(0, step + 1).every((m, i) => m === workbook.moves[i])
@@ -395,7 +398,7 @@ function LessonWorkspace({
                     : `Next: ${expected.san}`
                   : "Line complete"}
               </h3>
-              {(!practice || hint) && <p>{explanation}</p>}
+              {(hint || (!practice && info !== "Study")) && <p>{explanation}</p>}
               {message && (
                 <p className="feedback" role="status">
                   {message}
@@ -420,34 +423,15 @@ function LessonWorkspace({
               tabIndex={0}
               aria-label="Lesson notes"
             >
-              {guide ? (
-                info === "Study" && study ? (
-                  <div className="opening-study">
-                    <h3>{study.title}</h3>
-                    <p>{study.summary}</p>
-                    {activeContinuation && <p className="caption">Worked example with a Stockfish continuation.</p>}
-                    <Button
-                      className="secondary"
-                      onClick={() => jumpToNote(study.notes[0].ply)}
-                    >
-                      Study the position
-                    </Button>
-                    <div className="study-checkpoints">
-                      {study.notes.map((n) => (
-                        <button
-                          key={n.ply}
-                          onClick={() => jumpToNote(n.ply)}
-                        >
-                          <b>
-                            {Math.ceil(n.ply / 2)}
-                            {n.ply % 2 ? "." : "…"} {n.san}
-                          </b>
-                          <span>{n.text}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : info === "Decisions" && workbook ? (
+              {info === "Study" ? (
+                <div className="opening-study" aria-live="polite">
+                  {currentMove ? <>
+                    <h3>{Math.ceil(step / 2)}{currentMove.color === "w" ? "." : "…"} {currentMove.san}</h3>
+                    <p>{currentNote}</p>
+                  </> : <p>Play the first move to see its explanation.</p>}
+                </div>
+              ) : guide ? (
+                info === "Decisions" && workbook ? (
                   <div className="opening-decision">
                     <h3>{workbook.question}</h3>
                     <p className="caption">

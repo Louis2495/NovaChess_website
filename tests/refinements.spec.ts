@@ -131,7 +131,10 @@ test("opening workbooks and trap defenses are interactive", async ({
     page.getByRole("status").filter({ hasText: "Correct." }),
   ).toBeVisible();
   await page.evaluate(() => (location.hash = "#learn/traps"));
+  await page.getByRole("button", { name: "Browse traps" }).click();
   await expect(page.locator(".trap-list button")).toHaveCount(20);
+  await expect(page.getByText("Open games", { exact: true })).toHaveCount(0);
+  await page.keyboard.press("Escape");
   await page
     .getByRole("button", { name: "Find the defense", exact: true })
     .click();

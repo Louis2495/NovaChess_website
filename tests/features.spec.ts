@@ -511,12 +511,30 @@ test("flags can be selected as backgrounds and persist; harder achievements star
   );
 });
 
+test("Study explains the move on the board as playback advances and goes back", async ({ page }) => {
+  await page.goto("/#learn/lessons");
+  const study = page.locator(".opening-study");
+  const playback = page.locator(".lesson-board-area .lesson-step-controls");
+  await expect(study).toContainText("Play the first move");
+  await playback.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(study.getByRole("heading")).toHaveText(/^1\. e4$/);
+  await playback.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(study.getByRole("heading")).toHaveText("1… e5");
+  await playback.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(study.getByRole("heading")).toHaveText(/^1\. e4$/);
+});
+
 test("opening, trap, and endgame boards are large and fit the viewport", async ({ page }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
   for (const route of ["lessons", "traps", "endgames"]) {
     await page.goto("/#learn/" + route);
     const board = page.locator(".viewport-lesson .board");
     await expect(board).toBeVisible();
+    if (route === "traps") {
+      const next = page.locator(".trap-board .lesson-step-controls").getByRole("button", { name: "Next", exact: true });
+      await expect(next).toBeInViewport({ ratio: 1 });
+      expect((await next.boundingBox())!.y).toBeGreaterThan((await board.boundingBox())!.y + (await board.boundingBox())!.height);
+    }
     if (route !== "endgames") {
       const tabs = page.locator(".opening-lesson-panels").getByRole("group", { name: "Opening lessons section" });
       await expect(tabs.getByRole("button", { name: route === "traps" ? "Traps" : "Lessons" }))
@@ -528,8 +546,9 @@ test("opening, trap, and endgame boards are large and fit the viewport", async (
       if (mobile) return Math.abs(bounds.x + bounds.width / 2 - workspace.x - workspace.width / 2);
       const panel = (await page.locator(".viewport-lesson > :is(.lesson-sidebar, .endgame-lesson-panels)").boundingBox())!;
       const square = bounds.width / 8;
-      return Math.max(Math.abs(bounds.x - workspace.x - square * 3),
-        Math.abs(panel.x - bounds.x - bounds.width - square * 2));
+      const [left, right] = route === "endgames" ? [3, 2] : [2, 1];
+      return Math.max(Math.abs(bounds.x - workspace.x - square * left),
+        Math.abs(panel.x - bounds.x - bounds.width - square * right));
     }).toBeLessThanOrEqual(mobile ? 2 : 24);
     await expect.poll(async () => (await board.boundingBox())!.width).toBeGreaterThan(mobile ? 195 : 500);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);

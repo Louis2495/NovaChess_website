@@ -6579,14 +6579,16 @@ html { scrollbar-gutter:stable; }
 .opening-lesson-panels .lesson-practice-tools .toggle-row { margin:0; }
 .opening-lesson-panels .opening-list .scroll-list { max-height:clamp(120px, 34dvh, 420px); }
 .viewport-lesson .trap-board > .card-heading { min-height:0; }
-.trap-panels .trap-list { display:block; max-height:clamp(105px, 22dvh, 235px); }
-.trap-panels .trap-list > button { min-width:0; }
+.trap-catalog .trap-list { display:block; max-height:clamp(105px, 22dvh, 235px); }
+.trap-catalog .trap-list > button { min-width:0; }
 .trap-panels .trap-playback { background:var(--accent-soft); }
 .trap-panels .trap-score { max-height:112px; overflow:auto; padding-bottom:0; }
 
 .workspace:has(.viewport-lesson.lesson-workspace) { padding-block:6px 24px; }
 .workspace .viewport-lesson.lesson-workspace {
   --lesson-board-track:min(var(--board-max), calc((100% - 240px) / 1.625), calc(var(--lesson-height, 100dvh) - 130px));
+  --lesson-left-gap:max(0px, calc(var(--lesson-board-track) * .25 - 24px));
+  --lesson-right-gap:calc(var(--lesson-board-track) * .125);
 }
 .lesson-workspace > .lesson-board-area { container-type:inline-size; }
 .lesson-workspace .lesson-board-area > .card-heading { flex:none; gap:8px; }
