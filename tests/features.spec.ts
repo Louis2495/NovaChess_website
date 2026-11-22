@@ -622,16 +622,23 @@ test("Famous Games centers the board and move list and keeps playback and Explor
     const workspace = (await page.locator("#workspace").boundingBox())!;
     const moves = (await page.locator(".master-score").boundingBox())!;
     if (!mobile) {
-      const label = (await explore.locator("span").boundingBox())!;
+      const button = (await explore.boundingBox())!;
       expect(moves.x - board.x - board.width).toBeGreaterThan(155);
-      expect(label.x).toBeGreaterThan(board.x + board.width);
-      expect(label.x + label.width).toBeLessThan(moves.x);
-      expect(Math.abs(label.y - board.y)).toBeLessThanOrEqual(1);
+      expect(button.x).toBeGreaterThan(board.x + board.width);
+      expect(button.x + button.width).toBeLessThan(moves.x);
+      expect(Math.abs(button.y - board.y)).toBeLessThanOrEqual(1);
     }
     const right = mobile ? board.x + board.width : moves.x + moves.width;
     return Math.abs((board.x + right) / 2 - workspace.x - workspace.width / 2);
   }).toBeLessThanOrEqual(2);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
+  if (!mobile) {
+    const beforeHover = await explore.boundingBox();
+    await page.mouse.move(0, 0);
+    await explore.hover();
+    await expect(explore).toHaveCSS("transform", "none");
+    expect(await explore.boundingBox()).toEqual(beforeHover);
+  }
   await explore.click();
   const dialog = page.getByRole("dialog", { name: "Explore famous games" });
   await expect(dialog.getByRole("textbox", { name: "Search famous games" })).toBeVisible();
