@@ -295,7 +295,7 @@ test("history shows one timeline, event images, and champion portraits with rati
     await page.locator(".champion-timeline>.card").count(),
   ).toBeGreaterThan(0);
 });
-test("famous games replay, autoplay speeds and complete GIF export work", async ({
+test("famous games replay, autoplay, and complete GIF export work", async ({
   page,
 }) => {
   test.setTimeout(45000);
@@ -305,7 +305,6 @@ test("famous games replay, autoplay speeds and complete GIF export work", async 
   await expect(
     page.getByRole("heading", { name: "The Opera Game", exact: true }),
   ).toBeVisible();
-  await page.getByLabel("Replay speed").selectOption("250");
   await page.getByRole("button", { name: "Play replay", exact: true }).click();
   await expect
     .poll(() =>
@@ -604,7 +603,14 @@ test("Famous Games centers the board and move list and keeps playback and Explor
   await expect(explore).toBeInViewport({ ratio: 1 });
   await expect(playback).toBeInViewport({ ratio: 1 });
   await expect(playback.getByLabel("Replay speed")).toHaveCount(0);
-  await expect(page.getByLabel("Replay speed")).toBeVisible();
+  await expect(page.getByLabel("Replay speed")).toHaveCount(0);
+  if (!mobile) {
+    await expect.poll(async () => {
+      const title = (await heading.getByRole("heading").boundingBox())!;
+      const player = (await page.locator(".master-replay .player-top b").boundingBox())!;
+      return Math.abs(title.y - player.y);
+    }).toBeLessThanOrEqual(1);
+  }
   await expect.poll(async () => {
     const board = (await page.locator(".master-replay .board").boundingBox())!;
     const workspace = (await page.locator("#workspace").boundingBox())!;

@@ -18,7 +18,6 @@ import { useLessonViewport } from "../../lib/useLessonViewport";
 import { useControl } from "../../lib/controls";
 import { Board } from "../../components/Board";
 import {
-  ChoiceSelect,
   Card,
   Button,
   IconButton,
@@ -53,6 +52,8 @@ export default function FamousGames() {
   if (!data) return <Loading error={error} />;
   return <Archive games={data} />;
 }
+const replayDelay = 1000;
+
 function Archive({ games }: { games: FamousGame[] }) {
   const { appearance, setLibrary, navigate, notify } = useApp();
   const layout = useLessonViewport();
@@ -62,12 +63,18 @@ function Archive({ games }: { games: FamousGame[] }) {
     const chrome = [...archive.querySelectorAll<HTMLElement>(
       ".master-replay > :is(.board-player-label, .master-playback)",
     )];
+    const topName = archive.querySelector(".master-replay .player-top b");
     const measure = () => {
       const height = chrome.reduce((sum, element) => sum + element.offsetHeight, 44);
       archive.style.setProperty("--replay-chrome", `${height}px`);
+      if (topName) {
+        const offset = topName.getBoundingClientRect().top - archive.getBoundingClientRect().top;
+        archive.style.setProperty("--replay-title-offset", `${offset}px`);
+      }
     };
     const observer = new ResizeObserver(measure);
     chrome.forEach(element => observer.observe(element));
+    if (topName) observer.observe(topName);
     measure();
     return () => observer.disconnect();
   }, [layout]);
@@ -76,7 +83,6 @@ function Archive({ games }: { games: FamousGame[] }) {
     [id, setId] = useState(games[0].id),
     [cursor, setCursor] = useState(0),
     [playing, setPlaying] = useState(false),
-    [speed, setSpeed] = useState(1000),
     [flipped, setFlipped] = useState(false),
     [exporting, setExporting] = useState(false),
     [progress, setProgress] = useState(0);
@@ -119,9 +125,9 @@ function Archive({ games }: { games: FamousGame[] }) {
       setPlaying(false);
       return;
     }
-    const t = setTimeout(() => setCursor((n) => n + 1), speed);
+    const t = setTimeout(() => setCursor((n) => n + 1), replayDelay);
     return () => clearTimeout(t);
-  }, [playing, cursor, speed, game]);
+  }, [playing, cursor, game]);
   useEffect(() => {
     if (cursor !== game.moves.length) return;
     setLibrary((l) => ({
@@ -163,7 +169,7 @@ function Archive({ games }: { games: FamousGame[] }) {
     setProgress(0);
     try {
       await exportGIF(game.positions, appearance, flipped, setProgress, {
-        delay: speed,
+        delay: replayDelay,
         filename: game.id + ".gif",
       });
       notify("GIF exported.");
@@ -264,25 +270,9 @@ function Archive({ games }: { games: FamousGame[] }) {
           <Card className="master-score">
             <table className="paired-game-moves" aria-label="Famous game moves"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead><tbody>{Array.from({length:Math.ceil(game.notation.length/2)},(_,row)=><tr key={row}><th scope="row">{row+1}.</th>{[0,1].map(side=>{const i=row*2+side;return <td key={side}>{game.notation[i] && <button className={cursor===i+1?'current':''} onClick={()=>seek(i+1)} aria-label={`Move ${row+1}, ${side?'Black':'White'}: ${game.notation[i]}`}>{game.notation[i]}</button>}</td>;})}</tr>)}</tbody></table>
           </Card>
-          <div className="replay-speed">
-            <span>
-              {Math.ceil(cursor / 2)} / {Math.ceil(game.moves.length / 2)}
-            </span>
-            <label>
-              Speed
-              <ChoiceSelect
-                aria-label="Replay speed"
-                value={speed}
-                onChange={(e) => setSpeed(+e.target.value)}
-              >
-                <option value={3000}>3s / move</option>
-                <option value={2000}>2s / move</option>
-                <option value={1000}>1s / move</option>
-                <option value={500}>0.5s / move</option>
-                <option value={250}>0.25s / move</option>
-              </ChoiceSelect>
-            </label>
-          </div>
+          <p className="caption master-move-count">
+            {Math.ceil(cursor / 2)} / {Math.ceil(game.moves.length / 2)}
+          </p>
           <div className="button-row">
             <Button className="secondary" disabled={exporting} onClick={gif}>
               <Film size={16} />
