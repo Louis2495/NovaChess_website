@@ -99,7 +99,7 @@ test("suggestions are opt-in and check saved sidelines for the selected color", 
   await expect(page.getByRole("dialog", { name: "Repertoire suggestions" })).toHaveCount(0);
   await expect(page.getByText("Due now")).toHaveCount(0);
   await expect(page.getByText("Review status")).toHaveCount(0);
-  await page.getByRole("button", { name: "Show suggestions" }).click();
+  await page.getByRole("button", { name: "Suggestions", exact: true }).click();
   const suggestions = page.getByRole("dialog", { name: "Repertoire suggestions" });
   await expect(suggestions.getByRole("heading", { name: "Missing opening categories" })).toBeVisible();
   await expect(suggestions.getByRole("heading", { name: "Suggested missing lines" })).toBeVisible();
@@ -124,7 +124,7 @@ test("suggestions are opt-in and check saved sidelines for the selected color", 
   await page.getByRole("button", { name: "Save line", exact: true }).click();
   await expect(emptyLine.getByText("1 moves", { exact: true })).toBeVisible();
   await expect(french.getByText("Empty", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Show suggestions" }).click();
+  await page.getByRole("button", { name: "Suggestions", exact: true }).click();
   await expect(suggestions.getByRole("checkbox", { name: "French Defense", exact: true })).toHaveCount(0);
   await suggestions.getByText(/^Sicilian Defense \(/).click();
   await expect(corePlans).toHaveCount(0);
@@ -169,7 +169,7 @@ test("opening categories can be dragged, moved with buttons, and renamed across 
   await page.getByRole("searchbox", { name: "Search repertoire" }).fill("tournament");
   const renamed = page.getByRole("region", { name: "Tournament prep" });
   await expect(renamed.getByRole("heading", { name: "My Sicilian line" })).toBeVisible();
-  await page.getByRole("button", { name: "Show suggestions" }).click();
+  await page.getByRole("button", { name: "Suggestions", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Repertoire suggestions" }).getByText(/^Tournament prep \(/)).toBeVisible();
 });
 

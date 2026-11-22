@@ -115,7 +115,7 @@ function RepertoireLines({ onTrain, onTrainAll, onAdd }: {
         <div className="section-toolbar repertoire-toolbar">
           <h2 className="repertoire-heading">Your repertoire <span>{library.repertoire.length} {library.repertoire.length === 1 ? "variation" : "variations"}</span></h2>
           <div className="button-row">
-            <Button className="secondary" aria-haspopup="dialog" onClick={() => setShowSuggestions(true)}>Show suggestions</Button>
+            <Button className="secondary" aria-haspopup="dialog" onClick={() => setShowSuggestions(true)}>Suggestions</Button>
             {library.repertoire.some(line => line.moves.length > 0) && <Button className="secondary" onClick={() => setSharing(true)}>
               <Share2 size={16} /> Share
             </Button>}
