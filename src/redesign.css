@@ -6584,6 +6584,7 @@ html { scrollbar-gutter:stable; }
 .trap-panels .trap-playback { background:var(--accent-soft); }
 .trap-panels .trap-score { max-height:112px; overflow:auto; padding-bottom:0; }
 
+.workspace:has(.viewport-lesson.lesson-workspace) { padding-block:6px 24px; }
 .workspace .viewport-lesson.lesson-workspace {
   --lesson-board-track:min(var(--board-max), calc((100% - 240px) / 1.625), calc(var(--lesson-height, 100dvh) - 130px));
 }
@@ -6596,6 +6597,7 @@ html { scrollbar-gutter:stable; }
 .modal .opening-list { position:static; }
 .modal .opening-list .scroll-list { max-height:min(46dvh, 460px); }
 @media(max-width:1000px) {
+  .workspace:has(.viewport-lesson.lesson-workspace) { padding-bottom:max(86px, calc(65px + env(safe-area-inset-bottom))); }
   .workspace .viewport-lesson.lesson-workspace {
     grid-template-rows:minmax(0,1fr) clamp(110px, 18dvh, 200px);
   }
