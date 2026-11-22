@@ -19,22 +19,24 @@ export type HistoryData = {
     end: number | null;
     track: string;
     elo: number | null;
+    peakElo?: number;
     ratingYear: number | null;
     source: string;
     highlight: string;
     imageArticle?: string;
   }[];
 };
-function Picture({ image, description, className }: {
+function Picture({ image, description, className, caption }: {
   image?: HistoryImage | null;
   description: string;
   className: string;
+  caption?: string;
 }) {
   const [failed, setFailed] = useState(false);
   if (!image || failed) return null;
   return <figure className={className}>
     <img src={image.url} alt={description} loading="lazy" onError={() => setFailed(true)} />
-    <figcaption><a href={image.credits} target="_blank" rel="noreferrer">Image credits</a></figcaption>
+    <figcaption>{caption && <span>{caption} · </span>}<a href={image.credits} target="_blank" rel="noreferrer">Image credits</a></figcaption>
   </figure>;
 }
 
@@ -92,9 +94,11 @@ export default function History({ data }: { data: HistoryData }) {
               <Card className="history-detail">
                 <time className="history-event-year">{active.year}</time>
                 <h2>{active.title}</h2>
-                <Picture key={imageArticle} className="history-event-image"
-                  image={images.get(imageArticle ?? "")} description={imageArticle ?? active.title} />
-                <p>{active.detail}</p>
+                <div className="history-event-explanation">
+                  <Picture key={imageArticle} className="history-event-image" caption={imageArticle}
+                    image={images.get(imageArticle ?? "")} description={imageArticle ?? active.title} />
+                  <p>{active.detail}</p>
+                </div>
                 <a
                   className="external"
                   href={active.source}
@@ -156,7 +160,12 @@ export default function History({ data }: { data: HistoryData }) {
                 <div>
                   <h2>{c.name}</h2>
                   <p className="caption">{c.highlight}</p>
-                  {c.elo && <span className="pill">{c.elo} · {c.ratingYear}</span>}
+                  <div className="champion-ratings">
+                    {c.elo && <span className="pill">Event {c.elo} · {c.ratingYear}</span>}
+                    {c.peakElo && <a className="pill"
+                      href={"https://en.wikipedia.org/wiki/" + encodeURIComponent((c.imageArticle ?? c.name).replaceAll(" ", "_"))}
+                      target="_blank" rel="noreferrer">Peak FIDE {c.peakElo}</a>}
+                  </div>
                 </div>
                 <a
                   className="external"

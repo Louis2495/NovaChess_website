@@ -272,7 +272,7 @@ test("history shows one timeline, event images, and champion portraits with rati
   await expect(page.getByRole("searchbox", { name: "Search history" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "All eras" })).toHaveCount(0);
   await expect(page.getByText("Through 2024")).toHaveCount(0);
-  await expect(page.getByRole("img", { name: "Chaturanga", exact: true })).toBeVisible();
+  await expect(page.locator(".history-event-explanation").getByRole("img", { name: "Chaturanga", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Next event", exact: true }).click();
   await expect(page.locator(".history-paging")).toContainText("2 /");
   await page
@@ -280,6 +280,7 @@ test("history shows one timeline, event images, and champion portraits with rati
     .click();
   await expect(page.getByRole("img", { name: "Wilhelm Steinitz", exact: true })).toBeVisible();
   await expect(page.getByLabel("Show event ratings", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Peak FIDE 2882", exact: true })).toBeVisible();
   await expect(
     page
       .locator(".champion-timeline .pill")
