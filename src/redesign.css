@@ -6187,14 +6187,15 @@ html { scrollbar-gutter:stable; }
 .repertoire-editor,.workspace .repertoire-training { width:min(96%,1240px); margin-inline:auto; }
 .repertoire-color-toggle { display:flex; justify-content:center; margin-block:0 16px; }
 .repertoire-color-toggle > [role="group"] { width:min(100%,360px); }
+.learn-page-heading:has(+ .repertoire-page) { margin-bottom:30px; }
 .repertoire-controls {
   display:grid;
-  gap:16px;
-  margin-bottom:28px;
+  gap:32px;
+  margin-bottom:44px;
 }
 .repertoire-controls .repertoire-toolbar {
   align-items:center;
-  gap:12px 20px;
+  gap:20px;
   margin:0;
 }
 .repertoire-heading { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin:0; font-size:1.55rem; }
@@ -6210,8 +6211,8 @@ html { scrollbar-gutter:stable; }
   display:grid;
   grid-template-columns:minmax(0,1fr);
   justify-items:center;
-  gap:10px;
-  padding:12px;
+  gap:18px;
+  padding:18px 12px;
   border:1px solid var(--border);
   border-radius:var(--radius);
   background:var(--panel);

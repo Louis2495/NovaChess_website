@@ -37,7 +37,7 @@ export default function Learn() {
       </>
     );
   const tiles=[
-    {id:"repertoire",title:"Your repertoire",text:`${library.repertoire.length} saved lines`,tile:0},
+    {id:"repertoire",title:"Your repertoire",text:`${library.repertoire.length} ${library.repertoire.length === 1 ? "variation" : "variations"}`,tile:0},
     {id:"lessons",title:"Opening lessons",text:"Lessons, traps & refutations",tile:1},
     {id:"endgames",title:"Endgame Lessons",text:"17 positions · engine replies",tile:2},
     {id:"train",title:"Train an opening",text:"Practice the next move",tile:3},

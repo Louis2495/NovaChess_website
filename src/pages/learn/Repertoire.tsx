@@ -113,7 +113,7 @@ function RepertoireLines({ onTrain, onTrainAll, onAdd }: {
     <div className="repertoire-page">
       <div className="repertoire-controls">
         <div className="section-toolbar repertoire-toolbar">
-          <h2 className="repertoire-heading">Your repertoire <span>{library.repertoire.length} {library.repertoire.length === 1 ? "line" : "lines"}</span></h2>
+          <h2 className="repertoire-heading">Your repertoire <span>{library.repertoire.length} {library.repertoire.length === 1 ? "variation" : "variations"}</span></h2>
           <div className="button-row">
             <Button className="secondary" aria-haspopup="dialog" onClick={() => setShowSuggestions(true)}>Show suggestions</Button>
             {library.repertoire.some(line => line.moves.length > 0) && <Button className="secondary" onClick={() => setSharing(true)}>
@@ -125,10 +125,10 @@ function RepertoireLines({ onTrain, onTrainAll, onAdd }: {
             <Button className="secondary" onClick={() => navigate("learn", "repertoire:import")}>
               <Download size={16} /> Import
             </Button>
+            <Button className={trainingLines.length ? "secondary" : ""} onClick={onAdd}><Plus size={16} /> Add line</Button>
             {!!trainingLines.length && <Button onClick={() => onTrainAll(trainingLines)}>
               <GraduationCap size={16} /> Train everything
             </Button>}
-            <Button className={trainingLines.length ? "secondary" : ""} onClick={onAdd}><Plus size={16} /> Add line</Button>
           </div>
         </div>
         {!managing && !!groups.length && <div className="repertoire-browse">
