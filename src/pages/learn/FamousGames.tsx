@@ -60,7 +60,7 @@ function Archive({ games }: { games: FamousGame[] }) {
     const archive = layout.current;
     if (!archive) return;
     const chrome = [...archive.querySelectorAll<HTMLElement>(
-      ".master-replay > :is(.card-heading, .board-player-label, .master-playback)",
+      ".master-replay > :is(.board-player-label, .master-playback)",
     )];
     const measure = () => {
       const height = chrome.reduce((sum, element) => sum + element.offsetHeight, 44);
@@ -177,19 +177,6 @@ function Archive({ games }: { games: FamousGame[] }) {
     <>
       <div className="master-archive" ref={layout}>
         <div className="master-replay">
-          <div className="card-heading">
-            <div className="master-title">
-              <IconButton label="Back to Learn" onClick={() => navigate("learn")}><ArrowLeft size={18} /></IconButton>
-              <div>
-                <span className="eyebrow">{game.event} · {game.year}</span>
-                <h1 title={game.title}>{game.title}</h1>
-              </div>
-            </div>
-            <Button className="secondary" aria-haspopup="dialog" onClick={() => {
-              setPlaying(false);
-              setExploring(true);
-            }}><Search size={15} /> Explore</Button>
-          </div>
           <BoardPlayer placement="top" side={flipped?'w':'b'} name={flipped?game.white:game.black} rating={flipped?game.whiteRating:game.blackRating} result={game.result}/>
           <div className="master-board-slot">
             <Board
@@ -261,6 +248,19 @@ function Archive({ games }: { games: FamousGame[] }) {
           </div>
         </div>
         <div className="master-notes">
+          <div className="master-game-heading">
+            <div className="master-title">
+              <h1>{game.title}</h1>
+              <p className="caption">{game.event} {game.year}</p>
+            </div>
+            <div className="master-game-actions">
+              <IconButton label="Back to Learn" onClick={() => navigate("learn")}><ArrowLeft size={18} /></IconButton>
+              <Button className="secondary" aria-haspopup="dialog" onClick={() => {
+                setPlaying(false);
+                setExploring(true);
+              }}><Search size={15} /> Explore</Button>
+            </div>
+          </div>
           <Card className="master-score">
             <table className="paired-game-moves" aria-label="Famous game moves"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead><tbody>{Array.from({length:Math.ceil(game.notation.length/2)},(_,row)=><tr key={row}><th scope="row">{row+1}.</th>{[0,1].map(side=>{const i=row*2+side;return <td key={side}>{game.notation[i] && <button className={cursor===i+1?'current':''} onClick={()=>seek(i+1)} aria-label={`Move ${row+1}, ${side?'Black':'White'}: ${game.notation[i]}`}>{game.notation[i]}</button>}</td>;})}</tr>)}</tbody></table>
           </Card>

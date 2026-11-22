@@ -6712,13 +6712,11 @@ html { scrollbar-gutter:stable; }
   min-height:0;
   max-width:none;
 }
-.master-replay > .card-heading { flex:none; margin:0; gap:10px; }
-.master-replay > .card-heading > div { min-width:0; }
-.master-title { display:flex; align-items:center; gap:8px; }
-.master-title > div { min-width:0; }
-.master-title .eyebrow, .master-title h1 { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.master-title h1 { margin:0; font-size:clamp(1.2rem, 2.4vw, 2rem); line-height:1.2; }
-.master-replay > .card-heading .btn { flex:none; }
+.master-game-heading { flex:none; display:grid; gap:8px; min-width:0; }
+.master-title { min-width:0; }
+.master-title h1 { margin:0; font-size:clamp(1.2rem, 2.4vw, 2rem); line-height:1.2; overflow-wrap:anywhere; }
+.master-title p { margin:3px 0 0; }
+.master-game-actions { display:flex; justify-content:flex-end; align-items:center; gap:5px; }
 .master-replay .board-player-label { margin-inline:auto; flex:none; flex-wrap:nowrap; white-space:nowrap; }
 .master-replay .board-player-label b { overflow:hidden; text-overflow:ellipsis; }
 .master-board-slot {
@@ -6737,8 +6735,8 @@ html { scrollbar-gutter:stable; }
 .master-playback {
   flex:none;
   display:flex;
-  align-items:center;
-  gap:10px;
+  flex-direction:column;
+  gap:4px;
   width:100%;
   margin-inline:auto;
   border:1px solid var(--border);
@@ -6746,9 +6744,9 @@ html { scrollbar-gutter:stable; }
   padding:4px 8px;
   background:var(--panel);
 }
-.master-playback .board-navigation { flex:none; margin:0; padding:0; border:0; gap:4px; }
+.master-playback .board-navigation { flex:none; margin:0; padding:2px 4px; gap:4px; }
 .master-playback .board-navigation .icon-btn { width:32px; min-width:0; height:32px; min-height:0; padding:4px; }
-.master-playback .replay-slider { flex:1; width:0; min-width:0; margin:0; }
+.master-playback .replay-slider { display:block; width:100%; min-width:0; margin:0; }
 .master-notes .replay-speed { flex:none; margin:0; }
 .workspace .master-archive > .master-notes {
   grid-column:2;
@@ -6765,7 +6763,7 @@ html { scrollbar-gutter:stable; }
   .workspace:has(.master-archive) { padding-bottom:max(88px, calc(67px + env(safe-area-inset-bottom))); }
   .workspace .master-archive {
     grid-template-columns:minmax(0,1fr);
-    grid-template-rows:minmax(0,1fr) clamp(97px, 16dvh, 155px);
+    grid-template-rows:minmax(0,1fr) clamp(126px, 20dvh, 180px);
     gap:8px;
   }
   .workspace .master-archive > .master-replay { grid-column:1; }
@@ -6774,16 +6772,19 @@ html { scrollbar-gutter:stable; }
     grid-row:2;
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
-    grid-template-rows:auto minmax(0,1fr);
+    grid-template-rows:auto auto minmax(0,1fr);
     align-items:center;
   }
-  .master-archive .master-notes > .master-score { grid-column:1/-1; grid-row:2; height:100%; }
+  .master-game-heading { grid-column:1/-1; grid-row:1; grid-template-columns:minmax(0,1fr) auto; align-items:center; }
+  .master-game-actions .btn { min-height:32px; padding:4px 8px; }
+  .master-archive .master-notes > .master-score { grid-column:1/-1; grid-row:3; height:100%; }
+  .master-notes .replay-speed { grid-column:2; grid-row:2; }
   .master-notes .replay-speed > span { display:none; }
-  .master-replay > .card-heading .btn { min-height:32px; padding:4px 8px; }
   .master-playback { width:min(100%, 420px); }
+  .master-playback .replay-slider { order:-1; }
   .master-playback .board-navigation { gap:2px; }
   .master-notes .replay-speed select { min-height:29px; padding-block:3px; }
-  .master-archive .master-notes > .button-row { order:-1; }
+  .master-archive .master-notes > .button-row { grid-column:1; grid-row:2; }
   .master-board-slot > .board-frame { max-width:min(100%,var(--board-max),max(0px,calc(100cqh - 24px))) !important; }
   .master-board-slot > .board-frame:not(.compact-frame) { padding-block:12px; }
   .master-board-slot .board-frame > :is(.material-top,.material-imbalance) {
@@ -6792,7 +6793,4 @@ html { scrollbar-gutter:stable; }
   .master-board-slot { height:calc(min(100cqw, var(--board-max)) + 24px); }
   .master-replay .board-player-label.player-top { top:7px; }
   .master-replay .board-player-label.player-bottom { top:-7px; }
-}
-@media(min-width:1201px) {
-  .workspace .master-archive > .master-notes { padding-top:var(--replay-board-top, 0px); }
 }

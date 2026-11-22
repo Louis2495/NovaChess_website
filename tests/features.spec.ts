@@ -598,6 +598,9 @@ test("Famous Games centers the board and move list and keeps playback and Explor
   await page.goto("/#learn/famous");
   const explore = page.getByRole("button", { name: "Explore", exact: true });
   const playback = page.getByRole("group", { name: "Replay controls" });
+  const heading = page.locator(".master-notes .master-game-heading");
+  await expect(heading.getByRole("heading", { level: 1 })).toBeVisible();
+  expect((await heading.locator(".caption").boundingBox())!.y).toBeGreaterThan((await heading.getByRole("heading").boundingBox())!.y);
   await expect(explore).toBeInViewport({ ratio: 1 });
   await expect(playback).toBeInViewport({ ratio: 1 });
   await expect(playback.getByLabel("Replay speed")).toHaveCount(0);
