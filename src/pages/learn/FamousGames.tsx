@@ -1,7 +1,8 @@
 import BoardPlayer from "../../components/BoardPlayer";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import {
   Search,
+  ArrowLeft,
   Play,
   Square,
   ChevronLeft,
@@ -55,6 +56,21 @@ export default function FamousGames() {
 function Archive({ games }: { games: FamousGame[] }) {
   const { appearance, setLibrary, navigate, notify } = useApp();
   const layout = useLessonViewport();
+  useLayoutEffect(() => {
+    const archive = layout.current;
+    if (!archive) return;
+    const chrome = [...archive.querySelectorAll<HTMLElement>(
+      ".master-replay > :is(.card-heading, .board-player-label, .master-playback)",
+    )];
+    const measure = () => {
+      const height = chrome.reduce((sum, element) => sum + element.offsetHeight, 44);
+      archive.style.setProperty("--replay-chrome", `${height}px`);
+    };
+    const observer = new ResizeObserver(measure);
+    chrome.forEach(element => observer.observe(element));
+    measure();
+    return () => observer.disconnect();
+  }, [layout]);
   const [search, setSearch] = useState(""),
     [exploring, setExploring] = useState(false),
     [id, setId] = useState(games[0].id),
@@ -162,11 +178,12 @@ function Archive({ games }: { games: FamousGame[] }) {
       <div className="master-archive" ref={layout}>
         <div className="master-replay">
           <div className="card-heading">
-            <div>
-              <span className="eyebrow">
-                {game.event} · {game.year}
-              </span>
-              <h2>{game.title}</h2>
+            <div className="master-title">
+              <IconButton label="Back to Learn" onClick={() => navigate("learn")}><ArrowLeft size={18} /></IconButton>
+              <div>
+                <span className="eyebrow">{game.event} · {game.year}</span>
+                <h1 title={game.title}>{game.title}</h1>
+              </div>
             </div>
             <Button className="secondary" aria-haspopup="dialog" onClick={() => {
               setPlaying(false);
@@ -240,31 +257,32 @@ function Archive({ games }: { games: FamousGame[] }) {
               value={cursor}
               onChange={(e) => seek(+e.target.value)}
             />
-            <div className="replay-speed">
-              <span>
-                {Math.ceil(cursor / 2)} / {Math.ceil(game.moves.length / 2)}
-              </span>
-              <label>
-                Speed
-                <ChoiceSelect
-                  aria-label="Replay speed"
-                  value={speed}
-                  onChange={(e) => setSpeed(+e.target.value)}
-                >
-                  <option value={3000}>3s / move</option>
-                  <option value={2000}>2s / move</option>
-                  <option value={1000}>1s / move</option>
-                  <option value={500}>0.5s / move</option>
-                  <option value={250}>0.25s / move</option>
-                </ChoiceSelect>
-              </label>
-            </div>
+
           </div>
         </div>
         <div className="master-notes">
           <Card className="master-score">
             <table className="paired-game-moves" aria-label="Famous game moves"><thead><tr><th>#</th><th>White</th><th>Black</th></tr></thead><tbody>{Array.from({length:Math.ceil(game.notation.length/2)},(_,row)=><tr key={row}><th scope="row">{row+1}.</th>{[0,1].map(side=>{const i=row*2+side;return <td key={side}>{game.notation[i] && <button className={cursor===i+1?'current':''} onClick={()=>seek(i+1)} aria-label={`Move ${row+1}, ${side?'Black':'White'}: ${game.notation[i]}`}>{game.notation[i]}</button>}</td>;})}</tr>)}</tbody></table>
           </Card>
+          <div className="replay-speed">
+            <span>
+              {Math.ceil(cursor / 2)} / {Math.ceil(game.moves.length / 2)}
+            </span>
+            <label>
+              Speed
+              <ChoiceSelect
+                aria-label="Replay speed"
+                value={speed}
+                onChange={(e) => setSpeed(+e.target.value)}
+              >
+                <option value={3000}>3s / move</option>
+                <option value={2000}>2s / move</option>
+                <option value={1000}>1s / move</option>
+                <option value={500}>0.5s / move</option>
+                <option value={250}>0.25s / move</option>
+              </ChoiceSelect>
+            </label>
+          </div>
           <div className="button-row">
             <Button className="secondary" disabled={exporting} onClick={gif}>
               <Film size={16} />

@@ -6689,20 +6689,24 @@ html { scrollbar-gutter:stable; }
 }
 .trivia-game .trivia-explanation { font-size:1rem; }
 
-.workspace:has(.master-archive) { padding-block:8px 14px; }
+.workspace:has(.master-archive) { padding-block:6px 28px; }
 .workspace .master-archive {
-  --replay-rail:clamp(208px, 21%, 300px);
+  --replay-rail:clamp(208px, 23%, 300px);
+  --replay-gap:clamp(90px, 13.3vw, 192px);
+  --replay-board:min(var(--board-max), calc(100% - var(--replay-rail) - var(--replay-gap)),
+    max(0px, calc(var(--lesson-height, 100dvh) - var(--replay-chrome, 200px) - 2px)));
   height:var(--lesson-height, calc(100dvh - 110px));
-  grid-template-columns:var(--replay-rail) minmax(0,1fr) var(--replay-rail);
+  grid-template-columns:minmax(0,var(--replay-board)) var(--replay-rail);
+  justify-content:center;
   grid-template-rows:minmax(0,1fr);
   align-items:stretch;
-  gap:16px;
+  gap:var(--replay-gap);
 }
 .workspace .master-archive > .master-replay {
   display:flex;
   container-type:inline-size;
   flex-direction:column;
-  grid-column:2;
+  grid-column:1;
   grid-row:1;
   width:100%;
   min-height:0;
@@ -6710,7 +6714,10 @@ html { scrollbar-gutter:stable; }
 }
 .master-replay > .card-heading { flex:none; margin:0; gap:10px; }
 .master-replay > .card-heading > div { min-width:0; }
-.master-replay > .card-heading h2 { margin:0; }
+.master-title { display:flex; align-items:center; gap:8px; }
+.master-title > div { min-width:0; }
+.master-title .eyebrow, .master-title h1 { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.master-title h1 { margin:0; font-size:clamp(1.2rem, 2.4vw, 2rem); line-height:1.2; }
 .master-replay > .card-heading .btn { flex:none; }
 .master-replay .board-player-label { margin-inline:auto; flex:none; flex-wrap:nowrap; white-space:nowrap; }
 .master-replay .board-player-label b { overflow:hidden; text-overflow:ellipsis; }
@@ -6729,18 +6736,22 @@ html { scrollbar-gutter:stable; }
 }
 .master-playback {
   flex:none;
-  width:min(100%, max(315px, var(--actual-board-width, 100%)));
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
   margin-inline:auto;
   border:1px solid var(--border);
   border-radius:10px;
   padding:4px 8px;
   background:var(--panel);
 }
-.master-playback .board-navigation { margin:0; }
-.master-playback .replay-slider { display:block; width:100%; margin:2px 0; }
-.master-playback .replay-speed { margin:0; }
+.master-playback .board-navigation { flex:none; margin:0; padding:0; border:0; gap:4px; }
+.master-playback .board-navigation .icon-btn { width:32px; min-width:0; height:32px; min-height:0; padding:4px; }
+.master-playback .replay-slider { flex:1; width:0; min-width:0; margin:0; }
+.master-notes .replay-speed { flex:none; margin:0; }
 .workspace .master-archive > .master-notes {
-  grid-column:3;
+  grid-column:2;
   grid-row:1;
   min-height:0;
   padding-top:0;
@@ -6751,27 +6762,27 @@ html { scrollbar-gutter:stable; }
 .modal .master-game-rows { display:block; max-height:min(52dvh, 535px); }
 .modal .master-game-rows > button { min-width:0; }
 @media(max-width:1000px) {
-  .workspace:has(.master-archive) { padding-bottom:max(76px, calc(55px + env(safe-area-inset-bottom))); }
+  .workspace:has(.master-archive) { padding-bottom:max(88px, calc(67px + env(safe-area-inset-bottom))); }
   .workspace .master-archive {
     grid-template-columns:minmax(0,1fr);
     grid-template-rows:minmax(0,1fr) clamp(97px, 16dvh, 155px);
     gap:8px;
   }
   .workspace .master-archive > .master-replay { grid-column:1; }
-  .workspace .master-archive > .master-notes { grid-column:1; grid-row:2; }
-  .master-replay > .card-heading .btn { min-height:32px; padding:4px 8px; }
-  .master-playback {
-    width:min(100%, 420px);
+  .workspace .master-archive > .master-notes {
+    grid-column:1;
+    grid-row:2;
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
+    grid-template-rows:auto minmax(0,1fr);
     align-items:center;
-    gap:4px 10px;
   }
-  .master-playback .board-navigation { border:0; padding:0; gap:2px; }
-  .master-playback .board-navigation .icon-btn { width:30px; min-width:0; height:30px; min-height:0; padding:4px; }
-  .master-playback .replay-slider { grid-row:1; grid-column:1/-1; }
-  .master-playback .replay-speed > span { display:none; }
-  .master-playback .replay-speed select { min-height:30px; padding-block:3px; }
+  .master-archive .master-notes > .master-score { grid-column:1/-1; grid-row:2; height:100%; }
+  .master-notes .replay-speed > span { display:none; }
+  .master-replay > .card-heading .btn { min-height:32px; padding:4px 8px; }
+  .master-playback { width:min(100%, 420px); }
+  .master-playback .board-navigation { gap:2px; }
+  .master-notes .replay-speed select { min-height:29px; padding-block:3px; }
   .master-archive .master-notes > .button-row { order:-1; }
   .master-board-slot > .board-frame { max-width:min(100%,var(--board-max),max(0px,calc(100cqh - 24px))) !important; }
   .master-board-slot > .board-frame:not(.compact-frame) { padding-block:12px; }

@@ -592,7 +592,7 @@ test("Train an opening shows three Stockfish lines and a left-side evaluation ba
   expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
 });
 
-test("Famous Games centers the board and keeps playback and Explore in view", async ({ page }, testInfo) => {
+test("Famous Games centers the board and move list and keeps playback and Explore in view", async ({ page }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
   await page.setViewportSize({ width: mobile ? 390 : 1280, height: 664 });
   await page.goto("/#learn/famous");
@@ -600,11 +600,16 @@ test("Famous Games centers the board and keeps playback and Explore in view", as
   const playback = page.getByRole("group", { name: "Replay controls" });
   await expect(explore).toBeInViewport({ ratio: 1 });
   await expect(playback).toBeInViewport({ ratio: 1 });
+  await expect(playback.getByLabel("Replay speed")).toHaveCount(0);
+  await expect(page.getByLabel("Replay speed")).toBeVisible();
   await expect.poll(async () => {
     const board = (await page.locator(".master-replay .board").boundingBox())!;
     const workspace = (await page.locator("#workspace").boundingBox())!;
-    return Math.abs(board.x + board.width / 2 - workspace.x - workspace.width / 2);
-  }).toBeLessThanOrEqual(1);
+    const moves = (await page.locator(".master-score").boundingBox())!;
+    if (!mobile) expect(moves.x - board.x - board.width).toBeGreaterThan(140);
+    const right = mobile ? board.x + board.width : moves.x + moves.width;
+    return Math.abs((board.x + right) / 2 - workspace.x - workspace.width / 2);
+  }).toBeLessThanOrEqual(2);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
   await explore.click();
   const dialog = page.getByRole("dialog", { name: "Explore famous games" });

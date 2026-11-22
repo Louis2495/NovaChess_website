@@ -27,7 +27,7 @@ export default function Learn() {
   if (detail)
     return (
       <>
-        <div className="learn-page-heading">
+        {section !== "famous" && section !== "quizzes" && <div className="learn-page-heading">
           <Button
             className="learn-back"
             aria-label={section === "repertoire" && detail !== "repertoire" ? "Back to repertoire" : "Back to Learn"}
@@ -36,7 +36,7 @@ export default function Learn() {
             <ArrowLeft size={21} />
           </Button>
           <PageTitle title={labels[section] || "Learn"}></PageTitle>
-        </div>
+        </div>}
         {["lessons","traps","search"].includes(section) ? (
           showTraps ? <OpeningTraps sectionTabs={openingTabs} /> :
             <Openings mode="lesson" sectionTabs={openingTabs} query={section==="search"?detail.slice(7):""}
