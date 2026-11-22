@@ -8,8 +8,6 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  PanelLeftClose,
-  PanelLeftOpen,
   Lightbulb,
   Check,
   Save,
@@ -123,7 +121,7 @@ function LessonWorkspace({
         all.find((l) => l.id === selectedId) ||
         lessons[0],
     ),
-    [catalog, setCatalog] = useState(!selectedId),
+    [catalog, setCatalog] = useState(!!query),
     [branch, setBranch] = useState(0),
     [step, setStep] = useState(0),
     [practice, setPractice] = useState(mode === "train"),
@@ -360,22 +358,10 @@ function LessonWorkspace({
     <>
       <div
         ref={layout}
-        className={`viewport-lesson lesson-workspace ${catalog ? "catalog-open" : "catalog-closed"}`}
+        className="viewport-lesson lesson-workspace"
       >
         <div className="lesson-sidebar opening-lesson-panels">
           {sectionTabs}
-          <Button
-            className="secondary catalog-toggle"
-            aria-expanded={catalog}
-            onClick={() => setCatalog((v) => !v)}
-          >
-            {catalog ? (
-              <PanelLeftClose size={18} />
-            ) : (
-              <PanelLeftOpen size={18} />
-            )}
-            {catalog ? "Hide openings" : "Browse openings"}
-          </Button>
           <div className="lesson-variation-panel">
             <Field label="Lesson variation">
               <ChoiceSelect
@@ -397,296 +383,228 @@ function LessonWorkspace({
               </ChoiceSelect>
             </Field>
           </div>
-          {catalog && (
-            <div className="lesson-compact-controls">
-              {navigation}
-              <p className="caption">
-                {expected ? `Next: ${expected.san}` : "Line complete"}
-              </p>
+          <Card className="lesson-desk">
+            <div className="lesson-next">
+              <span className="eyebrow">
+                {Math.ceil(step / 2)} / {Math.ceil(moves.length / 2)}
+              </span>
+              <h3>
+                {expected
+                  ? practice && !hint
+                    ? "Play the next move"
+                    : `Next: ${expected.san}`
+                  : "Line complete"}
+              </h3>
+              {(!practice || hint) && <p>{explanation}</p>}
+              {message && (
+                <p className="feedback" role="status">
+                  {message}
+                </p>
+              )}
             </div>
-          )}
-          {catalog ? (
-            <Card className="opening-list">
-              <div className="search-field">
-                <Search size={16} />
-                <input
-                  aria-label="Search openings"
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setLimit(80);
-                  }}
-                  placeholder="Name or ECO code"
-                />
-              </div>
-              <Field label="Opening family">
-                <select value={familyFilter} onChange={event => { setFamilyFilter(event.target.value); setLimit(80); }}>
-                  <option value="">All openings</option>
-                  {families.map(family => <option key={family}>{family}</option>)}
-                </select>
-              </Field>
-              <div className="list-summary">
-                {search
-                  ? `${candidates.length} lines`
-                  : `${candidates.length} lessons`}
-              </div>
-              <div className="scroll-list">
-                {visibleGroups.map(({ family, lines }) => (
-                  <section className="opening-family" key={family} aria-label={family}>
-                    <h3>{family}</h3>
-                    {lines.map((o) => (
-                      <button
-                        className={`opening-row ${selected.id === o.id ? "active" : ""}`}
-                        key={o.id}
-                        onClick={() => choose(o)}
-                      >
-                        <span className="eco">{o.eco}</span>
-                        <span>
-                          {o.name}
-                          <small>{Math.ceil(o.moves.length / 2)} moves</small>
-                        </span>
-                        {library.progress.learned.includes(o.id) && (
-                          <Check size={15} />
-                        )}
-                      </button>
-                    ))}
-                  </section>
-                ))}
-                {candidates.length > limit && (
-                  <Button
-                    className="secondary"
-                    onClick={() => setLimit(limit + 80)}
+            <div className="segmented" role="group" aria-label="Lesson notes sections">
+              {["Study", "Plan", "Structure", "Decisions", "Review"].map(
+                (v) => (
+                  <button
+                    key={v}
+                    className={info === v ? "active" : ""}
+                    onClick={() => setInfo(v)}
                   >
-                    Show more
-                  </Button>
-                )}
-              </div>
-            </Card>
-          ) : (
-            <Card className="lesson-desk">
-              <div className="lesson-next">
-                <span className="eyebrow">
-                  {Math.ceil(step / 2)} / {Math.ceil(moves.length / 2)}
-                </span>
-                <h3>
-                  {expected
-                    ? practice && !hint
-                      ? "Play the next move"
-                      : `Next: ${expected.san}`
-                    : "Line complete"}
-                </h3>
-                {(!practice || hint) && <p>{explanation}</p>}
-                {message && (
-                  <p className="feedback" role="status">
-                    {message}
-                  </p>
-                )}
-                {navigation}
-              </div>
-              <div className="segmented" role="group" aria-label="Lesson notes sections">
-                {["Study", "Plan", "Structure", "Decisions", "Review"].map(
-                  (v) => (
-                    <button
-                      key={v}
-                      className={info === v ? "active" : ""}
-                      onClick={() => setInfo(v)}
+                    {v}
+                  </button>
+                ),
+              )}
+            </div>
+            <div
+              className="lesson-info-scroll"
+              tabIndex={0}
+              aria-label="Lesson notes"
+            >
+              {guide ? (
+                info === "Study" && study ? (
+                  <div className="opening-study">
+                    <h3>{study.title}</h3>
+                    <p>{study.summary}</p>
+                    {activeContinuation && <p className="caption">Worked example with a Stockfish continuation.</p>}
+                    <Button
+                      className="secondary"
+                      onClick={() => jumpToNote(study.notes[0].ply)}
                     >
-                      {v}
-                    </button>
-                  ),
-                )}
-              </div>
-              <div
-                className="lesson-info-scroll"
-                tabIndex={0}
-                aria-label="Lesson notes"
-              >
-                {guide ? (
-                  info === "Study" && study ? (
-                    <div className="opening-study">
-                      <h3>{study.title}</h3>
-                      <p>{study.summary}</p>
-                      {activeContinuation && <p className="caption">Worked example with a Stockfish continuation.</p>}
-                      <Button
-                        className="secondary"
-                        onClick={() => jumpToNote(study.notes[0].ply)}
-                      >
-                        Study the position
-                      </Button>
-                      <div className="study-checkpoints">
-                        {study.notes.map((n) => (
-                          <button
-                            key={n.ply}
-                            onClick={() => jumpToNote(n.ply)}
-                          >
-                            <b>
-                              {Math.ceil(n.ply / 2)}
-                              {n.ply % 2 ? "." : "…"} {n.san}
-                            </b>
-                            <span>{n.text}</span>
-                          </button>
-                        ))}
-                      </div>
+                      Study the position
+                    </Button>
+                    <div className="study-checkpoints">
+                      {study.notes.map((n) => (
+                        <button
+                          key={n.ply}
+                          onClick={() => jumpToNote(n.ply)}
+                        >
+                          <b>
+                            {Math.ceil(n.ply / 2)}
+                            {n.ply % 2 ? "." : "…"} {n.san}
+                          </b>
+                          <span>{n.text}</span>
+                        </button>
+                      ))}
                     </div>
-                  ) : info === "Decisions" && workbook ? (
-                    <div className="opening-decision">
-                      <h3>{workbook.question}</h3>
-                      <p className="caption">
-                        Find the move that fits this lesson’s plan.
-                      </p>
-                      <Button
-                        onClick={() => studyPosition(workbook.challenge, true)}
-                      >
-                        Try the position
-                      </Button>
-                      {lines[branch].name === "Study: " + workbook.title && (
-                        <>
-                          <div className="lesson-quiz">
-                            {[...workbook.answers]
-                              .sort((a, b) => a.san.localeCompare(b.san))
-                              .map((a) => (
-                                <button
-                                  key={a.uci}
-                                  disabled={!decisionActive}
-                                  onClick={() =>
-                                    play(
-                                      a.uci.slice(0, 2),
-                                      a.uci.slice(2, 4),
-                                      a.uci[4],
-                                    )
-                                  }
-                                >
-                                  {a.san}
-                                </button>
-                              ))}
-                          </div>
-                          {decisionActive && (
-                            <Button
-                              className="text-button"
-                              onClick={() => {
-                                studyPosition(workbook.challenge + 1);
-                                setInfo("Decisions");
-                                setMessage(
-                                  workbook.notes.find(
-                                    (n) => n.ply === workbook.challenge + 1,
-                                  )?.text || "",
-                                );
-                              }}
-                            >
-                              Show answer
-                            </Button>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  ) : info === "Plan" ? (
-                    <>
-                      <p>{guide.idea}</p>
-                      <h3>White’s plan</h3>
-                      <ul>
-                        {guide.white.map((s) => (
-                          <li key={s}>{s}</li>
-                        ))}
-                      </ul>
-                      <h3>Black’s plan</h3>
-                      <ul>
-                        {guide.black.map((s) => (
-                          <li key={s}>{s}</li>
-                        ))}
-                      </ul>
-                    </>
-                  ) : info === "Structure" ? (
-                    <>
-                      <p>{guide.structure}</p>
-                      <h3>Pawn breaks</h3>
-                      <div className="button-row">
-                        {guide.breaks.map((s) => (
-                          <span className="pill" key={s}>
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                      <h3>Watch for</h3>
-                      <p>{guide.avoid}</p>
-                    </>
-                  ) : (
-                    <>
-                      <h3>{guide.quiz.question}</h3>
-                      <div className="lesson-quiz">
-                        {answers.map((a, i) => (
-                          <button
-                            key={a}
-                            className={answer === i ? "selected" : ""}
-                            onClick={() => setAnswer(i)}
+                  </div>
+                ) : info === "Decisions" && workbook ? (
+                  <div className="opening-decision">
+                    <h3>{workbook.question}</h3>
+                    <p className="caption">
+                      Find the move that fits this lesson’s plan.
+                    </p>
+                    <Button
+                      onClick={() => studyPosition(workbook.challenge, true)}
+                    >
+                      Try the position
+                    </Button>
+                    {lines[branch].name === "Study: " + workbook.title && (
+                      <>
+                        <div className="lesson-quiz">
+                          {[...workbook.answers]
+                            .sort((a, b) => a.san.localeCompare(b.san))
+                            .map((a) => (
+                              <button
+                                key={a.uci}
+                                disabled={!decisionActive}
+                                onClick={() =>
+                                  play(
+                                    a.uci.slice(0, 2),
+                                    a.uci.slice(2, 4),
+                                    a.uci[4],
+                                  )
+                                }
+                              >
+                                {a.san}
+                              </button>
+                            ))}
+                        </div>
+                        {decisionActive && (
+                          <Button
+                            className="text-button"
+                            onClick={() => {
+                              studyPosition(workbook.challenge + 1);
+                              setInfo("Decisions");
+                              setMessage(
+                                workbook.notes.find(
+                                  (n) => n.ply === workbook.challenge + 1,
+                                )?.text || "",
+                              );
+                            }}
                           >
-                            {a}
-                          </button>
-                        ))}
-                      </div>
-                      {answer !== null && (
-                        <p role="status">
-                          {answers[answer] ===
-                          guide.quiz.answers[guide.quiz.correct]
-                            ? "Correct. "
-                            : "Try again. "}
-                          {guide.quiz.explanation}
-                        </p>
-                      )}
-                    </>
-                  )
+                            Show answer
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                ) : info === "Plan" ? (
+                  <>
+                    <p>{guide.idea}</p>
+                    <h3>White’s plan</h3>
+                    <ul>
+                      {guide.white.map((s) => (
+                        <li key={s}>{s}</li>
+                      ))}
+                    </ul>
+                    <h3>Black’s plan</h3>
+                    <ul>
+                      {guide.black.map((s) => (
+                        <li key={s}>{s}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : info === "Structure" ? (
+                  <>
+                    <p>{guide.structure}</p>
+                    <h3>Pawn breaks</h3>
+                    <div className="button-row">
+                      {guide.breaks.map((s) => (
+                        <span className="pill" key={s}>
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                    <h3>Watch for</h3>
+                    <p>{guide.avoid}</p>
+                  </>
                 ) : (
-                  <p>
-                    Compare development, central pawn breaks and king safety in
-                    this position.
-                  </p>
-                )}
-              </div>
-              <div className="lesson-practice-tools">
-                <Toggle
-                  label="Practice moves"
-                  checked={practice}
-                  onChange={(v) => {
-                    setPractice(v);
-                    show(0);
-                    setPerfect(true);
-                    setAutoplay(false);
-                  }}
-                />
-                {practice && (
-                  <Field label="Train as">
-                    <ChoiceSelect
-                      value={side}
-                      onChange={(e) => {
-                        setSide(e.target.value as "w" | "b");
-                        show(0);
-                        setPerfect(true);
-                      }}
-                    >
-                      <option value="w">White</option>
-                      <option value="b">Black</option>
-                    </ChoiceSelect>
-                  </Field>
-                )}
-                <Button
-                  className="text-button"
-                  onClick={() => {
-                    setName(selected.name);
-                    setSaving(true);
-                  }}
-                >
-                  <Save size={15} />
-                  Save to repertoire
-                </Button>
-              </div>
-            </Card>
-          )}
+                  <>
+                    <h3>{guide.quiz.question}</h3>
+                    <div className="lesson-quiz">
+                      {answers.map((a, i) => (
+                        <button
+                          key={a}
+                          className={answer === i ? "selected" : ""}
+                          onClick={() => setAnswer(i)}
+                        >
+                          {a}
+                        </button>
+                      ))}
+                    </div>
+                    {answer !== null && (
+                      <p role="status">
+                        {answers[answer] ===
+                        guide.quiz.answers[guide.quiz.correct]
+                          ? "Correct. "
+                          : "Try again. "}
+                        {guide.quiz.explanation}
+                      </p>
+                    )}
+                  </>
+                )
+              ) : (
+                <p>
+                  Compare development, central pawn breaks and king safety in
+                  this position.
+                </p>
+              )}
+            </div>
+            <div className="lesson-practice-tools">
+              <Toggle
+                label="Practice moves"
+                checked={practice}
+                onChange={(v) => {
+                  setPractice(v);
+                  show(0);
+                  setPerfect(true);
+                  setAutoplay(false);
+                }}
+              />
+              {practice && (
+                <Field label="Train as">
+                  <ChoiceSelect
+                    value={side}
+                    onChange={(e) => {
+                      setSide(e.target.value as "w" | "b");
+                      show(0);
+                      setPerfect(true);
+                    }}
+                  >
+                    <option value="w">White</option>
+                    <option value="b">Black</option>
+                  </ChoiceSelect>
+                </Field>
+              )}
+              <Button
+                className="text-button"
+                onClick={() => {
+                  setName(selected.name);
+                  setSaving(true);
+                }}
+              >
+                <Save size={15} />
+                Save to repertoire
+              </Button>
+            </div>
+          </Card>
         </div>
         <div className="lesson-board-area">
           <div className="card-heading">
-            <div>
-              <span className="eyebrow">{selected.eco}</span>
-              <h2>{selected.name}</h2>
-            </div>
+            <h2>{selected.name}</h2>
+            <Button className="secondary" aria-haspopup="dialog" onClick={() => setCatalog(true)}>
+              <Search size={15} /> Browse openings
+            </Button>
           </div>
           <PremoveQueue
             moves={premove.queue}
@@ -724,7 +642,7 @@ function LessonWorkspace({
                     })()
                   : practice
                     ? side === "b"
-                    : c.turn() === "b"
+                    : false
               }
               highlights={
                 step
@@ -737,9 +655,69 @@ function LessonWorkspace({
           <div className="lesson-bar">
             <span style={{ width: `${(step / moves.length) * 100}%` }} />
           </div>
-
+          {navigation}
         </div>
       </div>
+      {catalog && (
+        <Modal title="Browse openings" wide onClose={() => setCatalog(false)}>
+          <Card className="opening-list">
+            <div className="search-field">
+              <Search size={16} />
+              <input
+                aria-label="Search openings"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setLimit(80);
+                }}
+                placeholder="Name or ECO code"
+              />
+            </div>
+            <Field label="Opening family">
+              <select value={familyFilter} onChange={event => { setFamilyFilter(event.target.value); setLimit(80); }}>
+                <option value="">All openings</option>
+                {families.map(family => <option key={family}>{family}</option>)}
+              </select>
+            </Field>
+            <div className="list-summary">
+              {search
+                ? `${candidates.length} lines`
+                : `${candidates.length} lessons`}
+            </div>
+            <div className="scroll-list">
+              {visibleGroups.map(({ family, lines }) => (
+                <section className="opening-family" key={family} aria-label={family}>
+                  <h3>{family}</h3>
+                  {lines.map((o) => (
+                    <button
+                      className={`opening-row ${selected.id === o.id ? "active" : ""}`}
+                      key={o.id}
+                      onClick={() => choose(o)}
+                    >
+                      <span className="eco">{o.eco}</span>
+                      <span>
+                        {o.name}
+                        <small>{Math.ceil(o.moves.length / 2)} moves</small>
+                      </span>
+                      {library.progress.learned.includes(o.id) && (
+                        <Check size={15} />
+                      )}
+                    </button>
+                  ))}
+                </section>
+              ))}
+              {candidates.length > limit && (
+                <Button
+                  className="secondary"
+                  onClick={() => setLimit(limit + 80)}
+                >
+                  Show more
+                </Button>
+              )}
+            </div>
+          </Card>
+        </Modal>
+      )}
       {saving && (
         <Modal title="Save repertoire line" onClose={() => setSaving(false)}>
           <Field label="Name">

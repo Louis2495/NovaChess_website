@@ -216,6 +216,7 @@ test("opening desk collapses the catalog, exposes deep plans and branches and fi
   page,
 }) => {
   await page.goto("/#learn/lessons");
+  await page.getByRole("button", { name: "Browse openings" }).click();
   await page.locator(".opening-row").first().click();
   await expect(page.locator(".opening-list")).toHaveCount(0);
   await page.getByRole("button", { name: "Plan", exact: true }).click();
@@ -232,7 +233,13 @@ test("opening desk collapses the catalog, exposes deep plans and branches and fi
   ).toBeVisible();
   await page.getByRole("button", { name: "Review", exact: true }).click();
   await expect(page.locator(".lesson-quiz>button")).toHaveCount(3);
-  await page.getByRole("button", { name: "Next", exact: true }).click();
+  const boardArea = page.locator(".lesson-workspace .lesson-board-area");
+  const topLeft = boardArea.locator(".board-square").first();
+  const next = boardArea.getByRole("button", { name: "Next", exact: true });
+  await expect(next).toBeInViewport({ ratio: 1 });
+  await expect(topLeft).toHaveAttribute("aria-label", /^a8,/);
+  await next.click();
+  await expect(topLeft).toHaveAttribute("aria-label", /^a8,/);
   await expect(page.locator(".lesson-next")).toContainText("1 /");
   if ((await page.evaluate(() => innerHeight)) >= 700)
     expect(

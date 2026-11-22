@@ -113,6 +113,7 @@ test("opening workbooks and trap defenses are interactive", async ({
   page,
 }) => {
   await page.goto("/#learn/lessons");
+  await page.getByRole("button", { name: "Browse openings" }).click();
   await page.locator(".opening-row").first().click();
   await page.getByRole("button", { name: "Decisions", exact: true }).click();
   await page

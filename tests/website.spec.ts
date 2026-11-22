@@ -263,14 +263,13 @@ test("curated opening lesson and searchable full opening library work", async ({
   page,
 }) => {
   await page.goto("/#learn/lessons");
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(page.locator(".lesson-next")).toContainText("Next: e5");
+  await page.getByRole("button", { name: "Browse openings" }).click();
   await expect(page.locator(".list-summary")).toHaveText(`${JSON.parse(fs.readFileSync("public/data/lessons.json", "utf8")).length} lessons`);
   const sicilian = page.getByRole("region", { name: "Sicilian Defense", exact: true });
   await expect(sicilian.getByRole("button", { name: /Sicilian Defense: Core plans/ })).toBeVisible();
   expect(await sicilian.getByRole("button").count()).toBeGreaterThan(1);
-  await page.getByRole("button", { name: "Next", exact: true }).click();
-  await expect(page.locator(".lesson-compact-controls")).toContainText(
-    "Next: e5",
-  );
   await page.getByLabel("Search openings", { exact: true }).fill("Najdorf");
   await expect(sicilian.locator(".opening-row").first()).toContainText("Najdorf");
   await page.locator(".opening-row").first().click();
