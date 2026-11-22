@@ -16,6 +16,14 @@ export default function Learn() {
   const section = detail.split(":")[0];
   const [openingTab,setOpeningTab]=useState("Lessons");
   const labels: Record<string,string>={repertoire:"Your repertoire",train:"Train an opening",lessons:"Opening lessons",traps:"Opening lessons",search:"Opening lessons",famous:"Famous Games",history:"History",endgames:"Endgame Lessons",encyclopedia:"Encyclopedia",trivia:"Trivia",facts:"Trivia",quizzes:"Famous Games"};
+  const showTraps = section === "traps" || openingTab === "Traps";
+  const openingTabs = <div className="segmented learn-section-tabs" role="group" aria-label="Opening lessons section">
+    {["Lessons", "Traps"].map(tab => <button key={tab} aria-pressed={showTraps === (tab === "Traps")}
+      className={showTraps === (tab === "Traps") ? "active" : ""} onClick={() => {
+        setOpeningTab(tab);
+        if (section === "traps" && tab === "Lessons") navigate("learn", "lessons");
+      }}>{tab}</button>)}
+  </div>;
   if (detail)
     return (
       <>
@@ -29,10 +37,11 @@ export default function Learn() {
           </Button>
           <PageTitle title={labels[section] || "Learn"}></PageTitle>
         </div>
-        {["lessons","traps","search"].includes(section) ? <>
-          <div className="segmented learn-section-tabs" role="group" aria-label="Opening lessons section">{["Lessons","Traps"].map(t=><button key={t} className={(section==="traps"?"Traps":openingTab)===t?"active":""} onClick={()=>{setOpeningTab(t);if(section==="traps")navigate("learn","lessons");}}>{t}</button>)}</div>
-          {(section==="traps" || openingTab==="Traps") ? <OpeningTraps/> : <Openings mode="lesson" query={section==="search"?detail.slice(7):""} selectedId={section==="lessons"?detail.slice(8):undefined}/>}
-        </> : section==="famous" || section==="quizzes" ? <FamousGames/> : section==="history" ? <Knowledge section="history"/> : section==="encyclopedia" ? <Encyclopedia/> : section==="trivia" || section==="facts" ? <Playground/> : section==="repertoire" ? <Repertoire/> : section==="endgames" ? <Endgames/> : <Openings mode={section==="train"?"train":"lesson"}/>}
+        {["lessons","traps","search"].includes(section) ? (
+          showTraps ? <OpeningTraps sectionTabs={openingTabs} /> :
+            <Openings mode="lesson" sectionTabs={openingTabs} query={section==="search"?detail.slice(7):""}
+              selectedId={section==="lessons"?detail.slice(8):undefined} />
+        ) : section==="famous" || section==="quizzes" ? <FamousGames/> : section==="history" ? <Knowledge section="history"/> : section==="encyclopedia" ? <Encyclopedia/> : section==="trivia" || section==="facts" ? <Playground/> : section==="repertoire" ? <Repertoire/> : section==="endgames" ? <Endgames/> : <Openings mode={section==="train"?"train":"lesson"}/>}
 
       </>
     );

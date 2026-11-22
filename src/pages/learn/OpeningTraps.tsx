@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Chess } from "chess.js";
 import {
   Search,
@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Board } from "../../components/Board";
 import { useData } from "../../lib/store";
+import { useLessonViewport } from "../../lib/useLessonViewport";
 import { useControl } from "../../lib/controls";
 import { Card, Button, Loading } from "../../components/UI";
 type Trap = {
@@ -23,12 +24,13 @@ type Trap = {
   defense: string;
   lesson: string;
 };
-export default function OpeningTraps() {
+export default function OpeningTraps({ sectionTabs }: { sectionTabs: ReactNode }) {
   const { data, error } = useData<Trap[]>("opening-traps");
-  if (!data) return <Loading error={error} />;
-  return <TrapArchive traps={data} />;
+  if (!data) return <>{sectionTabs}<Loading error={error} /></>;
+  return <TrapArchive traps={data} sectionTabs={sectionTabs} />;
 }
-function TrapArchive({ traps }: { traps: Trap[] }) {
+function TrapArchive({ traps, sectionTabs }: { traps: Trap[]; sectionTabs: ReactNode }) {
+  const layout = useLessonViewport();
   const [query, setQuery] = useState(""),
     [id, setId] = useState(traps[0].id),
     [branch, setBranch] = useState<"trap" | "refutation">("trap"),
@@ -78,38 +80,8 @@ function TrapArchive({ traps }: { traps: Trap[] }) {
     setFeedback("");
   }
   return (
-    <div className="trap-workspace">
-      <Card className="trap-catalog">
-        <div className="search-field">
-          <Search size={16} />
-          <input
-            aria-label="Search opening traps"
-            placeholder="Trap or opening"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
-        <div className="trap-list">
-          {filtered.map((t) => (
-            <button
-              key={t.id}
-              className={id === t.id ? "active" : ""}
-              onClick={() => select(t)}
-            >
-              <span>
-                <b>{t.name}</b>
-                <small>{t.opening}</small>
-              </span>
-              {solved.includes(t.id) ? (
-                <Check size={15} />
-              ) : (
-                null
-              )}
-            </button>
-          ))}
-        </div>
-      </Card>
-      <div className="trap-board">
+    <div className="viewport-lesson trap-workspace" ref={layout}>
+      <div className="lesson-board-area trap-board">
         <div className="card-heading">
           <div>
             <span className="eyebrow">{trap.opening}</span>
@@ -117,83 +89,119 @@ function TrapArchive({ traps }: { traps: Trap[] }) {
           </div>
           <ShieldCheck size={22} />
         </div>
-        <div className="segmented trap-branches">
-          {["trap", "refutation"].map((v) => (
-            <button
-              key={v}
-              className={branch === v ? "active" : ""}
-              onClick={() => {
-                setBranch(v as "trap" | "refutation");
-                setCursor(trap.setup.length);
-                setDrill(false);
-                setFeedback("");
-              }}
-            >
-              {v === "trap" ? "Trap line" : "Refutation"}
-            </button>
-          ))}
-        </div>
-        <Board
-          fen={fen}
-          disabled={!drill}
-          flipped={
-            new Chess(
-              (() => {
-                const b = new Chess();
-                for (const m of trap.setup) b.move(m);
-                return b.fen();
-              })(),
-            ).turn() === "b"
-          }
-          highlights={
-            cursor
-              ? [moves[cursor - 1].slice(0, 2), moves[cursor - 1].slice(2, 4)]
-              : []
-          }
-          onMove={(from, to, promotion) => {
-            const move = from + to + (promotion || "");
-            if (move !== trap.refutation[trap.setup.length]) {
-              setFeedback("That is not the defense in this lesson. Try again.");
-              return;
+        <div className="lesson-board-slot">
+          <Board
+            fen={fen}
+            disabled={!drill}
+            flipped={
+              new Chess(
+                (() => {
+                  const b = new Chess();
+                  for (const m of trap.setup) b.move(m);
+                  return b.fen();
+                })(),
+              ).turn() === "b"
             }
-            setSolved((v) => [...new Set([...v, trap.id])]);
-            setCursor(trap.setup.length + 1);
-            setDrill(false);
-            setFeedback("Correct. " + trap.defense);
-          }}
-        />
-        <div className="lesson-step-controls">
-          <Button className="secondary" onClick={() => seek(trap.setup.length)}>
-            <RotateCcw size={15} />
-            Position
-          </Button>
-          <Button
-            className="secondary"
-            disabled={!cursor}
-            onClick={() => seek(cursor - 1)}
-          >
-            <ChevronLeft size={15} />
-            Back
-          </Button>
-          <Button
-            disabled={drill || cursor === moves.length}
-            onClick={() => seek(cursor + 1)}
-          >
-            Next
-            <ChevronRight size={15} />
-          </Button>
-        </div>
-        <div className="move-chips trap-score">
-          {notation.map((m, i) => (
-            <span key={i}>
-              {i % 2 === 0 ? `${Math.floor(i / 2) + 1}. ` : ""}
-              {m}
-            </span>
-          ))}
+            highlights={
+              cursor
+                ? [moves[cursor - 1].slice(0, 2), moves[cursor - 1].slice(2, 4)]
+                : []
+            }
+            onMove={(from, to, promotion) => {
+              const move = from + to + (promotion || "");
+              if (move !== trap.refutation[trap.setup.length]) {
+                setFeedback("That is not the defense in this lesson. Try again.");
+                return;
+              }
+              setSolved((v) => [...new Set([...v, trap.id])]);
+              setCursor(trap.setup.length + 1);
+              setDrill(false);
+              setFeedback("Correct. " + trap.defense);
+            }}
+          />
         </div>
       </div>
-      <div className="trap-coach">
-        <Card>
+      <div className="lesson-sidebar opening-lesson-panels trap-panels">
+        {sectionTabs}
+        <Card className="trap-catalog">
+          <div className="search-field">
+            <Search size={16} />
+            <input
+              aria-label="Search opening traps"
+              placeholder="Trap or opening"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <div className="trap-list">
+            {filtered.map((t) => (
+              <button
+                key={t.id}
+                className={id === t.id ? "active" : ""}
+                onClick={() => select(t)}
+              >
+                <span>
+                  <b>{t.name}</b>
+                  <small>{t.opening}</small>
+                </span>
+                {solved.includes(t.id) ? (
+                  <Check size={15} />
+                ) : (
+                  null
+                )}
+              </button>
+            ))}
+          </div>
+        </Card>
+        <Card className="trap-playback">
+          <div className="segmented trap-branches" role="group" aria-label="Trap variation">
+            {["trap", "refutation"].map((v) => (
+              <button
+                key={v}
+                className={branch === v ? "active" : ""}
+              aria-pressed={branch === v}
+                onClick={() => {
+                  setBranch(v as "trap" | "refutation");
+                  setCursor(trap.setup.length);
+                  setDrill(false);
+                  setFeedback("");
+                }}
+              >
+                {v === "trap" ? "Trap line" : "Refutation"}
+              </button>
+            ))}
+          </div>
+          <div className="lesson-step-controls">
+            <Button className="secondary" onClick={() => seek(trap.setup.length)}>
+              <RotateCcw size={15} />
+              Position
+            </Button>
+            <Button
+              className="secondary"
+              disabled={!cursor}
+              onClick={() => seek(cursor - 1)}
+            >
+              <ChevronLeft size={15} />
+              Back
+            </Button>
+            <Button
+              disabled={drill || cursor === moves.length}
+              onClick={() => seek(cursor + 1)}
+            >
+              Next
+              <ChevronRight size={15} />
+            </Button>
+          </div>
+          <div className="move-chips trap-score">
+            {notation.map((m, i) => (
+              <span key={i}>
+                {i % 2 === 0 ? `${Math.floor(i / 2) + 1}. ` : ""}
+                {m}
+              </span>
+            ))}
+          </div>
+        </Card>
+        <Card className="trap-coach">
           <span className="pill">
             {drill
               ? "Find the defense"

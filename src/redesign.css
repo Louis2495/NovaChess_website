@@ -6522,21 +6522,64 @@ html { scrollbar-gutter:stable; }
   .endgame-lesson .lesson-controls .button-row { margin-top:6px; }
 }
 
-.viewport-lesson .lesson-board-heading {
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-  align-items:center;
-  gap:8px;
-}
-.viewport-lesson .lesson-board-heading > :is(.card-heading, select) { margin:0; }
-.viewport-lesson .lesson-board-heading .card-heading > div { min-width:0; }
-.viewport-lesson .lesson-board-heading > :is(select, .choice-select) { min-width:0; }
 @media(max-width:1000px) {
-  .learn-page-heading:has(+ .learn-section-tabs + .viewport-lesson) { position:absolute; margin:0; }
-  .learn-section-tabs:has(+ .viewport-lesson) { margin:0 0 10px 52px; }
   .workspace .viewport-lesson { grid-template-rows:minmax(0,1fr) clamp(128px, 22dvh, 220px); }
   .viewport-lesson .lesson-board-slot > .board-frame { max-width:min(100%, var(--board-max), max(0px, calc(100cqh - 24px))) !important; }
   .viewport-lesson .lesson-board-slot > .board-frame:not(.compact-frame) { padding-block:12px; }
   .viewport-lesson .board-frame > :is(.material-top, .material-imbalance) { height:12px; min-height:12px; font-size:.63rem; line-height:1; }
-  .viewport-lesson .lesson-board-heading h2 { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 }
+
+.viewport-lesson .opening-lesson-panels {
+  min-width:0;
+  overflow:auto;
+  gap:12px;
+  scrollbar-width:thin;
+}
+.opening-lesson-panels > .learn-section-tabs {
+  width:100%;
+  flex:none;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  margin:0;
+}
+.opening-lesson-panels > :is(.lesson-variation-panel, .lesson-compact-controls, .card) {
+  flex:none;
+  min-width:0;
+}
+.opening-lesson-panels .lesson-variation-panel,
+.opening-lesson-panels .lesson-compact-controls,
+.opening-lesson-panels .lesson-next {
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--accent-soft);
+}
+.opening-lesson-panels .lesson-variation-panel .field { margin:0; }
+.opening-lesson-panels .lesson-variation-panel select { text-overflow:ellipsis; }
+.viewport-lesson .opening-lesson-panels > .lesson-desk {
+  display:flex;
+  gap:12px;
+  overflow:visible;
+}
+.opening-lesson-panels .lesson-next { display:block; }
+.opening-lesson-panels .lesson-next h3 { margin:4px 0 8px; }
+.opening-lesson-panels .lesson-next > p { display:block; margin:0 0 10px; }
+.opening-lesson-panels .lesson-desk > .segmented {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.opening-lesson-panels .lesson-desk > .segmented > button { padding-inline:3px; }
+.viewport-lesson .opening-lesson-panels .lesson-info-scroll { min-height:0; max-height:none; overflow:visible; }
+.opening-lesson-panels .lesson-practice-tools {
+  display:grid;
+  gap:8px;
+  border-top:1px solid var(--border);
+  padding-top:10px;
+}
+.opening-lesson-panels .lesson-practice-tools .toggle-row { margin:0; }
+.opening-lesson-panels .opening-list .scroll-list { max-height:clamp(120px, 34dvh, 420px); }
+.viewport-lesson .trap-board > .card-heading { min-height:0; }
+.trap-panels .trap-list { display:block; max-height:clamp(105px, 22dvh, 235px); }
+.trap-panels .trap-list > button { min-width:0; }
+.trap-panels .trap-playback { background:var(--accent-soft); }
+.trap-panels .trap-score { max-height:112px; overflow:auto; padding-bottom:0; }

@@ -2,7 +2,7 @@ import { useLessonViewport } from "../../lib/useLessonViewport";
 import { groupByOpening, openingFamily } from "../../lib/openingFamilies";
 import { usePremoves } from "../../lib/usePremoves";
 import PremoveQueue from "../../components/PremoveQueue";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Chess } from "chess.js";
 import {
   Search,
@@ -63,10 +63,12 @@ export default function Openings({
   mode,
   query = "",
   selectedId,
+  sectionTabs,
 }: {
   mode: "train" | "lesson";
   query?: string;
   selectedId?: string;
+  sectionTabs?: ReactNode;
 }) {
   const { data: lessons, error } = useData<Opening[]>("lessons"),
     { data: all, error: allError } = useData<Opening[]>("openings"),
@@ -79,7 +81,7 @@ export default function Openings({
     !workbooks ||
     (selectedId && !lessons.some((l) => l.id === selectedId) && !all)
   )
-    return <Loading error={error || allError || workbookError} />;
+    return <>{sectionTabs}<Loading error={error || allError || workbookError} /></>;
   return (
     <LessonWorkspace
       lessons={lessons}
@@ -89,6 +91,7 @@ export default function Openings({
       mode={mode}
       query={query}
       selectedId={selectedId}
+      sectionTabs={sectionTabs}
     />
   );
 }
@@ -100,6 +103,7 @@ function LessonWorkspace({
   mode,
   query,
   selectedId,
+  sectionTabs,
 }: {
   lessons: Opening[];
   all: Opening[];
@@ -108,6 +112,7 @@ function LessonWorkspace({
   mode: "train" | "lesson";
   query: string;
   selectedId?: string;
+  sectionTabs?: ReactNode;
 }) {
   const { library, setLibrary, notify, appearance } = useApp();
   const layout = useLessonViewport();
@@ -357,9 +362,11 @@ function LessonWorkspace({
         ref={layout}
         className={`viewport-lesson lesson-workspace ${catalog ? "catalog-open" : "catalog-closed"}`}
       >
-        <div className="lesson-sidebar">
+        <div className="lesson-sidebar opening-lesson-panels">
+          {sectionTabs}
           <Button
             className="secondary catalog-toggle"
+            aria-expanded={catalog}
             onClick={() => setCatalog((v) => !v)}
           >
             {catalog ? (
@@ -367,8 +374,29 @@ function LessonWorkspace({
             ) : (
               <PanelLeftOpen size={18} />
             )}
-            Openings<span>{catalog ? "Hide" : "Browse"}</span>
+            {catalog ? "Hide openings" : "Browse openings"}
           </Button>
+          <div className="lesson-variation-panel">
+            <Field label="Lesson variation">
+              <ChoiceSelect
+                  value={branch}
+                  onChange={(e) => {
+                    setDecisionActive(false);
+                    setBranch(+e.target.value);
+                    setStep(0);
+                    setHint(false);
+                    setPerfect(true);
+                    setMessage("");
+                  }}
+                >
+                  {lines.map((l, i) => (
+                    <option key={i} value={i}>
+                      {l.name}
+                    </option>
+                  ))}
+              </ChoiceSelect>
+            </Field>
+          </div>
           {catalog && (
             <div className="lesson-compact-controls">
               {navigation}
@@ -453,9 +481,9 @@ function LessonWorkspace({
                     {message}
                   </p>
                 )}
+                {navigation}
               </div>
-              {navigation}
-              <div className="segmented">
+              <div className="segmented" role="group" aria-label="Lesson notes sections">
                 {["Study", "Plan", "Structure", "Decisions", "Review"].map(
                   (v) => (
                     <button
@@ -613,70 +641,52 @@ function LessonWorkspace({
                   </p>
                 )}
               </div>
-              <Toggle
-                label="Practice moves"
-                checked={practice}
-                onChange={(v) => {
-                  setPractice(v);
-                  show(0);
-                  setPerfect(true);
-                  setAutoplay(false);
-                }}
-              />
-              {practice && (
-                <Field label="Train as">
-                  <ChoiceSelect
-                    value={side}
-                    onChange={(e) => {
-                      setSide(e.target.value as "w" | "b");
-                      show(0);
-                      setPerfect(true);
-                    }}
-                  >
-                    <option value="w">White</option>
-                    <option value="b">Black</option>
-                  </ChoiceSelect>
-                </Field>
-              )}
-              <Button
-                className="text-button"
-                onClick={() => {
-                  setName(selected.name);
-                  setSaving(true);
-                }}
-              >
-                <Save size={15} />
-                Save to repertoire
-              </Button>
+              <div className="lesson-practice-tools">
+                <Toggle
+                  label="Practice moves"
+                  checked={practice}
+                  onChange={(v) => {
+                    setPractice(v);
+                    show(0);
+                    setPerfect(true);
+                    setAutoplay(false);
+                  }}
+                />
+                {practice && (
+                  <Field label="Train as">
+                    <ChoiceSelect
+                      value={side}
+                      onChange={(e) => {
+                        setSide(e.target.value as "w" | "b");
+                        show(0);
+                        setPerfect(true);
+                      }}
+                    >
+                      <option value="w">White</option>
+                      <option value="b">Black</option>
+                    </ChoiceSelect>
+                  </Field>
+                )}
+                <Button
+                  className="text-button"
+                  onClick={() => {
+                    setName(selected.name);
+                    setSaving(true);
+                  }}
+                >
+                  <Save size={15} />
+                  Save to repertoire
+                </Button>
+              </div>
             </Card>
           )}
         </div>
         <div className="lesson-board-area">
-          <div className="lesson-board-heading">
-            <div className="card-heading">
-              <div>
-                <span className="eyebrow">{selected.eco}</span>
-                <h2>{selected.name}</h2>
-              </div>
+          <div className="card-heading">
+            <div>
+              <span className="eyebrow">{selected.eco}</span>
+              <h2>{selected.name}</h2>
             </div>
-            <ChoiceSelect
-              aria-label="Lesson variation"
-              value={branch}
-              onChange={(e) => {
-                setDecisionActive(false);
-                setBranch(+e.target.value);
-                setStep(0);
-                setHint(false);
-                setPerfect(true);
-                setMessage("");
-              }}
-            >
-              {lines.map((l, i) => (
-                <option key={i} value={i}>
-                  {l.name}
-                </option>
-              ))}
-            </ChoiceSelect>
           </div>
           <PremoveQueue
             moves={premove.queue}

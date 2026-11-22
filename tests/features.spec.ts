@@ -504,12 +504,17 @@ test("flags can be selected as backgrounds and persist; harder achievements star
   );
 });
 
-test("opening and endgame lesson boards are large and fit the viewport", async ({ page }, testInfo) => {
+test("opening, trap, and endgame boards are large and fit the viewport", async ({ page }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
-  for (const route of ["lessons", "endgames"]) {
+  for (const route of ["lessons", "traps", "endgames"]) {
     await page.goto("/#learn/" + route);
     const board = page.locator(".viewport-lesson .board");
     await expect(board).toBeVisible();
+    if (route !== "endgames") {
+      const tabs = page.locator(".opening-lesson-panels").getByRole("group", { name: "Opening lessons section" });
+      await expect(tabs.getByRole("button", { name: route === "traps" ? "Traps" : "Lessons" }))
+        .toHaveAttribute("aria-pressed", "true");
+    }
     await expect.poll(async () => {
       const bounds = (await board.boundingBox())!;
       const workspace = (await page.locator("#workspace").boundingBox())!;
