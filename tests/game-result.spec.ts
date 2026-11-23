@@ -17,6 +17,13 @@ test('computer game result can be dismissed outside the message and opened for r
   const bounds = (await page.locator('.play-match .board').boundingBox())!;
   await page.mouse.click(bounds.x+8,bounds.y+8);
   await expect(message).toHaveCount(0);
+  const sidebar = page.locator('.match-sidebar');
+  const moves = await sidebar.locator('.card').filter({ has: page.getByRole('heading', { name: 'Moves', exact: true }) }).boundingBox();
+  const review = await sidebar.getByRole('button', { name: 'Review game', exact: true }).boundingBox();
+  const newGame = await sidebar.getByRole('button', { name: 'New game', exact: true }).boundingBox();
+  expect(review!.x).toBeCloseTo(moves!.x, 0);
+  expect(review!.y).toBeCloseTo(newGame!.y, 0);
+  expect(newGame!.x + newGame!.width).toBeCloseTo(moves!.x + moves!.width, 0);
   await page.reload();
   await message.getByRole('button', {name:'Game review',exact:true}).click();
   await expect(page).toHaveURL(/#library\/finished-local/);

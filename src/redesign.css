@@ -4041,8 +4041,7 @@ select.theme-select {
 }
 .play-match .match-sidebar { gap: 12px; }
 .match-sidebar > .card { padding: 14px; }
-.match-sidebar .game-actions,
-.match-sidebar > .button-row {
+.match-sidebar .game-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
@@ -4055,6 +4054,9 @@ select.theme-select {
   font-size: .7rem;
 }
 .match-sidebar .game-actions > .btn { flex: 1; }
+.match-sidebar > .finished-game-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }
+.finished-game-actions .btn { min-width:0; white-space:normal; }
+.finished-game-actions .btn svg { flex:none; }
 .match-sidebar h2 { font-size: .9rem; }
 .match-notation { max-height: calc(100dvh - 180px); overflow: auto; margin-top: 12px; }
 .match-notation .notation-row {

@@ -1061,7 +1061,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 </Button>
               </div>
             ) : (
-              <div className="button-row">
+              <div className="finished-game-actions">
                 <Button onClick={() => navigate("library", game.id)}>
                   Review game
                   <ArrowRight size={15} />
