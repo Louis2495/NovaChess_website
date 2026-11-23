@@ -70,7 +70,7 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
     ['Black', 'rgb(17, 19, 24)', 'rgb(255, 56, 91)'],
   ]) {
     const panel = stats.locator(`dl[aria-label="${side}"]`);
-    await expect(panel.locator('dt')).toHaveText(['Estimated rating', 'Centipawn loss']);
+    await expect(panel.locator('dt')).toHaveText(['Estimated rating', 'Average centipawn loss']);
     await expect(panel.locator('dd')).toHaveCount(2);
     await expect(panel).toHaveCSS('background-color', fill);
     for (const edge of ['top', 'right', 'bottom', 'left']) {

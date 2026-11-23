@@ -751,7 +751,7 @@ function GameViewer({ game }: { game: SavedGame }) {
                   data-outcome={outcome?.toLowerCase()}>
                   <dt>Estimated rating</dt>
                   <dd>{rating ?? "—"}</dd>
-                  <dt>Centipawn loss</dt>
+                  <dt>Average centipawn loss</dt>
                   <dd>{loss ?? "—"}</dd>
                 </dl>
               ))}

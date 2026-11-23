@@ -4212,7 +4212,7 @@ select.theme-select {
 .board-move-badge { position:absolute; top:2px; right:2px; z-index:5; pointer-events:none; }
 .move-quality {
   display:inline-flex; align-items:center; justify-content:center; flex:none;
-  box-sizing:border-box; width:24px; height:24px; border-radius:8px;
+  box-sizing:border-box; width:24px; height:24px; border-radius:50%;
   color:#fff; background:var(--quality);
   border:1px solid #fff8; box-shadow:0 2px 0 #0003;
   font-weight:900; font-size:15px; line-height:1;
@@ -4221,8 +4221,9 @@ select.theme-select {
 .quality-book { --quality:#6d28c9; }
 .quality-best { --quality:#087a3c; }
 .quality-excellent { --quality:#006b91; }
-.quality-inaccuracy { --quality:#875b00; }
-.quality-mistake { --quality:#af4600; }
+.quality-inaccuracy { --quality:#eab308; }
+.quality-mistake { --quality:#f97316; }
+.move-quality:is(.quality-inaccuracy,.quality-mistake) { text-shadow:0 1px 2px #000, 0 0 2px #000; }
 .quality-blunder { --quality:#bc1741; }
 .quality-good:empty { display:none; }
 .game-review-layout .board-navigation { width:var(--actual-board-width,calc(100% - 29px)); margin-left:29px; }
