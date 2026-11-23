@@ -27,6 +27,13 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  const badge = (await book.boundingBox())!;
  expect(moveText.x - (badge.x + badge.width)).toBeCloseTo(14, 0);
  await expect(page.locator('.evaluation-graph polyline')).toHaveAttribute('points',/\S+ \S+/);
+ const breakdown = page.getByLabel('Move breakdown', { exact: true });
+ await expect(breakdown.locator('dt > span:last-child')).toHaveText(['Book','Best','Great','Good','Inaccuracy','Mistake','Blunder']);
+ const badgeLabels = await page.locator('.review-notation .move-quality').evaluateAll(badges => badges.map(badge => badge.getAttribute('aria-label')));
+ for (const label of ['Book','Best','Great','Good','Inaccuracy','Mistake','Blunder']) {
+  await expect(breakdown.locator('div').filter({ has: page.getByText(label, { exact: true }) }).locator('dd'))
+    .toHaveText(String(badgeLabels.filter(name => name === label).length));
+ }
  await expect(page.locator('.review-performance .review-player-metric dd:first-of-type')).not.toHaveText(['—','—']);
  for (const panel of await page.locator('.review-performance dl').all()) {
   await expect(panel).toHaveCSS('border-top-color', 'rgb(137, 141, 151)');

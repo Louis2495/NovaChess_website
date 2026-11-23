@@ -2,7 +2,7 @@ import {SavedBoardPlayer} from "../components/BoardPlayer";
 import {screenName} from "../lib/screenName";
 import { cachedReview, cacheReview } from "../lib/reviewCache";
 import { classifyMove, performanceRating, restoreReviewHistory } from "../lib/gameReview";
-import { MoveBadge, EvaluationGraph } from "../components/ReviewVisuals";
+import { MoveBadge, EvaluationGraph, MoveBreakdown } from "../components/ReviewVisuals";
 import { isStudy, libraryKind } from "../lib/library";
 import { RepertoireTrainer } from "./learn/Repertoire";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -758,7 +758,7 @@ function GameViewer({ game }: { game: SavedGame }) {
             </div>
             {playerMetrics.some(({ rating }) => rating === null) && <p className="caption">Needs 8 non-book moves per side.</p>}
           </Card>}
-          {standard && <Card className="review-graph-card"><h2>Evaluation</h2><EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor}/></Card>}
+          {standard && <Card className="review-graph-card"><h2>Evaluation</h2><EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor}/><MoveBreakdown rows={rows}/></Card>}
           {status && <p role="status" className="review-status">{status}</p>}
           {isStudy(game) && !!game.branches?.length && (
             <Card>

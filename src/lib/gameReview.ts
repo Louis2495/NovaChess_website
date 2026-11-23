@@ -1,11 +1,11 @@
 import { Chess } from "chess.js";
 import type { ReviewRow, SavedGame } from "./types";
 export function classifyMove(best: boolean, loss: number, book: boolean) {
-  return book && loss < 30 ? "Book" : best ? "Best" : loss < 15 ? "Excellent" : loss < 40 ? "Good" : loss < 100 ? "Inaccuracy" : loss < 250 ? "Mistake" : "Blunder";
+  return book && loss < 30 ? "Book" : best ? "Best" : loss < 15 ? "Great" : loss < 40 ? "Good" : loss < 100 ? "Inaccuracy" : loss < 250 ? "Mistake" : "Blunder";
 }
 export function reviewQuality(label: string) {
   const key = label.toLowerCase();
-  return key === "book" ? "book" : key.includes("blunder") ? "blunder" : key.includes("mistake") ? "mistake" : key.includes("inaccuracy") ? "inaccuracy" : key.includes("best") || key.includes("top") ? "best" : key === "excellent" ? "excellent" : "good";
+  return key === "book" ? "book" : key.includes("blunder") ? "blunder" : key.includes("mistake") ? "mistake" : key.includes("inaccuracy") ? "inaccuracy" : key.includes("best") || key.includes("top") ? "best" : (key === "excellent" || key === "great") ? "great" : "good";
 }
 export function performanceRating(rows: ReviewRow[]) {
   const moves = rows.filter(r => r.label !== "Book");

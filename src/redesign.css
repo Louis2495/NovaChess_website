@@ -4220,15 +4220,19 @@ select.theme-select {
 .move-quality svg { width:66%; height:66%; stroke-width:2.5; }
 .quality-book { --quality:#6d28c9; }
 .quality-best { --quality:#087a3c; }
-.quality-excellent { --quality:#006b91; }
+.quality-great { --quality:#087fa7; }
 .quality-inaccuracy { --quality:#eab308; }
 .quality-mistake { --quality:#f97316; }
 .move-quality:is(.quality-inaccuracy,.quality-mistake) { text-shadow:0 1px 2px #000, 0 0 2px #000; }
 .quality-blunder { --quality:#bc1741; }
-.quality-good:empty { display:none; }
+.quality-good { --quality:#426280; }
 .game-review-layout .board-navigation { width:var(--actual-board-width,calc(100% - 29px)); margin-left:29px; }
 .game-review-layout .side-panels { gap:14px; }
 .review-graph-card h2 { font-size:.9rem; margin-bottom:12px; }
+.review-move-breakdown { display:grid; gap:5px; margin:12px 0 0; }
+.review-move-breakdown > div { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.review-move-breakdown dt { display:flex; align-items:center; gap:8px; font-size:.85rem; }
+.review-move-breakdown dd { margin:0; font-weight:700; font-variant-numeric:tabular-nums; }
 .review-status { margin:0; color:var(--muted); font-size:.75rem; }
 .evaluation-graph { position:relative; }
 .evaluation-graph svg { display:block; width:100%; }
