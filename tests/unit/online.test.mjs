@@ -180,6 +180,8 @@ before(async () => {
 
   await pg.exec(readFileSync("supabase/migrations/202611180020_reserved_usernames.sql", "utf8"));
 
+  await pg.exec(readFileSync("supabase/migrations/202611180021_global_chat_setting.sql", "utf8"));
+
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
     .replace('"./team-engine.ts"',JSON.stringify(pathToFileURL(resolve("supabase/functions/chess/team-engine.ts")).href))
@@ -1002,4 +1004,30 @@ test("standard chess can be left before the player's first move without a result
   const resigned=await command(users[0],game,"resign");
   assert.equal(resigned.status,200,JSON.stringify(resigned.data));
   assert.equal(resigned.data.state.result,"0-1");
+});
+
+test("only site administrators can disable global chat and disabled chat rejects new messages", async () => {
+  const actor = id => pg.query("select set_config('request.jwt.claim.sub', $1, false)", [id]);
+  const switchChat = value => pg.query("select public.set_global_chat_enabled($1)", [value]);
+  const enabled = async () => (await pg.query("select public.global_chat_enabled()")).rows[0].global_chat_enabled;
+  const message = "Global chat feature-setting test";
+  try {
+    await actor(users[1]);
+    await assert.rejects(switchChat(false), /Administrator access required/);
+    await actor(users[0]);
+    await switchChat(false);
+    assert.equal(await enabled(), false);
+    await actor(users[1]);
+    await assert.rejects(pg.query("select public.post_message($1)", [message]), /Global chat is turned off/);
+    await actor(users[0]);
+    await switchChat(true);
+    assert.equal(await enabled(), true);
+    await actor(users[1]);
+    await pg.query("select public.post_message($1)", [message]);
+  } finally {
+    await actor(users[0]);
+    await switchChat(true);
+    await actor("");
+    await pg.query("delete from public.messages where body = $1", [message]);
+  }
 });

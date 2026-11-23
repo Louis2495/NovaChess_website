@@ -1,3 +1,4 @@
+import { useGlobalChatSetting } from "../lib/globalChatSetting";
 import {screenName} from "../lib/screenName";
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
@@ -21,6 +22,10 @@ function fitChat(box: ChatBox): ChatBox {
   return { width, height, left: Math.max(12, Math.min(box.left, innerWidth-width-12)), top: Math.max(12,Math.min(box.top,innerHeight-height-bottom)) };
 }
 export default function GlobalChat() {
+  return useGlobalChatSetting() ? <ChatDock /> : null;
+}
+
+function ChatDock() {
   const [box, setBox] = useState<ChatBox>(() => fitChat({left:innerWidth>1000?220:12,top:40,width:440,height:760}));
   const moving = useRef<(ChatBox & { kind:string; x:number; y:number }) | null>(null);
   const panel = useRef<HTMLElement>(null);

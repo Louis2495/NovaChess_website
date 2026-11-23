@@ -13,7 +13,6 @@ import {
   RotateCcw,
   Flag,
   Handshake,
-  ChevronDown,
   ChevronRight,
   ArrowRight,
   Trash2,
@@ -772,7 +771,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                 onClick={() => setOptions(!options)}
               >
                 Game options
-                {variantsOnly ? <ChevronRight size={19} aria-hidden="true" /> : <ChevronDown size={17} aria-hidden="true" />}
+                {variantsOnly && <ChevronRight size={19} aria-hidden="true" />}
               </button>
               {!variantsOnly && gameOptions}
             </Card>

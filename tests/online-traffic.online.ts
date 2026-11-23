@@ -694,3 +694,27 @@ test("a finished online game reaches Library without opening review", async ({ p
   await page.goto("/#library");
   await expect(page.getByRole("heading", { name: "Live room", exact: true })).toBeVisible();
 });
+
+test("Admin Controls hides and restores the global chat tab", async ({ page }) => {
+  let enabled = true;
+  await connected(page);
+  await page.route("**/rpc/is_site_admin", route => route.fulfill({ json: true }));
+  await page.route("**/rpc/global_chat_enabled", route => route.fulfill({ json: enabled }));
+  await page.route("**/rpc/set_global_chat_enabled", route => {
+    enabled = route.request().postDataJSON().p_enabled;
+    return route.fulfill({ json: enabled });
+  });
+  await page.goto("/#profile/admin");
+  const toggle = page.getByRole("checkbox", { name: "Global chat", exact: true });
+  const tab = page.getByRole("button", { name: "Open global chat" });
+  await expect(toggle).toBeChecked();
+  await expect(tab).toBeVisible();
+  await toggle.click();
+  await expect(tab).toHaveCount(0);
+  await page.reload();
+  await expect(toggle).toBeEnabled();
+  await expect(toggle).not.toBeChecked();
+  await expect(tab).toHaveCount(0);
+  await toggle.click();
+  await expect(tab).toBeVisible();
+});

@@ -1,7 +1,8 @@
+import { setGlobalChatEnabled, useGlobalChatSetting } from "../lib/globalChatSetting";
 import {screenName,isGeneratedUsername} from "../lib/screenName";
 import {useEffect,useState} from 'react';
 import {online,useSiteAdmin,requestPasswordReset} from '../lib/online';
-import {Button,Card,Field} from './UI';
+import {Button,Card,Field,Toggle} from './UI';
 type Account={id:string;username:string|null;screen_name?:string|null;email:string|null;created_at:string|null;last_sign_in_at:string|null;email_confirmed_at:string|null;provider:string};
 const date=(value:string|null)=>value?new Date(value).toLocaleDateString(): '—';
 export default function AdminAccounts(){
@@ -18,6 +19,27 @@ function GrantAdmin(){
  <h3>Add an administrator</h3><label className="field"><input aria-label="Administrator email" type="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} autoComplete="off"/></label><Button disabled={busy}>{busy?'Granting…':'Grant admin access'}</Button>
  {message && <p role="status">{message}</p>}{error && <p role="alert" className="auth-error">{error}</p>}
  </form>;
+}
+function GlobalChatControl() {
+  const enabled = useGlobalChatSetting();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  return <section className="admin-grant" aria-label="Global chat settings">
+    <fieldset disabled={saving || enabled === null}>
+      <Toggle label="Global chat" checked={enabled ?? false} onChange={async value => {
+        setSaving(true);
+        setError("");
+        try {
+          await setGlobalChatEnabled(value);
+        } catch (error) {
+          setError((error as Error).message);
+        } finally {
+          setSaving(false);
+        }
+      }} />
+    </fieldset>
+    {error && <p role="alert" className="auth-error">{error}</p>}
+  </section>;
 }
 function ReservedUsernames() {
   const [names, setNames] = useState<string[]>([]);
@@ -95,7 +117,7 @@ function AccountList(){
  },[accountIds]);
  return <Card className="admin-accounts"><div className="card-heading"><h2>Accounts</h2><span className="pill">{total}</span></div>
   <p className="admin-presence-counts" aria-label="Account activity totals"><span>{counts?.online ?? "—"} online</span><span>{counts?.offline ?? "—"} offline</span></p>
-  <GrantAdmin/><ReservedUsernames/><form className="admin-account-search" onSubmit={e=>{e.preventDefault();setPage(0);setQuery(search.trim());}}><Field label="Search accounts"><input type="search" value={search} maxLength={100} onChange={e=>setSearch(e.target.value)} placeholder="Screen name, username or email"/></Field><Button>Search</Button></form>
+  <GlobalChatControl/><GrantAdmin/><ReservedUsernames/><form className="admin-account-search" onSubmit={e=>{e.preventDefault();setPage(0);setQuery(search.trim());}}><Field label="Search accounts"><input type="search" value={search} maxLength={100} onChange={e=>setSearch(e.target.value)} placeholder="Screen name, username or email"/></Field><Button>Search</Button></form>
   {error && <p role="alert" className="auth-error">{error}</p>}{message && <p role="status">{message}</p>}
   {loading?<p role="status">Loading accounts…</p>:<div className="admin-account-table"><table><thead><tr><th>Screen name</th><th>Username</th><th>Email</th><th>Joined</th><th>Last sign-in</th><th>Provider</th><th>Password</th></tr></thead><tbody>{users.map(user=><tr key={user.id}><td><span className="admin-account-name"><span className={`account-status-dot ${onlineIds===null?'unknown':onlineIds.has(user.id)?'online':'offline'}`} role="img" aria-label={onlineIds===null?'Status unavailable':onlineIds.has(user.id)?'Online':'Offline'} title={onlineIds===null?'Status unavailable':onlineIds.has(user.id)?'Online':'Offline'}/><span>{screenName(user)}</span></span></td><td>{isGeneratedUsername(user.username)?'—':user.username||'—'}</td><td>{user.email||'—'}{user.email && !user.email_confirmed_at && <small>Not confirmed</small>}</td><td>{date(user.created_at)}</td><td>{date(user.last_sign_in_at)}</td><td>{user.provider}</td><td><div className="admin-password-actions"><Button className="secondary" disabled={!user.email || !!resetting} aria-label={`Send password reset to ${screenName(user,user.email||"Player")}`} onClick={async()=>{
    setResetting(user.id);setError('');setMessage('');try{await requestPasswordReset(user.email!);setMessage('Reset link requested. The user sets their own password.');}catch(e){setError((e as Error).message);}finally{setResetting('');}
