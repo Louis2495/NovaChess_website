@@ -40,6 +40,15 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  }
  const batch=await page.evaluate(()=>(window as any).__engineWorkers.filter((w:any)=>w.commands.filter((s:string)=>s.startsWith('go ')&&!s.includes('infinite')).length>1));expect(batch).toHaveLength(1);
  await page.locator('.review-notation td button').first().click();await expect(page.locator('.board-move-badge .move-quality')).toHaveAttribute('aria-label','Book');await expect(page.locator('.board-move-badge .quality-book svg')).toBeVisible();
+ await expect(page.locator('.review-graph-card').getByLabel('Move breakdown')).toHaveCount(0);
+ const highlights = page.locator('.review-highlight-card');
+ await expect(highlights.getByRole('heading')).toHaveText(['Best / Coolest move','Worst move']);
+ for (const move of await highlights.getByRole('button').all()) {
+  const san = (await move.locator('span').last().innerText()).split(' ').at(-1);
+  await move.click();
+  await expect(page.locator('.review-notation .current > span:last-child')).toHaveText(san!);
+ }
+ await expect(highlights.getByRole('button')).toHaveCount(2);
  const board=(await page.locator('.game-review-layout .board').boundingBox())!,bar=(await page.locator('.review-board-eval .eval-meter').boundingBox())!;expect(bar.x+bar.width).toBeLessThan(board.x);expect(Math.abs(bar.height-board.height)).toBeLessThan(1);
  await page.getByRole('button',{name:'Share',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Share game',exact:true});await expect(dialog.getByRole('button',{name:'Download PGN',exact:true})).toBeVisible();await expect(dialog.getByRole('button',{name:'Game GIF',exact:true})).toBeVisible();
  const download=page.waitForEvent('download');await dialog.getByRole('button',{name:'Download PGN',exact:true}).click();expect((await download).suggestedFilename()).toMatch(/\.pgn$/);

@@ -1,7 +1,7 @@
 import {SavedBoardPlayer} from "../components/BoardPlayer";
 import {screenName} from "../lib/screenName";
 import { cachedReview, cacheReview } from "../lib/reviewCache";
-import { classifyMove, performanceRating, restoreReviewHistory } from "../lib/gameReview";
+import { classifyMove, performanceRating, restoreReviewHistory, reviewHighlights } from "../lib/gameReview";
 import { MoveBadge, EvaluationGraph, MoveBreakdown } from "../components/ReviewVisuals";
 import { isStudy, libraryKind } from "../lib/library";
 import { RepertoireTrainer } from "./learn/Repertoire";
@@ -582,6 +582,7 @@ function GameViewer({ game }: { game: SavedGame }) {
         )
       : null;
   };
+  const highlights = standard ? reviewHighlights(rows, game) : null;
   const selected = rows.find((r) => r.ply === Math.max(0, cursor - 1));
   const sideRows = (side: string) => rows.filter(r => game.positions[r.ply]?.split(" ")[1] === side);
   const winner = game.result === "1-0" ? "w" : game.result === "0-1" ? "b" : null;
@@ -758,7 +759,34 @@ function GameViewer({ game }: { game: SavedGame }) {
             </div>
             {playerMetrics.some(({ rating }) => rating === null) && <p className="caption">Needs 8 non-book moves per side.</p>}
           </Card>}
-          {standard && <Card className="review-graph-card"><h2>Evaluation</h2><EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor}/><MoveBreakdown rows={rows}/></Card>}
+          {highlights && <>
+            <Card className="review-graph-card">
+              <h2>Evaluation</h2>
+              <EvaluationGraph rows={rows} total={game.moves.length} cursor={cursor} onSelect={setCursor} />
+            </Card>
+            <div className="review-summary">
+              <Card className="review-count-card">
+                <h2>Move counts</h2>
+                <MoveBreakdown rows={rows} />
+              </Card>
+              <Card className="review-highlight-card">
+                {([
+                  ["Best / Coolest move", highlights.best, "No reviewed moves"],
+                  ["Worst move", highlights.worst, "No move lost evaluation"],
+                ] as const).map(([title, row, empty]) => (
+                  <div className="review-highlight" key={title}>
+                    <h2>{title}</h2>
+                    {row ? (
+                      <Button className="review-highlight-move" onClick={() => setCursor(row.ply + 1)}>
+                        <MoveBadge label={row.label} />
+                        <span>{game.positions[row.ply]?.split(" ")[5]}{game.positions[row.ply]?.split(" ")[1] === "b" ? "…" : "."} {row.move}</span>
+                      </Button>
+                    ) : <p className="caption">{rows.length ? empty : "Awaiting review"}</p>}
+                  </div>
+                ))}
+              </Card>
+            </div>
+          </>}
           {status && <p role="status" className="review-status">{status}</p>}
           {isStudy(game) && !!game.branches?.length && (
             <Card>

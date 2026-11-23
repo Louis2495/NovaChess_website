@@ -7,6 +7,37 @@ export function reviewQuality(label: string) {
   const key = label.toLowerCase();
   return key === "book" ? "book" : key.includes("blunder") ? "blunder" : key.includes("mistake") ? "mistake" : key.includes("inaccuracy") ? "inaccuracy" : key.includes("best") || key.includes("top") ? "best" : (key === "excellent" || key === "great") ? "great" : "good";
 }
+const highlightPriority = {
+  best: 6,
+  great: 5,
+  good: 4,
+  book: 3,
+  inaccuracy: 2,
+  mistake: 1,
+  blunder: 0,
+};
+
+export function reviewHighlights(rows: ReviewRow[], game: SavedGame) {
+  let best: ReviewRow | undefined;
+  let worst: ReviewRow | undefined;
+  let bestRank = -Infinity;
+  for (const row of rows) {
+    const side = game.positions[row.ply]?.split(" ")[1];
+    if (!side || (game.origin === "novachess" && side !== game.human)) continue;
+    if (row.loss > (worst?.loss ?? 0)) worst = row;
+
+    const quality = reviewQuality(row.label);
+    const gain = ((row.afterScore ?? row.score) - row.score) * (side === "w" ? 1 : -1);
+    const tacticalBonus = row.move.endsWith("#") ? 40 : /[x+=]/.test(row.move) ? 20 : 0;
+    const rank = highlightPriority[quality] * 1000 + Math.max(-400, Math.min(400, gain)) + tacticalBonus;
+    if (rank > bestRank) {
+      best = row;
+      bestRank = rank;
+    }
+  }
+  return { best, worst };
+}
+
 export function performanceRating(rows: ReviewRow[]) {
   const moves = rows.filter(r => r.label !== "Book");
   // Short opening fragments cannot support a useful performance estimate.
