@@ -771,7 +771,7 @@ function GameViewer({ game }: { game: SavedGame }) {
               </Card>
               <Card className="review-highlight-card">
                 {([
-                  ["Best / Coolest move", highlights.best, "No reviewed moves"],
+                  ["Best move", highlights.best, "No reviewed moves"],
                   ["Worst move", highlights.worst, "No move lost evaluation"],
                 ] as const).map(([title, row, empty]) => (
                   <div className="review-highlight" key={title}>

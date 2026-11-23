@@ -42,7 +42,7 @@ test('review reuses its engine, shows evaluations, quality icons, ratings and Sh
  await page.locator('.review-notation td button').first().click();await expect(page.locator('.board-move-badge .move-quality')).toHaveAttribute('aria-label','Book');await expect(page.locator('.board-move-badge .quality-book svg')).toBeVisible();
  await expect(page.locator('.review-graph-card').getByLabel('Move breakdown')).toHaveCount(0);
  const highlights = page.locator('.review-highlight-card');
- await expect(highlights.getByRole('heading')).toHaveText(['Best / Coolest move','Worst move']);
+ await expect(highlights.getByRole('heading')).toHaveText(['Best move','Worst move']);
  for (const move of await highlights.getByRole('button').all()) {
   const san = (await move.locator('span').last().innerText()).split(' ').at(-1);
   await move.click();
