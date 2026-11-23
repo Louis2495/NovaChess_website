@@ -677,3 +677,20 @@ test("Admin Controls can reserve and release a username", async ({ page }) => {
   await reservations.getByRole("button", { name: "Release Nova Support" }).click();
   await expect(reservations.getByText("Nova Support", { exact: true })).toHaveCount(0);
 });
+
+test("a finished online game reaches Library without opening review", async ({ page }) => {
+  const { room, c } = await connected(page);
+  const start = c.fen();
+  const moves = ["e2e4", "e7e5", "g1f3"];
+  const notation = moves.map(move => c.move(move).san);
+  Object.assign(room, { status: "finished", state: {
+    ...room.state, moves, notation, positions: [start, c.fen()], fen: c.fen(), result: "1-0",
+  } });
+  await page.goto("/#play/online/" + room.id);
+  await expect.poll(() => page.evaluate(() => {
+    const library = JSON.parse(localStorage.getItem("novachess-library-v2") ?? "{}");
+    return library.games?.find((game: { title: string }) => game.title === "Live room")?.positions.length;
+  })).toBe(4);
+  await page.goto("/#library");
+  await expect(page.getByRole("heading", { name: "Live room", exact: true })).toBeVisible();
+});

@@ -1,3 +1,4 @@
+import { useGameLibrary } from "./lib/gameLibrary";
 import {online} from "./lib/online";
 import {screenName} from "./lib/screenName";
 import {useOnlineSession,useRecoveryState,oauthSignupIntent,oauthProfilePending} from "./lib/online";
@@ -39,7 +40,6 @@ import "@fontsource/manrope/latin-700.css";
 import { AppContext } from "./lib/context";
 import {
   defaults,
-  emptyLibrary,
   usePersistent,
   annotationColors,
   base,
@@ -48,7 +48,7 @@ import {
   pieceUrl,
   boardSizeKey,
 } from "./lib/store";
-import type { Appearance as AppearanceType, Library, Tab } from "./lib/types";
+import type { Appearance as AppearanceType, Tab } from "./lib/types";
 import { IconButton, Modal, Loading, External } from "./components/UI";
 import WorkspaceShortcuts from "./components/WorkspaceShortcuts";
 import Appearance from "./components/Appearance";
@@ -116,10 +116,7 @@ function App() {
       "novachess-appearance-v2",
       defaults,
     ),
-    [library, setLibrary] = usePersistent<Library>(
-      "novachess-library-v2",
-      emptyLibrary,
-    ),
+    [library, setLibrary] = useGameLibrary(),
     [locationState, setLocation] = useState(route),
     [showAppearance, setShowAppearance] = useState(false),
     [researchVisited, setResearchVisited] = useState(

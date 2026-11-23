@@ -861,3 +861,61 @@ test("Stats has dedicated navigation and derives charts from completed local gam
   expect(totals).toBe(3);
   expect((await stored(page)).games).toHaveLength(4);
 });
+
+test("Library migrates old games and persists new games past the localStorage quota", async ({ page }) => {
+  await page.addInitScript(() => {
+    const key = "novachess-library-v2";
+    const write = Storage.prototype.setItem;
+    if (!sessionStorage.getItem("seeded-library")) {
+      const initial = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+      write.call(localStorage, key, JSON.stringify({ games: [{
+        id: "legacy-game", title: "Legacy game", initial, positions: [initial], moves: [],
+        notation: [], result: "1-0", variant: "chess", human: "w", folder: "Games", created: Date.now(),
+      }] }));
+      write.call(sessionStorage, "seeded-library", "true");
+    }
+    Storage.prototype.setItem = function (name, value) {
+      if (this === localStorage && name === key && (JSON.parse(value).games.length || JSON.parse(value).activeGame)) {
+        throw new DOMException("Storage quota reached", "QuotaExceededError");
+      }
+      write.call(this, name, value);
+    };
+  });
+  await page.goto("/#library");
+  await expect(page.getByRole("heading", { name: "Legacy game", exact: true })).toBeVisible();
+  await expect.poll(async () => (await stored(page)).games.length).toBe(0);
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Legacy game", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Delete Legacy game" }).click();
+  await expect(page.getByRole("heading", { name: "Legacy game", exact: true })).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => new Promise<number>(resolve => {
+    const request = indexedDB.open("novachess-game-library", 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const read = db.transaction("archive").objectStore("archive").get("games");
+      read.onsuccess = () => { resolve(read.result?.games.length ?? -1); db.close(); };
+    };
+  }))).toBe(0);
+  await page.reload();
+  await expect(page.getByText("No games here", { exact: true })).toBeVisible();
+  await page.goto("/#analysis");
+  await uiMove(page, "e2e4");
+  await page.getByRole("button", { name: "Save study", exact: true }).click();
+  await page.getByLabel("Study name").fill("New durable study");
+  await page.getByRole("dialog", { name: "Save study" }).getByRole("button", { name: "Save", exact: true }).click();
+  await page.goto("/#library");
+  await expect(page.getByRole("heading", { name: "New durable study", exact: true })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => new Promise<boolean>(resolve => {
+    const request = indexedDB.open("novachess-game-library", 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const read = db.transaction("archive").objectStore("archive").get("games");
+      read.onsuccess = () => {
+        resolve(read.result?.games.some((game: { title: string }) => game.title === "New durable study"));
+        db.close();
+      };
+    };
+  }))).toBe(true);
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "New durable study", exact: true })).toBeVisible();
+});

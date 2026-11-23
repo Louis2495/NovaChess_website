@@ -306,10 +306,10 @@ export default function Community({presetMode = "standard", presetVariant = "che
     const key=room.id+':'+room.revision;if((timeoutRequested.current.key===key && Date.now()-timeoutRequested.current.at<2000) || pending.current)return;timeoutRequested.current={key,at:Date.now()};
     void act('claim_timeout');
   },[clock,room?.revision,gameClock?.startedAt]);
-  function reviewGame(previous = false) {
+  function recordedGame(previous = false) {
     if (!room) return;
     const state = previous && last ? last.position || roundHistory.current.get(last.id) : position;
-    if (!state) { notify("This older round has no recorded moves available for review."); return; }
+    if (!state) return;
     const human = previous && last ? (last.white === uid ? "w" : "b") : me?.team || "w";
     const id = `online-${room.id}-${previous && last ? last.id : state.gameKey || "game"}`;
     const game: SavedGame = {
@@ -324,9 +324,32 @@ export default function Community({presetMode = "standard", presetVariant = "che
       opponent:room.settings.bot ? "Computer" : room.members.filter(m => m.team && m.team !== human).map(m => username(m.id)).join(", "),
       ...(specialVariants.includes(room.variant) && "blocked" in state ? {special:state} : {}),
     };
-    setLibrary(l => ({...l, games:[restoreReviewHistory(game),...l.games.filter(g => g.id !== id)]}));
-    navigate("library", id);
+    return restoreReviewHistory(game);
   }
+  function saveRecordedGame(game: SavedGame) {
+    setLibrary(current => current.games.some(saved => saved.id === game.id)
+      ? current : { ...current, games: [game, ...current.games] });
+  }
+  function reviewGame(previous = false) {
+    const game = recordedGame(previous);
+    if (!game) {
+      notify("This round has no recorded moves available for review.");
+      return;
+    }
+    saveRecordedGame(game);
+    navigate("library", game.id);
+  }
+  useEffect(() => {
+    if (!uid || room !== confirmed || !confirmed) return;
+    if (position?.result !== "*" && position?.moves.length && me?.team) {
+      const game = recordedGame();
+      if (game) saveRecordedGame(game);
+    }
+    if (last && (uid === last.white || uid === last.black)) {
+      const game = recordedGame(true);
+      if (game?.moves.length) saveRecordedGame(game);
+    }
+  }, [confirmed, room?.state.result, uid]);
   function playerStrip(side: "w" | "b", placement: "top" | "bottom") {
     if (!room) return null;
     const members = room.members.filter(m => m.team === side &&
