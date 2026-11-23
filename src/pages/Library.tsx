@@ -771,13 +771,13 @@ function GameViewer({ game }: { game: SavedGame }) {
               </Card>
               <Card className="review-highlight-card">
                 {([
-                  ["Best move", highlights.best, "No reviewed moves"],
-                  ["Worst move", highlights.worst, "No move lost evaluation"],
-                ] as const).map(([title, row, empty]) => (
-                  <div className="review-highlight" key={title}>
+                  ["best", "Best move", highlights.best, "No reviewed moves"],
+                  ["worst", "Worst move", highlights.worst, "No move lost evaluation"],
+                ] as const).map(([kind, title, row, empty]) => (
+                  <div className="review-highlight" data-highlight={kind} key={kind}>
                     <h2>{title}</h2>
                     {row ? (
-                      <Button className="review-highlight-move" onClick={() => setCursor(row.ply + 1)}>
+                      <Button className="review-highlight-move" aria-current={cursor === row.ply + 1 ? "step" : undefined} onClick={() => setCursor(row.ply + 1)}>
                         <MoveBadge label={row.label} />
                         <span>{game.positions[row.ply]?.split(" ")[5]}{game.positions[row.ply]?.split(" ")[1] === "b" ? "…" : "."} {row.move}</span>
                       </Button>

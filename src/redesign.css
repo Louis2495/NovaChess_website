@@ -4234,10 +4234,29 @@ select.theme-select {
 .review-summary h2 { font-size:.9rem; margin:0 0 8px; }
 .review-move-breakdown { display:grid; gap:5px; margin:0; }
 .review-move-breakdown .move-quality { width:18px; height:18px; font-size:11px; }
-.review-highlight + .review-highlight { margin-top:14px; }
-.review-highlight .caption { margin:0; }
-.review-highlight-move { display:flex; align-items:center; gap:6px; max-width:100%; padding:5px 6px; text-align:left; }
-.review-highlight-move > span:last-child { overflow-wrap:anywhere; }
+.review-highlight-card { display:grid; grid-template-rows:repeat(2,minmax(min-content,1fr)); gap:8px; }
+.review-highlight {
+  --highlight-color:#19af79;
+  display:flex; flex-direction:column; align-items:stretch; min-width:0;
+  border:1px solid color-mix(in srgb,var(--highlight-color) 32%,transparent);
+  border-radius:10px; overflow:hidden;
+  background:color-mix(in srgb,var(--highlight-color) 11%,transparent);
+}
+.review-highlight[data-highlight="worst"] { --highlight-color:#ee6b52; }
+.review-highlight h2 { margin:0; padding:7px 8px 0; }
+.review-highlight .caption { display:grid; flex:1; align-content:center; margin:0; padding:6px 8px 8px; }
+.review-highlight .review-highlight-move {
+  display:flex; flex:1; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; align-content:center; gap:6px;
+  width:100%; min-height:44px; padding:6px 8px 8px;
+  background:transparent; border:0; border-radius:0;
+  color:var(--text); font-size:1rem; font-weight:800; text-align:left; white-space:normal;
+}
+.review-highlight .review-highlight-move:is(:hover,[aria-current]) {
+  background:color-mix(in srgb,var(--highlight-color) 18%,transparent);
+}
+.review-highlight .review-highlight-move:focus-visible { outline-offset:-3px; }
+.review-highlight-move > span:last-child { min-width:0; overflow-wrap:anywhere; }
 .review-move-breakdown > div { display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .review-move-breakdown dt { display:flex; align-items:center; gap:4px; min-width:0; font-size:.75rem; overflow-wrap:anywhere; }
 .review-move-breakdown dd { margin:0; font-weight:700; font-variant-numeric:tabular-nums; }
