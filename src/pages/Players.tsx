@@ -1,10 +1,10 @@
 import {useState} from 'react';
-import {UserPlus,Check,X,UserMinus,Play} from 'lucide-react';
+import {UserPlus,Check,X,UserMinus,Play,Users} from 'lucide-react';
 import {useApp} from '../lib/context';
 import {online,onlineAction,useOnlineSession} from '../lib/online';
 import {usePlayers,type Player} from '../lib/players';
 import {screenName} from '../lib/screenName';
-import {Card,Button} from '../components/UI';
+import {Card,Button,Empty} from '../components/UI';
 export default function Players(){
  const {session}=useOnlineSession(),{navigate,notify}=useApp();
  const [section,setSection]=useState('friends'),[query,setQuery]=useState(''),[page,setPage]=useState(0),[busy,setBusy]=useState(''),[error,setError]=useState('');
@@ -44,7 +44,14 @@ export default function Players(){
   </article>;
  }
  return <div className="players-page">
- {!online||!session?<Card><p>Sign in to find players and see your friends list.</p><Button className="sign-in-action" onClick={()=>navigate('signin')}>Sign in</Button></Card>:<>
+ {!online||!session?(
+  <Card className="players-sign-in">
+    <Empty icon={<Users size={35} aria-hidden="true" />} title="Players"
+      description="Sign in to find players and see your friends list.">
+      <Button className="sign-in-action" onClick={()=>navigate('signin')}>Sign in</Button>
+    </Empty>
+  </Card>
+ ):<>
  <div className="players-search-controls"><div className="segmented page-segments" role="group" aria-label="Player sections">{[['friends','Friends'],['everyone','Everyone']].map(([id,label])=><button key={id} className={section===id?'active':''} aria-pressed={section===id} onClick={()=>{setSection(id);setPage(0);}}>{label}</button>)}</div>
  <input className="players-search-input" aria-label="Search players" type="search" value={query} maxLength={100} placeholder="Search by name" onChange={e=>{setQuery(e.target.value);setPage(0);}}/></div>
  <div className="players-results">
