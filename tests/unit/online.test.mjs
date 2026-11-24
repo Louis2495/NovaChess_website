@@ -181,6 +181,7 @@ before(async () => {
   await pg.exec(readFileSync("supabase/migrations/202611180020_reserved_usernames.sql", "utf8"));
 
   await pg.exec(readFileSync("supabase/migrations/202611180021_global_chat_setting.sql", "utf8"));
+  await pg.exec(readFileSync("supabase/migrations/202611180022_site_analytics.sql", "utf8"));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -591,7 +592,7 @@ test("Throne counts completed incumbent games once, including loss and draw",asy
 });
 
 test("online deployment schedules voting and bounded chat/vote retention",async()=>{
- const jobs=await pg.query('select * from cron.test_jobs order by name');assert.equal(jobs.rows.length,6);const votes=jobs.rows.find(j=>j.name==='novachess-votes');assert.equal(votes.schedule,'* * * * *');assert.match(votes.command,/close_due_votes/);assert.match(jobs.rows.find(j=>j.name==='novachess-chat-retention').command,/30 days/);
+ const jobs=await pg.query('select * from cron.test_jobs order by name');assert.equal(jobs.rows.length,7);assert.match(jobs.rows.find(j=>j.name==='matein4-site-analytics-retention').command,/site_page_daily.*- 89/);const votes=jobs.rows.find(j=>j.name==='novachess-votes');assert.equal(votes.schedule,'* * * * *');assert.match(votes.command,/close_due_votes/);assert.match(jobs.rows.find(j=>j.name==='novachess-chat-retention').command,/30 days/);
 });
 
 test('public lobby projection excludes full board histories and private-size queues',async()=>{
@@ -771,6 +772,7 @@ test('only the pinned owner can grant admin access to confirmed active accounts 
  assert.equal((await pg.query('select is_site_owner() as owner')).rows[0].owner,false);
  assert.ok((await pg.query("select admin_accounts() as result")).rows[0].result.users.length>0);
  await assert.rejects(()=>pg.query("select grant_site_admin('other@example.test')"),/Only the site owner/);
+ await assert.rejects(()=>pg.query('select owner_site_analytics(7)'),/Only the site owner/);
  await assert.rejects(()=>pg.query(`insert into site_owners values('${users[2]}')`),/permission denied|row-level security/);
  await assert.rejects(()=>pg.query(`insert into site_admins values('${users[1]}')`),/permission denied|row-level security/);
  }finally{await pg.exec('reset role');}
@@ -1029,5 +1031,37 @@ test("only site administrators can disable global chat and disabled chat rejects
     await switchChat(true);
     await actor("");
     await pg.query("delete from public.messages where body = $1", [message]);
+  }
+});
+
+test('site analytics count anonymous traffic and return aggregates only to the owner', async () => {
+  const session = '33b31fa1-c848-417f-9864-a2896ecb8432';
+  await pg.exec("set role anon");
+  try {
+    await pg.query("select record_site_page($1, 'home') from generate_series(1, 110)", [session]);
+    await pg.query("select record_site_page($1, 'puzzles'), record_site_page($1, 'invalid')", [session]);
+    await assert.rejects(() => pg.query('select * from site_page_daily'), /permission denied/);
+    await assert.rejects(() => pg.query('select owner_site_analytics(7)'), /permission denied/);
+  } finally {
+    await pg.exec("reset role");
+  }
+  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
+  try {
+    await assert.rejects(() => pg.query('select owner_site_analytics(7)'), /Only the site owner/);
+  } finally {
+    await pg.exec("reset role");
+  }
+  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+  try {
+    const { snapshot } = (await pg.query('select owner_site_analytics(7) as snapshot')).rows[0];
+    assert.equal(snapshot.sessions, 1);
+    assert.equal(snapshot.views, 101);
+    assert.equal(snapshot.days.length, 7);
+    assert.equal(snapshot.days.at(-1).views, 101);
+    assert.ok(snapshot.accounts >= 2);
+    assert.deepEqual(snapshot.pages, [{ page: 'home', views: 100 }, { page: 'puzzles', views: 1 }]);
+    assert.ok(!JSON.stringify(snapshot).includes(session));
+  } finally {
+    await pg.exec("reset role");
   }
 });

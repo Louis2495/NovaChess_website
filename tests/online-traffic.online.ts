@@ -737,3 +737,40 @@ test('guests see a sign-in action in online Play and can still start computer ga
   await expect(page).toHaveURL(/#signin$/);
   await expect(page.locator('.account-form')).toBeVisible();
 });
+
+test('website analytics uses page categories and opens only for the site owner', async ({ page }) => {
+  await connected(page);
+  let owner = true;
+  const visits: Array<{ p_session: string; p_page: string }> = [];
+  const periods: number[] = [];
+  await page.route('**/rpc/is_site_admin', route => route.fulfill({ json: true }));
+  await page.route('**/rpc/is_site_owner', route => route.fulfill({ json: owner }));
+  await page.route('**/rpc/record_site_page', route => {
+    visits.push(route.request().postDataJSON());
+    return route.fulfill({ json: null });
+  });
+  await page.route('**/rpc/owner_site_analytics', route => {
+    periods.push(route.request().postDataJSON().p_days);
+    return route.fulfill({ json: {
+      views: 42, sessions: 12, accounts: 19,
+      days: [{ day: '2026-11-24', views: 42, sessions: 12, signups: 2, ratedGames: 6 }],
+      pages: [{ page: 'home', views: 42 }],
+    } });
+  });
+
+  await page.goto('/');
+  await expect.poll(() => visits.map(visit => visit.p_page)).toEqual(['home']);
+  await page.goto('/#profile/admin');
+  await page.getByRole('button', { name: 'Website analytics', exact: true }).click();
+  const dashboard = page.getByRole('region', { name: 'Website analytics', exact: true });
+  await expect(dashboard.getByRole('heading', { name: 'Top pages' })).toBeVisible();
+  await expect(dashboard.locator('.site-analytics-totals').getByText('42', { exact: true })).toBeVisible();
+  await dashboard.getByLabel('Date range').selectOption('7');
+  expect(periods[0]).toBe(30);
+  await expect.poll(() => periods.at(-1)).toBe(7);
+  expect(visits).toHaveLength(1);
+  owner = false;
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Accounts', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Website analytics', exact: true })).toHaveCount(0);
+});

@@ -1,3 +1,4 @@
+import { useSitePageTracking } from "./lib/siteAnalytics";
 import { useGameLibrary } from "./lib/gameLibrary";
 import {online} from "./lib/online";
 import {screenName} from "./lib/screenName";
@@ -213,6 +214,7 @@ function App() {
     });return()=>{active=false;};
   },[session?.user.id]);
   const { tab, detail } = locationState;
+  useSitePageTracking(tab, detail);
   const notify = (text: string) => {
     if (
       !/illegal move|move is not legal|drop is not legal|premove is unavailable/i.test(
@@ -703,8 +705,9 @@ function App() {
               <p>
                 Games, repertoire, profiles and preferences are saved locally in
                 this browser. Optional online accounts, multiplayer games, chat
-                and rankings use the connected Supabase project. No analytics or
-                advertising cookies are used.
+                and rankings use the connected Supabase project. Site analytics
+                record page categories and a random browser-session identifier
+                to measure visits. Traffic records are kept for up to 90 days.
               </p>
               <p>
                 Public-game research contacts only the Chess.com or Lichess
