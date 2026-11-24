@@ -142,7 +142,13 @@ export default function HomePage() {
             <RecentGame key={g.id} game={g} open={() => navigate("library", g.id)} />
           ))}</div>
         ) : (
-          <p className="muted home-recent-empty">No games yet.</p>
+          <div className="home-recent-empty">
+            <img src={`${base}recent-games-empty.webp`} alt="" />
+            <p>No games yet.</p>
+            <Button className="secondary" onClick={() => navigate("play")}>
+              Play your first game <ArrowRight size={15} aria-hidden="true" />
+            </Button>
+          </div>
         )}
       </section>
       <div className="home-extras">

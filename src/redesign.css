@@ -6044,7 +6044,18 @@ html { scrollbar-gutter:stable; }
 }
 .home-dashboard .home-recent .home-section-heading { margin-bottom:12px; }
 .home-dashboard .home-recent .home-section-heading .text-link { font-size:.9rem; }
-.home-dashboard .home-recent-empty { margin:auto; padding:18px 0; font-size:1rem; }
+.home-dashboard .home-recent-empty {
+  flex:1;
+  display:grid;
+  place-content:center;
+  justify-items:center;
+  gap:9px;
+  padding:8px 0 12px;
+  text-align:center;
+  background:radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 68%);
+}
+.home-recent-empty img { display:block; width:clamp(150px,22vw,250px); max-width:100%; height:clamp(105px,16vw,165px); object-fit:contain; }
+.home-recent-empty p { margin:0; font-size:1.04rem; font-weight:750; }
 .home-extras {
   grid-column:1 / -1;
   display:grid;

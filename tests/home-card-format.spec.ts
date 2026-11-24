@@ -13,6 +13,9 @@ test('Recent games stays visible when the library is empty', async ({ page }) =>
   const recent = page.getByRole('region', { name: 'Recent games' });
   await expect(recent.getByText('No games yet.')).toBeVisible();
   await expect(recent.locator('.recent-game-entry')).toHaveCount(0);
+  await recent.locator('.home-recent-empty img').evaluate((image: HTMLImageElement) => image.decode());
+  await recent.getByRole('button', { name: 'Play your first game' }).click();
+  await expect(page).toHaveURL(/#play$/);
 });
 
 test('the meme image area fills both empty bands with white over a custom background', async ({ page }) => {
