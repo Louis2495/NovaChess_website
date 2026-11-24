@@ -223,12 +223,10 @@ test("all 4,000 puzzles load; adaptive solution, grading, hints and daily replay
     page.getByRole("group", { name: "Chessboard", exact: true }),
   ).toBeVisible();
   const list = JSON.parse(fs.readFileSync("public/data/puzzles.json", "utf8"));
-  const progress = (await stored(page)).progress;
-  const p = [...list].sort(
-    (a, b) =>
-      Math.abs(a.sourceRating - progress.rating) -
-        Math.abs(b.sourceRating - progress.rating) || a.id.localeCompare(b.id),
-  )[0];
+  expect(list).toHaveLength(4000);
+  const puzzleId = await page.locator(".puzzle-board").getAttribute("data-puzzle-id");
+  const p = list.find(puzzle => puzzle.id === puzzleId);
+  expect(p).toBeDefined();
   for (let i = 1; i < p.moves.length; i += 2) {
     const m = p.moves[i];
     await uiMove(page, m);

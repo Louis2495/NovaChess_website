@@ -54,25 +54,23 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
         : puzzles.filter((p) => p.themes.includes(theme)),
     [puzzles, theme],
   );
-  function choose(exclude?: string) {
+  function choose(exclude?: string, candidates = pool) {
     if (daily) {
       const saved = library.progress.daily[today()];
       return puzzles.find((p) => p.id === saved?.id) || dailyPuzzle(puzzles);
     }
-    const unseen = pool.filter(
+    const unseen = candidates.filter(
       (p) => p.id !== exclude && !library.progress.completed.includes(p.id),
     );
     const choices = unseen.length
       ? unseen
-      : pool.filter((p) => p.id !== exclude);
-    return (
-      [...choices].sort(
-        (a, b) =>
-          Math.abs(a.sourceRating - library.progress.rating) -
-            Math.abs(b.sourceRating - library.progress.rating) ||
-          a.id.localeCompare(b.id),
-      )[0] || pool[0]
-    );
+      : candidates.filter((p) => p.id !== exclude);
+    if (!choices.length) return candidates[0];
+
+    const distance = (p: PuzzleData) => Math.abs(p.sourceRating - library.progress.rating);
+    const nearest = choices.reduce((min, p) => Math.min(min, distance(p)), Infinity);
+    const comparable = choices.filter(p => distance(p) <= nearest + 100);
+    return comparable[Math.floor(Math.random() * comparable.length)];
   }
   const [puzzle, setPuzzle] = useState(() => choose()),
     [cursor, setCursor] = useState(1),
@@ -334,6 +332,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
           <div className="puzzle-board-area">
           <div
             ref={puzzleBoardRef}
+            data-puzzle-id={puzzle.id}
             className={`puzzle-board ${(reviewing ? reviewMistake : wrong) ? "wrong" : ""} ${done && !reviewing ? "solved" : ""}`}
           >
             <Board
@@ -381,7 +380,7 @@ function PuzzleTrainer({ puzzles }: { puzzles: PuzzleData[] }) {
                 setTheme(value);
                 const choices = value === "All themes" ? puzzles : puzzles.filter(p => p.themes.includes(value));
                 if (!done) grade(false);
-                load([...choices].sort((a, b) => Math.abs(a.sourceRating - library.progress.rating) - Math.abs(b.sourceRating - library.progress.rating))[0]);
+                load(choose(puzzle.id, choices));
               }} />
             </Card>
           )}
