@@ -571,7 +571,7 @@ function App() {
             <div id="sidebar-chat" />
           </nav>
           <div className="sidebar-bottom">
-            {authReady && !session && tab !== "signin" && <button className="sidebar-sign-in btn" onClick={()=>navigate("signin")}>Sign in</button>}
+            {authReady && !session && tab !== "signin" && <button className="sidebar-sign-in btn sign-in-action" onClick={()=>navigate("signin")}>Sign in</button>}
             <button
               className="account-stamp"
               onClick={() => navigate("profile")}

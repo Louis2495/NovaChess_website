@@ -718,3 +718,22 @@ test("Admin Controls hides and restores the global chat tab", async ({ page }) =
   await toggle.click();
   await expect(tab).toBeVisible();
 });
+
+test('guests see a sign-in action in online Play and can still start computer games', async ({ page }) => {
+  await connected(page, false);
+  await page.goto('/#play');
+  const hub = page.locator('.standard-play-hub');
+  const signIn = hub.getByRole('button', { name: 'Sign in to play online' });
+  await expect(signIn).toBeEnabled();
+  await expect(signIn).toHaveCSS('background-color', 'rgb(255, 88, 111)');
+  await expect(hub.locator('.account-form')).toHaveCount(0);
+  await hub.getByRole('button', { name: 'Computer', exact: true }).click();
+  await expect(signIn).toHaveCount(0);
+  await hub.getByRole('button', { name: 'Start game', exact: true }).click();
+  await expect(page.locator('.play-match .board')).toBeVisible();
+  await page.goto('/#home');
+  await page.goto('/#play');
+  await signIn.click();
+  await expect(page).toHaveURL(/#signin$/);
+  await expect(page.locator('.account-form')).toBeVisible();
+});

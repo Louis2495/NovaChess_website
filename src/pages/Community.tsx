@@ -37,7 +37,6 @@ import { useApp } from "../lib/context";
 import { base } from "../lib/store";
 import { specialLegal, type SpecialState } from "../lib/specialRules";
 import { Board, Piece, type BoardMark } from "../components/Board";
-import OnlineAccount from "../components/OnlineAccount";
 import GameResult from "../components/GameResult";
 import { ChoiceSelect, Button, Card, Field, PageTitle } from "../components/UI";
 type Member = { id: string; team: "w" | "b" | null; board?:number };
@@ -427,9 +426,20 @@ export default function Community({presetMode = "standard", presetVariant = "che
       {room && <div className="online-game-heading"><div className="online-game-title">{['throne','vote','team'].includes(room.mode)?<MultiplayerPicture mode={room.mode}/> : room.variant==='speedrun'?<img className="speedrun-picture" src={`${base}variants/speedrun.webp`} alt=""/>:<VariantIcon id={room.variant} size={68}/>}<h1>{variantTitle}</h1></div></div>}
       {!online || !uid ? (
         <>
-          <Card className="quick-online-play"><Button className="new-game-primary" disabled>{mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}</Button>{selectedDescription && <p className="caption">{selectedDescription}</p>}</Card>
+          <Card className="quick-online-play">
+            {online ? (
+              <Button className="new-game-primary sign-in-action" onClick={() => navigate("signin")}>
+                Sign in to play online
+              </Button>
+            ) : (
+              <Button className="new-game-primary" disabled>
+                {mode === "throne" ? "Join queue" : mode === "vote" ? "Join Vote Chess" : mode === "team" ? "Start Team Chess" : "Start"}
+              </Button>
+            )}
+            {selectedDescription && <p className="caption">{selectedDescription}</p>}
+          </Card>
           {children}
-          {children ? (online ? <Button className="secondary variant-sign-in" onClick={() => navigate("signin")}>Sign in to play online</Button> : <p className="caption variant-sign-in">Online play is unavailable.</p>) : <OnlineAccount />}
+          {!online && <p className="caption variant-sign-in">Online play is unavailable.</p>}
         </>
       ) : (
         <>

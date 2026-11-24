@@ -32,7 +32,7 @@ export default function OnlineAccount() {
     } catch(e){setError((e as Error).message);} finally{setBusy(false);}
   }}>
     <SignupProfileFields country={country} avatar={avatar} onCountry={setCountry} onAvatar={setAvatar} onBusy={setAvatarBusy} onError={setError}/>
-    <Button disabled={busy || avatarBusy}>{busy?'Saving…':'Save profile'}</Button>
+    <Button className={!reset && mode === "signin" ? "sign-in-action" : undefined} disabled={busy || avatarBusy}>{busy?'Saving…':'Save profile'}</Button>
   </form>
  </Card>;
  if(session && !reset && mode!=='forgot')return <Card><div className="card-heading"><h2>Account</h2><span className="pill">Connected</span></div><p className="caption">{session.user.email}</p><Button className="secondary" onClick={()=>online!.auth.signOut()}>Sign out</Button></Card>;

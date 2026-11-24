@@ -171,9 +171,9 @@ function ChatDock() {
             <p className="caption">Draft only · chat is not connected yet.</p>
           ) : !session ? (
             <Button
-              className="text-button"
+              className="sign-in-action"
               onClick={() => {
-                navigate("profile");
+                navigate("signin");
                 setOpen(false);
               }}
             >
