@@ -48,7 +48,7 @@ If this step fails, share the failed step and error text, with credentials remov
 
 ## 4. Choose the website host
 
-**Simplest:** keep [the existing GitHub Pages site](https://louis2495.github.io/NovaChess_website/). The workflow above updates it automatically.
+**Matein4 on GitHub Pages:** In the repository's **Settings → Pages**, keep **GitHub Actions** as the source and set the custom domain to `matein4.com`. At your DNS provider, point the apex domain to GitHub Pages using [GitHub's documented DNS records](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-an-apex-domain). Once the DNS check passes and GitHub issues the certificate, enable **Enforce HTTPS**. The workflow reads the configured Pages path before building, so it serves from `/` on the custom domain and from `/NovaChess_website/` on the default project URL. If you set the domain after a build, rerun **Deploy website**.
 
 **Recommended for a larger free audience:** create a [Cloudflare account](https://dash.cloudflare.com/), then open **Workers & Pages → Create → Pages → Connect to Git**. Select `Louis2495/NovaChess_website` and configure:
 
@@ -65,20 +65,20 @@ If this step fails, share the failed step and error text, with credentials remov
 
 Save and deploy. Cloudflare gives you a free `https://YOUR_NAME.pages.dev/` address and deploys future GitHub pushes automatically. Set these variables in Cloudflare's **production** build environment. Never put the database password, personal token or service-role key in Cloudflare's Vite settings.
 
-`VITE_BASE_PATH=/` is important on Cloudflare. The GitHub Pages workflow keeps its `/NovaChess_website/` path. All current assets are below Cloudflare Pages' 25 MiB-per-file limit. The included `_headers` file adds browser caching for hashed assets, and service-worker updates reuse unchanged files.
+`VITE_BASE_PATH=/` is important on Cloudflare. The GitHub Pages workflow gets its base path from GitHub Pages settings. All current assets are below Cloudflare Pages' 25 MiB-per-file limit. The included `_headers` file adds browser caching for hashed assets, and service-worker updates reuse unchanged files.
 
 ## 5. Enable free sign-in
 
 In Supabase **Authentication → URL Configuration**:
 
-- Set **Site URL** to your chosen production website address, including its repository path if using GitHub Pages.
+- Set **Site URL** to `https://matein4.com/` once the custom domain serves the site. For the default GitHub Pages URL, include the repository path.
 - Add that exact URL to **Redirect URLs**. If keeping both hosts, add both production URLs.
 
 For public signup without email-delivery costs, enable **Google sign-in**:
 
 1. Open **Authentication → Sign In / Providers → Google** in Supabase. Copy the callback URL shown there; it normally ends in `/auth/v1/callback`.
 2. In [Google Cloud Console](https://console.cloud.google.com/), create a project and configure **Google Auth Platform/OAuth consent** for external users. Use the basic email/profile/OpenID scopes.
-3. Create a **Web application OAuth client**. Add your website's origin under authorized JavaScript origins; use only `https://YOUR_NAME.pages.dev` or `https://louis2495.github.io`, without a repository path. Add the Supabase callback as an authorized redirect URI.
+3. Create a **Web application OAuth client**. Add your website's origin under authorized JavaScript origins; use an origin such as `https://matein4.com` without a repository path. Add the Supabase callback as an authorized redirect URI.
 4. Copy the Google client ID and client secret into the Supabase Google provider settings and enable it. Keep the client secret in Supabase.
 5. Publish the Google OAuth app when opening to everyone. Google's Testing mode restricts sign-in to the test users you add; follow any verification requirements Google displays.
 6. In Supabase, you can disable the **Email** provider if you want Google-only signup. NovaChess automatically shows enabled Google/GitHub buttons and hides the email form when Email is disabled. No new frontend setting is needed.

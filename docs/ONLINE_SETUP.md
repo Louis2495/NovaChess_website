@@ -4,7 +4,7 @@ Start with the [step-by-step $0 multiplayer launch guide](MULTIPLAYER_LAUNCH.md)
 
 The repository is ready for deployment but is not connected to a live project until you supply your own project configuration. The **Set up multiplayer** workflow applies all database migrations and scheduled jobs; do not also rerun the original SQL files manually.
 
-For local development, copy `.env.example` to `.env.local` and fill in your public URL/key. Restart Vite. Public browser settings are `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. `VITE_BASE_PATH=/` is for a root-hosted site such as Cloudflare Pages; GitHub Pages keeps the repository path by default. Never use service-role/secret keys in Vite settings.
+For local development, copy `.env.example` to `.env.local` and fill in your public URL/key. Restart Vite. Public browser settings are `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. `VITE_BASE_PATH=/` is for a root-hosted site such as Cloudflare Pages; The GitHub Pages workflow selects the base path from the configured Pages URL. Never use service-role/secret keys in Vite settings.
 
 After deployment, `npm run check:online` checks Auth, database accessibility and rejection of unsigned game actions. Supply `SUPABASE_PROJECT_REF` and the two public Vite settings in your shell environment. It is a smoke check, not a substitute for two signed-in players testing a real game.
 
