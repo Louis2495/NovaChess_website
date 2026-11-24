@@ -629,9 +629,8 @@ async function seedGame(
   }
   b.delete();
   await page.evaluate(
-    ({ key, variant, fen, moves, positions, notation, partner }) => {
-      const l = JSON.parse(localStorage.getItem(key)!);
-      l.activeGame = {
+    async ({ variant, fen, moves, positions, notation, partner }) => {
+      const activeGame = {
         id: "fixture",
         title: "Rule check",
         created: Date.now(),
@@ -659,12 +658,30 @@ async function seedGame(
             }
           : {}),
       };
-      localStorage.setItem(key, JSON.stringify(l));
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open("novachess-game-library", 1);
+        request.onupgradeneeded = () => request.result.createObjectStore("archive");
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const tx = db.transaction("archive", "readwrite");
+          tx.oncomplete = () => resolve();
+          tx.onabort = () => reject(tx.error);
+          const archive = tx.objectStore("archive");
+          const request = archive.get("games");
+          request.onsuccess = () => archive.put({
+            games: request.result?.games ?? [], activeGame,
+          }, "games");
+        });
+      } finally {
+        db.close();
+      }
     },
-    { key: BASE_KEY, variant, fen, moves, positions, notation, partner },
+    { variant, fen, moves, positions, notation, partner },
   );
-  await page.goto("/#play/resume");
-  await page.reload();
+  await page.goto("/?variant-fixture#variants/resume");
   await expect(
     page.getByRole("group", { name: "Chessboard", exact: true }).first(),
   ).toBeVisible();
@@ -802,7 +819,6 @@ test("Home shows the meme without a visible label", async ({
 test("Stats has dedicated navigation and derives charts from completed local games only", async ({
   page,
 }, testInfo) => {
-  await page.goto("/");
   const c = new Chess();
   const move = c.move("e4");
   const start = new Date();
@@ -823,18 +839,12 @@ test("Stats has dedicated navigation and derives charts from completed local gam
     human: "w",
     folder: "Games",
   }));
-  await page.evaluate(
-    ({ key, games }) => {
-      const data = JSON.parse(localStorage.getItem(key)!);
-      data.games = games;
-      data.localRating = 1250;
-      data.progress.solved = 9;
-      data.progress.streak = 2;
-      localStorage.setItem(key, JSON.stringify(data));
-    },
-    { key: BASE_KEY, games: fixtures },
-  );
-  await page.reload();
+  await page.addInitScript(({ key, games }) => {
+    localStorage.setItem(key, JSON.stringify({
+      games, localRating: 1250,
+    }));
+  }, { key: BASE_KEY, games: fixtures });
+  await page.goto("/");
   await page
     .getByRole("navigation", {
       name: testInfo.project.name === "mobile" ? "App tabs" : "Main navigation",

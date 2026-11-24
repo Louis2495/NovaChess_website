@@ -15,7 +15,9 @@ test('Stats uses a quiet overview, outcome splits and a separate competition tab
 test('Speedrun rating squares start a local game at the selected Elo',async({page})=>{
  await page.goto('/#stats');await page.getByRole('group',{name:'Stats sections'}).getByRole('button',{name:'Variants',exact:true}).click();await page.getByRole('button',{name:'Play Speedrun at 3050 Elo',exact:true}).click();
  await expect(page.locator('.play-match')).toBeVisible();
- const game=await page.evaluate(()=>JSON.parse(localStorage.getItem('novachess-library-v2')!).activeGame);expect(game.botRating).toBe(3050);expect(game.title).toBe('Speedrun');expect(game.speedrun.invalid).not.toBe(true);
+ await expect(page).toHaveURL(/#variants\/speedrun%2F3050$/);
+ await expect(page.getByLabel('Black player', {exact:true})).toContainText('(3050)');
+ await expect(page.getByRole('timer', {name:'Your move time'})).toBeVisible();
 });
 test('variant breakdown uses display names',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('novachess-library-v2',JSON.stringify({games:[{id:'fog-game',title:'Fog',variant:'cvfog',folder:'Games',moves:['e2e4'],result:'1-0',human:'w',created:Date.now()}]})));

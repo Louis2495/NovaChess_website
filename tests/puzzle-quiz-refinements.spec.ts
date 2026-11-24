@@ -62,17 +62,7 @@ test("black-to-move positions face the mover in Analysis and Guess the Eval, and
   const c = new Chess();
   c.move("e4");
   const fen = c.fen();
-  await page.goto("/#analysis/" + encodeURIComponent("fen:" + fen));
-  await expect(squares(page).last()).toHaveAttribute("aria-label", /^a8,/);
-  const puzzle = JSON.parse(
-    fs.readFileSync("public/data/puzzles.json", "utf8"),
-  ).find((p: any) => p.fen.split(" ")[1] === "b");
-  await page.route("**/data/puzzles.json", (r) =>
-    r.fulfill({ json: [puzzle] }),
-  );
-  await page.goto("/#puzzles/eval");
-  await expect(squares(page).last()).toHaveAttribute("aria-label", /^a8,/);
-  await page.evaluate(
+  await page.addInitScript(
     (fen) =>
       localStorage.setItem(
         "novachess-library-v2",
@@ -96,7 +86,16 @@ test("black-to-move positions face the mover in Analysis and Guess the Eval, and
       ),
     fen,
   );
-  await page.goto("/#library");
-  await page.reload();
+  await page.goto("/#analysis/" + encodeURIComponent("fen:" + fen));
+  await expect(squares(page).last()).toHaveAttribute("aria-label", /^a8,/);
+  const puzzle = JSON.parse(
+    fs.readFileSync("public/data/puzzles.json", "utf8"),
+  ).find((p: any) => p.fen.split(" ")[1] === "b");
+  await page.route("**/data/puzzles.json", (r) =>
+    r.fulfill({ json: [puzzle] }),
+  );
+  await page.goto("/#puzzles/eval");
+  await expect(squares(page).last()).toHaveAttribute("aria-label", /^a8,/);
+  await page.goto("/#library/black-start");
   await expect(squares(page).last()).toHaveAttribute("aria-label", /^h1,/);
 });
