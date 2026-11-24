@@ -44,7 +44,7 @@ export default function Players(){
   </article>;
  }
  return <div className="players-page">
- {!online||!session?<Card><p>Sign in to find players and manage your friends.</p><Button className="sign-in-action" onClick={()=>navigate('signin')}>Sign in</Button></Card>:<>
+ {!online||!session?<Card><p>Sign in to find players and see your friends list.</p><Button className="sign-in-action" onClick={()=>navigate('signin')}>Sign in</Button></Card>:<>
  <div className="players-search-controls"><div className="segmented page-segments" role="group" aria-label="Player sections">{[['friends','Friends'],['everyone','Everyone']].map(([id,label])=><button key={id} className={section===id?'active':''} aria-pressed={section===id} onClick={()=>{setSection(id);setPage(0);}}>{label}</button>)}</div>
  <input className="players-search-input" aria-label="Search players" type="search" value={query} maxLength={100} placeholder="Search by name" onChange={e=>{setQuery(e.target.value);setPage(0);}}/></div>
  <div className="players-results">
