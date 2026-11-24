@@ -122,7 +122,7 @@ export default function LibraryPage() {
         role="group"
         aria-label="Library sections"
       >
-        {["All", "Studies", "Games", "NovaChess"].map((value) => (
+        {["All", "Studies", "Games", "Matein4"].map((value) => (
           <button
             key={value}
             aria-pressed={category === value}

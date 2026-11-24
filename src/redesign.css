@@ -4460,9 +4460,9 @@ select.theme-select {
 .board-move-badge .move-quality { width:clamp(22px,3vw,32px); height:clamp(22px,3vw,32px); font-size:clamp(13px,1.4vw,18px); box-shadow:0 2px 5px #0005; }
 @media(prefers-reduced-motion:reduce){ .eval-meter > div { transition:none; } }
 .stats-overview { --muted:color-mix(in srgb,var(--text) 85%,var(--panel)); }
-.brand img { width:40px; height:40px; object-fit:contain; border-radius:0; }
+.brand img { width:56px; height:40px; object-fit:contain; border-radius:0; }
 .mobile-wordmark { align-items:center; gap:8px; }
-.mobile-wordmark img { width:30px; height:30px; object-fit:contain; }
+.mobile-wordmark img { width:44px; height:30px; object-fit:contain; }
 @media(max-width:1000px){ .mobile-wordmark { display:flex; } }
 .stats-overview .stat-metric-label { color:var(--text); }
 
@@ -4728,7 +4728,7 @@ html { scrollbar-gutter:stable; }
 .sidebar .sidebar-footer { padding-top:4px; }
 @media(max-height:500px){
  .sidebar .brand { font-size:1rem; min-height:30px; padding-bottom:4px; }
- .sidebar .brand img { width:26px; height:26px; }
+ .sidebar .brand img { width:40px; height:26px; }
  .sidebar nav button { font-size:.72rem; padding-block:1px; gap:9px; }
  .sidebar nav button svg { width:16px; height:16px; }
  .sidebar .account-stamp .avatar { width:22px; height:22px; }

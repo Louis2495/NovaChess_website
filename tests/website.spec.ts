@@ -31,8 +31,13 @@ test("dark Home provides tools, has no clock/camera/slogans, and fits responsive
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Welcome to NovaChess", exact: true }),
+    page.getByRole("heading", { name: "Welcome to Matein4", exact: true }),
   ).toBeVisible();
+  await expect(page).toHaveTitle("Home · Matein4");
+  const logo = page.locator('.brand img:visible, .mobile-wordmark img:visible').first();
+  await expect(logo).toBeVisible();
+  await expect(logo).toHaveAttribute("src", /matein4-logo\.png$/);
+  await expect.poll(() => logo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
   await expect(page.getByRole("link", { name: /Daily puzzle/ })).toBeVisible();
   await expect(page.locator(".app")).toHaveCSS(
     "background-color",

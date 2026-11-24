@@ -1,6 +1,6 @@
 {
-  "name": "NovaChess",
-  "short_name": "NovaChess",
+  "name": "Matein4",
+  "short_name": "Matein4",
   "description": "Local chess analysis, play and training.",
   "start_url": "./",
   "scope": "./",

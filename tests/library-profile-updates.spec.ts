@@ -10,7 +10,7 @@ function line(moves: string[]) {
   }
   return { initial: positions[0], moves, positions, notation };
 }
-test("Library separates recorded games, branching training studies and NovaChess history", async ({
+test("Library separates recorded games, branching training studies and Matein4 history", async ({
   page,
 }) => {
   const main = line(["e2e4", "e7e5", "g1f3", "b8c6"]),
@@ -46,7 +46,7 @@ test("Library separates recorded games, branching training studies and NovaChess
       {
         ...common,
         id: "played",
-        title: "NovaChess game",
+        title: "Matein4 game",
         kind: "game",
         origin: "novachess",
         result: "0-1",
@@ -67,11 +67,11 @@ test("Library separates recorded games, branching training studies and NovaChess
     0,
   );
   await sections
-    .getByRole("button", { name: "NovaChess", exact: true })
+    .getByRole("button", { name: "Matein4", exact: true })
     .click();
   await expect(page.locator(".saved-game-card")).toHaveCount(1);
   await expect(page.locator(".saved-game-card")).toContainText(
-    "NovaChess game",
+    "Matein4 game",
   );
   await sections.getByRole("button", { name: "Studies", exact: true }).click();
   await expect(page.locator(".saved-game-card")).toContainText("2 lines");

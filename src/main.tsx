@@ -426,7 +426,7 @@ function App() {
     }
   }, []);
   useEffect(() => {
-    document.title = `${mainNav.find((v) => v.id === tab)?.label || "Home"} · NovaChess`;
+    document.title = `${mainNav.find((v) => v.id === tab)?.label || "Home"} · Matein4`;
   }, [tab]);
 
   const panelHex = appearance.panelColor.replace("#", "");
@@ -548,10 +548,10 @@ function App() {
           <button
             className="brand"
             onClick={() => navigate("home")}
-            aria-label="NovaChess home"
+            aria-label="Matein4 home"
           >
-            <img src={`${base}app-icon.webp`} alt="" />
-            <span>NovaChess</span>
+            <img src={`${base}matein4-logo.png`} alt="" />
+            <span>Matein4</span>
           </button>
 
           <nav aria-label="Main navigation">
@@ -614,7 +614,7 @@ function App() {
             >
               <Menu size={21} />
             </IconButton>
-            <span className="mobile-wordmark"><img src={`${base}app-icon.webp`} alt="" />NovaChess</span>
+            <span className="mobile-wordmark"><img src={`${base}matein4-logo.png`} alt="" />Matein4</span>
             <div className="topbar-right"></div>
           </header>
           <main id="workspace" tabIndex={-1} className="workspace">
@@ -720,7 +720,7 @@ function App() {
               </p>
               <p>
                 The iPhone app’s CloudKit and Game Center are native-only.
-                Online web features use separate NovaChess accounts.
+                Online web features use separate Matein4 accounts.
               </p>
               <p>
                 Artwork, chess pieces, puzzles, lessons and piano recordings are

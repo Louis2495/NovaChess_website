@@ -56,7 +56,7 @@ export default function HomePage() {
   const daily = !!library.progress.daily?.[today()]?.completed;
   const resumable = library.activeGame?.result === "*";
   const name = screenName(library.profile, "");
-  const welcome = name && name !== emptyLibrary.profile.name ? `Welcome back, ${name}!` : "Welcome to NovaChess";
+  const welcome = name && name !== emptyLibrary.profile.name ? `Welcome back, ${name}!` : "Welcome to Matein4";
   const games = library.games.filter(game => !isStudy(game) && game.folder !== "Studies");
   const recent = [...games].sort((a, b) => b.created - a.created).slice(0, 3);
   const lastSavedVariant = [...games, ...(library.activeGame ? [library.activeGame] : [])]
@@ -151,7 +151,7 @@ export default function HomePage() {
           <div>
             <h2 id="home-app-title">Try the app</h2>
             {appStoreUrl
-              ? <a className="text-link" href={appStoreUrl}>Get NovaChess on the App Store <ArrowRight size={14} aria-hidden="true" /></a>
+              ? <a className="text-link" href={appStoreUrl}>Get Matein4 on the App Store <ArrowRight size={14} aria-hidden="true" /></a>
               : <p>Coming soon to the App Store</p>}
           </div>
         </section>

@@ -1110,7 +1110,7 @@
     "sections": [
       {
         "title": "In practice",
-        "body": "National ratings and rating categories are distinct from FIDE ratings. An account or profile link does not automatically imply that playing online on NovaChess affects an official record."
+        "body": "National ratings and rating categories are distinct from FIDE ratings. An account or profile link does not automatically imply that playing online on Matein4 affects an official record."
       }
     ]
   },
@@ -75907,13 +75907,13 @@
     "sections": [
       {
         "title": "In practice",
-        "body": "NovaChess reveals friendly pieces and attacked squares and ends by checkmate. Do not assume another site's Fog of War uses the same visibility or victory rules."
+        "body": "Matein4 reveals friendly pieces and attacked squares and ends by checkmate. Do not assume another site's Fog of War uses the same visibility or victory rules."
       }
     ]
   },
   {
     "id": "guide-throne-on-novachess",
-    "title": "Throne on NovaChess",
+    "title": "Throne on Matein4",
     "category": "Variants",
     "body": "A continuing multiplayer challenge has two seated players and a queue. The winner keeps the seat to face the next challenger.",
     "aliases": [],
@@ -75927,7 +75927,7 @@
   },
   {
     "id": "guide-vote-chess-on-novachess",
-    "title": "Vote Chess on NovaChess",
+    "title": "Vote Chess on Matein4",
     "category": "Variants",
     "body": "Interested players are divided into teams and vote for a legal move. Each voting period lasts one day, then the leading move is played.",
     "aliases": [],
@@ -75941,7 +75941,7 @@
   },
   {
     "id": "guide-team-chess-on-novachess",
-    "title": "Team Chess on NovaChess",
+    "title": "Team Chess on Matein4",
     "category": "Variants",
     "body": "Teammates share a side, can contribute moves, and can draw arrows to coordinate. It is collaborative play rather than a vote-based decision process.",
     "aliases": [],
@@ -75955,7 +75955,7 @@
   },
   {
     "id": "guide-dropping-squares-on-novachess",
-    "title": "Dropping Squares on NovaChess",
+    "title": "Dropping Squares on Matein4",
     "category": "Variants",
     "body": "After each five full moves, a square from ranks three through six becomes unusable until the chosen total has dropped. The default total is two squares.",
     "aliases": [],
@@ -75969,7 +75969,7 @@
   },
   {
     "id": "guide-chaos-chess-on-novachess",
-    "title": "Chaos Chess on NovaChess",
+    "title": "Chaos Chess on Matein4",
     "category": "Variants",
     "body": "Pawns retain one- or two-square advances beyond their initial rank, subject to clear paths and the variant's legality. Each side also has limited freeze and friendly-piece switching abilities.",
     "aliases": [],
@@ -75983,7 +75983,7 @@
   },
   {
     "id": "guide-random-on-novachess",
-    "title": "Random on NovaChess",
+    "title": "Random on Matein4",
     "category": "Variants",
     "body": "The computer selects a movable piece for each side on each turn. A player chooses a legal move using that selected piece.",
     "aliases": [],
@@ -76915,7 +76915,7 @@
     "sections": [
       {
         "title": "What to notice",
-        "body": "On NovaChess an invalid attempted move returns the piece rather than playing a nearby alternative. Competition penalties should not be inferred from app behavior."
+        "body": "On Matein4 an invalid attempted move returns the piece rather than playing a nearby alternative. Competition penalties should not be inferred from app behavior."
       }
     ]
   },

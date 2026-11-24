@@ -5,7 +5,7 @@ export function isStudy(g: SavedGame) {
     : !g.id.startsWith("famous-") &&
         (g.folder === "Studies" || !!g.branches?.length);
 }
-export function isNovaChessGame(g: SavedGame) {
+export function isMatein4Game(g: SavedGame) {
   return g.origin
     ? g.origin === "novachess"
     : !isStudy(g) &&
@@ -19,7 +19,7 @@ export function isNovaChessGame(g: SavedGame) {
 export function libraryKind(g: SavedGame) {
   return isStudy(g)
     ? "Studies"
-    : isNovaChessGame(g)
-      ? "NovaChess"
+    : isMatein4Game(g)
+      ? "Matein4"
       : "Games";
 }

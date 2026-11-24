@@ -76,7 +76,7 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
               <p>{mine.country_percentile}th percentile</p>
             </Card>
             <Card>
-              <span>NovaChess rating</span>
+              <span>Matein4 rating</span>
               <strong>{mine.rating}</strong>
               <p>
                 {mine.wins} W · {mine.draws} D · {mine.losses} L
@@ -113,7 +113,7 @@ export default function Rankings({ embedded = false }: { embedded?: boolean }) {
         ) : error ? (
           <p role="alert">{error}</p>
         ) : rankings.length ? (
-          <table className="stats-leaderboard" aria-label="NovaChess leaderboard">
+          <table className="stats-leaderboard" aria-label="Matein4 leaderboard">
             <thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Rating</th></tr></thead>
             <tbody>{rankings.map(r => (
               <tr key={r.id} className={r.id === session?.user.id ? "you" : ""}>

@@ -36,7 +36,7 @@ test("analysis keeps all four tools visible in one menu", async ({
     page.getByRole("group", { name: "Analysis actions", exact: true }),
   ).toBeVisible();
 });
-test("Research source/color toggles align with username and NovaChess explores real local games", async ({
+test("Research source/color toggles align with username and Matein4 explores real local games", async ({
   page,
 }) => {
   const c = new Chess(),
@@ -73,7 +73,7 @@ test("Research source/color toggles align with username and NovaChess explores r
     color = page.getByRole("group", { name: "Player’s color", exact: true });
   await expect(source.getByRole("button")).toHaveCount(3);
   await expect(color.getByRole("button")).toHaveCount(2);
-  await source.getByRole("button", { name: "NovaChess", exact: true }).click();
+  await source.getByRole("button", { name: "Matein4", exact: true }).click();
   await expect(page.getByLabel("Public username")).toHaveValue("Tester");
   const userBox = (await page.getByLabel("Public username").boundingBox())!,
     colorBox = (await color.boundingBox())!;

@@ -372,7 +372,7 @@ export default function Appearance({ onClose, embedded = false }: { onClose: () 
               </p>
               <p className="caption">
                 Field, Nocturne No. 5 · Burgmüller, Consolation and Douce
-                plainte. NovaChess synthesized performance, CC BY-SA 4.0.{" "}
+                plainte. Matein4 synthesized performance, CC BY-SA 4.0.{" "}
                 <a
                   className="external"
                   href="./licenses/Piano-provenance.md"

@@ -2,7 +2,7 @@ import {researchParser,cachedArchive,cacheArchive} from "../../lib/researchLoade
 import type {ResearchGame as PublicGame} from "../../lib/researchGames";
 import ResearchLoadingAnimation from "../../components/ResearchLoadingAnimation";
 import {screenName} from "../../lib/screenName";
-import { isNovaChessGame } from "../../lib/library";
+import { isMatein4Game } from "../../lib/library";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import {
@@ -108,9 +108,9 @@ export default function Research() {
       }
     }
     try {
-      if (site === "NovaChess") {
+      if (site === "Matein4") {
         if (name.toLowerCase() !== screenName(library.profile).toLowerCase())
-          throw Error("No games saved on NovaChess for that screen name.");
+          throw Error("No games saved on Matein4 for that screen name.");
         const records =
           library.activeGame &&
           !library.games.some((g) => g.id === library.activeGame?.id)
@@ -118,7 +118,7 @@ export default function Research() {
             : library.games;
         for (const g of records.filter(
           (g) =>
-            isNovaChessGame(g) &&
+            isMatein4Game(g) &&
             ["chess", "blind", "blindtext"].includes(g.variant),
         )) {
           try {
@@ -200,7 +200,7 @@ export default function Research() {
       setError(
         (e as Error).name === "AbortError"
           ? "Loading canceled. Previous results retained."
-          : `${(e as Error).message}${site === "NovaChess" ? "" : " Public access or browser CORS may be unavailable; try again later."}`,
+          : `${(e as Error).message}${site === "Matein4" ? "" : " Public access or browser CORS may be unavailable; try again later."}`,
       );
     } finally {
       parser?.close();
@@ -264,13 +264,13 @@ export default function Research() {
           <div className="research-source field">
             <span>Source</span>
             <div className="segmented-control" role="group" aria-label="Source">
-              {["NovaChess", "Chess.com", "Lichess"].map((value) => (
+              {["Matein4", "Chess.com", "Lichess"].map((value) => (
                 <button
                   key={value}
                   aria-pressed={site === value}
                   onClick={() => {
                     setSite(value);
-                    if (value === "NovaChess")
+                    if (value === "Matein4")
                       setUsername(screenName(library.profile));
                   }}
                 >
