@@ -6149,14 +6149,18 @@ html { scrollbar-gutter:stable; }
   .home-featured-group:has(> :nth-child(2)) .home-featured > span:last-child > span { grid-column:1 / -1; }
 }
 
-.variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) {
+.variants-hub.setup-active[data-online-variant="team"] > .quick-online-play:has(.team-rating-input) {
   display:grid;
-  grid-template-columns:minmax(0,2.3fr) minmax(0,1fr);
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  width:min(75%,440px);
   column-gap:8px;
 }
-.variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) > :not(.field) {
+.variants-hub[data-online-variant="team"] .quick-online-play:has(.team-rating-input) > :not(.field,.team-computer-rating) {
   grid-column:1 / -1;
 }
+.variants-hub[data-online-variant="team"] .quick-online-play .team-computer-rating { flex-wrap:nowrap; gap:4px; }
+.variants-hub[data-online-variant="team"] .quick-online-play .team-computer-rating .field { flex:1; min-width:0; }
+.variants-hub[data-online-variant="team"] .quick-online-play .team-computer-rating .btn { min-height:32px; padding:3px 5px; font-size:.65rem; line-height:1.1; white-space:normal; }
 .variants-hub[data-online-variant="team"] .team-rating-input {
   min-width:0;
   height:32px;

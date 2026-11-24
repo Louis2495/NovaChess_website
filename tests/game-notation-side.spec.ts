@@ -34,6 +34,10 @@ for(const variant of ['chess','atomic','cvfog','speedrun'])test(`${variant} cent
  if(variant==='speedrun'){
   await page.setViewportSize({width:1440,height:1000});
   await expect.poll(async()=>{const b=(await board.boundingBox())!;return Math.abs(b.x+b.width/2-720);}).toBeLessThan(1);
-  const timer=(await page.getByRole('timer',{name:'Your move time'}).boundingBox())!,b=(await board.boundingBox())!;expect(timer.x+timer.width).toBeLessThan(b.x);expect(Math.abs(timer.y+timer.height/2-b.y-b.height/2)).toBeLessThan(1);
+  const player=page.getByLabel('White player', {exact:true});
+  const timer=(await player.getByRole('timer',{name:'Your move time'}).boundingBox())!;
+  const b=(await board.boundingBox())!, label=(await player.boundingBox())!;
+  expect(Math.abs(timer.x+timer.width-b.x-b.width)).toBeLessThan(2);
+  expect(Math.abs(timer.y+timer.height/2-label.y-label.height/2)).toBeLessThan(2);
  }
 });

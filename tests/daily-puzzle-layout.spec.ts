@@ -14,7 +14,7 @@ test('daily puzzle has scoped chat, controls below the board, and replay only af
  await page.getByRole('button',{name:'Replay',exact:true}).click();await expect(page.getByRole('button',{name:'Replay',exact:true})).toHaveCount(0);await expect(hint).toBeVisible();
 });
 test('recent games use bright outlines for each result',async({page})=>{
- const c=new Chess(),initial=c.fen();c.move('e4');await page.addInitScript(games=>localStorage.setItem('novachess-library-v2',JSON.stringify({games})),['*','1/2-1/2','1-0','0-1'].map((result,i)=>({id:String(i),title:'Game',initial,positions:[initial,c.fen()],moves:['e2e4'],notation:['e4'],human:'w',variant:'chess',created:Date.now(),result})));
+ const c=new Chess(),initial=c.fen();c.move('e4');await page.addInitScript(games=>localStorage.setItem('novachess-library-v2',JSON.stringify({games})),['*','1/2-1/2','1-0'].map((result,i)=>({id:String(i),title:'Game',initial,positions:[initial,c.fen()],moves:['e2e4'],notation:['e4'],human:'w',variant:'chess',created:Date.now()-i*1000,result})));
  await page.goto('/');await expect(page.locator('.recent-game-entry.result-unfinished')).toHaveCSS('border-color','rgb(255, 255, 255)');await expect(page.locator('.recent-game-entry.result-draw')).toHaveCSS('border-color','rgb(225, 231, 237)');await expect(page.locator('.recent-game-entry.result-win')).toHaveCSS('border-color','rgb(57, 237, 131)');
 });
 

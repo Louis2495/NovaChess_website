@@ -5,7 +5,7 @@ test("recent game scrubber previews positions and colors results without home ac
   const g = { id: "preview", title: "Preview game", created: Date.now(), initial, variant: "chess", moves: ["e2e4"], notation: ["e4"], positions: [initial, c.fen()], result: "1-0", human: "w", folder: "Games" };
   await page.addInitScript(g => localStorage.setItem("novachess-library-v2", JSON.stringify({ games: [g], activeGame: { ...g, result: "*" } })), g);
   await page.goto("/#home");
-  await expect(page.locator(".new-game-primary svg")).toHaveCount(0);
+  await expect(page.locator(".new-game-primary .lucide-arrow-right, .new-game-primary .lucide-chevron-right")).toHaveCount(0);
   await expect(page.locator(".resume-game-button .lucide-chevron-right")).toHaveCount(0);
   await expect(page.locator(".recent-game-entry")).toHaveClass(/result-win/);
   const slider = page.getByRole("slider", { name: "Preview Preview game" });

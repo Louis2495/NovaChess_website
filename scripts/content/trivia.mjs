@@ -80,7 +80,7 @@ const questions = entries
   .filter((q) => q.answers.length === 4);
 const extra = [
   [
-    "How many ways can you place eight queens so none attacks another? Count rotations and reflections separately.",
+    "Counting rotations and reflections separately, how many ways can you place eight queens on a chessboard so none attacks another?",
     "92",
     "64",
     "128",

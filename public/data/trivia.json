@@ -1540,7 +1540,7 @@
   },
   {
     "id": "trivia-extra-0",
-    "prompt": "How many ways can you place eight queens so none attacks another? Count rotations and reflections separately.",
+    "prompt": "Counting rotations and reflections separately, how many ways can you place eight queens on a chessboard so none attacks another?",
     "category": "Chess knowledge",
     "answers": [
       "92",

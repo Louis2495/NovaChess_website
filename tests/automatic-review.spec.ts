@@ -1,9 +1,29 @@
 import {test,expect} from '@playwright/test';
 import {Chess} from 'chess.js';
-test('result banner is centered on the board and uses player-relative winner wording',async({page})=>{
- const c=new Chess(),initial=c.fen();await page.addInitScript(g=>{if(!localStorage.getItem('novachess-library-v2'))localStorage.setItem('novachess-library-v2',JSON.stringify({activeGame:g}));},{id:'won',title:'Standard',created:Date.now(),initial,positions:[initial],moves:[],notation:[],result:'1-0',human:'w',variant:'chess',folder:'Games',origin:'novachess'});await page.goto('/#play/resume');await expect(page.getByText('You won!',{exact:true})).toBeVisible({timeout:15000});const board=(await page.locator('.play-match .board').boundingBox())!,banner=(await page.locator('.board-result-overlay .game-result-banner').boundingBox())!;expect(Math.abs(board.x+board.width/2-banner.x-banner.width/2)).toBeLessThan(2);expect(Math.abs(board.y+board.height/2-banner.y-banner.height/2)).toBeLessThan(2);
- await page.evaluate(()=>{const l=JSON.parse(localStorage.getItem('novachess-library-v2')!);l.activeGame.human='b';localStorage.setItem('novachess-library-v2',JSON.stringify(l));});await page.reload();await expect(page.getByText('White won',{exact:true})).toBeVisible();await expect(page.getByRole('img',{name:'Sad chess king'})).toBeVisible();
-});
+for (const [human, title, image] of [
+  ['w', 'You won!', 'Happy chess king'],
+  ['b', 'White won', 'Sad chess king'],
+] as const) {
+  test(`result banner is centered and shows "${title}"`, async ({ page }) => {
+    const initial = new Chess().fen();
+    await page.addInitScript(game => localStorage.setItem(
+      'novachess-library-v2', JSON.stringify({ activeGame: game }),
+    ), {
+      id: 'finished', title: 'Standard', created: Date.now(), initial,
+      positions: [initial], moves: [], notation: [], result: '1-0',
+      human, variant: 'chess', folder: 'Games', origin: 'novachess',
+    });
+    await page.goto('/#play/resume');
+    const banner = page.locator('.board-result-overlay .game-result-banner');
+    await expect(banner.getByText(title, { exact: true })).toBeVisible({ timeout: 15000 });
+    await expect(banner.getByRole('img', { name: image })).toBeVisible();
+
+    const board = (await page.locator('.play-match .board').boundingBox())!;
+    const result = (await banner.boundingBox())!;
+    expect(Math.abs(board.x + board.width / 2 - result.x - result.width / 2)).toBeLessThan(2);
+    expect(Math.abs(board.y + board.height / 2 - result.y - result.height / 2)).toBeLessThan(2);
+  });
+}
 test('review starts automatically and shows an open book for opening moves',async({page})=>{
  const c=new Chess(),initial=c.fen();c.move('e4');await page.addInitScript(g=>localStorage.setItem('novachess-library-v2',JSON.stringify({games:[g]})),{id:'auto',title:'Automatic',created:Date.now(),initial,positions:[initial,c.fen()],moves:['e2e4'],notation:['e4'],result:'1-0',human:'w',variant:'chess',folder:'Games',origin:'archive'});await page.goto('/#library/auto');await expect(page.getByRole('status').filter({hasText:'Review complete.'})).toBeVisible({timeout:30000});await expect(page.locator('.review-notation .move-quality[aria-label=Book] svg')).toBeVisible();await expect(page.locator('.board-move-badge .move-quality')).toBeVisible();
 });

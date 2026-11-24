@@ -682,14 +682,14 @@ export default function Community({presetMode = "standard", presetVariant = "che
             <Card className="quick-online-play">
               {mode === "team" && <Field label="Opponent"><ChoiceSelect value={bot?"bot":"friends"} onChange={e=>{setBot(e.target.value==="bot");if(e.target.value==="bot")setSelectedFriend(null);}}><option value="friends">Another team</option><option value="bot">Computer</option></ChoiceSelect></Field>}
               {mode === "team" && bot && <div className="team-computer-rating"><Field label="Computer rating">
-                <input className="team-rating-input" type="number" min={teamComputerMinRating} max={teamComputerMaxRating} step={teamComputerRatingStep}
+                <input className="team-rating-input" aria-describedby="team-rating-note" type="number" min={teamComputerMinRating} max={teamComputerMaxRating} step={teamComputerRatingStep}
                   value={botRating} onChange={e=>setBotRating(e.target.value)}
                   onBlur={()=>setBotRating(String(clampTeamComputerRating(botRating === "" ? undefined : Number(botRating))))}/>
               </Field>
                 <Button className="secondary" aria-pressed={Number(botRating) === teamComputerMaxRating}
                   onClick={() => setBotRating(String(teamComputerMaxRating))}>Max strength</Button>
               </div>}
-              {mode === "team" && bot && <p className="caption">Computer ratings are approximate.</p>}
+              {mode === "team" && bot && <p className="sr-only" id="team-rating-note">Computer ratings are approximate.</p>}
               <Button className="new-game-primary" disabled={busy} onClick={async()=>{
                 if(selectedFriend){await challengeFriend(selectedFriend.id);return;}
                 setBusy(true);setError("");
