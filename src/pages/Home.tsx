@@ -152,15 +152,22 @@ export default function HomePage() {
         )}
       </section>
       <div className="home-extras">
-        <section className="home-app" aria-labelledby="home-app-title">
-          <span className="home-app-icon"><Smartphone size={28} aria-hidden="true" /></span>
-          <div>
-            <h2 id="home-app-title">Try the app</h2>
-            {appStoreUrl
-              ? <a className="text-link" href={appStoreUrl}>Get Matein4 on the App Store <ArrowRight size={14} aria-hidden="true" /></a>
-              : <p>Coming soon to the App Store</p>}
-          </div>
-        </section>
+        <div className="home-app-group">
+          <section className="home-app" aria-labelledby="home-app-title">
+            <span className="home-app-icon"><Smartphone size={28} aria-hidden="true" /></span>
+            <div>
+              <h2 id="home-app-title">Try the app</h2>
+              {appStoreUrl
+                ? <a className="text-link" href={appStoreUrl}>Get Matein4 on the App Store <ArrowRight size={14} aria-hidden="true" /></a>
+                : <p>Coming soon to the App Store</p>}
+            </div>
+          </section>
+          <section className="home-free" aria-label="Free chess tools">
+            <strong>1000% Free</strong>
+            <strong>No Ads</strong>
+            <p>All the best chess tools in one place</p>
+          </section>
+        </div>
         <div className="home-featured-group">
           <button type="button" className="home-featured" onClick={() => navigate("variants", "choose/vote")}>
             <MultiplayerPicture mode="vote" />

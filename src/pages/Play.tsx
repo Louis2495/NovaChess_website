@@ -10,7 +10,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { FairyStockfish } from "ffish-es6";
 import {
   Timer,
-  Dice5,
   RotateCcw,
   Flag,
   Handshake,
@@ -645,7 +644,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
         value={colorChoice} onChange={e => setColorChoice(e.target.value)}>
         <option value="w">{variantsOnly ? "White" : <><Piece symbol="P" /><span className="sr-only">White</span></>}</option>
         <option value="b">{variantsOnly ? "Black" : <><Piece symbol="p" /><span className="sr-only">Black</span></>}</option>
-        <option value="random">{variantsOnly ? "Random" : <><Dice5 aria-hidden="true" /><span className="sr-only">Random</span></>}</option>
+        <option value="random">{variantsOnly ? "Random" : <><span className="split-color-pawn" aria-hidden="true"><Piece symbol="P" /><Piece symbol="p" /></span><span className="sr-only">Random</span></>}</option>
       </ChoiceSelect>
       {!speedrunMode && !["dropping", "chaos", "random"].includes(variant) && (
         <>

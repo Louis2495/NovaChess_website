@@ -89,6 +89,10 @@ test('Home shows the app announcement and opens Vote Chess from the entire tile'
  expect(launch.x+launch.width).toBeCloseTo(recent.x+recent.width,0);
  const app=page.getByRole('region',{name:'Try the app'});
  await expect(app.getByText('Coming soon to the App Store')).toBeVisible();
+ const free=page.getByRole('region',{name:'Free chess tools'});
+ await expect(free.locator(':scope > *')).toHaveText(['1000% Free','No Ads','All the best chess tools in one place']);
+ const appBounds=(await app.boundingBox())!, freeBounds=(await free.boundingBox())!;
+ expect(freeBounds.x).toBeGreaterThan(appBounds.x+appBounds.width);
  await expect(page.getByRole('region',{name:'Next up'})).toHaveCount(0);
  await expect(page.getByText('Featured variant',{exact:true})).toHaveCount(0);
  await expect(page.locator('.home-featured-group > button:nth-child(2)')).toHaveCount(0);
