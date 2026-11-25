@@ -9,16 +9,26 @@ test('sidebar fits short and tall screens without scrolling or hiding links',asy
   for(const item of bounds.items){expect(item.top,item.name||'button').toBeGreaterThanOrEqual(0);expect(item.bottom,item.name||'button').toBeLessThanOrEqual(height);}
  }
 });
-test('computer Play places Start game beneath the inline settings', async ({ page }) => {
+test('computer Play keeps the settings compact and Start game lower on the page', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('novachess-appearance-v2',
+    JSON.stringify({ theme: 'Amber', accent: '#e8b953', buttonColor: '#e8b953' })));
   await page.goto('/#play');
   await page.getByRole('button', { name: 'Computer', exact: true }).click();
   const settings = page.getByRole('group', { name: 'Game setup' });
   await expect(settings.getByRole('group', { name: 'Your color' })).toBeVisible();
   await expect(settings.getByText('Your color', { exact: true })).toHaveCount(0);
-  await expect(settings.getByRole('group', { name: 'Rating mode' })).toBeVisible();
+  const rated = settings.getByRole('group', { name: 'Rating mode' }).getByRole('button', { name: 'Rated', exact: true });
+  await expect(rated).toHaveCSS('background-color', 'rgb(232, 185, 83)');
+  await expect(rated).toHaveCSS('color', 'rgb(16, 22, 16)');
+  await expect(settings.locator('.opponent-choices label:has(input:checked) small')).toHaveCSS('color', 'rgb(16, 22, 16)');
+  await expect(settings.getByRole('button', { name: 'White', exact: true })).toHaveCSS('color', 'rgb(16, 22, 16)');
   const start = await page.getByRole('button', { name: 'Start game', exact: true }).boundingBox();
   const controls = await settings.boundingBox();
-  expect(start!.y).toBeGreaterThan(controls!.y + controls!.height);
+  expect(controls!.width).toBeLessThanOrEqual(340);
+  expect(start!.y - controls!.y - controls!.height).toBeGreaterThan(60);
+  const startCenter = (start!.y + start!.height / 2) / page.viewportSize()!.height;
+  expect(startCenter).toBeGreaterThan(0.65);
+  expect(startCenter).toBeLessThan(0.85);
 });
 test('time control labels use compact chess notation and main boards stay inside the viewport',async({page})=>{
  await page.goto('/#play');await expect(page.getByRole('group',{name:'Time control'}).getByRole('button')).toHaveText(['3','3|2','5','10']);

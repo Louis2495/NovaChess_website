@@ -6900,10 +6900,11 @@ html { scrollbar-gutter:stable; }
 .site-analytics-filters li span { text-transform:none; overflow-wrap:anywhere; }
 
 .standard-play-hub.computer-opponent > .play-hub-heading { margin-bottom:clamp(18px,4vh,42px); }
-.standard-game-settings { margin-top:0; padding-inline:0; }
+.standard-game-settings { width:min(100%,340px); margin-top:0; padding-inline:0; align-self:start; }
 .standard-game-settings .game-options { gap:12px; }
 .standard-game-settings .play-color-choice,
-.standard-game-settings .play-rating-mode { width:100%; box-sizing:border-box; margin:0; }
+.standard-game-settings .play-rating-mode { width:100%; box-sizing:border-box; margin:0 auto; }
+.standard-game-settings .play-rating-mode { width:min(100%,240px); }
 .standard-game-settings .play-color-choice button,
 .standard-game-settings .play-rating-mode button { flex:1; }
 .standard-game-settings .play-color-choice button::before {
@@ -6913,6 +6914,19 @@ html { scrollbar-gutter:stable; }
 .standard-game-settings .play-color-choice button:nth-child(1)::before { background:#fff1d3; }
 .standard-game-settings .play-color-choice button:nth-child(2)::before { background:#182131; }
 .standard-game-settings .play-color-choice button:nth-child(3)::before { background:linear-gradient(135deg,#fff1d3 50%,#182131 50%); }
-.standard-game-settings .opponent-choices label:has(input:checked) { color:var(--button-text); background:var(--button); }
+.standard-game-settings .play-color-choice button[aria-pressed="true"],
+.standard-game-settings .opponent-choices label:has(input:checked) {
+  color:var(--button-text); background:var(--button);
+}
+.standard-game-settings .opponent-choices label:has(input:checked) small { color:inherit; }
+.standard-play-hub.setup-active.computer-opponent .game-setup-page {
+  display:grid;
+  grid-template-rows:minmax(47dvh,auto) auto;
+}
 .standard-play-hub.setup-active.computer-opponent .setup-launch { min-height:0; margin-top:20px; }
+@media(max-width:1000px) {
+  .standard-play-hub.setup-active.computer-opponent .game-setup-page {
+    grid-template-rows:minmax(38dvh,auto) auto;
+  }
+}
 .standard-play-hub.computer-opponent .setup-launch .play-feature-copy { display:flex; flex-direction:column; align-items:center; gap:10px; }
