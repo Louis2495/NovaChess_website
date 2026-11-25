@@ -82,7 +82,7 @@ test('Home completion uses a yellow outline and recent games show stacked player
  const faint=await entries.first().evaluate(e=>{const s=getComputedStyle(e);return s.backgroundColor!==s.borderTopColor});expect(faint).toBe(true);
 });
 
-test('Home shows the app announcement and opens Vote Chess from the entire tile',async({page})=>{
+test('Home shows the app announcement and opens Vote Chess from the entire tile',async({page,isMobile})=>{
  await page.goto('/');
  const launch=(await page.getByRole('button',{name:'New game',exact:true}).boundingBox())!;
  const recent=(await page.getByRole('region',{name:'Recent games'}).boundingBox())!;
@@ -93,6 +93,15 @@ test('Home shows the app announcement and opens Vote Chess from the entire tile'
  await expect(free.locator(':scope > *')).toHaveText(['1000% Free','No Ads','All the best chess tools in one place']);
  const appBounds=(await app.boundingBox())!, freeBounds=(await free.boundingBox())!;
  expect(freeBounds.x).toBeGreaterThan(appBounds.x+appBounds.width);
+ if(!isMobile){
+  const columns = await Promise.all(['.home-puzzle', '.daily-meme', '.home-recent'].map(selector =>
+    page.locator(selector).boundingBox()));
+  const featured = (await page.locator('.home-featured-group').boundingBox())!;
+  for (const [index, lower] of [appBounds, freeBounds, featured].entries()) {
+   expect(lower.x).toBeCloseTo(columns[index]!.x, 0);
+   expect(lower.x + lower.width).toBeCloseTo(columns[index]!.x + columns[index]!.width, 0);
+  }
+ }
  await expect(page.getByRole('region',{name:'Next up'})).toHaveCount(0);
  await expect(page.getByText('Featured variant',{exact:true})).toHaveCount(0);
  await expect(page.locator('.home-featured-group > button:nth-child(2)')).toHaveCount(0);

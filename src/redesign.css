@@ -6015,7 +6015,7 @@ html { scrollbar-gutter:stable; }
 .home-extras {
   grid-column:1 / -1;
   display:grid;
-  grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
+  grid-template-columns:minmax(0,1fr);
   gap:var(--home-gap);
 }
 .home-app,
@@ -6034,6 +6034,7 @@ html { scrollbar-gutter:stable; }
 }
 .home-free strong { font-size:clamp(1rem,1.5vw,1.35rem); }
 .home-free p { margin:3px 0 0; color:var(--muted); line-height:1.35; }
+.home-dashboard:not(:has(.daily-meme)) .home-app { flex-direction:column; align-items:flex-start; gap:10px; }
 @media(max-width:1100px) {
   .home-app-group .home-app { flex-direction:column; align-items:flex-start; gap:10px; }
 }
@@ -6098,6 +6099,12 @@ html { scrollbar-gutter:stable; }
   .home-page.home-dashboard:has(.daily-meme) .daily-meme { height:auto; }
   .home-page.home-dashboard:has(.daily-meme) > .home-recent { grid-column:3; }
   .home-page.home-dashboard:not(:has(.daily-meme)) { grid-template-columns:minmax(0,1fr) minmax(0,1.8fr); }
+  .home-dashboard > .home-extras { grid-template-columns:subgrid; column-gap:normal; }
+  .home-dashboard:has(.daily-meme) .home-app-group {
+    grid-column:span 2;
+    grid-template-columns:subgrid;
+    column-gap:normal;
+  }
 }
 @media(max-width:1000px) {
   .home-page.home-dashboard .home-practice-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -6106,7 +6113,6 @@ html { scrollbar-gutter:stable; }
 @media(max-width:600px) {
   .home-page.home-dashboard > .home-practice-grid { display:contents; }
   .home-page.home-dashboard .daily-meme { order:1; }
-  .home-extras { grid-template-columns:minmax(0,1fr); }
   .home-featured-group:has(> :nth-child(2)) .home-featured {
     display:grid;
     grid-template-columns:auto minmax(0,1fr);
