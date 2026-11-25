@@ -172,7 +172,7 @@ export default function HomePage() {
           </section>
         </div>
         <div className="home-featured-group">
-          <button type="button" className="home-featured" onClick={() => navigate("variants", "choose/vote")}>
+          <button type="button" className="home-featured home-featured-vote" onClick={() => navigate("variants", "choose/vote")}>
             <MultiplayerPicture mode="vote" />
             <span>
               <strong>Vote Chess</strong>

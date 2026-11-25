@@ -6078,6 +6078,7 @@ html { scrollbar-gutter:stable; }
   text-align:left;
   background:linear-gradient(135deg,color-mix(in srgb,var(--panel-solid) 87%,var(--accent)),var(--panel-solid));
 }
+.home-featured-vote { justify-content:center; }
 .home-featured:hover { background:color-mix(in srgb,var(--panel-solid) 77%,var(--accent)); }
 .home-featured > :is(.multiplayer-picture,.variant-picture,.speedrun-picture) {
   flex:none;
@@ -6122,6 +6123,11 @@ html { scrollbar-gutter:stable; }
   }
   .home-featured-group:has(> :nth-child(2)) .home-featured > span:last-child { display:contents; }
   .home-featured-group:has(> :nth-child(2)) .home-featured > span:last-child > span { grid-column:1 / -1; }
+  .home-featured-group:has(> :nth-child(2)) .home-featured-vote {
+    grid-template-columns:auto minmax(0,max-content);
+    align-content:center;
+  }
+  .home-featured-vote > span:last-child > span { text-align:center; }
 }
 
 .variants-hub.setup-active[data-online-variant="team"] > .quick-online-play:has(.team-rating-input) {
