@@ -1,9 +1,9 @@
 import {test,expect} from '@playwright/test';
 import {readFileSync} from 'node:fs';
 const memes=JSON.parse(readFileSync('public/memes/candidates.json','utf8'));
-test('meme frames match puzzle height without cropping and puzzle hover highlights the whole card',async({page})=>{
+test('memes preserve their proportions and puzzle hover highlights the whole card',async({page})=>{
  for(const meme of [memes.reduce((a:any,b:any)=>a.width/a.height<b.width/b.height?a:b),memes.reduce((a:any,b:any)=>a.width/a.height>b.width/b.height?a:b)]){
-  await page.route('**/memes/candidates.json',r=>r.fulfill({json:[meme]}));await page.goto('/');const image=page.locator('.daily-meme-image');await image.evaluate((e:HTMLImageElement)=>e.decode());await expect(image).toHaveCSS('object-fit','contain');await expect(page.locator('.daily-meme')).toHaveCSS('background-color','rgb(255, 255, 255)');await expect.poll(async()=>Math.abs((await page.locator('.daily-meme').boundingBox())!.height-(await page.locator('.home-puzzle').boundingBox())!.height)).toBeLessThan(1);await page.unroute('**/memes/candidates.json');
+  await page.route('**/memes/candidates.json',r=>r.fulfill({json:[meme]}));await page.goto('/');const image=page.locator('.daily-meme-image');await image.evaluate((e:HTMLImageElement)=>e.decode());await expect(image).toHaveCSS('object-fit','contain');await expect(page.locator('.daily-meme')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');await page.unroute('**/memes/candidates.json');
  }
  const card=page.locator('.home-puzzle'),content=page.locator('.home-puzzle-content');const before=await card.evaluate(e=>getComputedStyle(e).backgroundColor);await card.hover();await expect.poll(()=>card.evaluate(e=>getComputedStyle(e).backgroundColor)).not.toBe(before);await expect(content).toHaveCSS('background-color','rgba(0, 0, 0, 0)');const c=(await card.boundingBox())!,b=(await card.locator('.board').boundingBox())!;expect(b.y+b.height).toBeLessThanOrEqual(c.y+c.height);await card.click();await expect(page).toHaveURL(/puzzles/);
 });
@@ -18,36 +18,6 @@ test('Recent games stays visible when the library is empty', async ({ page }) =>
   await expect(page).toHaveURL(/#play$/);
 });
 
-test('the meme image area fills both empty bands with white over a custom background', async ({ page }) => {
-  await page.route('**/memes/candidates.json', route => route.fulfill({
-    json: [{ id: 'wide-meme', image: 'wide-meme.svg', alt: 'Wide test meme', width: 800, height: 100, status: 'approved' }],
-  }));
-  await page.route('**/memes/wide-meme.svg', route => route.fulfill({
-    contentType: 'image/svg+xml',
-    body: '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="100"><rect width="800" height="100" fill="#182460"/></svg>',
-  }));
-  await page.goto('/');
-  await page.locator('.app').evaluate(el => { (el as HTMLElement).style.backgroundColor = '#301a55'; });
-  const image = page.locator('.daily-meme-image');
-  await image.evaluate((meme: HTMLImageElement) => meme.decode());
-  await expect(image).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-  const screenshot = await image.screenshot();
-  const colors = await page.evaluate(async (png) => {
-    const image = new Image();
-    image.src = 'data:image/png;base64,' + png;
-    await image.decode();
-    const canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
-    const ctx = canvas.getContext('2d')!;
-    ctx.drawImage(image, 0, 0);
-    return [.12, .5, .88].map(row => Array.from(
-      ctx.getImageData(Math.floor(image.width / 2), Math.floor(image.height * row), 1, 1).data,
-    ));
-  }, screenshot.toString('base64'));
-  expect(colors).toEqual([[255, 255, 255, 255], [24, 36, 96, 255], [255, 255, 255, 255]]);
-});
-
 test('desktop Home places equally tall Recent games beside the meme',async({page})=>{
  await page.addInitScript(()=>{const initial='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';localStorage.setItem('novachess-library-v2',JSON.stringify({games:['1-0','0-1','1/2-1/2'].map((result,i)=>({id:String(i),title:'Standard',initial,positions:[initial],moves:[],notation:[],result,human:'w',variant:'chess',folder:'Games',kind:'game',created:Date.now(),opponent:'Computer',botRating:1200}))}));});
  for(const meme of [memes.reduce((a:any,b:any)=>a.width/a.height<b.width/b.height?a:b),memes.reduce((a:any,b:any)=>a.width/a.height>b.width/b.height?a:b)]){
@@ -56,7 +26,8 @@ test('desktop Home places equally tall Recent games beside the meme',async({page
    await page.setViewportSize({width,height});await page.goto('/');const image=page.locator('.daily-meme-image');await image.evaluate((image:HTMLImageElement)=>image.decode());
    const puzzle=(await page.locator('.home-puzzle').boundingBox())!,m=(await page.locator('.daily-meme').boundingBox())!,recent=(await page.locator('.home-recent').boundingBox())!;
    expect(Math.abs(puzzle.y-m.y)).toBeLessThan(2);expect(Math.abs(recent.y-m.y)).toBeLessThan(2);expect(recent.x).toBeGreaterThan(m.x+m.width);
-   await expect(page.locator('.daily-meme')).toHaveCSS('border-width','8px');expect(Math.abs(m.height-puzzle.height)).toBeLessThan(1);expect(Math.abs(recent.height-puzzle.height)).toBeLessThan(1);expect(await page.locator('.home-recent-list').evaluate(e=>e.scrollHeight-e.clientHeight)).toBeLessThanOrEqual(1);
+   await expect(page.locator('.daily-meme')).toHaveCSS('border-width','0px');expect(Math.abs(m.height-puzzle.height)).toBeLessThan(1);expect(Math.abs(recent.height-puzzle.height)).toBeLessThan(1);expect(await page.locator('.home-recent-list').evaluate(e=>e.scrollHeight-e.clientHeight)).toBeLessThanOrEqual(1);
+   expect(await page.evaluate(() => document.scrollingElement!.scrollHeight - innerHeight), `Home fits at ${width}x${height}`).toBeLessThanOrEqual(1);
   }
   await page.unroute('**/memes/candidates.json');
  }

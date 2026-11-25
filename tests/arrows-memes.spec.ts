@@ -30,7 +30,7 @@ test('Show memes defaults on, persists off and leaves a full dashboard',async({p
 
 test.describe('responsive meme layout', () => {
  test.use({ serviceWorkers: 'block' });
- test('Home fits wide, square and tall memes without a white frame', async ({ page }) => {
+ test('Home fits wide, square and tall memes with an even black frame', async ({ page }) => {
   for (const [width, height] of [[900, 250], [600, 600], [280, 1100]]) {
    await page.route('**/memes/candidates.json', route => route.fulfill({ json: [{
     id: 'test-meme', image: 'test-meme.svg', alt: 'Test chess meme', width, height, status: 'approved',
@@ -45,6 +45,8 @@ test.describe('responsive meme layout', () => {
    await image.scrollIntoViewIfNeeded();
    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBe(width);
    await expect(card).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+   await expect(image).toHaveCSS('outline-width', '3px');
+   await expect(image).toHaveCSS('outline-color', 'rgb(0, 0, 0)');
    const frame = (await card.boundingBox())!;
    const art = (await image.boundingBox())!;
    expect(art.width / art.height).toBeCloseTo(width / height, 2);
