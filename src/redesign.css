@@ -5982,11 +5982,10 @@ html { scrollbar-gutter:stable; }
   font-weight:800;
 }
 .home-page.home-dashboard .home-practice-grid .daily-meme {
-  --meme-frame-width:15px;
   display:grid;
   place-items:center;
   margin:0;
-  padding:calc(var(--meme-frame-width) + 1px);
+  padding:0;
   height:auto;
   max-width:none;
   align-self:stretch;
@@ -6000,8 +5999,9 @@ html { scrollbar-gutter:stable; }
   max-width:100%;
   max-height:min(480px,60dvh);
   border-radius:var(--radius);
-  outline:var(--meme-frame-width) solid #000;
-  box-shadow:0 0 0 calc(var(--meme-frame-width) + 1px) var(--border-strong);
+  border:15px solid #000;
+  outline:0;
+  box-shadow:none;
 }
 .home-page.home-dashboard > .home-recent {
   margin:0;
@@ -6142,7 +6142,7 @@ html { scrollbar-gutter:stable; }
   .home-dashboard .home-welcome-actions h1 { font-size:clamp(1.5rem,4svh,2.4rem); }
   .home-dashboard .home-welcome .new-game-primary { min-height:48px; padding-block:8px; }
   .home-page.home-dashboard .home-practice-grid .daily-meme .daily-meme-image {
-    max-height:calc(clamp(240px,49svh,420px) - 2 * (var(--meme-frame-width) + 1px));
+    max-height:clamp(240px,49svh,420px);
   }
   .home-dashboard :is(.home-app,.home-free,.home-featured) { padding:12px; }
   .home-dashboard .home-app-group .home-app { flex-direction:row; align-items:center; gap:10px; }
