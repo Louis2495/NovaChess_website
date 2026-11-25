@@ -10,7 +10,7 @@ test('sidebar fits short and tall screens without scrolling or hiding links',asy
  }
 });
 test('opening request combines filtering, selection, keyboard access and clearing in one field',async({page})=>{
- await page.goto('/#play');await page.getByRole('button',{name:'Computer',exact:true}).click();await page.getByRole('button',{name:'Game options',exact:true}).click();
+ await page.goto('/#play');await page.getByRole('button',{name:'Computer',exact:true}).click();
  await expect(page.getByLabel('Search openings',{exact:true})).toHaveCount(0);
  const picker=page.getByRole('combobox',{name:'Request an opening',exact:true});
  await picker.fill('Sicilian Najdorf');await expect(page.getByRole('option').first()).toContainText('Najdorf');

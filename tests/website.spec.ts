@@ -799,7 +799,7 @@ test("Home has one large New Game action", async ({
   await expect(start).toBeVisible();
   expect((await start.boundingBox())!.height).toBeGreaterThanOrEqual(58);
   await expect(page.locator(".variant-grid")).toHaveCount(0);
-  await page.getByRole("button", { name: "Game options", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Game options", exact: true })).toHaveCount(0);
   await expect(page.getByLabel("Variant", { exact: true })).toHaveCount(0);
 });
 

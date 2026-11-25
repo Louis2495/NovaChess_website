@@ -29,7 +29,7 @@ test("game setup offers two strength choices, defaults to rated, searches openin
   page,
 }) => {
   await page.goto("/#play");await page.getByRole("button",{name:"Computer",exact:true}).click();
-  await page.getByRole("button", { name: "Game options", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Game options", exact: true })).toHaveCount(0);
   await expect(page.locator(".opponent-choices input")).toHaveCount(2);
   await expect(page.getByLabel("Current rating")).toBeChecked();
   await expect(page.getByRole("checkbox", { name: /^Rated/ })).toBeChecked();
@@ -48,6 +48,10 @@ test("game setup offers two strength choices, defaults to rated, searches openin
   await expect(opening).toHaveValue(/Sicilian/);
   await page.getByLabel("Custom", { exact: true }).check();
   await page.getByLabel("Rating", { exact: true }).fill("1500");
+  const random = page.getByRole("group", { name: "Your color" }).getByRole("button", { name: "Random", exact: true });
+  await random.click();
+  await expect(random).toHaveAttribute("aria-pressed", "true");
+  await page.evaluate(() => { Math.random = () => 0.9; });
   await page.getByRole("button", { name: "Start game", exact: true }).click();
   await expect
     .poll(async () =>
@@ -58,6 +62,9 @@ test("game setup offers two strength choices, defaults to rated, searches openin
       ),
     )
     .toBe(true);
+  await expect.poll(() => page.evaluate(() =>
+    JSON.parse(localStorage.getItem("novachess-library-v2") || "{}").activeGame?.human,
+  )).toBe("b");
   await page.goto("/#home");
   for (const route of ["home", "play"]) {
     await page.goto("/#" + route);

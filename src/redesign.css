@@ -5852,7 +5852,6 @@ html { scrollbar-gutter:stable; }
   --computer-top-shift:min(18px,calc(var(--variants-top-inset) - 8px));
   padding-top:calc(var(--variants-top-inset) - var(--computer-top-shift));
 }
-.game-settings-footer { display:contents; }
 .variants-hub.setup-active .variant-settings-footer {
   flex:none;
   display:flex;
@@ -6856,7 +6855,7 @@ html { scrollbar-gutter:stable; }
 .admin-grant[aria-label="Global chat settings"] fieldset { min-width:0; border:0; padding:0; margin:0; }
 .standard-play-hub.computer-opponent .game-setup-page { width:100%; max-width:1040px; }
 .standard-play-hub.computer-opponent .setup-launch .play-feature-copy { width:min(100%,840px); }
-.standard-play-hub.computer-opponent .game-settings-card > .options-toggle { justify-content:center; }
+.standard-game-settings .game-options { border-top:0; padding-block:0; }
 
 .btn.sign-in-action {
   background:#ff586f;

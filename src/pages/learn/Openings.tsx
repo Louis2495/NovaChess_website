@@ -1,3 +1,4 @@
+import { resolvePlayColor } from "../../lib/playColor";
 import { useLessonViewport } from "../../lib/useLessonViewport";
 import { groupByOpening, openingFamily } from "../../lib/openingFamilies";
 import { usePremoves } from "../../lib/usePremoves";
@@ -580,13 +581,14 @@ function LessonWorkspace({
                   <ChoiceSelect
                     value={side}
                     onChange={(e) => {
-                      setSide(e.target.value as "w" | "b");
+                      setSide(resolvePlayColor(e.target.value));
                       show(0);
                       setPerfect(true);
                     }}
                   >
                     <option value="w">White</option>
                     <option value="b">Black</option>
+                    <option value="random">Random</option>
                   </ChoiceSelect>
                 </Field>
               )}
@@ -735,10 +737,11 @@ function LessonWorkspace({
           <Field label="Train as">
             <ChoiceSelect
               value={side}
-              onChange={(e) => setSide(e.target.value as "w" | "b")}
+              onChange={(e) => setSide(resolvePlayColor(e.target.value))}
             >
               <option value="w">White</option>
               <option value="b">Black</option>
+              <option value="random">Random</option>
             </ChoiceSelect>
           </Field>
           <Button

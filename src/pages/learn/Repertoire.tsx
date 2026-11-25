@@ -1,3 +1,4 @@
+import { resolvePlayColor } from "../../lib/playColor";
 import { groupByOpening, openingFamily, repertoireFamilyLookup } from "../../lib/openingFamilies";
 import { exportRepertoire, repertoirePaths, uci } from "../../lib/repertoire";
 import { RepertoireInbox, ShareWithFriend } from "./RepertoireFriends";
@@ -462,8 +463,8 @@ function RepertoireSuggestions({ reference, repertoire, savedFamilies, categoryN
     {error ? <p>Opening suggestions could not be loaded.</p> : loading ? <p>Loading suggestions…</p> : <>
       <p className="caption">Select categories and lines to add as empty placeholders.</p>
       <ChoiceSelect aria-label="Color for new lines" value={side}
-        onChange={event => setSide(event.target.value === "b" ? "b" : "w")}>
-        <option value="w">White</option><option value="b">Black</option>
+        onChange={event => setSide(resolvePlayColor(event.target.value))}>
+        <option value="w">White</option><option value="b">Black</option><option value="random">Random</option>
       </ChoiceSelect>
       <div className="repertoire-suggestions">
         <section>

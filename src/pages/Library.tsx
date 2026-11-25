@@ -1,3 +1,4 @@
+import { resolvePlayColor } from "../lib/playColor";
 import {SavedBoardPlayer} from "../components/BoardPlayer";
 import {screenName} from "../lib/screenName";
 import { cachedReview, cacheReview } from "../lib/reviewCache";
@@ -326,10 +327,11 @@ function StudyTraining({
         <Field label="Practice as">
           <ChoiceSelect
             value={side}
-            onChange={(e) => setSide(e.target.value as "w" | "b")}
+            onChange={(e) => setSide(resolvePlayColor(e.target.value))}
           >
             <option value="w">White</option>
             <option value="b">Black</option>
+            <option value="random">Random</option>
           </ChoiceSelect>
         </Field>
       </div>

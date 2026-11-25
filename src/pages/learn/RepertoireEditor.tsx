@@ -1,3 +1,4 @@
+import { resolvePlayColor } from "../../lib/playColor";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { BookOpen, ChevronLeft, ChevronRight, Download, RotateCcw, Save, SkipBack, Trash2 } from "lucide-react";
 import { Chess } from "chess.js";
@@ -114,8 +115,8 @@ export default function RepertoireEditor({ line, category, onBack }: { line?: Re
       </div>
       <Card className="repertoire-edit-panel">
         <Field label="Line name"><input value={name} onChange={event => setName(event.target.value)} maxLength={100} /></Field>
-        <Field label="Train as"><ChoiceSelect value={side} onChange={event => setSide(event.target.value as "w" | "b")}>
-          <option value="w">White</option><option value="b">Black</option>
+        <Field label="Train as"><ChoiceSelect value={side} onChange={event => setSide(resolvePlayColor(event.target.value))}>
+          <option value="w">White</option><option value="b">Black</option><option value="random">Random</option>
         </ChoiceSelect></Field>
         <p className="caption">Select an earlier move, then play a different continuation to add a sideline.</p>
         <div className="repertoire-moves"><Notation nodes={tree} prefix={[]} cursor={cursor} select={setCursor} label="Main line" /></div>

@@ -1,3 +1,4 @@
+import { resolvePlayColor } from "../lib/playColor";
 import {SavedBoardPlayer} from "../components/BoardPlayer";
 import OpeningPicker from "../components/OpeningPicker";
 import { useReviewWarmup } from "../lib/useReviewWarmup";
@@ -127,7 +128,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
         : null,
     ),
     [dropCount, setDropCount] = useState(2),
-    [human, setHuman] = useState<"w" | "b">("w"),
+    [colorChoice, setColorChoice] = useState("w"),
     [choice, setChoice] = useState("Current rating"),
     [rating, setRating] = useState(1200),
     [rated, setRated] = useState(true),
@@ -198,6 +199,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
     };
   }
   function start() {
+    const human = resolvePlayColor(colorChoice);
     if (["dropping", "chaos", "random"].includes(variant)) {
       const state = newSpecial(variant as SpecialVariant, dropCount),
         id = uid();
@@ -598,7 +600,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
     return (
       <SpecialPlay
         variant={special}
-        human={game?.special ? game.human : human}
+        human={game?.human ?? "w"}
         dropCount={game?.special?.dropCount || dropCount}
         onBack={() => {
           if(detail === "resume"){navigate("variants");return;}
@@ -611,7 +613,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
     );
   const moveTime = game?.speedrun && <span className={`turn-clock speedrun-clock${game.result === "*" && valid?.turn === game.human ? " is-active" : ""}`} role="timer" aria-label="Your move time"><Timer size={18}/>{duration(game.speedrun.elapsedMs + (game.result === "*" && game.speedrun.turnStartedAt !== null ? Math.max(0,clockNow-game.speedrun.turnStartedAt) : 0))}</span>;
   const speedrunEloField = <Field label="Computer Rating"><input type="number" min={speedrunMinRating} max={speedrunMaxRating} step={speedrunRatingStep} value={speedrunRating} onChange={e=>setSpeedrunRating(+e.target.value)} onBlur={()=>setSpeedrunRating(clampSpeedrunRating(speedrunRating || speedrunMinRating))}/></Field>;
-  const gameOptions = options && (
+  const gameOptions = (
     <div className={`game-options${variantsOnly ? " variant-dialog-options" : ""}`}>
       {variantsOnly && <Field label="Variant">
         <ChoiceSelect
@@ -644,11 +646,12 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
       )}
       <Field label="Your color">
         <ChoiceSelect
-          value={human}
-          onChange={(e) => setHuman(e.target.value as "w" | "b")}
+          value={colorChoice}
+          onChange={(e) => setColorChoice(e.target.value)}
         >
           <option value="w">White</option>
           <option value="b">Black</option>
+          <option value="random">Random</option>
         </ChoiceSelect>
       </Field>
       {!speedrunMode && !["dropping", "chaos", "random"].includes(variant) && (
@@ -761,21 +764,22 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
             ))}
 
           </div>}
-          <div className={variantsOnly ? "variant-settings-footer" : "game-settings-footer"}>
-            {speedrunMode && <Card className="speedrun-setup" aria-hidden={variantsOnly && options ? true : undefined}>{!variantsOnly && <p className="caption">Beat the computer as fast as possible</p>}{speedrunEloField}</Card>}
-            <Card className="game-settings-card">
-              <button
-                className="options-toggle"
-                aria-expanded={options}
-                aria-haspopup={variantsOnly ? "dialog" : undefined}
-                onClick={() => setOptions(!options)}
-              >
-                Game options
-                {variantsOnly && <ChevronRight size={19} aria-hidden="true" />}
-              </button>
-              {!variantsOnly && gameOptions}
-            </Card>
-          </div>
+          {variantsOnly ? (
+            <div className="variant-settings-footer">
+              {speedrunMode && <Card className="speedrun-setup" aria-hidden={options || undefined}>{speedrunEloField}</Card>}
+              <Card className="game-settings-card">
+                <button className="options-toggle" aria-expanded={options} aria-haspopup="dialog"
+                  onClick={() => setOptions(!options)}>
+                  Game options
+                  <ChevronRight size={19} aria-hidden="true" />
+                </button>
+              </Card>
+            </div>
+          ) : (
+            <div className="game-settings-card standard-game-settings" role="group" aria-label="Game setup">
+              {gameOptions}
+            </div>
+          )}
           {variantsOnly && options && (
             <Modal title="Game options" onClose={() => setOptions(false)}>
               {gameOptions}
