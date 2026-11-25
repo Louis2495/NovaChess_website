@@ -4316,7 +4316,16 @@ select.theme-select {
 .profile-page-layout { align-items:stretch; }
 .profile-side > .card { flex:1; }
 .profile-online { grid-column:1 / -1; }
-.appearance-inline { border:1px solid var(--border); border-radius:var(--radius); padding:24px; background:var(--panel); }
+.appearance-inline {
+  box-sizing:border-box;
+  width:min(860px,calc(100% - clamp(12px,5vw,64px)));
+  margin-inline:auto;
+  padding:clamp(12px,2vw,24px);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--panel);
+}
+.page-segments:has(+ .appearance-inline) { margin-inline:auto; }
 .move-sound-upload { display:flex; align-items:center; gap:8px; margin-top:10px; }
 .move-sound-upload .file-button { display:inline-flex; align-items:center; gap:8px; font-size:.8rem; position:relative; cursor:pointer; }
 .move-sound-upload input { position:absolute; width:1px; height:1px; opacity:0; }

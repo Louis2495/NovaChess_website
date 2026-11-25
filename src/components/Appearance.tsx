@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Chess } from "chess.js";
 import {
   Palette,
   ImagePlus,
@@ -35,8 +36,13 @@ const sections = [
   ["Audio", Volume2],
   ["Moves", Move],
 ] as const;
+const previewPosition = new Chess(initialFen);
+previewPosition.move("e4");
+const previewFen = previewPosition.fen();
+
 export default function Appearance({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
   const { appearance: a, setAppearance: set, notify } = useApp();
+  const [previewMove, setPreviewMove] = useState(false);
   const [tab, setTab] = useState("Colors"),
     [presets, setPresets] = usePersistent<
       { name: string; settings: AppearanceType }[]
@@ -133,11 +139,14 @@ export default function Appearance({ onClose, embedded = false }: { onClose: () 
         </div>
         <div className="appearance-controls">
           <div className="appearance-preview">
-            <Board fen={initialFen} disabled compact />
+            <Board fen={previewMove ? previewFen : initialFen}
+              highlights={previewMove ? ["e2", "e4"] : []} disabled compact />
             <div>
               <span className="eyebrow">LIVE PREVIEW</span>
               <h3>{a.theme}</h3>
-              <span className="btn">Preview button</span>
+              <Button onClick={() => setPreviewMove(value => !value)}>
+                {previewMove ? "Reset preview" : "Preview move"}
+              </Button>
               <p>All changes save automatically.</p>
             </div>
           </div>
