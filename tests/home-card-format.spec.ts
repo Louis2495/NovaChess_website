@@ -90,7 +90,9 @@ test('Home shows the app announcement and opens Vote Chess from the entire tile'
  const app=page.getByRole('region',{name:'Try the app'});
  await expect(app.getByText('Coming soon to the App Store')).toBeVisible();
  const free=page.getByRole('region',{name:'Free chess tools'});
- await expect(free.locator(':scope > *')).toHaveText(['1000% Free','No Ads','All the best chess tools in one place']);
+ await expect(free.locator('strong, p')).toHaveText(['1000% Free','No Ads','All the best chess tools in one place']);
+ await expect(free.locator('img')).toBeVisible();
+ await expect.poll(() => free.locator('img').evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
  const appBounds=(await app.boundingBox())!, freeBounds=(await free.boundingBox())!;
  expect(freeBounds.x).toBeGreaterThan(appBounds.x+appBounds.width);
  if(!isMobile){

@@ -163,9 +163,12 @@ export default function HomePage() {
             </div>
           </section>
           <section className="home-free" aria-label="Free chess tools">
-            <strong>1000% Free</strong>
-            <strong>No Ads</strong>
-            <p>All the best chess tools in one place</p>
+            <div className="home-free-copy">
+              <strong>1000% Free</strong>
+              <strong>No Ads</strong>
+              <p>All the best chess tools in one place</p>
+            </div>
+            <img className="home-free-art" src={`${base}learn/studying-knight.webp`} alt="" width={512} height={614} />
           </section>
         </div>
         <div className="home-featured-group">
