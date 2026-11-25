@@ -6028,6 +6028,7 @@ html { scrollbar-gutter:stable; }
   display:grid;
   grid-template-columns:minmax(0,1fr);
   gap:var(--home-gap);
+  margin-top:var(--home-gap);
 }
 .home-app,
 .home-free,
@@ -6162,6 +6163,10 @@ html { scrollbar-gutter:stable; }
     font-size:.86rem;
     text-align:right;
   }
+}
+@media(min-width:1001px) and (max-height:740px) {
+  .workspace:has(.home-dashboard) { padding-bottom:4px; }
+  .home-dashboard :is(.home-app,.home-free,.home-featured) { padding-block:7px; }
 }
 @media(max-width:1000px) {
   .home-page.home-dashboard .home-practice-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }

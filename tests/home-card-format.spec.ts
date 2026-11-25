@@ -27,6 +27,9 @@ test('desktop Home places equally tall Recent games beside the meme',async({page
    const puzzle=(await page.locator('.home-puzzle').boundingBox())!,m=(await page.locator('.daily-meme').boundingBox())!,recent=(await page.locator('.home-recent').boundingBox())!;
    expect(Math.abs(puzzle.y-m.y)).toBeLessThan(2);expect(Math.abs(recent.y-m.y)).toBeLessThan(2);expect(recent.x).toBeGreaterThan(m.x+m.width);
    await expect(page.locator('.daily-meme')).toHaveCSS('border-width','0px');expect(Math.abs(m.height-puzzle.height)).toBeLessThan(1);expect(Math.abs(recent.height-puzzle.height)).toBeLessThan(1);expect(await page.locator('.home-recent-list').evaluate(e=>e.scrollHeight-e.clientHeight)).toBeLessThanOrEqual(1);
+   const extras = (await page.locator('.home-extras').boundingBox())!;
+   const rowGap = await page.locator('.home-dashboard').evaluate(el => parseFloat(getComputedStyle(el).rowGap));
+   expect(extras.y - (recent.y + recent.height)).toBeCloseTo(2 * rowGap, 0);
    expect(await page.evaluate(() => document.scrollingElement!.scrollHeight - innerHeight), `Home fits at ${width}x${height}`).toBeLessThanOrEqual(1);
   }
   await page.unroute('**/memes/candidates.json');
