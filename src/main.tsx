@@ -214,7 +214,7 @@ function App() {
     });return()=>{active=false;};
   },[session?.user.id]);
   const { tab, detail } = locationState;
-  useSitePageTracking(tab, detail);
+  useSitePageTracking(tab, detail, authReady);
   const notify = (text: string) => {
     if (
       !/illegal move|move is not legal|drop is not legal|premove is unavailable/i.test(
@@ -710,7 +710,8 @@ function App() {
                 this browser. Optional online accounts, multiplayer games, chat
                 and rankings use the connected Supabase project. Site analytics
                 record page categories and a random browser-session identifier
-                to measure visits. Traffic records are kept for up to 90 days.
+                to measure visits. Signed-in visits are linked to your account so they
+                can be excluded from totals. Traffic records are kept for up to 90 days.
               </p>
               <p>
                 Public-game research contacts only the Chess.com or Lichess

@@ -4,11 +4,11 @@ import { online } from "./online";
 let sessionId: string | undefined;
 let previousLocation: string | undefined;
 
-export function useSitePageTracking(page: string, detail: string) {
+export function useSitePageTracking(page: string, detail: string, authReady: boolean) {
   useEffect(() => {
     const client = online;
-    if (!client || !globalThis.crypto?.randomUUID) return;
-    const location = JSON.stringify([page, detail]);
+    if (!client || !authReady || !globalThis.crypto?.randomUUID) return;
+    const location = JSON.stringify([page, detail, authReady]);
     if (previousLocation === location) return;
     previousLocation = location;
     if (page === "profile" && detail === "admin") return;
@@ -23,5 +23,5 @@ export function useSitePageTracking(page: string, detail: string) {
       }
     }
     void client.rpc("record_site_page", { p_session: sessionId, p_page: page }).then(undefined, () => {});
-  }, [page, detail]);
+  }, [page, detail, authReady]);
 }

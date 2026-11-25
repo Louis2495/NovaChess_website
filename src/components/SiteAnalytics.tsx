@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { online } from "../lib/online";
-import { Button, Card, Field } from "./UI";
+import { Button, Card, Field, Toggle } from "./UI";
 
 type Day = { day: string; views: number; sessions: number; signups: number; ratedGames: number };
 type Snapshot = {
   views: number;
   sessions: number;
   accounts: number;
+  filters?: { enabled: boolean; emails: string[] };
   days: Day[];
   pages: { page: string; views: number }[];
 };
@@ -22,6 +23,25 @@ export default function SiteAnalytics() {
   const [snapshot, setSnapshot] = useState<Snapshot>();
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
+  const [email, setEmail] = useState("");
+  const [savingFilter, setSavingFilter] = useState(false);
+  const [filterError, setFilterError] = useState("");
+
+  async function saveFilter(params: { p_enabled?: boolean; p_email?: string; p_remove?: boolean }) {
+    if (!online) return;
+    setSavingFilter(true);
+    setFilterError("");
+    try {
+      const { error } = await online.rpc("set_owner_analytics_filter", params);
+      if (error) throw error;
+      if (params.p_email && !params.p_remove) setEmail("");
+      setRevision(value => value + 1);
+    } catch (error) {
+      setFilterError((error as Error).message);
+    } finally {
+      setSavingFilter(false);
+    }
+  }
 
   useEffect(() => {
     if (!online) return;
@@ -50,6 +70,28 @@ export default function SiteAnalytics() {
       </div>
     </div>
     {error ? <p role="alert">{error}</p> : !snapshot ? <p role="status">Loading analytics…</p> : <>
+      {snapshot.filters && <section className="site-analytics-filters" aria-label="Analytics exclusions">
+        <fieldset disabled={savingFilter}>
+          <Toggle label="Exclude my account and added accounts" checked={snapshot.filters.enabled}
+            onChange={enabled => void saveFilter({ p_enabled: enabled })} />
+          <form className="site-analytics-add-email" onSubmit={event => {
+            event.preventDefault();
+            void saveFilter({ p_email: email.trim() });
+          }}>
+            <Field label="Email to exclude"><input type="email" value={email} required maxLength={254}
+              onChange={event => setEmail(event.target.value)} /></Field>
+            <Button className="secondary">Add email</Button>
+          </form>
+          {!!snapshot.filters.emails.length && <ul>
+            {snapshot.filters.emails.map(address => <li key={address}><span>{address}</span>
+              <Button className="secondary" aria-label={`Remove ${address}`}
+                onClick={() => void saveFilter({ p_email: address, p_remove: true })}>Remove</Button>
+            </li>)}
+          </ul>}
+        </fieldset>
+        <p className="caption">This filter hides selected accounts, their rated games, and browser sessions linked to them. Unlinked guest traffic stays in the totals.</p>
+        {filterError && <p role="alert">{filterError}</p>}
+      </section>}
       <dl className="site-analytics-totals">
         {([
           ["Page views", snapshot.views],

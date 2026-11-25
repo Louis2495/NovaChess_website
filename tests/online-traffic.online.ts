@@ -743,6 +743,13 @@ test('website analytics uses page categories and opens only for the site owner',
   let owner = true;
   const visits: Array<{ p_session: string; p_page: string }> = [];
   const periods: number[] = [];
+  const filters = { enabled: false, emails: [] as string[] };
+  await page.route('**/rpc/set_owner_analytics_filter', route => {
+    const { p_enabled, p_email } = route.request().postDataJSON();
+    if (typeof p_enabled === 'boolean') filters.enabled = p_enabled;
+    if (p_email) filters.emails.push(p_email);
+    return route.fulfill({ json: null });
+  });
   await page.route('**/rpc/is_site_admin', route => route.fulfill({ json: true }));
   await page.route('**/rpc/is_site_owner', route => route.fulfill({ json: owner }));
   await page.route('**/rpc/record_site_page', route => {
@@ -752,7 +759,7 @@ test('website analytics uses page categories and opens only for the site owner',
   await page.route('**/rpc/owner_site_analytics', route => {
     periods.push(route.request().postDataJSON().p_days);
     return route.fulfill({ json: {
-      views: 42, sessions: 12, accounts: 19,
+      views: filters.enabled ? 31 : 42, sessions: 12, accounts: 19, filters,
       days: [{ day: '2026-11-24', views: 42, sessions: 12, signups: 2, ratedGames: 6 }],
       pages: [{ page: 'home', views: 42 }],
     } });
@@ -769,6 +776,13 @@ test('website analytics uses page categories and opens only for the site owner',
   expect(periods[0]).toBe(30);
   await expect.poll(() => periods.at(-1)).toBe(7);
   expect(visits).toHaveLength(1);
+  await dashboard.getByLabel('Email to exclude').fill('friend@example.test');
+  await dashboard.getByRole('button', { name: 'Add email' }).click();
+  await expect(dashboard.getByText('friend@example.test', { exact: true })).toBeVisible();
+  const toggle = dashboard.getByRole('checkbox', { name: 'Exclude my account and added accounts' });
+  await toggle.click();
+  await expect(toggle).toBeChecked();
+  await expect(dashboard.locator('.site-analytics-totals').getByText('31', { exact: true })).toBeVisible();
   owner = false;
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Accounts', exact: true })).toBeVisible();

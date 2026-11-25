@@ -182,6 +182,7 @@ before(async () => {
 
   await pg.exec(readFileSync("supabase/migrations/202611180021_global_chat_setting.sql", "utf8"));
   await pg.exec(readFileSync("supabase/migrations/202611180022_site_analytics.sql", "utf8"));
+  await pg.exec(readFileSync("supabase/migrations/202611180023_site_analytics_filters.sql", "utf8"));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -1036,7 +1037,7 @@ test("only site administrators can disable global chat and disabled chat rejects
 
 test('site analytics count anonymous traffic and return aggregates only to the owner', async () => {
   const session = '33b31fa1-c848-417f-9864-a2896ecb8432';
-  await pg.exec("set role anon");
+  await pg.exec("set role anon;set request.jwt.claim.sub='';");
   try {
     await pg.query("select record_site_page($1, 'home') from generate_series(1, 110)", [session]);
     await pg.query("select record_site_page($1, 'puzzles'), record_site_page($1, 'invalid')", [session]);
@@ -1063,5 +1064,41 @@ test('site analytics count anonymous traffic and return aggregates only to the o
     assert.ok(!JSON.stringify(snapshot).includes(session));
   } finally {
     await pg.exec("reset role");
+  }
+});
+
+test('owner analytics filter excludes linked sessions and rated games for selected accounts', async () => {
+  const ownerSession = 'fe85df8c-5eb5-4196-995d-4e779c43771c';
+  const otherSession = '7d9f7cdb-c7ce-4435-b8cd-2b8059d4ab2b';
+  const email = 'analytics-filter@example.test';
+  await pg.query('update auth.users set email = $1 where id = $2', [email, users[1]]);
+  const before = async () => (await pg.query('select owner_site_analytics(7) as snapshot')).rows[0].snapshot;
+  await pg.exec(`set role anon;set request.jwt.claim.sub='';`);
+  await pg.query("select record_site_page($1, 'home')", [ownerSession]);
+  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[1]}';`);
+  try {
+    await pg.query("select record_site_page($1, 'learn')", [otherSession]);
+    await assert.rejects(() => pg.query('select set_owner_analytics_filter(true)'), /Only the site owner/);
+  } finally {
+    await pg.exec('reset role');
+  }
+  await pg.query("insert into rated_games(room_id,game_key,white,black,result) values(gen_random_uuid(),'filter-test',$1,$2,'1-0')", [users[0],users[1]]);
+  await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
+  try {
+    await pg.query("select record_site_page($1, 'puzzles')", [ownerSession]);
+    const all = await before();
+    await pg.query('select set_owner_analytics_filter(true, $1)', [email.toUpperCase()]);
+    const filtered = await before();
+    assert.deepEqual(filtered.filters, { enabled: true, emails: [email] });
+    assert.equal(filtered.views, all.views - 3);
+    assert.equal(filtered.sessions, all.sessions - 2);
+    assert.equal(filtered.accounts, all.accounts - 2);
+    assert.ok(filtered.days.at(-1).ratedGames < all.days.at(-1).ratedGames);
+    await pg.query('select set_owner_analytics_filter(false)');
+    assert.equal((await before()).views, all.views);
+    await pg.query('select set_owner_analytics_filter(p_email => $1, p_remove => true)', [email]);
+    assert.deepEqual((await before()).filters, { enabled: false, emails: [] });
+  } finally {
+    await pg.exec('reset role');
   }
 });
