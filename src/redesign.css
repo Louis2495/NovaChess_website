@@ -1061,7 +1061,7 @@
     gap: 0;
   }
   .workspace {
-    padding: 16px 22px 105px;
+    padding: 16px 22px max(24px, env(safe-area-inset-bottom));
   }
   .page-title {
     margin-bottom: 23px;
@@ -1202,23 +1202,6 @@
   .game-result-label {
     font-size: 0.68rem;
     margin-right: 0;
-  }
-  .mobile-tabs {
-    padding-left: 5px;
-    padding-right: 5px;
-    background: color-mix(in srgb, var(--base) 95%, transparent);
-  }
-  .mobile-tabs > button {
-    flex: 1;
-    min-width: 0;
-    padding: 4px 2px;
-    font-size: 0.59rem;
-    gap: 6px;
-  }
-  .mobile-tabs > button > svg {
-    width: 19px;
-    height: 19px;
-    stroke-width: 1.6;
   }
   .game-setup-page .play-feature-art {
     right: -7px;
@@ -2795,19 +2778,6 @@ h3 {
     width: 155px;
     flex-basis: 155px;
   }
-  .mobile-tabs {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    padding-left: 4px;
-    padding-right: 4px;
-  }
-  .mobile-tabs > button {
-    font-size: 0.56rem;
-    gap: 5px;
-  }
-  .mobile-tabs > button > svg {
-    width: 18px;
-    height: 18px;
-  }
   .era-picker {
     gap: 7px;
   }
@@ -3255,7 +3225,6 @@ h3 {
 }
 .focus-mode .sidebar,
 .focus-mode .topbar,
-.focus-mode .mobile-tabs,
 .focus-mode .skip-link {
   display: none !important;
 }
@@ -5255,7 +5224,6 @@ html { scrollbar-gutter:stable; }
 }
 .sidebar nav button.active:before { background:var(--nav-color,var(--accent)); width:4px; top:8px; bottom:8px; }
 .sidebar nav button.active > svg { background:var(--nav-color,var(--accent)); color:#172d3e; }
-.mobile-tabs button > svg { color:var(--nav-color,var(--accent)); stroke-width:2.4; }
 @media(max-height:750px) { .sidebar nav button > svg { width:26px; height:26px; padding:4px; border-radius:7px; } }
 
 /* Insights reserve only two text lines and grow naturally with their content. */
@@ -5522,7 +5490,7 @@ html { scrollbar-gutter:stable; }
   .variants-hub.setup-active .variant-gallery { --variant-gallery-gap:clamp(7px,1.7dvh,15px); }
   .workspace-shell:has(.variants-hub.setup-active) > .workspace {
     --variants-top-inset:clamp(14px,6dvh,48px);
-    padding-bottom:calc(72px + env(safe-area-inset-bottom));
+    padding-bottom:max(14px,env(safe-area-inset-bottom));
   }
   .variants-hub.setup-active :is(.variant-gallery,.computer-variant-gallery) {
     --variant-gallery-rows:6;
@@ -6475,7 +6443,7 @@ html { scrollbar-gutter:stable; }
 .learn-page-heading:has(+ .repertoire-training) { position:absolute; margin:0; }
 .learn-page-heading:has(+ .repertoire-training) > .learn-back { display:none; }
 @media(max-width:760px) {
-  .workspace:has(.repertoire-training) { padding-bottom:max(76px, calc(55px + env(safe-area-inset-bottom))); }
+  .workspace:has(.repertoire-training) { padding-bottom:max(18px,env(safe-area-inset-bottom)); }
   .repertoire-training-panel .feedback { padding:2px 0; }
 }
 
@@ -6558,7 +6526,7 @@ html { scrollbar-gutter:stable; }
 .viewport-lesson .queued-moves { padding:4px 0; flex-wrap:nowrap; }
 .viewport-lesson .queued-moves > span { min-width:0; overflow:auto; white-space:nowrap; }
 @media(max-width:1000px) {
-  .workspace:has(.viewport-lesson) { padding-bottom:max(76px, calc(55px + env(safe-area-inset-bottom))); }
+  .workspace:has(.viewport-lesson) { padding-bottom:max(18px,env(safe-area-inset-bottom)); }
   .workspace .viewport-lesson {
     grid-template-columns:minmax(0, 1fr);
     grid-template-rows:minmax(0, 1fr) clamp(140px, 26dvh, 235px);
@@ -6663,7 +6631,7 @@ html { scrollbar-gutter:stable; }
 .modal .opening-list { position:static; }
 .modal .opening-list .scroll-list { max-height:min(46dvh, 460px); }
 @media(max-width:1000px) {
-  .workspace:has(.viewport-lesson.lesson-workspace) { padding-bottom:max(86px, calc(65px + env(safe-area-inset-bottom))); }
+  .workspace:has(.viewport-lesson.lesson-workspace) { padding-bottom:max(18px,env(safe-area-inset-bottom)); }
   .workspace .viewport-lesson.lesson-workspace {
     grid-template-rows:minmax(0,1fr) clamp(110px, 18dvh, 200px);
   }
@@ -6819,7 +6787,7 @@ html { scrollbar-gutter:stable; }
 .modal .master-game-rows { display:block; max-height:min(52dvh, 535px); }
 .modal .master-game-rows > button { min-width:0; }
 @media(max-width:1000px) {
-  .workspace:has(.master-archive) { padding-bottom:max(88px, calc(67px + env(safe-area-inset-bottom))); }
+  .workspace:has(.master-archive) { padding-bottom:max(18px,env(safe-area-inset-bottom)); }
   .workspace .master-archive {
     grid-template-columns:minmax(0,1fr);
     grid-template-rows:minmax(0,1fr) clamp(126px, 20dvh, 180px);
@@ -6919,3 +6887,29 @@ html { scrollbar-gutter:stable; }
 .site-analytics li { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid var(--border); }
 .site-analytics li span { text-transform:capitalize; }
 @media(max-width:700px) { .site-analytics-panels { grid-template-columns:1fr; } }
+
+@media(max-width:760px) {
+  .sidebar {
+    visibility:hidden;
+    width:min(280px,85vw);
+    padding-bottom:max(18px,env(safe-area-inset-bottom));
+    overscroll-behavior:contain;
+  }
+  .sidebar.open { visibility:visible; }
+  .sidebar nav button { min-height:44px; font-size:.9rem; }
+  .topbar { min-height:52px; padding-inline:12px; gap:10px; }
+  .topbar .mobile-menu { width:44px; height:44px; }
+  .mobile-wordmark { font-size:1rem; }
+  .appearance-layout { gap:14px; }
+  .appearance-sections {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    align-self:stretch;
+  }
+  .appearance-sections > button { min-width:0; min-height:48px; font-size:.75rem; }
+  .appearance-preview { grid-template-columns:minmax(64px,1fr) minmax(0,1.5fr); gap:12px; }
+  .appearance-preview .btn { white-space:normal; }
+}
+@media(max-width:480px) {
+  .appearance-controls .theme-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}

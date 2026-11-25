@@ -18,10 +18,10 @@ test('recent games use bright outlines for each result',async({page})=>{
  await page.goto('/');await expect(page.locator('.recent-game-entry.result-unfinished')).toHaveCSS('border-color','rgb(255, 255, 255)');await expect(page.locator('.recent-game-entry.result-draw')).toHaveCSS('border-color','rgb(225, 231, 237)');await expect(page.locator('.recent-game-entry.result-win')).toHaveCSS('border-color','rgb(57, 237, 131)');
 });
 
-test('daily puzzle Hint fits above the bottom navigation on short screens',async({page})=>{
+test('daily puzzle Hint fits inside the viewport on short screens',async({page})=>{
  for(const [width,height] of [[1440,700],[390,664]]){
   await page.setViewportSize({width,height});await page.goto('/#puzzles/daily');const hint=page.getByRole('button',{name:'Hint',exact:true});await expect(hint).toBeVisible();
-  await expect.poll(async()=>{const h=(await hint.boundingBox())!,tabs=page.locator('.mobile-tabs');const bottom=await tabs.isVisible()?(await tabs.boundingBox())!.y:height;return h.y+h.height-bottom;}).toBeLessThanOrEqual(-8);
+  await expect.poll(async()=>{const h=(await hint.boundingBox())!;return h.y+h.height-height;}).toBeLessThanOrEqual(-8);
  }
 });
 

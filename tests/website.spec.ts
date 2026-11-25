@@ -729,9 +729,11 @@ test("mobile navigation and search lead to working app tools", async ({
 }, testInfo) => {
   await page.goto("/");
   if (testInfo.project.name === "mobile") {
-    await page
-      .getByRole("button", { name: "Open navigation", exact: true })
-      .click();
+    const menu = page.getByRole("button", { name: "Open navigation", exact: true });
+    await expect(page.getByRole("navigation", { name: "App tabs" })).toHaveCount(0);
+    await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeHidden();
+    await menu.click();
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
     await page
       .getByRole("navigation", { name: "Main navigation", exact: true })
       .getByRole("button", { name: "Library", exact: true })
@@ -843,11 +845,11 @@ test("Stats has dedicated navigation and derives charts from completed local gam
     }));
   }, { key: BASE_KEY, games: fixtures });
   await page.goto("/");
+  if (testInfo.project.name === "mobile") {
+    await page.getByRole("button", { name: "Open navigation", exact: true }).click();
+  }
   await page
-    .getByRole("navigation", {
-      name: testInfo.project.name === "mobile" ? "App tabs" : "Main navigation",
-      exact: true,
-    })
+    .getByRole("navigation", { name: "Main navigation", exact: true })
     .getByRole("button", { name: "Stats", exact: true })
     .click();
   await expect(

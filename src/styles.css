@@ -2400,7 +2400,6 @@ option {
 .skip-link:focus {
   transform: translateY(0);
 }
-.mobile-tabs,
 .mobile-menu,
 .sidebar-scrim {
   display: none;
@@ -2639,37 +2638,6 @@ option {
   }
   .workspace {
     padding: 25px 20px 30px;
-  }
-  .mobile-tabs {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    min-height: 67px;
-    padding: 8px 8px max(9px, env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border);
-    background: color-mix(in srgb, var(--base) 90%, transparent);
-    backdrop-filter: blur(20px);
-    z-index: 45;
-  }
-  .mobile-tabs > button {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    gap: 5px;
-    font-size: 0.66rem;
-    color: var(--muted);
-    padding: 4px 10px;
-    min-width: 55px;
-  }
-  .mobile-tabs > button.active {
-    color: var(--accent);
-  }
-  .mobile-tabs > button > svg {
-    stroke-width: 1.7;
   }
   .page-title {
     margin-bottom: 23px;
@@ -3140,10 +3108,6 @@ option {
   }
   .piece-set-grid > button {
     font-size: 0.7rem;
-  }
-  .mobile-tabs > button {
-    min-width: 52px;
-    padding: 4px 7px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -158,6 +158,6 @@
 }
 @media(max-width:760px) {
   .workspace-shell:has(.stats-map-active) > .workspace {
-    padding-bottom:calc(72px + env(safe-area-inset-bottom));
+    padding-bottom:max(14px, env(safe-area-inset-bottom));
   }
 }

@@ -229,6 +229,19 @@ function App() {
     setShowMenu(false);
     window.scrollTo({ top: 0, behavior: "instant" });
   }
+  function closeNavigation() {
+    setShowMenu(false);
+    document.getElementById("mobile-navigation-trigger")?.focus();
+  }
+  useEffect(() => {
+    if (!showMenu) return;
+    document.querySelector<HTMLElement>('#site-sidebar [aria-current="page"]')?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeNavigation();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showMenu]);
   useEffect(()=>{if(recovery.active || recovery.checking || recovery.error)navigate("signin","reset");},[recovery.active,recovery.checking,recovery.error]);
   useEffect(() => {
     if (!authReady || !session || recovery.active || recovery.checking || recovery.error) return;
@@ -546,7 +559,7 @@ function App() {
         <a className="skip-link" href="#workspace">
           Skip to workspace
         </a>
-        <aside className={`sidebar ${showMenu ? "open" : ""}`}>
+        <aside id="site-sidebar" className={`sidebar ${showMenu ? "open" : ""}`}>
           <button
             className="brand"
             onClick={() => navigate("home")}
@@ -603,14 +616,17 @@ function App() {
         {showMenu && (
           <button
             className="sidebar-scrim"
-            onClick={() => setShowMenu(false)}
+            onClick={closeNavigation}
             aria-label="Close navigation"
           />
         )}
         <div className="workspace-shell">
           <header className="topbar">
             <IconButton
+              id="mobile-navigation-trigger"
               label="Open navigation"
+              aria-controls="site-sidebar"
+              aria-expanded={showMenu}
               className="mobile-menu"
               onClick={() => setShowMenu(!showMenu)}
             >
@@ -634,19 +650,6 @@ function App() {
             )}
           </main>
         </div>
-        <nav className="mobile-tabs" aria-label="App tabs">
-          {mainNav.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              data-nav={id}
-              className={tab === id ? "active" : ""}
-              onClick={() => navigate(id)}
-            >
-              <Icon size={20} />
-              <span>{label}</span>
-            </button>
-          ))}
-        </nav>
         {showAppearance && (
           <Appearance onClose={() => setShowAppearance(false)} />
         )}{" "}

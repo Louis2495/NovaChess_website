@@ -45,7 +45,7 @@ test('Variants centers its setup and fits all cards without page scrolling',asyn
   expect(action.y+action.height).toBeLessThan(cards.y);
   if(page.viewportSize()!.width>1000)expect(Math.abs(action.y-toggleBox.y)).toBeLessThan(1);
   expect(await page.evaluate(()=>document.documentElement.scrollHeight-window.innerHeight)).toBeLessThanOrEqual(1);
-  if(isMobile) expect(cards.y+cards.height).toBeLessThan((await page.locator('.mobile-tabs').boundingBox())!.y);
+  if(isMobile) expect(cards.y+cards.height).toBeLessThan(page.viewportSize()!.height);
  }
  await expect(page.getByRole('group',{name:'Online variants',exact:true}).getByRole('button')).toHaveCount(21);
  await check('Online variants','Join queue');

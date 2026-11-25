@@ -129,10 +129,7 @@ test('game review runs real Stockfish when WASM is served as binary', async ({ p
   await page.setViewportSize(isMobile ? { width: 390, height: 650 } : { width: 1440, height: 720 });
   await expect.poll(async () => {
     const controls = (await replay.boundingBox())!;
-    const viewportBottom = await page.evaluate(() => {
-      const tabs = document.querySelector('.mobile-tabs');
-      return tabs && tabs.getBoundingClientRect().height ? tabs.getBoundingClientRect().top : innerHeight;
-    });
+    const viewportBottom = await page.evaluate(() => innerHeight);
     return controls.y + controls.height <= viewportBottom;
   }).toBe(true);
 });

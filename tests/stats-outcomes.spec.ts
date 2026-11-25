@@ -40,8 +40,7 @@ test('Achievements can be filtered and the interactive World map fits the viewpo
   expect(await page.evaluate(()=>document.documentElement.scrollHeight-window.innerHeight)).toBeLessThanOrEqual(1);
   if(isMobile){
     const map=(await page.locator('.world-map-card').boundingBox())!;
-    const tabs=(await page.locator('.mobile-tabs').boundingBox())!;
-    expect(map.y+map.height).toBeLessThan(tabs.y);
+    expect(map.y+map.height).toBeLessThan(page.viewportSize()!.height);
   }
 });
 
