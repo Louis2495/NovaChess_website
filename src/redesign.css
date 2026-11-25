@@ -6907,13 +6907,11 @@ html { scrollbar-gutter:stable; }
 .standard-game-settings .play-rating-mode { width:min(100%,240px); }
 .standard-game-settings .play-color-choice button,
 .standard-game-settings .play-rating-mode button { flex:1; }
-.standard-game-settings .play-color-choice button::before {
-  content:""; display:inline-block; width:12px; height:12px; margin-inline-end:7px;
-  vertical-align:middle; border:1px solid #808693; border-radius:50%;
+.standard-game-settings .play-color-choice button { display:grid; place-items:center; min-height:46px; }
+.standard-game-settings .play-color-choice :is(.piece,svg) { width:28px; height:28px; }
+.standard-game-settings .opponent-choices label > span {
+  justify-content:center; align-items:center; gap:6px; text-align:center; flex-wrap:wrap;
 }
-.standard-game-settings .play-color-choice button:nth-child(1)::before { background:#fff1d3; }
-.standard-game-settings .play-color-choice button:nth-child(2)::before { background:#182131; }
-.standard-game-settings .play-color-choice button:nth-child(3)::before { background:linear-gradient(135deg,#fff1d3 50%,#182131 50%); }
 .standard-game-settings .play-color-choice button[aria-pressed="true"],
 .standard-game-settings .opponent-choices label:has(input:checked) {
   color:var(--button-text); background:var(--button);

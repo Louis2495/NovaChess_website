@@ -22,6 +22,10 @@ test('computer Play keeps the settings compact and Start game lower on the page'
   await expect(rated).toHaveCSS('color', 'rgb(16, 22, 16)');
   await expect(settings.locator('.opponent-choices label:has(input:checked) small')).toHaveCSS('color', 'rgb(16, 22, 16)');
   await expect(settings.getByRole('button', { name: 'White', exact: true })).toHaveCSS('color', 'rgb(16, 22, 16)');
+  await expect(settings.getByRole('button', { name: 'White', exact: true }).locator('img')).toBeVisible();
+  await expect(settings.getByRole('button', { name: 'Black', exact: true }).locator('img')).toBeVisible();
+  await expect(settings.getByRole('button', { name: 'Random', exact: true }).locator('svg')).toBeVisible();
+  await expect(settings.locator('.opponent-choices label > span').first()).toHaveCSS('justify-content', 'center');
   const start = await page.getByRole('button', { name: 'Start game', exact: true }).boundingBox();
   const controls = await settings.boundingBox();
   expect(controls!.width).toBeLessThanOrEqual(340);
