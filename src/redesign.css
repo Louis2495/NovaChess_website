@@ -6028,7 +6028,6 @@ html { scrollbar-gutter:stable; }
   display:grid;
   grid-template-columns:minmax(0,1fr);
   gap:var(--home-gap);
-  margin-top:var(--home-gap);
 }
 .home-app,
 .home-free,
@@ -6119,7 +6118,12 @@ html { scrollbar-gutter:stable; }
     margin-bottom:calc(clamp(10px,2dvh,22px) + 1cm + clamp(0px,32svh - 312px,38px) + clamp(0px,15svh - 144px,.5in));
   }
   .home-page.home-dashboard:has(.daily-meme) {
+    --home-card-column-gap:28px;
     grid-template-columns:minmax(0,1fr) minmax(0,.88fr) minmax(0,1.58fr);
+    column-gap:var(--home-card-column-gap);
+  }
+  .home-dashboard:has(.daily-meme) > .home-extras {
+    margin-top:calc(var(--home-card-column-gap) - var(--home-gap));
   }
   .home-page.home-dashboard > .home-practice-grid { display:contents; }
   .home-page.home-dashboard:has(.daily-meme) > .home-recent { grid-column:3; }
@@ -6165,7 +6169,7 @@ html { scrollbar-gutter:stable; }
   }
 }
 @media(min-width:1001px) and (max-height:740px) {
-  .workspace:has(.home-dashboard) { padding-bottom:4px; }
+  .workspace:has(.home-dashboard) { padding-bottom:1px; }
   .home-dashboard :is(.home-app,.home-free,.home-featured) { padding-block:7px; }
 }
 @media(max-width:1000px) {
