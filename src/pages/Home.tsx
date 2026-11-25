@@ -173,7 +173,7 @@ export default function HomePage() {
         </div>
         <div className="home-featured-group">
           <button type="button" className="home-featured home-featured-vote" onClick={() => navigate("variants", "choose/vote")}>
-            <MultiplayerPicture mode="vote" />
+            <img className="home-vote-art" src={`${base}variants/vote-home.webp`} alt="" width={256} height={256} />
             <span>
               <strong>Vote Chess</strong>
               <span>{multiplayerVariants.vote.description}</span>

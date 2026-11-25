@@ -107,7 +107,9 @@ test('Home shows the app announcement and opens Vote Chess from the entire tile'
  await expect(page.getByRole('region',{name:'Next up'})).toHaveCount(0);
  await expect(page.getByText('Featured variant',{exact:true})).toHaveCount(0);
  await expect(page.locator('.home-featured-group > button:nth-child(2)')).toHaveCount(0);
- await page.getByRole('button',{name:/^Vote Chess/}).click({position:{x:5,y:5}});
+ const vote=page.getByRole('button',{name:/^Vote Chess/});
+ await expect.poll(() => vote.locator('img').evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+ await vote.click({position:{x:5,y:5}});
  await expect(page.getByRole('group',{name:'Online variants'}).getByRole('button',{name:'Vote Chess',exact:true})).toHaveAttribute('aria-pressed','true');
 });
 
@@ -131,7 +133,7 @@ test('Home splits the featured space with the most recently played variant',asyn
  await expect(recent).toContainText("Captures explode nearby non-pawns.");
  await expect(page.getByText('Last played variant',{exact:true})).toHaveCount(0);
  for(const tile of [vote,recent]){
-  const art=(await tile.locator(':scope > span').first().boundingBox())!;
+  const art=(await tile.locator(':scope > [aria-hidden=true], :scope > img').first().boundingBox())!;
   const title=(await tile.locator('strong').boundingBox())!;
   expect(title.x).toBeGreaterThan(art.x+art.width);
  }
