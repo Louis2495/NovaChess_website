@@ -6078,7 +6078,10 @@ html { scrollbar-gutter:stable; }
   text-align:left;
   background:linear-gradient(135deg,color-mix(in srgb,var(--panel-solid) 87%,var(--accent)),var(--panel-solid));
 }
-.home-featured-vote { justify-content:center; }
+.home-featured-vote {
+  justify-content:center;
+  column-gap:clamp(12px,1.55vw,22px);
+}
 .home-featured:hover { background:color-mix(in srgb,var(--panel-solid) 77%,var(--accent)); }
 .home-featured > :is(.multiplayer-picture,.variant-picture,.speedrun-picture,.home-vote-art) {
   flex:none;
@@ -6094,6 +6097,8 @@ html { scrollbar-gutter:stable; }
 .home-featured-group:has(> :nth-child(2)) .home-featured > :is(.multiplayer-picture,.variant-picture,.speedrun-picture,.home-vote-art) {
   width:clamp(28px,5vw,78px);
 }
+.home-featured > .home-vote-art { width:clamp(60px,6.8vw,104px); }
+.home-featured-group:has(> :nth-child(2)) .home-featured > .home-vote-art { width:clamp(32px,5.6vw,88px); }
 @media(min-width:1001px) {
   .home-page.home-dashboard:has(.daily-meme) {
     grid-template-columns:minmax(0,1fr) minmax(0,.88fr) minmax(0,1.58fr);
