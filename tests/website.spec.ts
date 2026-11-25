@@ -935,13 +935,11 @@ test("Library migrates old games and persists new games past the localStorage qu
   await expect(page.getByRole("heading", { name: "New durable study", exact: true })).toBeVisible();
 });
 
-test("Customize centers its panel and previews a move", async ({ page }) => {
+test("Customize centers its panel and shows the live board", async ({ page }) => {
   await page.goto("/#profile/customize");
   const panel = page.getByRole("region", { name: "Appearance", exact: true });
   const preview = panel.locator(".appearance-preview");
-  await preview.getByRole("button", { name: "Preview move" }).click();
-  await expect(preview.getByRole("button", { name: "e4, white pawn", exact: true })).toBeVisible();
-  await preview.getByRole("button", { name: "Reset preview" }).click();
+  await expect(preview.getByRole("button", { name: /preview/i })).toHaveCount(0);
   await expect(preview.getByRole("button", { name: "e2, white pawn", exact: true })).toBeVisible();
   const bounds = await panel.evaluate(element => {
     const panel = element.getBoundingClientRect();

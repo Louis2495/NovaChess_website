@@ -743,7 +743,7 @@ test('website analytics uses page categories and opens only for the site owner',
   let owner = true;
   const visits: Array<{ p_session: string; p_page: string }> = [];
   const periods: number[] = [];
-  const filters = { enabled: false, emails: [] as string[] };
+  const filters = { enabled: true, emails: [] as string[] };
   await page.route('**/rpc/set_owner_analytics_filter', route => {
     const { p_enabled, p_email } = route.request().postDataJSON();
     if (typeof p_enabled === 'boolean') filters.enabled = p_enabled;
@@ -771,7 +771,7 @@ test('website analytics uses page categories and opens only for the site owner',
   await page.getByRole('button', { name: 'Website analytics', exact: true }).click();
   const dashboard = page.getByRole('region', { name: 'Website analytics', exact: true });
   await expect(dashboard.getByRole('heading', { name: 'Top pages' })).toBeVisible();
-  await expect(dashboard.locator('.site-analytics-totals').getByText('42', { exact: true })).toBeVisible();
+  await expect(dashboard.locator('.site-analytics-totals').getByText('31', { exact: true })).toBeVisible();
   await dashboard.getByLabel('Date range').selectOption('7');
   expect(periods[0]).toBe(30);
   await expect.poll(() => periods.at(-1)).toBe(7);
@@ -780,9 +780,10 @@ test('website analytics uses page categories and opens only for the site owner',
   await dashboard.getByRole('button', { name: 'Add email' }).click();
   await expect(dashboard.getByText('friend@example.test', { exact: true })).toBeVisible();
   const toggle = dashboard.getByRole('checkbox', { name: 'Exclude my account and added accounts' });
-  await toggle.click();
   await expect(toggle).toBeChecked();
-  await expect(dashboard.locator('.site-analytics-totals').getByText('31', { exact: true })).toBeVisible();
+  await toggle.click();
+  await expect(toggle).not.toBeChecked();
+  await expect(dashboard.locator('.site-analytics-totals').getByText('42', { exact: true })).toBeVisible();
   owner = false;
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Accounts', exact: true })).toBeVisible();

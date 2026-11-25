@@ -183,6 +183,7 @@ before(async () => {
   await pg.exec(readFileSync("supabase/migrations/202611180021_global_chat_setting.sql", "utf8"));
   await pg.exec(readFileSync("supabase/migrations/202611180022_site_analytics.sql", "utf8"));
   await pg.exec(readFileSync("supabase/migrations/202611180023_site_analytics_filters.sql", "utf8"));
+  await pg.exec(readFileSync("supabase/migrations/202611180024_default_analytics_exclusions.sql", "utf8"));
 
   let source = readFileSync("supabase/functions/chess/index.ts", "utf8");
   source = source
@@ -1055,6 +1056,7 @@ test('site analytics count anonymous traffic and return aggregates only to the o
   await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
   try {
     const { snapshot } = (await pg.query('select owner_site_analytics(7) as snapshot')).rows[0];
+    assert.equal(snapshot.filters.enabled, true);
     assert.equal(snapshot.sessions, 1);
     assert.equal(snapshot.views, 101);
     assert.equal(snapshot.days.length, 7);
@@ -1086,6 +1088,7 @@ test('owner analytics filter excludes linked sessions and rated games for select
   await pg.exec(`set role authenticated;set request.jwt.claim.sub='${users[0]}';`);
   try {
     await pg.query("select record_site_page($1, 'puzzles')", [ownerSession]);
+    await pg.query("select set_owner_analytics_filter(false)");
     const all = await before();
     await pg.query('select set_owner_analytics_filter(true, $1)', [email.toUpperCase()]);
     const filtered = await before();
