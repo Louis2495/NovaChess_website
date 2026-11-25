@@ -6109,6 +6109,12 @@ html { scrollbar-gutter:stable; }
 .home-featured > .home-vote-art { width:clamp(60px,6.8vw,104px); }
 .home-featured-group:has(> :nth-child(2)) .home-featured > .home-vote-art { width:clamp(32px,5.6vw,88px); }
 @media(min-width:1001px) {
+  .home-page.home-dashboard {
+    padding-top:calc(clamp(4px,1.5dvh,16px) + 1cm + clamp(0px,12svh - 116px,14px));
+  }
+  .home-page.home-dashboard > .home-welcome {
+    margin-bottom:calc(clamp(10px,2dvh,22px) + 1cm + clamp(0px,32svh - 312px,38px));
+  }
   .home-page.home-dashboard:has(.daily-meme) {
     grid-template-columns:minmax(0,1fr) minmax(0,.88fr) minmax(0,1.58fr);
   }
@@ -6126,11 +6132,11 @@ html { scrollbar-gutter:stable; }
   .workspace:has(.home-dashboard) { padding-block:8px; }
   .home-page.home-dashboard {
     --home-gap:clamp(12px,1.8svh,18px);
-    padding-top:clamp(4px,2svh,18px);
+    padding-top:calc(clamp(4px,2svh,18px) + clamp(0px,8svh - 57.6px,14px));
   }
   .home-page.home-dashboard > .home-welcome {
     grid-template-columns:clamp(76px,14svh,126px) minmax(0,1fr);
-    margin-bottom:clamp(6px,1.2svh,12px);
+    margin-bottom:calc(clamp(6px,1.2svh,12px) + clamp(0px,21svh - 151.2px,38px));
   }
   .home-page.home-dashboard .home-practice-grid .daily-meme .daily-meme-image {
     max-height:calc(clamp(240px,49svh,420px) - 2 * var(--meme-frame-width));
