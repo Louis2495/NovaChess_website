@@ -45,7 +45,7 @@ test.describe('responsive meme layout', () => {
    await image.scrollIntoViewIfNeeded();
    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBe(width);
    await expect(card).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-   await expect(image).toHaveCSS('outline-width', '5px');
+   await expect(image).toHaveCSS('outline-width', '15px');
    await expect(image).toHaveCSS('outline-color', 'rgb(0, 0, 0)');
    const frame = (await card.boundingBox())!;
    const art = (await image.boundingBox())!;
