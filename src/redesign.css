@@ -5982,7 +5982,7 @@ html { scrollbar-gutter:stable; }
   font-weight:800;
 }
 .home-page.home-dashboard .home-practice-grid .daily-meme {
-  --meme-frame-width:4px;
+  --meme-frame-width:5px;
   display:grid;
   place-items:center;
   margin:0;
