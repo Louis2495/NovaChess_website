@@ -9,14 +9,16 @@ test('sidebar fits short and tall screens without scrolling or hiding links',asy
   for(const item of bounds.items){expect(item.top,item.name||'button').toBeGreaterThanOrEqual(0);expect(item.bottom,item.name||'button').toBeLessThanOrEqual(height);}
  }
 });
-test('opening request combines filtering, selection, keyboard access and clearing in one field',async({page})=>{
- await page.goto('/#play');await page.getByRole('button',{name:'Computer',exact:true}).click();
- await expect(page.getByLabel('Search openings',{exact:true})).toHaveCount(0);
- const picker=page.getByRole('combobox',{name:'Request an opening',exact:true});
- await picker.fill('Sicilian Najdorf');await expect(page.getByRole('option').first()).toContainText('Najdorf');
- await picker.press('ArrowDown');await picker.press('Enter');await expect(picker).toHaveValue(/Najdorf/);await expect(picker).toHaveAttribute('aria-expanded','false');
- const chosen=await picker.inputValue();await picker.click();await picker.fill('nothing-matches-this');await expect(page.getByText('No matching openings.',{exact:true})).toBeVisible();await picker.press('Escape');await expect(picker).toHaveValue(chosen);
- await picker.click();await page.getByRole('option',{name:'Any opening',exact:true}).click();await expect(picker).toHaveValue('Any opening');
+test('computer Play places Start game beneath the inline settings', async ({ page }) => {
+  await page.goto('/#play');
+  await page.getByRole('button', { name: 'Computer', exact: true }).click();
+  const settings = page.getByRole('group', { name: 'Game setup' });
+  await expect(settings.getByRole('group', { name: 'Your color' })).toBeVisible();
+  await expect(settings.getByText('Your color', { exact: true })).toHaveCount(0);
+  await expect(settings.getByRole('group', { name: 'Rating mode' })).toBeVisible();
+  const start = await page.getByRole('button', { name: 'Start game', exact: true }).boundingBox();
+  const controls = await settings.boundingBox();
+  expect(start!.y).toBeGreaterThan(controls!.y + controls!.height);
 });
 test('time control labels use compact chess notation and main boards stay inside the viewport',async({page})=>{
  await page.goto('/#play');await expect(page.getByRole('group',{name:'Time control'}).getByRole('button')).toHaveText(['3','3|2','5','10']);

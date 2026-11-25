@@ -3780,10 +3780,6 @@ select.theme-select {
   color: var(--text);
   box-shadow: 0 2px 8px #0002;
 }
-.opening-request {
-  display: grid;
-  gap: 12px;
-}
 @media (min-width: 1001px) {
   .analysis-layout.chess-layout {
     grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
@@ -4618,10 +4614,6 @@ html { scrollbar-gutter:stable; }
 .room-chat-message .icon-btn { position:absolute; top:4px; right:0; }
 .room-chat form { display:flex; gap:8px; }
 .room-chat form input { min-width:0; flex:1; margin:0; }
-.opening-request { border:1px solid var(--border); border-radius:16px; padding:8px 16px 16px; margin:12px 0 0; background:var(--accent-soft); }
-.opening-request legend { color:var(--text); padding:0 8px; font-weight:700; }
-.opening-request .field { margin:10px 0 0; }
-.opening-request { min-width:0; }
 .online-game-title > .speedrun-picture { width:72px; height:72px; border-radius:16px; }
 
 /* Generous, consistent illustration cards and clear primary actions. */
@@ -4712,18 +4704,6 @@ html { scrollbar-gutter:stable; }
  .sidebar .account-stamp .avatar { width:22px; height:22px; }
  .sidebar .sidebar-footer button { font-size:.62rem; }
 }
-.opening-picker { position:relative; display:grid; gap:8px; min-width:0; }
-.opening-picker > label { font-size:.8rem; color:var(--muted); }
-.opening-picker-input { position:relative; }
-.opening-picker-input input { width:100%; padding-right:36px; }
-.opening-picker-input > svg { position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--muted); }
-.opening-picker-popup { position:absolute; top:100%; left:0; right:0; z-index:15; background:var(--panel-solid); border:1px solid var(--accent); border-radius:12px; box-shadow:0 12px 28px #0005; overflow:hidden; margin-top:4px; }
-.opening-picker-popup > [role="listbox"] { max-height:min(280px,36dvh); overflow-y:auto; overscroll-behavior:contain; padding:5px; }
-.opening-picker-popup [role="option"] { display:block; width:100%; text-align:left; padding:10px; border-radius:7px; font-size:.8rem; line-height:1.5; }
-.opening-picker-popup [role="option"].highlighted { background:var(--accent-soft); }
-.opening-picker-popup [role="option"][aria-selected="true"] { color:var(--accent); font-weight:700; }
-.opening-picker-count { display:block; padding:7px 12px; border-top:1px solid var(--border); color:var(--muted); font-size:.7rem; }
-.opening-picker-popup.above { top:auto; bottom:calc(100% - 24px); margin-top:0; margin-bottom:4px; }
 @media(max-width:760px){
  .workspace:has(.research-layout) { padding:8px 12px 12px; }
  .workspace:has(.research-layout) .page-title { margin-bottom:10px; }
@@ -6918,3 +6898,21 @@ html { scrollbar-gutter:stable; }
 .site-analytics-add-email .field { flex:1 1 190px; max-width:360px; }
 .site-analytics-filters ul { padding:0; margin:8px 0; list-style:none; }
 .site-analytics-filters li span { text-transform:none; overflow-wrap:anywhere; }
+
+.standard-play-hub.computer-opponent > .play-hub-heading { margin-bottom:clamp(18px,4vh,42px); }
+.standard-game-settings { margin-top:0; padding-inline:0; }
+.standard-game-settings .game-options { gap:12px; }
+.standard-game-settings .play-color-choice,
+.standard-game-settings .play-rating-mode { width:100%; box-sizing:border-box; margin:0; }
+.standard-game-settings .play-color-choice button,
+.standard-game-settings .play-rating-mode button { flex:1; }
+.standard-game-settings .play-color-choice button::before {
+  content:""; display:inline-block; width:12px; height:12px; margin-inline-end:7px;
+  vertical-align:middle; border:1px solid #808693; border-radius:50%;
+}
+.standard-game-settings .play-color-choice button:nth-child(1)::before { background:#fff1d3; }
+.standard-game-settings .play-color-choice button:nth-child(2)::before { background:#182131; }
+.standard-game-settings .play-color-choice button:nth-child(3)::before { background:linear-gradient(135deg,#fff1d3 50%,#182131 50%); }
+.standard-game-settings .opponent-choices label:has(input:checked) { color:var(--button-text); background:var(--button); }
+.standard-play-hub.setup-active.computer-opponent .setup-launch { min-height:0; margin-top:20px; }
+.standard-play-hub.computer-opponent .setup-launch .play-feature-copy { display:flex; flex-direction:column; align-items:center; gap:10px; }

@@ -1,6 +1,5 @@
 import { resolvePlayColor } from "../lib/playColor";
 import {SavedBoardPlayer} from "../components/BoardPlayer";
-import OpeningPicker from "../components/OpeningPicker";
 import { useReviewWarmup } from "../lib/useReviewWarmup";
 import { clampSpeedrunRating, duration, speedrunMaxRating, speedrunMinRating, speedrunRatingStep } from "../lib/speedrun";
 import { weakComputerMove } from "../lib/computerStrength";
@@ -38,7 +37,6 @@ import {
   Card,
   Button,
   Field,
-  Toggle,
   Modal,
   IconButton,
   Loading,
@@ -132,7 +130,6 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
     [choice, setChoice] = useState("Current rating"),
     [rating, setRating] = useState(1200),
     [rated, setRated] = useState(true),
-    [openingId, setOpeningId] = useState(""),
     [options, setOptions] = useState(false),
     [drawPending, setDrawPending] = useState(false),
     [flipped, setFlipped] = useState(false),
@@ -276,7 +273,6 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
       botRating: speedrunMode ? clampSpeedrunRating(speedrunRating) : choice === "Current rating" ? library.localRating : rating,
       speedrun: speedrunMode ? {elapsedMs:0,turnStartedAt:human === "w" ? Date.now() : null} : undefined,
       rated: !speedrunMode && rated && variant === "chess",
-      requestedOpening: speedrunMode ? "" : openingId,
     };
     if (variant === "bughouse") {
       const b = new ff.Board("bughouse");
@@ -644,16 +640,12 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
           </ChoiceSelect>
         </Field>
       )}
-      <Field label="Your color">
-        <ChoiceSelect
-          value={colorChoice}
-          onChange={(e) => setColorChoice(e.target.value)}
-        >
-          <option value="w">White</option>
-          <option value="b">Black</option>
-          <option value="random">Random</option>
-        </ChoiceSelect>
-      </Field>
+      <ChoiceSelect aria-label="Your color" className={variantsOnly ? undefined : "play-color-choice"}
+        value={colorChoice} onChange={e => setColorChoice(e.target.value)}>
+        <option value="w">White</option>
+        <option value="b">Black</option>
+        <option value="random">Random</option>
+      </ChoiceSelect>
       {!speedrunMode && !["dropping", "chaos", "random"].includes(variant) && (
         <>
           <div className="opponent-choices">
@@ -692,19 +684,19 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
               />
             </Field>
           )}
-          <Toggle
-            label="Rated"
-            checked={rated && variant === "chess"}
-            onChange={(v) => setRated(v && variant === "chess")}
-          />
           {variant === "chess" && (
-            <OpeningPicker openings={openings||[]} value={openingId} onChange={setOpeningId}/>
+            <ChoiceSelect aria-label="Rating mode" className="play-opponent-toggle play-rating-mode"
+              value={rated ? "rated" : "unrated"} onChange={e => setRated(e.target.value === "rated")}>
+              <option value="rated">Rated</option>
+              <option value="unrated">Unrated</option>
+            </ChoiceSelect>
           )}
         </>
       )}
       {variantsOnly && speedrunMode && speedrunEloField}
     </div>
   );
+  const startButton = <Button className="new-game-primary" disabled={!ff} onClick={start}>Start game</Button>;
   return (
     <>
       <h1 className="sr-only">{playing ? "Chess game" : "New game"}</h1>
@@ -716,19 +708,18 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
       )}
       {!playing || !game || !valid ? (
         <div className="game-setup-page">
+          {!variantsOnly && (
+            <div className="game-settings-card standard-game-settings" role="group" aria-label="Game setup">
+              {gameOptions}
+            </div>
+          )}
           <section
             className="new-game-section setup-launch"
             aria-label="New game"
             aria-hidden={variantsOnly && options ? true : undefined}
           >
             <div className="play-feature-copy">
-              <Button
-                className="new-game-primary"
-                disabled={!ff}
-                onClick={start}
-              >
-                Start game
-              </Button>
+              {variantsOnly && startButton}
               {canResume && game && (
                 <button
                   className="resume-link resume-game-button"
@@ -745,6 +736,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                   Resume saved game
                 </button>
               )}
+              {!variantsOnly && startButton}
             </div>
           </section>
           {variantsOnly && <div
@@ -764,7 +756,7 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
             ))}
 
           </div>}
-          {variantsOnly ? (
+          {variantsOnly && (
             <div className="variant-settings-footer">
               {speedrunMode && <Card className="speedrun-setup" aria-hidden={options || undefined}>{speedrunEloField}</Card>}
               <Card className="game-settings-card">
@@ -774,10 +766,6 @@ export default function Play({variantsOnly = false, onPlayingChange, speedrunElo
                   <ChevronRight size={19} aria-hidden="true" />
                 </button>
               </Card>
-            </div>
-          ) : (
-            <div className="game-settings-card standard-game-settings" role="group" aria-label="Game setup">
-              {gameOptions}
             </div>
           )}
           {variantsOnly && options && (

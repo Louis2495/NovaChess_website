@@ -25,27 +25,26 @@ test("picked-up pieces center on the pointer immediately and drop on the square 
   await expect(page.locator(".notation-table")).toContainText("e4");
 });
 
-test("game setup offers two strength choices, defaults to rated, searches openings and centers standalone resume actions", async ({
+test("game setup offers two strength choices, defaults to rated and centers standalone resume actions", async ({
   page,
 }) => {
   await page.goto("/#play");await page.getByRole("button",{name:"Computer",exact:true}).click();
   await expect(page.getByRole("button", { name: "Game options", exact: true })).toHaveCount(0);
   await expect(page.locator(".opponent-choices input")).toHaveCount(2);
   await expect(page.getByLabel("Current rating")).toBeChecked();
-  await expect(page.getByRole("checkbox", { name: /^Rated/ })).toBeChecked();
+  const ratingMode = page.getByRole("group", { name: "Rating mode" });
+  const rated = ratingMode.getByRole("button", { name: "Rated", exact: true });
+  const unrated = ratingMode.getByRole("button", { name: "Unrated", exact: true });
+  await expect(rated).toHaveAttribute("aria-pressed", "true");
+  await unrated.click();
+  await expect(unrated).toHaveAttribute("aria-pressed", "true");
+  await rated.click();
   await expect(
     page.getByText(/Adaptive|Play the Developer|Rated locally/),
   ).toHaveCount(0);
   const options = (await page.locator(".game-settings-card").boundingBox())!;
   expect(options.width).toBeLessThanOrEqual(540);
-  const opening=page.getByRole("combobox",{name:"Request an opening",exact:true});
-  await opening.fill("Sicilian");
-  const optionsList=page.getByRole("listbox",{name:"Openings",exact:true});
-  await expect(optionsList.getByRole("option").first()).toContainText("Sicilian");
-  const names=await optionsList.getByRole("option").allTextContents();
-  expect(names.every(n=>/Sicilian/i.test(n))).toBeTruthy();
-  await optionsList.getByRole("option").first().click();
-  await expect(opening).toHaveValue(/Sicilian/);
+  await expect(page.getByRole("combobox", { name: "Request an opening" })).toHaveCount(0);
   await page.getByLabel("Custom", { exact: true }).check();
   await page.getByLabel("Rating", { exact: true }).fill("1500");
   const random = page.getByRole("group", { name: "Your color" }).getByRole("button", { name: "Random", exact: true });
