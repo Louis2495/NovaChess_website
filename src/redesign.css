@@ -5905,7 +5905,7 @@ html { scrollbar-gutter:stable; }
   grid-template-columns:clamp(72px,11vw,148px) minmax(0,1fr);
   gap:clamp(12px,2vw,26px);
   min-height:0;
-  margin:0 0 calc(clamp(10px,2dvh,22px) + 1cm + 1in);
+  margin:0 0 calc(clamp(10px,2dvh,22px) + 1cm + .5in);
   order:0;
 }
 .home-dashboard .home-welcome-actions h1 {
@@ -5999,7 +5999,7 @@ html { scrollbar-gutter:stable; }
   max-width:100%;
   max-height:min(480px,60dvh);
   border-radius:var(--radius);
-  border:8px solid #000;
+  border:9px solid #000;
   background-color:#000;
   outline:0;
   box-shadow:none;
@@ -6115,7 +6115,7 @@ html { scrollbar-gutter:stable; }
     padding-top:calc(clamp(4px,1.5dvh,16px) + 1cm + clamp(0px,12svh - 116px,14px));
   }
   .home-page.home-dashboard > .home-welcome {
-    margin-bottom:calc(clamp(10px,2dvh,22px) + 1cm + clamp(0px,32svh - 312px,38px) + clamp(0px,30svh - 288px,1in));
+    margin-bottom:calc(clamp(10px,2dvh,22px) + 1cm + clamp(0px,32svh - 312px,38px) + clamp(0px,15svh - 144px,.5in));
   }
   .home-page.home-dashboard:has(.daily-meme) {
     grid-template-columns:minmax(0,1fr) minmax(0,.88fr) minmax(0,1.58fr);
@@ -6138,7 +6138,7 @@ html { scrollbar-gutter:stable; }
   }
   .home-page.home-dashboard > .home-welcome {
     grid-template-columns:clamp(72px,12svh,120px) minmax(0,1fr);
-    margin-bottom:calc(clamp(6px,1.2svh,12px) + clamp(14px,20svh - 126px,38px) + clamp(0px,48svh - 346px,1in));
+    margin-bottom:calc(clamp(6px,1.2svh,12px) + clamp(14px,20svh - 126px,38px) + clamp(0px,24svh - 173px,.5in));
   }
   .home-dashboard .home-welcome-actions h1 { font-size:clamp(1.5rem,4svh,2.4rem); }
   .home-dashboard .home-welcome .new-game-primary { min-height:48px; padding-block:8px; }
