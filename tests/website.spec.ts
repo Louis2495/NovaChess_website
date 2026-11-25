@@ -442,9 +442,9 @@ test("Profile saves username, bio and avatar; defaults are auto-queen off and pr
   await expect(
     page.getByRole("heading", { name: "Sharing", exact: true }),
   ).toHaveCount(0);
-  await page.goto("/#community");
+  await page.goto("/#players");
   await expect(
-    page.getByText("Not connected yet.", { exact: true }),
+    page.getByText("Sign in to find players and see your friends list.", { exact: true }),
   ).toBeVisible();
 });
 
@@ -507,13 +507,16 @@ test("default dark views and customization dialog pass automated WCAG checks", a
     "/#analysis",
     "/#puzzles",
     "/#learn",
-    "/#community",
+    "/#players",
     "/#play",
     "/#variants",
     "/#stats",
   ]) {
     await page.goto(route);
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    const heading = route === "/#players"
+      ? page.getByRole("heading", { name: "Players", exact: true })
+      : page.getByRole("heading", { level: 1 });
+    await expect(heading).toBeVisible();
     if (route.includes("puzzles"))
       await expect(
         page.getByRole("group", { name: "Chessboard", exact: true }),
@@ -576,11 +579,12 @@ for (const variant of [
     test.setTimeout(45000);
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.goto(variant === "chess" ? "/#play" : "/#variants");await page.getByRole("button",{name:"Computer",exact:true}).click();
-    await page
-      .getByRole("button", { name: "Game options", exact: true })
-      .click();
-    if(variant !== "chess") await page.getByLabel("Variant", { exact: true }).selectOption(variant);
+    await page.goto(variant === "chess" ? "/#play" : "/#variants");
+    await page.getByRole("button", { name: "Computer", exact: true }).click();
+    if (variant !== "chess") {
+      await page.getByRole("button", { name: "Game options", exact: true }).click();
+      await page.getByLabel("Variant", { exact: true }).selectOption(variant);
+    }
     await page.getByRole("button", { name: "Start game", exact: true }).click();
     await expect(
       page.getByRole("group", { name: "Chessboard", exact: true }).first(),
