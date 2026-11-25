@@ -45,12 +45,12 @@ test.describe('responsive meme layout', () => {
    await image.scrollIntoViewIfNeeded();
    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBe(width);
    await expect(card).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-   await expect(image).toHaveCSS('border-width', '15px');
+   await expect(image).toHaveCSS('border-width', '8px');
    await expect(image).toHaveCSS('border-color', 'rgb(0, 0, 0)');
    await expect(image).toHaveCSS('box-shadow', 'none');
    const frame = (await card.boundingBox())!;
    const art = (await image.boundingBox())!;
-   expect((art.width - 30) / (art.height - 30)).toBeCloseTo(width / height, 2);
+   expect((art.width - 16) / (art.height - 16)).toBeCloseTo(width / height, 2);
    expect(art.width).toBeLessThanOrEqual(frame.width);
    expect(art.height).toBeLessThanOrEqual(frame.height);
    if (width === height) {
@@ -66,7 +66,7 @@ test.describe('responsive meme layout', () => {
      context.drawImage(snapshot, 0, 0);
      const x = Math.floor(canvas.width / 2);
      const y = Math.floor(canvas.height / 2);
-     return [[x, 12], [x, canvas.height - 13], [12, y], [canvas.width - 13, y]]
+     return [[x, 6], [x, canvas.height - 7], [6, y], [canvas.width - 7, y]]
       .map(([column, row]) => Array.from(context.getImageData(column, row, 1, 1).data));
     }, screenshot.toString('base64'));
     expect(edges).toEqual(Array.from({length:4}, () => [0, 0, 0, 255]));
