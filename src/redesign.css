@@ -5981,17 +5981,22 @@ html { scrollbar-gutter:stable; }
   font-weight:800;
 }
 .home-page.home-dashboard .home-practice-grid .daily-meme {
-  position:relative;
+  display:grid;
+  place-items:center;
   margin:0;
+  height:auto;
   max-width:none;
   align-self:stretch;
-  border-radius:var(--radius);
+  background:transparent;
+  border:0;
 }
-.home-page.home-dashboard .home-practice-grid .daily-meme-image {
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
+.home-page.home-dashboard .home-practice-grid .daily-meme .daily-meme-image {
+  position:static;
+  width:auto;
+  height:auto;
+  max-width:100%;
+  max-height:min(480px,60dvh);
+  border-radius:var(--radius);
 }
 .home-page.home-dashboard > .home-recent {
   margin:0;
@@ -6104,7 +6109,6 @@ html { scrollbar-gutter:stable; }
     grid-template-columns:minmax(0,1fr) minmax(0,.88fr) minmax(0,1.58fr);
   }
   .home-page.home-dashboard > .home-practice-grid { display:contents; }
-  .home-page.home-dashboard:has(.daily-meme) .daily-meme { height:auto; }
   .home-page.home-dashboard:has(.daily-meme) > .home-recent { grid-column:3; }
   .home-page.home-dashboard:not(:has(.daily-meme)) { grid-template-columns:minmax(0,1fr) minmax(0,1.8fr); }
   .home-dashboard > .home-extras { grid-template-columns:subgrid; column-gap:normal; }

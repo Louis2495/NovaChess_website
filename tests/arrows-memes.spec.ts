@@ -27,3 +27,31 @@ test('Show memes defaults on, persists off and leaves a full dashboard',async({p
  await page.goto('/');
  await expect(page.locator('.daily-meme')).toBeVisible();
 });
+
+test.describe('responsive meme layout', () => {
+ test.use({ serviceWorkers: 'block' });
+ test('Home fits wide, square and tall memes without a white frame', async ({ page }) => {
+  for (const [width, height] of [[900, 250], [600, 600], [280, 1100]]) {
+   await page.route('**/memes/candidates.json', route => route.fulfill({ json: [{
+    id: 'test-meme', image: 'test-meme.svg', alt: 'Test chess meme', width, height, status: 'approved',
+   }] }));
+   await page.route('**/memes/test-meme.svg', route => route.fulfill({
+    contentType: 'image/svg+xml',
+    body: `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect width="100%" height="100%" fill="purple"/></svg>`,
+   }));
+   await page.goto('/');
+   const card = page.getByRole('region', { name: 'Chess meme' });
+   const image = card.getByRole('img');
+   await image.scrollIntoViewIfNeeded();
+   await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBe(width);
+   await expect(card).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+   const frame = (await card.boundingBox())!;
+   const art = (await image.boundingBox())!;
+   expect(art.width / art.height).toBeCloseTo(width / height, 2);
+   expect(art.width).toBeLessThanOrEqual(frame.width);
+   expect(art.height).toBeLessThanOrEqual(frame.height);
+   await page.unrouteAll({ behavior: 'wait' });
+  }
+ });
+
+});
