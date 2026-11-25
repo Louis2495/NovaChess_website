@@ -5982,10 +5982,11 @@ html { scrollbar-gutter:stable; }
   font-weight:800;
 }
 .home-page.home-dashboard .home-practice-grid .daily-meme {
+  --meme-frame-width:4px;
   display:grid;
   place-items:center;
   margin:0;
-  padding:3px;
+  padding:var(--meme-frame-width);
   height:auto;
   max-width:none;
   align-self:stretch;
@@ -5999,7 +6000,7 @@ html { scrollbar-gutter:stable; }
   max-width:100%;
   max-height:min(480px,60dvh);
   border-radius:var(--radius);
-  outline:3px solid #000;
+  outline:var(--meme-frame-width) solid #000;
 }
 .home-page.home-dashboard > .home-recent {
   margin:0;
@@ -6132,7 +6133,7 @@ html { scrollbar-gutter:stable; }
     margin-bottom:clamp(6px,1.2svh,12px);
   }
   .home-page.home-dashboard .home-practice-grid .daily-meme .daily-meme-image {
-    max-height:calc(clamp(240px,49svh,420px) - 6px);
+    max-height:calc(clamp(240px,49svh,420px) - 2 * var(--meme-frame-width));
   }
   .home-dashboard :is(.home-app,.home-free,.home-featured) { padding:12px; }
   .home-dashboard .home-app-group .home-app { flex-direction:row; align-items:center; gap:10px; }
